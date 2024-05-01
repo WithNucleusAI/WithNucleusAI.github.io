@@ -4,7 +4,7 @@ const phrases = [
     "The fathers and the prodigies of AI have united, to help AI reach singularity.",
     //"Perceptive, Creative, Efficient and Self-Evolving Intelligence.",
     "NUCLEUS AI",
-    "NUCLEUS. General Intelligence"
+    "NUCLEUS."
 ];
 const prefix = [0,0,0,0,0,0];
 const commaOverrides = {
@@ -35,6 +35,7 @@ let isTyping = true;
 const textElement = document.getElementById('text');
 const cursorElement = document.querySelector('.cursor');
 const emailElement = document.getElementById('email');
+const captionElement = document.getElementById('caption');
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -52,7 +53,7 @@ async function typeWriter() {
     const currentPhrase = phrases[currentPhraseIndex];
     if (currentPhraseIndex === phrases.length - 2) deletingSpeed = 65;
     if (isTyping) { 
-        if (currentPhraseIndex === phrases.length - 2) textElement.style.fontSize = '3rem';
+        if (currentPhraseIndex === phrases.length - 2) textElement.style.fontSize = '4rem';
 
         let charToAdd = currentPhrase.charAt(letterIndex);
         letterIndex++;
@@ -87,7 +88,10 @@ async function typeWriter() {
         } else {
             if (currentPhraseIndex === phrases.length - 1) {
                 // cursorElement.style.opacity = '0'; // Hide cursor after typing the last phrase
-                emailElement.style.animationDelay = '1s'; // Start email animation immediately after showing Nucleus AI
+                captionElement.style.animationDelay = '1s'; // Start caption animation 1s after showing Nucleus AI
+                captionElement.classList.add('fadeInAnimation');
+
+                emailElement.style.animationDelay = '2s'; // Start email animation 5s after showing caption
                 emailElement.classList.add('dropDownAnimation');
             } else {
                 isTyping = false;

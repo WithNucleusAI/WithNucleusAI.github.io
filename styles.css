@@ -25,6 +25,12 @@ body {
     opacity: 0;
 }
 
+#caption {
+    font-size: 2.5rem;
+    font-weight: 500;
+    opacity: 0;
+}
+
 .fadeInAnimation {
     animation: fadeIn 2s ease-in forwards;
 }
@@ -65,7 +71,7 @@ body {
         font-size: 5vw; /* Bigger text on smaller screens */
     }
 
-    #typing, #email {
-        font-size: 1.5rem; /* Smaller base size for small devices */
+    #typing, #email, #caption {
+        font-size: 1.2rem; /* Smaller base size for small devices */
     }
 }
