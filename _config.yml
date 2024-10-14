@@ -1,3 +1,5 @@
 include:
   - ".well-known"
+  - "_pages"
+  - "_pages/well-known"
 verbose: true
