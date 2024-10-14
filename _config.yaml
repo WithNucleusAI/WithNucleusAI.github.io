@@ -1,0 +1,2 @@
+include:
+  - .well-known/microsoft-identity-association.json
