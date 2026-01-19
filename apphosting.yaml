@@ -1,0 +1,7 @@
+# apphosting.yaml
+env:
+  - variable: NEXT_PUBLIC_ENV
+    value: dev
+    availability:
+      - BUILD
+      - RUNTIME
