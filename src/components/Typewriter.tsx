@@ -7,11 +7,10 @@ const phrases = [
     "Intelligence isn’t compressed memory, it’s the ability to find those answers in the wind.",
     "The fathers and the prodigies of AI have united, to help AI reach singularity.",
     //"Perceptive, Creative, Efficient and Self-Evolving Intelligence.",
-    "NUCLEUS AI",
     "NUCLEUS.",
 ];
 
-const prefix = [0, 0, 0, 0, 0, 0];
+const prefix = [0, 0, 0, 0];
 const commaOverrides: { [key: number]: { [key: number]: number } } = {
     0: {
         10: 0,
@@ -68,11 +67,7 @@ export default function Typewriter() {
             const currentPhrase = phrases[currentPhraseIndex];
             let letterIndex = letterIndexRef.current;
 
-            if (currentPhraseIndex === phrases.length - 2) {
-                deletingSpeedRef.current = 65;
-                // Font size change logic was here in legacy: textElement.style.fontSize = '4rem';
-                // We will handle this via CSS class or conditional styling in render
-            }
+            // Removed font size change logic - keeping consistent sizing
 
             if (isTypingRef.current) {
                 let charToAdd = currentPhrase.charAt(letterIndex);
@@ -219,7 +214,7 @@ export default function Typewriter() {
 
     return (
         <>
-            <div id="typing">
+            <div id="typing" className={text === "NUCLEUS." ? "final-text" : ""}>
                 <span id="text" dangerouslySetInnerHTML={{ __html: text }}></span>
                 <span className="cursor"></span>
             </div>
@@ -235,12 +230,7 @@ export default function Typewriter() {
                     General Intelligence
                 </span>
             </div>
-            <style jsx>{`
-         /* Dynamic font size for the specific phrase */
-         #text {
-             font-size: ${text === "NUCLEUS AI" || text === "NUCLEUS." ? "4rem" : "inherit"};
-         }
-      `}</style>
+
         </>
     );
     // Note: legacy code changed font size for "NUCLEUS AI" and "NUCLEUS." (phrases.length - 2)

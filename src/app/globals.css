@@ -93,6 +93,11 @@ nav a:hover {
   letter-spacing: -0.03em;
   min-height: 3rem;
   max-width: 90%;
+  transition: font-size 0.3s ease;
+}
+
+#typing.final-text {
+  font-size: 3.5rem;
 }
 
 #email {
@@ -106,10 +111,12 @@ nav a:hover {
 }
 
 #caption {
-  font-size: 2.5rem;
-  font-weight: 500;
+  font-size: 1.5rem;
+  font-weight: 400;
   opacity: 0;
   display: block;
+  margin-top: 1rem;
+  color: #666;
 }
 
 .fadeInAnimation {
@@ -121,8 +128,14 @@ nav a:hover {
 }
 
 @keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% { 
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% { 
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes dropDown {
@@ -137,12 +150,12 @@ nav a:hover {
 }
 
 .cursor {
-  border-right: 3px solid black;
+  border-right: 0.1em solid black; /* Scales with font size */
   animation: blink 1s step-end infinite;
   display: inline-block;
-  vertical-align: bottom;
-  height: 1.1em;
-  margin-bottom: 0.2em;
+  vertical-align: baseline; /* Better alignment */
+  height: 0.8em;
+  margin-left: 0.1em; /* Slight gap from text */
 }
 
 @keyframes blink {
@@ -167,6 +180,14 @@ nav a:hover {
 
   #typing {
       font-size: 1.75rem;
+  }
+
+  #typing.final-text {
+      font-size: 2.5rem;
+  }
+
+  #caption {
+      font-size: 1.2rem;
   }
 
   #email {

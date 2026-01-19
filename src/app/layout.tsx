@@ -45,6 +45,20 @@ export default function RootLayout({
             <Link href="/" className="logo">
               <Image src="/logo.png" alt="Nucleus AI Logo" width={40} height={40} className="logo-img" />
               <span className="logo-text">Nucleus AI</span>
+              {process.env.NODE_ENV === "development" && (
+                <span style={{
+                  fontSize: "0.8rem",
+                  background: "#ff4444",
+                  color: "white",
+                  padding: "2px 6px",
+                  borderRadius: "4px",
+                  marginLeft: "8px",
+                  fontWeight: "bold",
+                  verticalAlign: "middle"
+                }}>
+                  DEV
+                </span>
+              )}
             </Link>
           </div>
           <nav>
