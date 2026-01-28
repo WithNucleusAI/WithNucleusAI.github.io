@@ -6,6 +6,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import "katex/dist/katex.min.css"; // Import Katex CSS
 
+// Force static generation (SSG)
+export const dynamic = 'force-static';
+export const revalidate = false;
+
 // Generate static params for SSG
 export async function generateStaticParams() {
     const posts = await getPosts();

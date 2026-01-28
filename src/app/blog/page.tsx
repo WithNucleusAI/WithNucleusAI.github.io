@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { getPosts } from "@/lib/posts";
 
+// Force static generation (SSG)
+export const dynamic = 'force-static';
+export const revalidate = false;
+
 export default async function BlogPage() {
     const posts = await getPosts();
 
