@@ -1,10 +1,7 @@
 import { getPostBySlug, getPosts } from "@/lib/posts";
 import type { Metadata } from "next";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
-import rehypeKatex from "rehype-katex";
-import TableOfContents from "@/components/TableOfContents";
+import CollapsibleToc from "@/components/CollapsibleToc";
+import BlogContent from "@/components/BlogContent";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import "katex/dist/katex.min.css"; // Import Katex CSS
@@ -61,44 +58,20 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
         notFound();
     }
 
-    // Custom renderer to add IDs to headings for TOC
-    const components = {
-        h2: ({ children }: any) => {
-            const id = children?.toString().toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
-            return <h2 id={id}>{children}</h2>;
-        },
-        h3: ({ children }: any) => {
-            const id = children?.toString().toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
-            return <h3 id={id}>{children}</h3>;
-        },
-    };
-
     return (
-        <div className="blog-post-container">
-            <Link href="/blog" className="back-link">
-                ← Back to Blog
+        <div className="max-w-[1200px] mx-auto py-10 px-4 sm:py-16 sm:px-8 text-left w-full box-border">
+            <Link href="/blog" className="inline-flex items-center mb-6 sm:mb-8 no-underline text-[#666] text-[0.8rem] sm:text-[0.85rem] font-medium transition-colors duration-200 hover:text-black">
+                ← Back to Blogs
             </Link>
 
-            <header className="post-header">
-                <h1>{post.title}</h1>
-                <p className="post-date">{post.date}</p>
+            <header className="mb-10 sm:mb-16 text-center flex flex-col items-center max-w-[800px] mx-auto">
+                <h1 className="mb-4 text-[2.2rem] sm:text-[3.5rem] leading-tight tracking-tight font-bold">{post.title}</h1>
+                <p className="text-sm sm:text-base text-[#888]">{post.date}</p>
             </header>
 
-            <div className="post-layout">
-                <aside className="post-sidebar">
-                    <TableOfContents content={post.content} />
-                </aside>
-
-                <main className="post-content">
-                    <ReactMarkdown
-                        components={components}
-                        remarkPlugins={[remarkGfm, remarkMath]}
-                        rehypePlugins={[rehypeKatex]}
-                    >
-                        {post.content}
-                    </ReactMarkdown>
-                </main>
-            </div>
+            <CollapsibleToc content={post.content}>
+                <BlogContent content={post.content} />
+            </CollapsibleToc>
         </div>
     );
 }
