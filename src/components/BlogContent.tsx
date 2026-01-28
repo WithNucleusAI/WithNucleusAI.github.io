@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';  // Add useMemo import
+import { useState, useMemo, type ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -9,6 +9,52 @@ import ImageViewer from './ImageViewer';
 
 interface BlogContentProps {
     content: string;
+}
+
+function CodeBlock({ children }: { children: ReactNode }) {
+    const [copied, setCopied] = useState(false);
+
+    const copyText = async (text: string) => {
+        if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            return;
+        }
+
+        if (typeof document === 'undefined') {
+            return;
+        }
+
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+    };
+
+    const handleCopy = () => {
+        const codeElement: any = (children as any)?.props?.children;
+        const code = typeof codeElement === 'string' ? codeElement : codeElement?.toString() || '';
+        void copyText(code);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    return (
+        <div className="relative group">
+            <button
+                onClick={handleCopy}
+                className="absolute right-2 top-2 px-3 py-1.5 text-xs bg-[#333] text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-[#444] z-10"
+                aria-label="Copy code"
+            >
+                {copied ? 'Copied!' : 'Copy'}
+            </button>
+            <pre>{children}</pre>
+        </div>
+    );
 }
 
 export default function BlogContent({ content }: BlogContentProps) {
@@ -34,10 +80,6 @@ export default function BlogContent({ content }: BlogContentProps) {
         }
     };
 
-    const handleCopyCode = (code: string) => {
-        navigator.clipboard.writeText(code);
-    };
-
     // Custom renderer to add IDs to headings for TOC and make images clickable
     const components = {
         h2: ({ children }: any) => {
@@ -61,30 +103,7 @@ export default function BlogContent({ content }: BlogContentProps) {
         a: ({ href, children }: any) => {
             return <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>;
         },
-        pre: ({ children }: any) => {
-            const [copied, setCopied] = useState(false);
-            
-            const handleCopy = () => {
-                const codeElement = children?.props?.children;
-                const code = typeof codeElement === 'string' ? codeElement : codeElement?.toString() || '';
-                navigator.clipboard.writeText(code);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-            };
-
-            return (
-                <div className="relative group">
-                    <button
-                        onClick={handleCopy}
-                        className="absolute right-2 top-2 px-3 py-1.5 text-xs bg-[#333] text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-[#444] z-10"
-                        aria-label="Copy code"
-                    >
-                        {copied ? 'Copied!' : 'Copy'}
-                    </button>
-                    <pre>{children}</pre>
-                </div>
-            );
-        },
+        pre: CodeBlock,
     };
 
     return (
