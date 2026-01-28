@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, type ReactNode } from 'react';
+import { useState, useMemo, type ReactNode, type ComponentProps } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -11,7 +11,7 @@ interface BlogContentProps {
     content: string;
 }
 
-function CodeBlock({ children }: { children: ReactNode }) {
+function CodeBlock({ children, ...rest }: ComponentProps<'pre'>) {
     const [copied, setCopied] = useState(false);
 
     const copyText = async (text: string) => {
@@ -36,7 +36,7 @@ function CodeBlock({ children }: { children: ReactNode }) {
     };
 
     const handleCopy = () => {
-        const codeElement: any = (children as any)?.props?.children;
+        const codeElement: any = (children as ReactNode as any)?.props?.children;
         const code = typeof codeElement === 'string' ? codeElement : codeElement?.toString() || '';
         void copyText(code);
         setCopied(true);
@@ -52,7 +52,7 @@ function CodeBlock({ children }: { children: ReactNode }) {
             >
                 {copied ? 'Copied!' : 'Copy'}
             </button>
-            <pre>{children}</pre>
+            <pre {...rest}>{children}</pre>
         </div>
     );
 }
