@@ -2,12 +2,20 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import "./globals.css";
 import Image from "next/image";
-import {Courier_Prime as  Outfit } from "next/font/google";
+import { IBM_Plex_Mono, Inconsolata } from "next/font/google";
 import ScrollToTop from "@/components/ScrollToTop";
 
-const outfit = Outfit({ subsets: ["latin"] , weight: ["400", "700"] }
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-base",
+});
 
-);
+const inconsolata = Inconsolata({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  variable: "--font-code",
+});
 
 export const viewport: Viewport = {
   themeColor: "#ffffff",
@@ -41,7 +49,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${outfit.className} text-[rgb(10,10,10)] bg-white flex flex-col items-center text-center min-h-screen m-0 p-0 overflow-x-hidden`}>
+      <body className={`${plexMono.variable} ${inconsolata.variable} text-[rgb(10,10,10)] bg-white flex flex-col items-center text-center min-h-screen m-0 p-0 overflow-x-hidden`}>
         <header className="relative w-full px-4 py-4 sm:px-8 sm:py-6 flex justify-between items-center box-border z-50 bg-transparent">
           <div className="logo-container">
             <Link href="/" className="flex items-center gap-2 sm:gap-3 no-underline text-inherit font-bold text-lg sm:text-xl transition-opacity duration-200 hover:opacity-80">

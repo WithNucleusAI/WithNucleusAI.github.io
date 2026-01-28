@@ -27,9 +27,9 @@ This post walks through the theory, engineering decisions, and kernel optimizati
 
 Since ResNet (2015) and the original Transformer (2017), deep networks have relied on the simple residual formula:
 
-```
-x[l+1] = x[l] + F(x[l])
-```
+$$
+x_{l+1} = x_l + F(x_l)
+$$
 
 This "identity mapping" ensures gradients flow through arbitrarily deep networks without vanishing. It's elegant, simple, and has powered every major language model from GPT to LLaMA.
 
@@ -75,35 +75,34 @@ Why does this work? A doubly stochastic matrix is like a "probability redistribu
 The mHC layer implements three operations:
 
 **Equation 10 — Pre-mixing** (weighted combination of streams):
-
-```
-branch_input = Σₙ H_pre[n] · H[n]
-```
+$$
+\text{branch\_input} = \sum_n H_{\text{pre}}[n] \cdot H[n]
+$$
 
 **Equation 11 — Residual mixing** (doubly stochastic transform):
 
-```
-H_residual[n] = Σₘ H_res[n,m] · H[m]
-```
+$$
+H_{\text{residual}}[n] = \sum_m H_{\text{res}}[n,m] \cdot H[m]
+$$
 
 **Equation 12 — Post-distribution** (route output back to streams):
 
-```
-H_new[n] = H_residual[n] + H_post[n] · branch_output
-```
+$$
+H_{\text{new}}[n] = H_{\text{residual}}[n] + H_{\text{post}}[n] \cdot \text{branch\_output}
+$$
 
 Where:
-- `H_pre` — normalized weights for combining streams into layer input
-- `H_res` — doubly stochastic 4×4 matrix (via Sinkhorn-Knopp)
-- `H_post` — distribution weights for routing output back
+- $H_{\text{pre}}$ — normalized weights for combining streams into layer input
+- $H_{\text{res}}$ — doubly stochastic 4×4 matrix (via Sinkhorn-Knopp)
+- $H_{\text{post}}$ — distribution weights for routing output back
 
 ### Dynamic Weights (Equations 14-19)
 
 The mixing weights aren't static—they're computed from the input via a learned projection:
 
-```
-x (mean-pooled hidden) → φ·x → RMSNorm → Scale+Bias → Activations → Sinkhorn → H_pre, H_post, H_res
-```
+$$
+x_{\text{pool}} \rightarrow \phi x \rightarrow \mathrm{RMSNorm} \rightarrow \text{Scale+Bias} \rightarrow \text{Activations} \rightarrow \text{Sinkhorn} \rightarrow H_{\text{pre}}, H_{\text{post}}, H_{\text{res}}
+$$
 
 This makes the architecture **input-dependent**: different inputs can take different paths through the network.
 

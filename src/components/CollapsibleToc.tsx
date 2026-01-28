@@ -85,7 +85,7 @@ export default function CollapsibleToc({ content, children }: CollapsibleTocProp
                     className={tocButtonClassName}
                     onClick={() => setIsOpen((open) => !open)}
                 >
-                    <span className="leading-none flex items-center   justify-center">☰</span>
+                    <span className="leading-none flex items-center pb-1  justify-center">☰</span>
                 </button>
             )}
 
