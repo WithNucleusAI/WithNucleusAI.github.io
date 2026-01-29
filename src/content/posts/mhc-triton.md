@@ -1,8 +1,4 @@
----
-title: "mHC-Triton: Building a 6× Faster Kernel for DeepSeek's Hyper-Connections"
-date: "2026-01-28"
-excerpt: "A deep dive into implementing Manifold-Constrained Hyper-Connections with fused Triton kernels—achieving 6.2× faster training and 1.3× memory savings."
----
+# mHC-Triton: Building a 6× Faster Kernel for DeepSeek's Hyper-Connections
 
 *A deep dive into implementing Manifold-Constrained Hyper-Connections with fused Triton kernels*
 
@@ -21,15 +17,26 @@ This post walks through the theory, engineering decisions, and kernel optimizati
 
 ---
 
+## Table of Contents
+
+1. [The Residual Bottleneck Problem](#1-the-residual-bottleneck-problem)
+2. [DeepSeek's mHC Solution](#2-deepseeks-mhc-solution)
+3. [Engineering the Triton Kernels](#3-engineering-the-triton-kernels)
+4. [Benchmarks & Results](#4-benchmarks--results)
+5. [Usage Guide](#5-usage-guide)
+6. [Conclusion](#6-conclusion)
+
+---
+
 ## 1. The Residual Bottleneck Problem
 
 ### The Legacy of Identity Mapping
 
 Since ResNet (2015) and the original Transformer (2017), deep networks have relied on the simple residual formula:
 
-$$
-x_{l+1} = x_l + F(x_l)
-$$
+```
+x[l+1] = x[l] + F(x[l])
+```
 
 This "identity mapping" ensures gradients flow through arbitrarily deep networks without vanishing. It's elegant, simple, and has powered every major language model from GPT to LLaMA.
 
@@ -67,42 +74,43 @@ Why does this work? A doubly stochastic matrix is like a "probability redistribu
 - But it **cannot amplify** the total signal magnitude
 - The constraint is differentiable and learnable
 
-![Sinkhorn Convergence](/images/mhc-triton/sinkhorn_convergence.svg)
+![Sinkhorn Convergence](sinkhorn_convergence.svg)
 *The Sinkhorn-Knopp algorithm converges to a doubly stochastic matrix by alternating row and column normalization.*
 
-### The Three Core Equations
+### The Three Core Operations
 
 The mHC layer implements three operations:
 
-**Equation 10 — Pre-mixing** (weighted combination of streams):
-$$
-\text{branch\_input} = \sum_n H_{\text{pre}}[n] \cdot H[n]
-$$
+**Pre-mixing** (weighted combination of streams):
 
-**Equation 11 — Residual mixing** (doubly stochastic transform):
+```
+branch_input = Σₙ H_pre[n] · H[n]
+```
 
-$$
-H_{\text{residual}}[n] = \sum_m H_{\text{res}}[n,m] \cdot H[m]
-$$
+**Residual mixing** (doubly stochastic transform):
 
-**Equation 12 — Post-distribution** (route output back to streams):
+```
+H_residual[n] = Σₘ H_res[n,m] · H[m]
+```
 
-$$
-H_{\text{new}}[n] = H_{\text{residual}}[n] + H_{\text{post}}[n] \cdot \text{branch\_output}
-$$
+**Post-distribution** (route output back to streams):
+
+```
+H_new[n] = H_residual[n] + H_post[n] · branch_output
+```
 
 Where:
-- $H_{\text{pre}}$ — normalized weights for combining streams into layer input
-- $H_{\text{res}}$ — doubly stochastic 4×4 matrix (via Sinkhorn-Knopp)
-- $H_{\text{post}}$ — distribution weights for routing output back
+- `H_pre` — normalized weights for combining streams into layer input
+- `H_res` — doubly stochastic 4×4 matrix (via Sinkhorn-Knopp)
+- `H_post` — distribution weights for routing output back
 
-### Dynamic Weights (Equations 14-19)
+### Dynamic Weights
 
 The mixing weights aren't static—they're computed from the input via a learned projection:
 
-$$
-x_{\text{pool}} \rightarrow \phi x \rightarrow \mathrm{RMSNorm} \rightarrow \text{Scale+Bias} \rightarrow \text{Activations} \rightarrow \text{Sinkhorn} \rightarrow H_{\text{pre}}, H_{\text{post}}, H_{\text{res}}
-$$
+```
+x (mean-pooled hidden) → φ·x → RMSNorm → Scale+Bias → Activations → Sinkhorn → H_pre, H_post, H_res
+```
 
 This makes the architecture **input-dependent**: different inputs can take different paths through the network.
 
@@ -125,10 +133,10 @@ A naive PyTorch implementation launches many small kernels, each reading from an
 
 Key insight: **fuse everything possible into single kernel launches**.
 
-![Kernel Fusion Comparison](/images/mhc-triton/kernel_fusion.svg)
+![Kernel Fusion Comparison](kernel_fusion.svg)
 *Left: Multiple kernel launches with memory round-trips. Right: Single fused kernel.*
 
-The `_fused_dynamic_weights_kernel` computes Equations 14-19 in **one pass**:
+The `_fused_dynamic_weights_kernel` computes all these steps in **one pass**:
 
 ```python
 # Single kernel does ALL of this:
@@ -159,7 +167,7 @@ def _fused_dynamic_weights_kernel(
 
 A 4×4 matrix has only 16 elements. This fits perfectly in GPU registers!
 
-![Register Matrix](/images/mhc-triton/register_matrix.svg)
+![Register Matrix](register_matrix.svg)
 *16 scalar registers hold the entire matrix—no shared memory needed.*
 
 ```python
@@ -197,7 +205,7 @@ phi1 = tl.load(phi_t_ptr + 1 * in_dim + k_offs, mask=k_mask)
 
 The Sinkhorn-Knopp algorithm runs T iterations (typically T=20). A naive backward pass would store all T intermediate matrices—that's 20× memory overhead.
 
-![Recomputation Strategy](/images/mhc-triton/recomputation_strategy.svg)
+![Recomputation Strategy](recomputation_strategy.svg)
 *Left: Store all intermediates. Right: Recompute on demand.*
 
 Approach: **store only the original input, recompute forward states during backward**.
@@ -247,7 +255,7 @@ All benchmarks run on NVIDIA H100 80GB HBM3 with batch=16, seq=2048, dim=4096.
 
 ### Speed Comparison
 
-![Benchmark Speed](/images/mhc-triton/benchmark_speed.svg)
+![Benchmark Speed](benchmark_speed.svg)
 
 | Operation | PyTorch | Triton | Speedup |
 |-----------|---------|--------|---------|
@@ -261,7 +269,7 @@ The stream mixing kernel shows the largest speedup (8.6×) because it benefits m
 
 ### Memory Comparison
 
-![Memory Comparison](/images/mhc-triton/memory_comparison.svg)
+![Memory Comparison](memory_comparison.svg)
 
 | Operation | PyTorch | Triton | Savings |
 |-----------|---------|--------|---------|
@@ -270,21 +278,22 @@ The stream mixing kernel shows the largest speedup (8.6×) because it benefits m
 
 The recomputation strategy provides 1.8× memory savings on Sinkhorn alone. Combined savings across the full pass are 1.3×.
 
-### Overhead vs Simple Residual
-
-![Overhead Comparison](/images/mhc-triton/overhead_comparison.svg)
-
-| Method | Time | Memory |
-|--------|------|--------|
-| Simple Residual | 4.01ms | 5184.0MB |
-| HyperConnection (Triton) | 13.66ms | 6162.8MB |
-| **Overhead** | **3.4×** | **1.2×** |
-
-The 3.4× time overhead is the cost of richer, learnable residual connections. For applications where model quality matters more than raw throughput, this is an acceptable trade-off.
-
 ### Residual Stream Gain Analysis
 
 A key validation of mHC's stability: the composite amax gain magnitudes of the residual streams remain bounded during training. The doubly stochastic constraint prevents the exponential amplification that plagued unconstrained hyper-connections.
+
+<div style="display:flex;gap:20px;justify-content:center;">
+  <div style="text-align:center;">
+    <strong>Forward Gain</strong><br>
+    <img src="forward_amax_gain.svg" alt="Forward Gain">
+  </div>
+  <div style="text-align:center;">
+    <strong>Backward Gain</strong><br>
+    <img src="backward_amax_gain.svg" alt="Backward Gain">
+  </div>
+</div>
+
+These visualizations confirm that both forward and backward passes maintain stable gain magnitudes across layers—a direct result of the Birkhoff polytope constraint.
 
 ---
 
@@ -325,7 +334,9 @@ H_new = add_residual(branch_output)
 
 ### Architecture Overview
 
-![Architecture Diagram](/images/mhc-triton/architecture_diagram.svg)
+<p align="center">
+  <img src="mhc-architecture-diagram.svg" alt="Architecture Diagram" width="520">
+</p>
 
 The flow is:
 1. **H** (hyper-hidden) enters the module
@@ -381,13 +392,13 @@ from mhc import (
 M = torch.randn(batch, 4, 4, device='cuda')
 P = sinkhorn_knopp(M, num_iters=20)  # P.sum(dim=-1) ≈ P.sum(dim=-2) ≈ 1
 
-# Stream mixing (Eq. 10-11)
+# Stream mixing
 branch_input, H_residual = fused_stream_mix(H, H_pre, H_res)
 
-# Residual addition (Eq. 12)
+# Residual addition
 H_new = fused_add_residual(H_residual, branch_output, H_post)
 
-# Dynamic weight computation (Eq. 14-19)
+# Dynamic weight computation
 H_pre, H_post, H_res = fused_dynamic_weights(
     x, phi, bias, alpha_pre, alpha_post, alpha_res
 )
@@ -454,3 +465,4 @@ The code is open source. We welcome contributions, bug reports, and discussions!
 ---
 
 *Created by [NucleusAI](https://github.com/WithNucleusAI). If you found this useful, please star the repo!*
+
