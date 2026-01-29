@@ -286,16 +286,11 @@ The recomputation strategy provides 1.8× memory savings on Sinkhorn alone. Comb
 
 A key validation of mHC's stability: the composite amax gain magnitudes of the residual streams remain bounded during training. The doubly stochastic constraint prevents the exponential amplification that plagued unconstrained hyper-connections.
 
-<div style="display:flex;gap:20px;justify-content:center;">
-  <div style="text-align:center;">
-    <strong>Forward Gain</strong><br>
-    <img src="/images/mhc-triton/forward_amax_gain.svg" alt="Forward Gain">
-  </div>
-  <div style="text-align:center;">
-    <strong>Backward Gain</strong><br>
-    <img src="/images/mhc-triton/backward_amax_gain.svg" alt="Backward Gain">
-  </div>
-</div>
+![Forward Gain](/images/mhc-triton/forward_amax_gain.svg)
+*Composite forward gain across all layers.*
+
+![Backward Gain](/images/mhc-triton/backward_amax_gain.svg)
+*Composite backward gain across all layers.*
 
 These visualizations confirm that both forward and backward passes maintain stable gain magnitudes across layers—a direct result of the Birkhoff polytope constraint.
 
@@ -338,9 +333,7 @@ H_new = add_residual(branch_output)
 
 ### Architecture Overview
 
-<p align="center">
-  <img src="/images/mhc-triton/mhc-architecture-diagram.svg" alt="Architecture Diagram" width="520">
-</p>
+![Architecture Diagram](/images/mhc-triton/mhc-architecture-diagram.svg)
 
 The flow is:
 1. **H** (hyper-hidden) enters the module
