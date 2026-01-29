@@ -5,6 +5,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { prism } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import ImageViewer from './ImageViewer';
 
 interface BlogContentProps {
@@ -44,10 +46,10 @@ function CodeBlock({ children, ...rest }: ComponentProps<'pre'>) {
     };
 
     return (
-        <div className="relative">
+        <div className="relative group my-6 rounded-lg overflow-hidden border border-gray-100">
             <button
                 onClick={handleCopy}
-                className="absolute right-2 top-2 p-1.5 text-[#666] hover:text-black rounded hover:bg-black/5 transition-colors duration-200 z-10"
+                className="absolute right-3 top-3 p-2 text-gray-400 hover:text-gray-700 bg-white hover:bg-gray-50 border border-gray-200 rounded-md transition-all duration-200 z-10 shadow-sm"
                 aria-label={copied ? 'Copied' : 'Copy code'}
                 title={copied ? 'Copied' : 'Copy code'}
             >
@@ -62,11 +64,19 @@ function CodeBlock({ children, ...rest }: ComponentProps<'pre'>) {
                     className="h-4 w-4"
                     aria-hidden="true"
                 >
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    {copied ? (
+                        <path d="M20 6L9 17l-5-5" />
+                    ) : (
+                        <>
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M9 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v5" />
+                        </>
+                    )}
                 </svg>
             </button>
-            <pre {...rest}>{children}</pre>
+            <pre {...rest} className="!m-0 !p-0 !bg-transparent !border-0 overflow-x-auto">
+                {children}
+            </pre>
         </div>
     );
 }
@@ -118,6 +128,26 @@ export default function BlogContent({ content }: BlogContentProps) {
             return <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>;
         },
         pre: CodeBlock,
+        code: ({ node, inline, className, children, ...props }: any) => {
+            const match = /language-(\w+)/.exec(className || '');
+            const language = match ? match[1] : '';
+
+            return !inline && language ? (
+                <SyntaxHighlighter
+                    style={prism}
+                    language={language}
+                    PreTag="div"
+                    customStyle={{ margin: 0, padding: '1.25rem', paddingRight: '3.5rem', backgroundColor: '#f5f7f9' }}
+                    {...props}
+                >
+                    {String(children).replace(/\n$/, '')}
+                </SyntaxHighlighter>
+            ) : (
+                <code className={`${className || ''} px-1.5 py-0.5 rounded bg-gray-100 text-[0.9em]`} {...props}>
+                    {children}
+                </code>
+            );
+        },
     };
 
     return (

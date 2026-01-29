@@ -181,3 +181,269 @@ samp {
     opacity: 1;
   }
 }
+
+/* ============================================
+   Table of Contents - Desktop Sidebar
+   ============================================ */
+
+/* Main container that holds both dashes and overlay */
+.toc-container {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
+/* Enlarged hover area to prevent flicker */
+.toc-container::before {
+  content: '';
+  position: absolute;
+  left: -180px;
+  right: -50vw; /* Massive right extension to catch all cursor movement to the right */
+  top: -20px;
+  bottom: -20px;
+  pointer-events: auto;
+}
+
+/* Dashes navigation - always visible */
+.toc-dashes {
+  position: relative;
+  z-index: 10;
+}
+
+.toc-dashes-list {
+  list-style: none;
+  margin: 0;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  max-height: 80vh;
+  overflow-y: auto;
+  /* Hide scrollbar for dashes */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.toc-dashes-list::-webkit-scrollbar {
+  display: none;
+}
+
+.toc-dash-item {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.toc-dash-item.indent {
+  margin-left: 1rem;
+}
+
+.toc-dash-link {
+  display: block;
+  text-decoration: none;
+}
+
+.toc-dash {
+  height: 4px;
+  background-color: black;
+  border-radius: 9999px;
+  opacity: 0.4;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.toc-dash.w-8 {
+  width: 2rem;
+}
+
+.toc-dash.w-5 {
+  width: 1.25rem;
+}
+
+.toc-dash.active {
+  opacity: 1;
+  transform: scaleX(1.1);
+}
+
+.toc-dash-link:hover .toc-dash {
+  opacity: 0.7;
+}
+
+/* Text overlay - slides in from right, covering over the dashes, vertically centered */
+.toc-text-overlay {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 280px;
+  z-index: 30;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(100%, -50%);
+  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.toc-text-overlay.visible {
+  opacity: 1;
+  transform: translate(0, -50%);
+  pointer-events: auto;
+}
+
+.toc-text-overlay-content {
+  background: #ffffff; /* Solid background to hide dashes completely */
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.toc-text-list {
+  list-style: none;
+  margin: 0;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+.toc-text-item {
+  display: flex;
+}
+
+.toc-text-item.indent {
+  padding-left: 1rem;
+}
+
+.toc-text-link {
+  display: block;
+  font-size: 0.9rem;
+  color: black;
+  text-decoration: none;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 240px;
+  opacity: 0.4; /* Match dashes non-active state */
+  transition: all 0.2s ease;
+}
+
+.toc-text-link:hover {
+  opacity: 0.7;
+}
+
+.toc-text-link.active {
+  font-weight: 600;
+  opacity: 1; /* Match dashes active state */
+}
+
+/* ============================================
+   Table of Contents - Mobile Overlay (from ContentsButton)
+   ============================================ */
+
+/* Mobile floating button */
+.contents-button {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.contents-button.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.contents-button button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.contents-button button:hover {
+  background: rgba(0, 0, 0, 0.95);
+  transform: scale(1.05);
+}
+
+/* Mobile overlay */
+.toc-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.toc-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.toc-overlay-content {
+  background: white;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.toc-overlay-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.05);
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.toc-overlay-close:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Hide mobile button on desktop */
+@media (min-width: 1024px) {
+  .contents-button,
+  .toc-overlay {
+    display: none;
+  }
+}
+
+/* Hide desktop TOC on mobile */
+@media (max-width: 1023px) {
+  .toc-container {
+    display: none;
+  }
+}

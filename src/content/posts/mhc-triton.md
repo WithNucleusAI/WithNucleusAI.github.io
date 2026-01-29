@@ -19,16 +19,6 @@ We present **mHC-Triton**, an open-source implementation of DeepSeek's [Manifold
 
 This post walks through the theory, engineering decisions, and kernel optimizations that make efficient mHC training possible.
 
----
-
-## Table of Contents
-
-1. [The Residual Bottleneck Problem](#1-the-residual-bottleneck-problem)
-2. [DeepSeek's mHC Solution](#2-deepseeks-mhc-solution)
-3. [Engineering the Triton Kernels](#3-engineering-the-triton-kernels)
-4. [Benchmarks & Results](#4-benchmarks--results)
-5. [Usage Guide](#5-usage-guide)
-6. [Conclusion](#6-conclusion)
 
 ---
 
@@ -104,9 +94,9 @@ H_{\text{new}}[n] = H_{\text{residual}}[n] + H_{\text{post}}[n] \cdot \text{bran
 $$
 
 Where:
-- `H_pre` — normalized weights for combining streams into layer input
-- `H_res` — doubly stochastic 4×4 matrix (via Sinkhorn-Knopp)
-- `H_post` — distribution weights for routing output back
+- $H_{\text{pre}}$ — normalized weights for combining streams into layer input
+- $H_{\text{res}}$ — doubly stochastic 4×4 matrix (via Sinkhorn-Knopp)
+- $H_{\text{post}}$ — distribution weights for routing output back
 
 ### Dynamic Weights
 
@@ -286,10 +276,10 @@ The recomputation strategy provides 1.8× memory savings on Sinkhorn alone. Comb
 
 A key validation of mHC's stability: the composite amax gain magnitudes of the residual streams remain bounded during training. The doubly stochastic constraint prevents the exponential amplification that plagued unconstrained hyper-connections.
 
-![Forward Gain](/images/mhc-triton/forward_amax_gain.svg)
+![Forward Gain](/images/mhc-triton/forward_amax_gain.png)
 *Composite forward gain across all layers.*
 
-![Backward Gain](/images/mhc-triton/backward_amax_gain.svg)
+![Backward Gain](/images/mhc-triton/backward_amax_gain.png)
 *Composite backward gain across all layers.*
 
 These visualizations confirm that both forward and backward passes maintain stable gain magnitudes across layers—a direct result of the Birkhoff polytope constraint.
