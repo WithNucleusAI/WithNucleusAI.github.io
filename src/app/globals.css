@@ -194,16 +194,7 @@ samp {
   justify-content: flex-end;
 }
 
-/* Enlarged hover area to prevent flicker */
-.toc-container::before {
-  content: '';
-  position: absolute;
-  left: -180px;
-  right: -50vw; /* Massive right extension to catch all cursor movement to the right */
-  top: -20px;
-  bottom: -20px;
-  pointer-events: auto;
-}
+/* Enlarged hover area removed */
 
 /* Dashes navigation - always visible */
 .toc-dashes {
@@ -223,6 +214,7 @@ samp {
   /* Hide scrollbar for dashes */
   scrollbar-width: none;
   -ms-overflow-style: none;
+  overscroll-behavior: contain;
 }
 
 .toc-dashes-list::-webkit-scrollbar {
@@ -303,6 +295,7 @@ samp {
   gap: 0.625rem;
   max-height: 65vh;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .toc-text-item {
