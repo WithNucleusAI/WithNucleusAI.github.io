@@ -7,10 +7,11 @@ const phrases = [
     "Intelligence isn’t compressed memory, it’s the ability to find those answers in the wind.",
     "The fathers and the prodigies of AI have united, to help AI reach singularity.",
     //"Perceptive, Creative, Efficient and Self-Evolving Intelligence.",
-    "NUCLEUS.",
+    "NUCLEUS AI",
+    "NUCLEUS."
 ];
 
-const prefix = [0, 0, 0, 0];
+const prefix = [0, 0, 0, 0, 0, 0];
 const commaOverrides: { [key: number]: { [key: number]: number } } = {
     0: {
         10: 0,
@@ -19,31 +20,21 @@ const commaOverrides: { [key: number]: { [key: number]: number } } = {
 const fullstopOverrides: { [key: number]: { [key: number]: number } } = {
     5: {
         7: 750,
-    },
+    }
 };
 
 const typingSpeed = 30;
-const defaultDeletingSpeed = 10;
+const normalDeletingSpeed = 10;
 const delayAfterTyping = 3500;
 const delayAfterDeleting = 1500;
 const defaultDelayAfterComma = 1500;
 const defaultDelayAfterFullStop = 1500;
 
 function isStringWithPause(str: string) {
-    const firstCommaIndex = str.indexOf(",");
-    const firstFullstopIndex = str.indexOf(".");
-    const isValidComma =
-        firstCommaIndex === -1
-            ? false
-            : firstCommaIndex === str.length - 1
-                ? false
-                : true;
-    const isValidFullStop =
-        firstFullstopIndex === -1
-            ? false
-            : firstFullstopIndex === str.length - 1
-                ? false
-                : true;
+    const firstCommaIndex = str.indexOf(',');
+    const firstFullstopIndex = str.indexOf('.');
+    const isValidComma = firstCommaIndex === -1 ? false : firstCommaIndex === str.length - 1 ? false : true;
+    const isValidFullStop = firstFullstopIndex === -1 ? false : firstFullstopIndex === str.length - 1 ? false : true;
     return isValidComma || isValidFullStop;
 }
 
@@ -51,103 +42,99 @@ const phrasesWithPause = phrases.map((str) => isStringWithPause(str));
 
 export default function Typewriter() {
     const [text, setText] = useState("");
+    const [fontSize, setFontSize] = useState<string | undefined>(undefined);
     const [showCaption, setShowCaption] = useState(false);
-    const [showEmail, setShowEmail] = useState(false);
 
-    // Refs to hold mutable state without triggering re-renders for logic
     const currentPhraseIndexRef = useRef(0);
     const letterIndexRef = useRef(0);
     const isTypingRef = useRef(true);
-    const deletingSpeedRef = useRef(defaultDeletingSpeed);
+    const deletingSpeedRef = useRef(normalDeletingSpeed);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
+        // Reset state on mount
+        currentPhraseIndexRef.current = 0;
+        letterIndexRef.current = 0;
+        isTypingRef.current = true;
+        deletingSpeedRef.current = normalDeletingSpeed;
+        setText("");
+        setFontSize(undefined);
+        setShowCaption(false);
+        setShowCaption(false);
+
         const typeWriter = async () => {
             const currentPhraseIndex = currentPhraseIndexRef.current;
             const currentPhrase = phrases[currentPhraseIndex];
-            let letterIndex = letterIndexRef.current;
 
-            // Removed font size change logic - keeping consistent sizing
+            // Legacy: if (currentPhraseIndex === phrases.length - 2) deletingSpeed = 65;
+            if (currentPhraseIndex === phrases.length - 2) {
+                deletingSpeedRef.current = 65;
+            }
 
             if (isTypingRef.current) {
+                // Legacy: if (currentPhraseIndex === phrases.length - 2) textElement.style.fontSize = '4rem';
+                if (currentPhraseIndex === phrases.length - 2) {
+                    setFontSize('4rem');
+                }
+
+                let letterIndex = letterIndexRef.current;
                 let charToAdd = currentPhrase.charAt(letterIndex);
                 letterIndex++;
 
                 // Handling typing of HTML tags
-                if (charToAdd === "<") {
-                    while (currentPhrase.charAt(letterIndex) !== ">") {
+                if (charToAdd === '<') {
+                    while (currentPhrase.charAt(letterIndex) !== '>') {
                         charToAdd += currentPhrase.charAt(letterIndex);
                         letterIndex++;
                     }
-                    charToAdd += ">";
+                    charToAdd += '>';
                     letterIndex++;
                 }
 
-                const newText = currentPhrase.substring(0, letterIndex); // Accumulate text correctly
-                // Actually, legacy code used += charToAdd. But substring is cleaner for React state.
-                // Wait, legacy logic: textElement.innerHTML += charToAdd;
-                // In React, setText(prev => prev + charToAdd) works, but we need to track accumulated text.
-                // Easier to just use substring from 0 to letterIndex.
-
-                // Wait, the logic for HTML tags in legacy:
-                // charToAdd includes the whole tag.
-                // So substring logic needs to account for tags if we use substring.
-                // Let's stick to the legacy accumulation logic but applied to `text` state?
-                // No, `text` state is reset on delete.
-
-                // Let's rely on `setText` updating the display.
-                // Current implementation uses text accumulation.
-
-                // For consistency with legacy logic:
-                // The legacy loop adds one char (or tag) at a time.
-                // We can replicate that by updating state.
-
-                // However, setting state is async. The Ref `letterIndex` is sync.
-                // So we can compute the string to display based on `letterIndex`.
-                // But since we skip over tags, `letterIndex` jumps.
-                // Legacy: `textElement.innerHTML += charToAdd`
-
-                // Let's just use the legacy logic path but update state.
-
-                setText((prev) => {
-                    // This is tricky because `prev` might not be up to date in the closure if we read it outside.
-                    // But we can rebuild expected text from `currentPhrase` and `letterIndex`.
-                    // The `letterIndex` includes the skipped tag chars.
-                    return currentPhrase.substring(0, letterIndex);
-                });
+                // Update text
+                // In legacy: textElement.innerHTML += charToAdd;
+                // Here we reconstruct the string up to the new letterIndex
+                // Note: currentPhrase.substring(0, letterIndex) handles the tags correctly as they are part of the string indices
+                setText(currentPhrase.substring(0, letterIndex));
 
                 letterIndexRef.current = letterIndex;
 
                 if (letterIndex < currentPhrase.length) {
                     if (phrasesWithPause[currentPhraseIndex]) {
-                        const char = currentPhrase.charAt(letterIndex - (charToAdd.length > 1 ? 0 : 0));
-                        // Wait, letterIndex is already incremented.
-                        // In legacy: 
-                        // charToAdd = currentPhrase.charAt(letterIndex); letterIndex++; ... textElement.innerHTML += charToAdd;
-                        // then: if (currentPhrase.charAt(letterIndex) === ',')
+                        // Check char at current position (which was just added? No, wait)
+                        // Legacy: 
+                        // charToAdd = ...; letterIndex++
+                        // textElement.innerHTML += charToAdd;
+                        // if (currentPhrase.charAt(letterIndex) === ',') ...
+                        // Wait, legacy checks `currentPhrase.charAt(letterIndex)` AFTER incrementing.
+                        // So it checks the NEXT char?
 
-                        // My port:
-                        // let charToAdd = ...; letterIndex++
+                        // Let's re-read legacy carefully:
+                        // 58: let charToAdd = currentPhrase.charAt(letterIndex);
+                        // 59: letterIndex++;
                         // ...
-                        // setText(...)
-                        // if (letterIndex < length) ... check char at letterIndex
+                        // 71: textElement.innerHTML += charToAdd;
+                        // 73: if (letterIndex < currentPhrase.length) {
+                        // 75:    if (currentPhrase.charAt(letterIndex) === ',') {
+                        // 76:        textElement.innerHTML += ',';
 
-                        // This matches legacy.
+                        // Ah! If the NEXT char is a comma, it adds it immediately and pauses.
+                        // So the comma is NOT typed in the normal loop step, it's peeked and added.
+                        // Wait, if it adds it, does it increment letterIndex again?
+                        // 79: letterIndex++;
+                        // Yes.
 
-                        if (currentPhrase.charAt(letterIndex) === ",") {
-                            setText(prev => prev + ",");
+                        const nextChar = currentPhrase.charAt(letterIndex);
+                        if (nextChar === ',') {
+                            setText(prev => prev + ',');
                             letterIndexRef.current++;
-                            let delay =
-                                commaOverrides[currentPhraseIndex]?.[letterIndex] ??
-                                defaultDelayAfterComma;
+                            let delay = commaOverrides[currentPhraseIndex]?.[letterIndex] ?? defaultDelayAfterComma;
                             timeoutRef.current = setTimeout(typeWriter, delay);
                             return;
-                        } else if (currentPhrase.charAt(letterIndex) === ".") {
-                            setText(prev => prev + ".");
+                        } else if (nextChar === '.') {
+                            setText(prev => prev + '.');
                             letterIndexRef.current++;
-                            let delay =
-                                fullstopOverrides[currentPhraseIndex]?.[letterIndex] ??
-                                defaultDelayAfterFullStop;
+                            let delay = fullstopOverrides[currentPhraseIndex]?.[letterIndex] ?? defaultDelayAfterFullStop;
                             timeoutRef.current = setTimeout(typeWriter, delay);
                             return;
                         }
@@ -155,9 +142,8 @@ export default function Typewriter() {
                     timeoutRef.current = setTimeout(typeWriter, typingSpeed);
                 } else {
                     if (currentPhraseIndex === phrases.length - 1) {
-                        // Done
-                        setTimeout(() => setShowCaption(true), 1000);
-                        setTimeout(() => setShowEmail(true), 3000); // 1s delay + 2s animation -> legacy said "2s after showing caption"
+                        // Finished
+                        setTimeout(() => setShowCaption(true), 1000); // 1s delay
                     } else {
                         isTypingRef.current = false;
                         timeoutRef.current = setTimeout(typeWriter, delayAfterTyping);
@@ -165,37 +151,27 @@ export default function Typewriter() {
                 }
             } else {
                 // Deleting
+                let letterIndex = letterIndexRef.current;
+
                 if (letterIndex > prefix[currentPhraseIndex]) {
                     // Handling deletion of HTML tags
-                    if (currentPhrase.charAt(letterIndex - 1) === ">") {
-                        while (
-                            letterIndex > 0 &&
-                            currentPhrase.charAt(letterIndex - 1) !== "<"
-                        ) {
+                    if (currentPhrase.charAt(letterIndex - 1) === '>') {
+                        while (letterIndex > 0 && currentPhrase.charAt(letterIndex - 1) !== '<') {
                             letterIndex--;
                         }
                         letterIndex--;
                     }
 
+                    // Legacy: textElement.innerHTML = currentPhrase.substring(0, letterIndex - 1); 
+                    // letterIndex--;
+
+                    // Logic check: if letterIndex is 5. 
+                    // substring(0, 4). Correct.
+
+                    setText(currentPhrase.substring(0, letterIndex - 1));
                     letterIndex--;
                     letterIndexRef.current = letterIndex;
 
-                    // Legacy: textElement.innerHTML = currentPhrase.substring(0, letterIndex - 1); -> wait, `letterIndex - 1`?
-                    // Legacy logic: 
-                    // letterIndex--;
-                    // textElement.innerHTML = currentPhrase.substring(0, letterIndex - 1);
-                    // NO, legacy was:
-                    // textElement.innerHTML = currentPhrase.substring(0, letterIndex - 1);
-                    // letterIndex--;
-
-                    // Wait, if letterIndex is 5.
-                    // substring(0, 4) gets 0,1,2,3.
-
-                    // My logic:
-                    // letterIndex--;
-                    // Use substring(0, letterIndex).
-
-                    setText(currentPhrase.substring(0, letterIndex));
                     timeoutRef.current = setTimeout(typeWriter, deletingSpeedRef.current);
                 } else {
                     isTypingRef.current = true;
@@ -214,7 +190,7 @@ export default function Typewriter() {
 
     return (
         <>
-            <div id="typing" className={text === "NUCLEUS." ? "final-text" : ""}>
+            <div id="typing" style={fontSize ? { fontSize } : undefined} className={text === "NUCLEUS." ? "final-text" : ""}>
                 <span id="text" dangerouslySetInnerHTML={{ __html: text }}></span>
                 <span className="cursor"></span>
             </div>
@@ -222,19 +198,11 @@ export default function Typewriter() {
                 <span
                     id="caption"
                     className={showCaption ? "fadeInAnimation" : ""}
-                    style={{ opacity: showCaption ? 1 : 0 }} // Keep explicit or let class handle it?
-                // Legacy: classList.add('fadeInAnimation'), style opacity initially 0.
-                // Animation @keyframes fadeIn goes 0 to 1.
-                // If we apply class, it animates.
+                    style={{ animationDelay: '1s', opacity: 0 }}
                 >
                     General Intelligence
                 </span>
             </div>
-
         </>
     );
-    // Note: legacy code changed font size for "NUCLEUS AI" and "NUCLEUS." (phrases.length - 2)
-    // My check `text === ...` is a bit loose, better store the index in state if we want to style based on index?
-    // But doing it via inline style or class wrapper is better.
-    // Actually, legacy modified `textElement.style.fontSize`.
 }

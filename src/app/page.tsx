@@ -1,9 +1,21 @@
 import Typewriter from "@/components/Typewriter";
+import ScrollDownButton from "@/components/ScrollDownButton";
+import BlogSection from "@/components/BlogSection";
+import { getPosts } from "@/lib/posts";
 
-export default function Home() {
+export default async function Home() {
+  const posts = await getPosts();
+  const recentPosts = posts.slice(0, 3);
+
   return (
-    <div className="min-h-[calc(100svh-6rem)] flex flex-col justify-center items-center w-full">
-      <Typewriter />
-    </div>
+    <main className="w-full">
+      <section className="min-h-[calc(100svh-6rem)] relative flex flex-col justify-center items-center w-full">
+        <Typewriter />
+        <ScrollDownButton />
+      </section>
+
+      {/* Blog Section now isolated in a Client Component to handle interaction */}
+      <BlogSection posts={recentPosts} />
+    </main>
   );
 }
