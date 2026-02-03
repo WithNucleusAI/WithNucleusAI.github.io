@@ -4,6 +4,7 @@ import React from 'react';
 import StructuredNetworkAnimation from "@/components/StructuredNetworkAnimation";
 import MiniBlogCard from "@/components/MiniBlogCard";
 import { Post } from "@/lib/posts";
+import DataStreamAnimation from "@/components/DataStreamAnimation";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
@@ -33,12 +34,21 @@ export default function BlogSection({ posts }: BlogSectionProps) {
                     {posts.map((post) => {
                         // Check if this post should have a specific visual
                         const isMHC = post.slug.includes('mhc-triton'); // Check slug
+                        const isData = post.slug.includes('data-blog');
 
                         // If it's the specific blog, pass the visual component
                         if (isMHC) {
                             return (
                                 <div key={post.slug} className="w-full">
                                     <MiniBlogCard post={post} VisualComponent={StructuredNetworkAnimation} />
+                                </div>
+                            )
+                        }
+
+                        if (isData) {
+                            return (
+                                <div key={post.slug} className="w-full">
+                                    <MiniBlogCard post={post} VisualComponent={DataStreamAnimation} />
                                 </div>
                             )
                         }
