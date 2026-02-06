@@ -1,0 +1,25 @@
+flowchart TD
+
+A["Ingest from Parquets <br/> Image + Metadata + Raw Caption (if present)"] --> B[Normalize inputs<br/>Decode Image, Clean Text, Extract Fields]
+
+B --> D{CLIP sim score}
+
+D -->|> 0.65| K["KEEP<br/>(Preserve original caption)"]
+
+K --> O
+
+D -->|< 0.30 or missing| S["SYNTHESIZE<br/>(Re-Caption from scratch)"]
+
+D -->|0.30-0.65| R["REFINE<br/>(Augment + Rewrite)"]
+
+R --> M1["Model router<br/>(heuristics + metadata)"]
+
+S --> M1["Model router<br/>(heuristics + metadata)"]
+
+M1 --> G1[Inject World-Knowledge]
+
+G1 --> G2[Generate Cascading Captions<br/>very short / short / medium / detailed]
+
+G2 --> P2[Polish + Schema Enforcement]
+
+P2 --> O[Write Outputs<br/>captions, caption_sources]

@@ -1,0 +1,24 @@
+graph TD
+
+A[URL stream/manifest]
+--> B[Domain Shaper<br/>Global + Per-Domain Budgets]
+
+B --> C[Fetch Workers<br/>HTTP GET + timeouts]
+
+C --> D{Classify Result}
+
+%% Success Path
+D -->|200 OK| E[Verify Queue<br/>size/type/checksum]
+E --> H[Write Queue<br/>batched writes]
+H --> I[(Object Store)]
+
+%% Retry Path
+D -->|429/5xx/timeout| F[Retry Queue<br/>backoff + jitter + caps]
+
+%% Failure Path
+D -->|dead/invalid| G[Fail Log<br/>reason code]
+
+%% Metrics Connections
+C --> J[Metrics<br/>bytes/sec, img/sec,<br/>p50/p95/p99, 429-rate]
+F --> J
+G --> J

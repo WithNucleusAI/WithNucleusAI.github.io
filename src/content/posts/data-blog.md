@@ -181,32 +181,7 @@ For the hot path, we chose Go because it provided low-overhead concurrency, pred
   
 We split the pipeline by the resource it stressed (Network, CPU, Disk), then enforced budgets at the edges to prevent cascading failures.
 
-```mermaid
-
-flowchart LR
-
-A[URL stream / Manifest] --> B[Domain Shaper<br/>Global + Per-Domain Budgets]
-
-B --> C[Fetch Workers<br/>HTTP GET + timeouts]
-
-C --> D{Classify Result}
-
-D -->|200 OK| E[Verify Queue<br/>size/type/checksum]
-
-D -->|429/5xx/timeout| F[Retry Queue<br/>backoff + jitter + caps]
-
-D -->|dead/invalid| G[Fail Log<br/>reason code]
-
-E --> H[Write Queue<br/>batched writes]
-
-H --> I[Object Store]
-
-C --> J[Metrics<br/>bytes/sec, img/sec,<br/>p50/p95/p99, 429-rate]
-
-F --> J
-
-G --> J
-  ```
+![Download Pipeline Flowchart](/images/data-blog/Download_Pipeline_Flowchart.png)
 
   
 ## Phase 3 - Cleaning & Validation: Turning Data Into Dataset
@@ -415,35 +390,7 @@ The payoff was substantial. Before Phase 6, ~80% of captions in our image datase
 -   CLIP alignment scores for the full corpus shifted right as the long tail of near-zero alignments disappeared.
 
 
-```mermaid
-
-flowchart TD
-
-A["Ingest from Parquets <br/> Image + Metadata + Raw Caption (if present)"] --> B[Normalize inputs<br/>Decode Image, Clean Text, Extract Fields]
-
-B --> D{CLIP sim score}
-
-D -->|> 0.65| K["KEEP<br/>(Preserve original caption)"]
-
-K --> O
-
-D -->|< 0.30 or missing| S["SYNTHESIZE<br/>(Re-Caption from scratch)"]
-
-D -->|0.30-0.65| R["REFINE<br/>(Augment + Rewrite)"]
-
-R --> M1["Model router<br/>(heuristics + metadata)"]
-
-S --> M1["Model router<br/>(heuristics + metadata)"]
-
-M1 --> G1[Inject World-Knowledge]
-
-G1 --> G2[Generate Cascading Captions<br/>very short / short / medium / detailed]
-
-G2 --> P2[Polish + Schema Enforcement]
-
-P2 --> O[Write Outputs<br/>captions, caption_sources]
-
-  ```
+![Caption Pipeline Flowchart](/images/data-blog/Caption_Pipeline_Flowchart.png)
 
 ---
 
