@@ -6,10 +6,9 @@ excerpt: "Building an image model is only partly a modeling problem. The other p
 
 Building an image model is only *partly* a modeling problem. The other part is a **data engineering problem disguised as a plumbing problem**, which is a polite way of saying: *"if your dataset is messy, your model becomes an expensive mirror for that mess."*
 
-Over the last year, we built an end-to-end pipeline to curate an image dataset that scales to **~1B images** with quality controls that treat data like a first-class product, not a folder of “*stuff*.”
+NucleusAI built an end-to-end pipeline to curate an image dataset that scales to **~1B images** with quality controls that treat data like a first-class product, not a folder of “*stuff*.”
 
 This article covers **The Dataset**: collection, validation, cleaning, scoring, captioning, and packaging.
-
 
 
 ---
@@ -33,7 +32,6 @@ We never relied on a centralized database to track our metadata. From day one, t
 
 Each Parquet file was:
 
-- **Self-contained** and append-only
 - Aligned to a deterministic shard index
 - Compression and Encryption enabled (when staged to cloud)
 
@@ -70,9 +68,9 @@ schema = pa.schema([
 
 with pq.ParquetWriter("metadata.parquet", schema=schema) as writer:
 	for batch in stream_batches():
-	table = pa.Table.from_pylist(batch, schema=schema)
-	assert table.schema == schema
-	writer.write_table(table, row_group_size=25_000)
+        table = pa.Table.from_pylist(batch, schema=schema)
+        assert table.schema == schema
+        writer.write_table(table, row_group_size=25_000)
 ```
 
 This choice of moving away from classic databases was fundamental to maintaining throughput at scale. Instead of overloading Postgres or BigQuery with billions of rows of rapidly changing state, we opted for a **declarative, immutable, columnar log** of the dataset.
@@ -255,7 +253,7 @@ We began with **~2B downloaded images** (after Phase 3). Aesthetic scoring filte
 
 We built a SigLIP-based image encoder + a lightweight head to predict a single scalar `aesthetic_score`,  trained on human-rated datasets (AVA-style) and internal labels. SigLIP treated each image-text pair independently via binary classification, rather than requiring batch-wide contrastive comparisons. This independence made SigLIP better suited to fine-grained similarity tasks and aesthetic assessment. 
 
-Operationally, we ran the scorer as a batched GPU inference job on 8×H100, batch size 128 and achieved a throughput of **~600 images/sec**. The key design choice was making this *offline and append-only*: score once, persist forever and never rescore unless the scorer changed.
+Operationally, we ran the scorer as a batched GPU inference job on 8×H100, batch size 128 and achieved a throughput of **~600 images/sec**. The key design choice was making this *offline and in-place*: score once, persist forever and never rescore unless the scorer changed.
 
 | Tier | Score range  | Count |  Share (%)  | Composition | 
 | -- | --             | --    | --          | -- |
@@ -285,19 +283,25 @@ We treated A1-A5 as static  _quality label_  (aesthetic + caption quality), and 
 
 We used a _distance-to-centers + temperature-softmax_ assignment which was conceptually the same idea as softmax gating used to route tokens to experts in Mixture-of-Experts (MoE) models. We assigned buckets **probabilistically** so each bucket has a controlled overlap. We turned a weighted combination of quality tier $q \in \{1,2,3,4,5\}$ and its size-bucket rank $s$ (from `get_size_bucket()`) into a single curriculum score $z$. 
 
-$$z = \alpha \cdot \text{norm}(q) + \beta \cdot \text{norm}(s)$$
+$$
+z = \alpha \cdot \text{norm}(q) + \beta \cdot \text{norm}(s)
+$$
 
 where $\alpha + \beta = 1$ (we used $\alpha = 0.6, \beta = 0.4$), and $\text{norm}(\cdot)$ maps values to $[0,1]$.
 
 For each episodic bucket $k \in \{1,\dots,8\}$, we computed how "*aligned*" the image's score is with that bucket's center $\mu_k$ (spaced uniformly from $-1.75$ to $+1.75$): 
 
-$$\ell_k = -\frac{(z-\mu_k)^2}{2\sigma^2}$$
+$$
+\ell_k = -\frac{(z-\mu_k)^2}{2\sigma^2}
+$$
 
 where we set $\sigma^2 \approx 1.0$ (tunable). Images close to $\mu_k$ received high logits; those far away received low logits.
 
 Finally, we converted logits into a probability distribution over the 8 buckets using a temperature-scaled softmax: 
 
-$$p(B=k \mid z)=\frac{\exp(\ell_k/T)}{\sum_{j=1}^{8}\exp(\ell_j/T)}$$
+$$
+p(B=k \mid z)=\frac{\exp(\ell_k/T)}{\sum_{j=1}^{8}\exp(\ell_j/T)}
+$$
 
 where $T$ is the temperature parameter. Higher $T$ increases overlap (early training, broad coverage), lower $T$ concentrates probability mass (late training, high quality). We sampled $B \sim \text{Categorical}(p)$ to assign the image to bucket $B \in \{1,\dots,8\}$.
 
@@ -403,7 +407,9 @@ We augmented only the top 30% aesthetic slice. The premise was simple: *low-qual
 ### The CLIP Similarity Constraint
 *But how much variation is "safe"?* We employed  **CLIP image-embedding similarity** as a guardrail. CLIP embeddings capture semantic content, so two images with cosine similarity `>=0.90` were treated as semantics-preserving. We computed:
 
-$$\text{sim}(\text{augmented}, \text{original}) = \frac{\mathbf{e}_{\text{aug}} \cdot \mathbf{e}_{\text{orig}}}{\left|\left| \hspace{2pt} \mathbf{e}_{\text{aug}} \hspace{2pt} \right|\right| \cdot \left|\left| \hspace{2pt} \mathbf{e}_{\text{orig}}  \hspace{2pt} \right|\right|}$$
+$$
+\text{sim}(\text{augmented}, \text{original}) = \frac{\mathbf{e}_{\text{aug}} \cdot \mathbf{e}_{\text{orig}}}{\left|\left| \hspace{2pt} \mathbf{e}_{\text{aug}} \hspace{2pt} \right|\right| \cdot \left|\left| \hspace{2pt} \mathbf{e}_{\text{orig}}  \hspace{2pt} \right|\right|}
+$$
 
 If an augmentation dropped similarity below `0.90`, we discarded it. Empirically, this threshold balanced diversity gains against distribution fidelity for us.
 

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Mermaid Renderer</title>
+   <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default', // Using default theme for high contrast
+            flowchart: { useMaxWidth: false, htmlLabels: true }, // Ensure full width rendering
+            securityLevel: 'loose',
+        });
+    </script>
+    <style>
+        body { font-family: sans-serif; background: white; margin: 20px; }
+        .mermaid { margin-bottom: 50px; border: 1px solid #ccc; padding: 20px; display: inline-block;}
+    </style>
+</head>
+<body>
+
+    <h2>Chart 1: Download Pipeline</h2>
+    <div class="mermaid" id="chart1">
+graph TD
+
+A[URL stream/manifest]
+--> B[Domain Shaper<br/>Global + Per-Domain Budgets]
+
+B --> C[Fetch Workers<br/>HTTP GET + timeouts]
+
+C --> D{Classify Result}
+
+%% Success Path
+D -->|200 OK| E[Verify Queue<br/>size/type/checksum]
+E --> H[Write Queue<br/>batched writes]
+H --> I[(Object Store)]
+
+%% Retry Path
+D -->|429/5xx/timeout| F[Retry Queue<br/>backoff + jitter + caps]
+
+%% Failure Path
+D -->|dead/invalid| G[Fail Log<br/>reason code]
+
+%% Metrics Connections
+C --> J[Metrics<br/>bytes/sec, img/sec,<br/>p50/p95/p99, 429-rate]
+F --> J
+G --> J
+    </div>
+
+    <h2>Chart 2: Caption Pipeline</h2>
+    <div class="mermaid" id="chart2">
+flowchart TD
+
+A["Ingest from Parquets <br/> Image + Metadata + Raw Caption (if present)"] --> B[Normalize inputs<br/>Decode Image, Clean Text, Extract Fields]
+
+B --> D{CLIP sim score}
+
+D -->|> 0.65| K["KEEP<br/>(Preserve original caption)"]
+
+K --> O
+
+D -->|< 0.30 or missing| S["SYNTHESIZE<br/>(Re-Caption from scratch)"]
+
+D -->|0.30-0.65| R["REFINE<br/>(Augment + Rewrite)"]
+
+R --> M1["Model router<br/>(heuristics + metadata)"]
+
+S --> M1["Model router<br/>(heuristics + metadata)"]
+
+M1 --> G1[Inject World-Knowledge]
+
+G1 --> G2[Generate Cascading Captions<br/>very short / short / medium / detailed]
+
+G2 --> P2[Polish + Schema Enforcement]
+
+P2 --> O[Write Outputs<br/>captions, caption_sources]
+    </div>
+
+</body>
+</html>

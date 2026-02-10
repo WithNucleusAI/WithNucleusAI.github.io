@@ -8,7 +8,7 @@ import rehypeKatex from 'rehype-katex';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { prism } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import ImageViewer from './ImageViewer';
-import Mermaid from './Mermaid';
+
 
 interface BlogContentProps {
     content: string;
@@ -126,16 +126,14 @@ export default function BlogContent({ content }: BlogContentProps) {
             );
         },
         a: ({ href, children }: any) => {
-            return <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>;
+            const isExternal = href?.startsWith('http');
+            const props = isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+            return <a href={href} {...props}>{children}</a>;
         },
         pre: CodeBlock,
         code: ({ node, inline, className, children, ...props }: any) => {
             const match = /language-(\w+)/.exec(className || '');
             const language = match ? match[1] : '';
-
-            if (!inline && language === 'mermaid') {
-                return <Mermaid chart={String(children).replace(/\n$/, '')} />;
-            }
 
             return !inline && language ? (
                 <SyntaxHighlighter

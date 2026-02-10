@@ -21,10 +21,17 @@ samp {
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
+  display: flex !important;
+  justify-content: center;
+  margin: 2rem 0 !important;
+  font-size: 1em !important;
 }
 
 .katex-display > .katex {
   max-width: 100%;
+  text-align: center;
+  width: 100%;
+  display: block;
 }
 
 @media (max-width: 640px) {
