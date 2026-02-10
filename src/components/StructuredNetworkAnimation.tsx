@@ -102,7 +102,7 @@ const StructuredNetworkAnimation: React.FC<Props> = ({ isHovered }) => {
 
         let animationFrameId: number;
         let signals: Signal[] = [];
-        const layers = [2, 5, 7, 5, 2];
+        const layers = [2, 4, 2]; // Simplified for square
         let nodes: Node[][] = [];
 
         const resizeCanvas = () => {
@@ -116,13 +116,29 @@ const StructuredNetworkAnimation: React.FC<Props> = ({ isHovered }) => {
             nodes = [];
             const width = canvas.width;
             const height = canvas.height;
-            const layerSpacing = width / (layers.length + 1);
+            // Add padding
+            const paddingX = width * 0.15;
+            const paddingY = height * 0.15;
+            const usableWidth = width - (paddingX * 2);
+            const usableHeight = height - (paddingY * 2);
+
+            const layerSpacing = usableWidth / (layers.length - 1);
+
+            // Standardize vertical spacing based on the 2-node layer to perfectly align
+            // the middle nodes of the 4-node layer with the outer layers.
+            // A 2-node layer splits the space into 3 parts (top, mid, bot). spacing = usableHeight / 3.
+            const nodeSpacing = usableHeight / 3;
+
             layers.forEach((count, idx) => {
-                const layerNodes = [];
-                const x = layerSpacing * (idx + 1);
-                const vSpacing = height / (count + 1);
+                const layerNodes: Node[] = [];
+                const x = paddingX + (layerSpacing * idx);
+
+                // Center nodes vertically using the fixed nodeSpacing
+                const startY = (height / 2) - ((count - 1) * nodeSpacing / 2);
+
                 for (let i = 0; i < count; i++) {
-                    layerNodes.push({ x, y: vSpacing * (i + 1), id: `${idx}_${i}` });
+                    const y = startY + (i * nodeSpacing);
+                    layerNodes.push({ x, y, id: `${idx}_${i}` });
                 }
                 nodes.push(layerNodes);
             });
@@ -137,7 +153,7 @@ const StructuredNetworkAnimation: React.FC<Props> = ({ isHovered }) => {
             const lineColor = currentHover ? activeLineColor : normalLineColor;
 
             // Connections
-            ctx.lineWidth = 0.5;
+            ctx.lineWidth = 0.3;
             ctx.strokeStyle = lineColor;
             for (let i = 0; i < nodes.length - 1; i++) {
                 nodes[i].forEach(n1 => {

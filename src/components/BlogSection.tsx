@@ -29,88 +29,28 @@ export default function BlogSection({ posts }: BlogSectionProps) {
                     </p>
                 </div>
 
-                {/* Blog Grid using MiniBlogCard's internal logic for wide vs compact */}
-                <div className="flex flex-col gap-8">
+                {/* Ultra-Minimalist Blog Grid */}
+                {/* Ultra-Minimalist Blog Grid */}
+                <div className="flex flex-wrap justify-center gap-x-12 gap-y-16">
                     {posts.map((post) => {
-                        // Check if this post should have a specific visual
-                        const isMHC = post.slug.includes('mhc-triton'); // Check slug
-                        const isData = post.slug.includes('data-blog');
-
-                        // If it's the specific blog, pass the visual component
-                        if (isMHC) {
-                            return (
-                                <div key={post.slug} className="w-full">
-                                    <MiniBlogCard post={post} VisualComponent={StructuredNetworkAnimation} />
-                                </div>
-                            )
+                        // Determine visual component based on slug
+                        let VisualComponent;
+                        if (post.slug.includes('mhc-triton')) {
+                            VisualComponent = StructuredNetworkAnimation;
+                        } else if (post.slug.includes('data-blog')) {
+                            VisualComponent = DataStreamAnimation;
                         }
 
-                        if (isData) {
-                            return (
-                                <div key={post.slug} className="w-full">
-                                    <MiniBlogCard post={post} VisualComponent={DataStreamAnimation} />
-                                </div>
-                            )
-                        }
-
-                        // Otherwise render it as a standard card
-                        // We might want to group standard cards in a grid if they appear sequentially?
-                        // For simplicity in this iteration, keeping them full width or making a grid wrapper?
-                        // The user wanted "Move things to miniblog card".
-                        // This allows mixing wide and small cards. 
-                        // But wait, wide takes full row. Small takes half?
-                        // Let's just render them. If grid needed, parent controls it.
-                        // However, dynamic grid with some full width is tricky.
-                        // For now, let's just assume the layout flow:
-                        // "mhc-triton" -> Wide Card.
-                        // Others -> should be compact.
-                        // Layout: Just a vertical stack of divs. If we really want a grid for the small ones, we need more logic.
-                        // Given we only have 3 posts likely...
-
                         return (
-                            <div key={post.slug} className="w-full md:w-1/2 lg:w-1/3 inline-block align-top pr-4 pb-4">
-                                {/* Use inline-block strategy or flex wrap? 
-                                    Lets use a grid for the container instead.
-                                */}
-                                {/* Wait, I cannot easily mix wide and grid cells without CSS Grid spanning. */}
-                                {/* Let's use a class based on type? */}
-                                <MiniBlogCard post={post} />
-                            </div>
-                        );
-                    })}
-                </div>
-
-                {/* 
-                   Wait, iterating and returning mixed widths in a flex-col gap-8 ?
-                   The wide card is w-full.
-                   The small cards being "w-full md:w-1/2" inside a flex-col will just be full width rows unless wrapped in flex-row flex-wrap.
-                */}
-
-                {/* RETHINK Layout strategy:
-                    We have a list of posts.
-                    WE want to render them.
-                    We can map and determine col-span.
-                    
-                    CSS Grid is perfect here.
-                */}
-
-                {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {posts.map((post) => {
-                        const isMHC = post.slug.includes('mhc-triton');
-
-                        return (
-                            <div
-                                key={post.slug}
-                                className={isMHC ? "col-span-1 md:col-span-2" : "col-span-1"}
-                            >
+                            <div key={post.slug} className="w-full max-w-[400px]">
                                 <MiniBlogCard
                                     post={post}
-                                    VisualComponent={isMHC ? StructuredNetworkAnimation : undefined}
+                                    VisualComponent={VisualComponent}
                                 />
                             </div>
                         );
                     })}
-                </div> */}
+                </div>
 
 
                 {/* View All Archives */}
