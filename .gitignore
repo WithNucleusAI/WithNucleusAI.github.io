@@ -46,6 +46,6 @@ engineering-blogs
 
 
 # Generated blog content
-src/content/posts/
-public/images/blog/
+# src/content/posts/
+# public/images/blog/
 
