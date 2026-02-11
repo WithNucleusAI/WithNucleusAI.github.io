@@ -1,0 +1,58 @@
+name: Sync Blogs
+
+on:
+  repository_dispatch:
+    types: [update_blog]
+  workflow_dispatch:
+
+jobs:
+  sync-blogs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Main Repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Checkout Blogs Repo
+        uses: actions/checkout@v4
+        with:
+          repository: WithNucleusAI/engineering-blogs
+          token: ${{ secrets.GH_PAT }}
+          path: temp_blogs
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Install Mermaid CLI
+        run: npm install -D @mermaid-js/mermaid-cli
+
+      - name: Install Puppeteer Dependencies
+        # mmdc requires chrome/puppeteer which might need system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ca-certificates fonts-liberation libasound2 libatk-bridge2.0-0 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgbm1 libgcc1 libglib2.0-0 libgtk-3-0 libnspr4 libnss3 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 lsb-release wget xdg-utils
+
+      - name: Process Blogs
+        run: node scripts/process-blogs.mjs
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          # We need to force add because these directories are in .gitignore
+          git add --force src/content/posts/ public/images/blog/
+          # Check if there are changes before committing
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: sync blogs from engineering-blogs"
+            git push
+          fi
