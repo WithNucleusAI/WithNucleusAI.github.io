@@ -49,7 +49,7 @@ export default function CollapsibleToc({ content, children }: CollapsibleTocProp
 
     const contentClassName = useMemo(() => {
         if (isDesktop && isOpen) {
-            return "max-w-[800px] mx-auto";
+            return "max-w-[1000px] mx-auto";
         }
         return "max-w-none w-full";
     }, [isDesktop, isOpen]);

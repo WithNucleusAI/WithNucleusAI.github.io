@@ -1,9 +1,12 @@
 ---
-title: "How NucleusAI Curated a 1B Image Dataset for Generative Vision Models"
+title: How NucleusAI Curated a 1B Image Dataset for Generative Vision Models
 date: '2026-02-03'
-excerpt: "Building an image model is only partly a modeling problem. The other part is a data engineering problem disguised as a plumbing problem. This article covers how we curated a ~1B image dataset."
+excerpt: >-
+  Building an image model is only partly a modeling problem. The other part is a
+  data engineering problem disguised as a plumbing problem. This article covers
+  how we curated a ~1B image dataset.
+animation: data-stream
 ---
-
 Building an image model is only *partly* a modeling problem. The other part is a **data engineering problem disguised as a plumbing problem**, which is a polite way of saying: *"if your dataset is messy, your model becomes an expensive mirror for that mess."*
 
 NucleusAI built an end-to-end pipeline to curate an image dataset that scales to **~1B images** with quality controls that treat data like a first-class product, not a folder of “*stuff*.”
@@ -264,7 +267,7 @@ Operationally, we ran the scorer as a batched GPU inference job on 8×H100, batc
 | A4 | 6.5–6.8        | 100M  | 14%				| High aesthetic (strong visual appeal) |
 | A5 | 6.8+           | 50M   |  7%				| Premium (sharp, balanced, refined) |
 
-![Aesthetic Score Distribution](/images/blog/data-engineering/Aesthetic%20Score%20Distribution.png)
+![Aesthetic Score Distribution](/images/blog/data-engineering/Aesthetic Score Distribution.png)
 
 ---
 
@@ -321,7 +324,7 @@ Episodic bucketing gave us a curriculum mechanism  _without copying data_, and i
 
 We also soft-capped each episodic bucket to **~90M** and enforced capacity at write-time so training never accidentally over-sampled a “*too-easy to fill*” subset (typically low-res, low-quality).
 
-![Softmax Bucketing](/images/blog/data-engineering/Softmax%20Based%20Bucketing.png)
+![Softmax Bucketing](/images/blog/data-engineering/Softmax Based Bucketing.png)
 
 ---
 

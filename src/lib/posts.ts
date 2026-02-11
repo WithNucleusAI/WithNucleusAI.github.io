@@ -8,6 +8,7 @@ export type Post = {
     date: string;
     excerpt: string;
     content: string;
+    animation?: string;
 };
 
 const postsDirectory = path.join(process.cwd(), "src/content/posts");
@@ -34,6 +35,7 @@ export async function getPosts(): Promise<Post[]> {
                 date: data.date || "",
                 excerpt: data.excerpt || "",
                 content: content,
+                animation: data.animation || null,
             } as Post;
         });
 
@@ -56,5 +58,6 @@ export async function getPostBySlug(slug: string): Promise<Post | undefined> {
         date: data.date || "",
         excerpt: data.excerpt || "",
         content: content,
+        animation: data.animation || null,
     } as Post;
 }

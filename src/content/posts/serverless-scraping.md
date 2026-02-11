@@ -1,11 +1,14 @@
 ---
-title: "Scalable Web Scraping at Scale: A Serverless Lambda Architecture"
+title: 'Scalable Web Scraping at Scale: A Serverless Lambda Architecture'
 date: '2026-02-11'
-excerpt: "In the age of big data, scraping millions of URLs efficiently while avoiding rate limits and detection remains a significant engineering challenge. This article details our production-grade serverless web scraping system that leverages AWS Lambda to process thousands of URLs concurrently while maintaining reliability and stealth."
+animation: serverless-scraping
+excerpt: >-
+  In the age of big data, scraping millions of URLs efficiently while avoiding
+  rate limits and detection remains a significant engineering challenge. This
+  article details our production-grade serverless web scraping system that
+  leverages AWS Lambda to process thousands of URLs concurrently while
+  maintaining reliability and stealth.
 ---
-
----
-
 ## 1. Introduction
 
 In the age of big data, scraping millions of URLs efficiently while avoiding rate limits and detection remains a significant engineering challenge. This article details our production-grade serverless web scraping system that leverages AWS Lambda to process thousands of URLs concurrently while maintaining reliability and stealth.

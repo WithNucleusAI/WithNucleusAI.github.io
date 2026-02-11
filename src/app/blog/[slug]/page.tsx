@@ -68,7 +68,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                 ← Back to Blogs
             </Link>
 
-            <header className="mb-10 sm:mb-16 text-center flex flex-col items-center max-w-[800px] mx-auto">
+            <header className="mb-10 sm:mb-16 text-center flex flex-col items-center max-w-[1000px] mx-auto">
                 <h1 className="mb-4 text-[2.2rem] sm:text-[3.5rem] leading-tight tracking-tight font-bold">{post.title}</h1>
                 <p className="text-sm sm:text-base text-[#888]">{post.date}</p>
             </header>

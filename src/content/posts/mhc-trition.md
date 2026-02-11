@@ -1,9 +1,11 @@
 ---
-title: "mHC-Triton: Building a 6× Faster Kernel for DeepSeek's Hyper-Connections"
+title: 'mHC-Triton: Building a 6× Faster Kernel for DeepSeek''s Hyper-Connections'
 date: '2026-01-28'
-excerpt: "A deep dive into implementing Manifold-Constrained Hyper-Connections with fused Triton kernels—achieving 6.2× faster training and 1.3× memory savings."
+excerpt: >-
+  A deep dive into implementing Manifold-Constrained Hyper-Connections with
+  fused Triton kernels—achieving 6.2× faster training and 1.3× memory savings.
+animation: structured-network
 ---
-
 ## TL;DR
 
 We present **mHC-Triton**, an open-source implementation of DeepSeek's [Manifold-Constrained Hyper-Connections](https://arxiv.org/abs/2512.24880) paper with fused Triton kernels that achieve:
@@ -64,7 +66,7 @@ Why does this work? A doubly stochastic matrix is like a "probability redistribu
 - But it **cannot amplify** the total signal magnitude
 - The constraint is differentiable and learnable
 
-![Sinkhorn Convergence](/images/mhc-triton/sinkhorn_convergence.svg)
+![Sinkhorn Convergence](/images/blog/mhc-trition/sinkhorn_convergence.svg)
 *The Sinkhorn-Knopp algorithm converges to a doubly stochastic matrix by alternating row and column normalization.*
 
 ### The Three Core Operations
@@ -123,7 +125,7 @@ A naive PyTorch implementation launches many small kernels, each reading from an
 
 Key insight: **fuse everything possible into single kernel launches**.
 
-![Kernel Fusion Comparison](/images/mhc-triton/kernel_fusion.svg)
+![Kernel Fusion Comparison](/images/blog/mhc-trition/kernel_fusion.svg)
 *Left: Multiple kernel launches with memory round-trips. Right: Single fused kernel.*
 
 The `_fused_dynamic_weights_kernel` computes all these steps in **one pass**:
@@ -157,7 +159,7 @@ def _fused_dynamic_weights_kernel(
 
 A 4×4 matrix has only 16 elements. This fits perfectly in GPU registers!
 
-![Register Matrix](/images/mhc-triton/register_matrix.svg)
+![Register Matrix](/images/blog/mhc-trition/register_matrix.svg)
 *16 scalar registers hold the entire matrix—no shared memory needed.*
 
 ```python
@@ -195,7 +197,7 @@ phi1 = tl.load(phi_t_ptr + 1 * in_dim + k_offs, mask=k_mask)
 
 The Sinkhorn-Knopp algorithm runs T iterations (typically T=20). A naive backward pass would store all T intermediate matrices—that's 20× memory overhead.
 
-![Recomputation Strategy](/images/mhc-triton/recomputation_strategy.svg)
+![Recomputation Strategy](/images/blog/mhc-trition/recomputation_strategy.svg)
 *Left: Store all intermediates. Right: Recompute on demand.*
 
 Approach: **store only the original input, recompute forward states during backward**.
@@ -245,7 +247,7 @@ All benchmarks run on NVIDIA H100 80GB HBM3 with batch=16, seq=2048, dim=4096.
 
 ### Speed Comparison
 
-![Benchmark Speed](/images/mhc-triton/benchmark_speed.svg)
+![Benchmark Speed](/images/blog/mhc-trition/benchmark_speed.svg)
 
 | Operation | PyTorch | Triton | Speedup |
 |-----------|---------|--------|---------|
@@ -259,7 +261,7 @@ The stream mixing kernel shows the largest speedup (8.6×) because it benefits m
 
 ### Memory Comparison
 
-![Memory Comparison](/images/mhc-triton/memory_comparison.svg)
+![Memory Comparison](/images/blog/mhc-trition/memory_comparison.svg)
 
 | Operation | PyTorch | Triton | Savings |
 |-----------|---------|--------|---------|
@@ -272,10 +274,10 @@ The recomputation strategy provides 1.8× memory savings on Sinkhorn alone. Comb
 
 A key validation of mHC's stability: the composite amax gain magnitudes of the residual streams remain bounded during training. The doubly stochastic constraint prevents the exponential amplification that plagued unconstrained hyper-connections.
 
-![Forward Gain](/images/mhc-triton/forward_amax_gain.png)
+![Forward Gain](/images/blog/mhc-trition/forward_amax_gain.png)
 *Composite forward gain across all layers.*
 
-![Backward Gain](/images/mhc-triton/backward_amax_gain.png)
+![Backward Gain](/images/blog/mhc-trition/backward_amax_gain.png)
 *Composite backward gain across all layers.*
 
 These visualizations confirm that both forward and backward passes maintain stable gain magnitudes across layers—a direct result of the Birkhoff polytope constraint.
@@ -319,7 +321,7 @@ H_new = add_residual(branch_output)
 
 ### Architecture Overview
 
-![Architecture Diagram](/images/mhc-triton/mhc-architecture-diagram.svg)
+![Architecture Diagram](/images/blog/mhc-trition/mhc-architecture-diagram.svg)
 
 The flow is:
 1. **H** (hyper-hidden) enters the module
