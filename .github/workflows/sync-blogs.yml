@@ -4,6 +4,13 @@ on:
   repository_dispatch:
     types: [update_blog]
   workflow_dispatch:
+  push:
+    branches:
+      - master
+      - dev
+    paths-ignore:
+      - 'src/content/posts/**'
+      - 'public/images/blog/**'
 
 jobs:
   sync-blogs:
