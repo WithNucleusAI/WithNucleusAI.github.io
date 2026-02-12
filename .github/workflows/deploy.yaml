@@ -5,7 +5,9 @@ on:
     types: [update_blog]
   push:
     branches: [master, dev]
-    paths-ignore: ['src/content/posts/**', 'public/images/blog/**']
+    paths-ignore:
+      - 'src/content/posts/**'
+      - 'public/images/blog/**'
 
 env:
   PROJECT_ID: poetic-avenue-438401-a7
@@ -16,13 +18,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Determine Environment
+      - name: Determine Target Branch
         run: |
           if [ "${{ github.event_name }}" == "repository_dispatch" ]; then
-            # Blogs push always goes to dev
             echo "TARGET_BRANCH=dev" >> $GITHUB_ENV
           else
-            # Code push follows the branch (master or dev)
             echo "TARGET_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
           fi
 
@@ -38,20 +38,37 @@ jobs:
           repository: WithNucleusAI/engineering-blogs
           token: ${{ secrets.GH_PAT }}
           path: temp_blogs
-          ref: master # Always pull blogs from master
+          ref: master
 
-      - name: Setup Node & Process Blogs
+      - name: Setup Node 20
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      
-      - name: Build & Push Docker Image
+
+      - name: Process Blogs
+        run: |
+          npm ci
+          # Install system deps for Mermaid/Puppeteer
+          sudo apt-get update && sudo apt-get install -y ca-certificates fonts-liberation libnss3 lsb-release xdg-utils
+          echo '{"args": ["--no-sandbox"]}' > puppeteer-config.json
+          node scripts/process-blogs.mjs
+        env:
+          PUPPETEER_CONFIG: ./puppeteer-config.json
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Build and Push Docker Image
         run: |
           TAG="${{ env.TARGET_BRANCH }}-${{ github.sha }}"
           IMAGE_NAME="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/nucleus-blog:${TAG}"
-          
-          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+          # Explicit Docker Login (Fixes the Unauthenticated error)
+          gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://${{ env.REGION }}-docker.pkg.dev
+
           docker build -t $IMAGE_NAME .
           docker push $IMAGE_NAME
           echo "IMAGE_URL=$IMAGE_NAME" >> $GITHUB_ENV
