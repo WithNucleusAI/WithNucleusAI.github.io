@@ -1,4 +1,4 @@
-name: Sync Blogs
+name: Build and Deploy
 
 on:
   repository_dispatch:
@@ -16,7 +16,7 @@ jobs:
   sync-blogs:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     steps:
       - name: Checkout Main Repo
         uses: actions/checkout@v4
@@ -50,16 +50,13 @@ jobs:
       - name: Process Blogs
         run: node scripts/process-blogs.mjs
 
-      - name: Commit and Push Changes
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          # We need to force add because these directories are in .gitignore
-          git add --force src/content/posts/ public/images/blog/
-          # Check if there are changes before committing
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "chore: sync blogs from engineering-blogs"
-            git push
-          fi
+      - name: Build Project
+        run: npm run build
+
+      - name: Deploy to Firebase
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_WITHNUCLEUSAI_GITHUB_IO }}'
+          channelId: live
+          projectId: withnucleusai-github-io
