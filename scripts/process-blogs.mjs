@@ -100,14 +100,17 @@ async function processBlogs() {
                 for (const asset of assets) {
                     if (asset.startsWith('.')) continue;
                     const src = path.join(assetsDir, asset);
-                    const dest = path.join(blogImagesDir, asset);
+                    // Replace spaces with hyphens for the destination file
+                    const sanitizedAsset = asset.replace(/\s+/g, '-');
+                    const dest = path.join(blogImagesDir, sanitizedAsset);
                     
                     if (fs.lstatSync(src).isDirectory()) continue;
                     
                     fs.copyFileSync(src, dest);
                     
-                    // Store mapping: filename -> /images/blog/slug/filename
-                    assetMap.set(asset, `/images/blog/${slug}/${asset}`);
+                    // Store mapping: filename -> /images/blog/slug/sanitizedAsset
+                    // Map the ORIGINAL filename to the NEW path
+                    assetMap.set(asset, `/images/blog/${slug}/${sanitizedAsset}`);
                 }
             }
     
