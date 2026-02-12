@@ -32,9 +32,12 @@ jobs:
           token: ${{ secrets.GH_PAT }}
           path: temp_blogs
 
-      # Note: We skip 'Install Dependencies' for system libs 
-      # because they are already in the Docker image.
-      
+      # The container has Node 18, but Next.js 16 requires >= 20.
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Install Project Deps
         run: npm ci
 
