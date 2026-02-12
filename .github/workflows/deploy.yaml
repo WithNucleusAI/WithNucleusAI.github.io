@@ -8,7 +8,7 @@ on:
     paths-ignore: ['src/content/posts/**', 'public/images/blog/**']
 
 env:
-  PROJECT_ID: poetic-something # Your GCP Project ID
+  PROJECT_ID: poetic-avenue-438401-a7 # Your GCP Project ID
   REGION: us-east1
   REPO_NAME: nucleus-repo
 
