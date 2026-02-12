@@ -1,0 +1,69 @@
+name: "CI/CD: Build and Deploy to Cloud Run"
+
+on:
+  repository_dispatch:
+    types: [update_blog]
+  push:
+    branches: [master, dev]
+    paths-ignore: ['src/content/posts/**', 'public/images/blog/**']
+
+env:
+  PROJECT_ID: poetic-something # Your GCP Project ID
+  REGION: us-east1
+  REPO_NAME: nucleus-repo
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Website
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Checkout Blogs
+        uses: actions/checkout@v4
+        with:
+          repository: WithNucleusAI/engineering-blogs
+          token: ${{ secrets.GH_PAT }}
+          path: temp_blogs
+
+      - name: Process Blogs (The Heavy Lifting)
+        run: |
+          npm ci
+          # We use the system deps on the runner for Mermaid
+          sudo apt-get update && sudo apt-get install -y ca-certificates fonts-liberation libnss3 lsb-release xdg-utils
+          echo '{"args": ["--no-sandbox"]}' > puppeteer-config.json
+          node scripts/process-blogs.mjs
+        env:
+          PUPPETEER_CONFIG: ./puppeteer-config.json
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Build and Push Docker Image
+        run: |
+          # Dynamic naming based on branch (dev/prod)
+          TAG="${{ github.ref_name }}-${{ github.sha }}"
+          IMAGE_NAME="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/nucleus-blog:${TAG}"
+          
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+          docker build -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
+          echo "IMAGE_URL=$IMAGE_NAME" >> $GITHUB_ENV
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: nucleus-blog-${{ github.ref_name }} # Creates dev and master services
+          image: ${{ env.IMAGE_URL }}
+          region: ${{ env.REGION }}
+          flags: '--allow-unauthenticated'
