@@ -16,7 +16,7 @@ jobs:
     # This runs the entire job inside a container that already has 
     # Node, Chrome, and Mermaid CLI installed.
     container:
-      image: minlag/mermaid-cli:latest
+      image: ghcr.io/mermaid-js/mermaid-cli/mermaid-cli:latest
       options: --user root # Ensure we have permissions to write files
 
     steps:
