@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import rehypeRaw from 'rehype-raw';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { prism } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import ImageViewer from './ImageViewer';
@@ -158,7 +159,7 @@ export default function BlogContent({ content }: BlogContentProps) {
             <ReactMarkdown
                 components={components}
                 remarkPlugins={[remarkGfm, remarkMath]}
-                rehypePlugins={[rehypeKatex]}
+                rehypePlugins={[rehypeRaw, rehypeKatex]}
             >
                 {content}
             </ReactMarkdown>
