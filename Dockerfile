@@ -4,20 +4,20 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
-# The blogs are already processed by the GitHub Action before this step
+# Blogs are already processed by GitHub Action before this
 RUN npm run build
 
 # Stage 2: Run
 FROM node:20-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-# Copy only the essentials for a tiny image size
-COPY --from=builder /app/next.config.js ./
+
+# Next.js standalone mode moves everything needed to this folder
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 
 EXPOSE 8080
 ENV PORT 8080
-CMD ["npm", "start"]
+# Use the server.js created by the standalone build
+CMD ["node", "server.js"]
