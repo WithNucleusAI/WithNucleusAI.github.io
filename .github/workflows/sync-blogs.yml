@@ -5,18 +5,20 @@ on:
     types: [update_blog]
   workflow_dispatch:
   push:
-    branches:
-      - master
-      - dev
+    branches: [master, dev]
     paths-ignore:
       - 'src/content/posts/**'
       - 'public/images/blog/**'
 
 jobs:
-  sync-blogs:
+  sync-and-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
+    # This runs the entire job inside a container that already has 
+    # Node, Chrome, and Mermaid CLI installed.
+    container:
+      image: minlag/mermaid-cli:latest
+      options: --user root # Ensure we have permissions to write files
+
     steps:
       - name: Checkout Main Repo
         uses: actions/checkout@v4
@@ -30,25 +32,19 @@ jobs:
           token: ${{ secrets.GH_PAT }}
           path: temp_blogs
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install Dependencies
+      # Note: We skip 'Install Dependencies' for system libs 
+      # because they are already in the Docker image.
+      
+      - name: Install Project Deps
         run: npm ci
 
-      - name: Install Mermaid CLI
-        run: npm install -D @mermaid-js/mermaid-cli
-
-      - name: Install Puppeteer Dependencies
-        # mmdc requires chrome/puppeteer which might need system deps
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ca-certificates fonts-liberation libasound2 libatk-bridge2.0-0 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgbm1 libgcc1 libglib2.0-0 libgtk-3-0 libnspr4 libnss3 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 lsb-release wget xdg-utils
-
       - name: Process Blogs
-        run: node scripts/process-blogs.mjs
+        run: |
+          # Use the mmdc binary already present in the container
+          node scripts/process-blogs.mjs
+        env:
+          # We tell the script to use the container's Chromium
+          PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium-browser
 
       - name: Build Project
         run: npm run build

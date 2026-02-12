@@ -212,8 +212,9 @@ async function processBlogs() {
                     const mmdPath = path.join(blogImagesDir, `temp-${hash}.mmd`);
                     fs.writeFileSync(mmdPath, mermaidCode);
                     try {
-                        execSync(`npx mmdc -i "${mmdPath}" -o "${imagePath}" -b white -s 3`, { stdio: 'inherit' });
-                        fs.unlinkSync(mmdPath);
+                       const mmdcCmd = process.env.PUPPETEER_EXECUTABLE_PATH ? 'mmdc' : 'npx mmdc';
+                         execSync(`${mmdcCmd} -p /puppeteer-config.json -i "${mmdPath}" -o "${imagePath}" -b white -s 3`, { stdio: 'inherit' });
+                         fs.unlinkSync(mmdPath);
                     } catch (e) {
                         console.error(`  Failed to generate mermaid for ${slug}`, e);
                         continue; 
