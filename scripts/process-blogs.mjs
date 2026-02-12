@@ -243,7 +243,14 @@ async function processBlogs() {
                 return match;
             });
     
-            // 5. Construct Final Content with Frontmatter
+            // 5. Normalize single-line display math to multi-line format
+            // remark-math requires $$ on separate lines for display (centered) math.
+            // Convert: $$...$$ (single line) -> $$\n...\n$$ (multi-line)
+            content = content.replace(/^\$\$(.+?)\$\$\s*$/gm, (match, equation) => {
+                return `$$\n${equation.trim()}\n$$`;
+            });
+
+            // 6. Construct Final Content with Frontmatter
             // Ensure content doesn't start with '---' (horizontal rule) which gray-matter mistakes for frontmatter
             content = content.trim();
             if (content.startsWith('---')) {

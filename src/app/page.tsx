@@ -14,7 +14,6 @@ export default async function Home() {
         <ScrollDownButton />
       </section>
 
-      {/* Blog Section now isolated in a Client Component to handle interaction */}
       <BlogSection posts={recentPosts} />
     </main>
   );
