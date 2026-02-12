@@ -8,7 +8,7 @@ on:
     paths-ignore: ['src/content/posts/**', 'public/images/blog/**']
 
 env:
-  PROJECT_ID: poetic-avenue-438401-a7 # Your GCP Project ID
+  PROJECT_ID: poetic-avenue-438401-a7
   REGION: us-east1
   REPO_NAME: nucleus-repo
 
@@ -16,43 +16,39 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Determine Environment
+        run: |
+          if [ "${{ github.event_name }}" == "repository_dispatch" ]; then
+            # Blogs push always goes to dev
+            echo "TARGET_BRANCH=dev" >> $GITHUB_ENV
+          else
+            # Code push follows the branch (master or dev)
+            echo "TARGET_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
+          fi
+
       - name: Checkout Website
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GH_PAT }}
+          ref: ${{ env.TARGET_BRANCH }}
 
-      - name: Setup Node 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Checkout Blogs
+      - name: Checkout Blogs (Master only)
         uses: actions/checkout@v4
         with:
           repository: WithNucleusAI/engineering-blogs
           token: ${{ secrets.GH_PAT }}
           path: temp_blogs
+          ref: master # Always pull blogs from master
 
-      - name: Process Blogs (The Heavy Lifting)
-        run: |
-          npm ci
-          # We use the system deps on the runner for Mermaid
-          sudo apt-get update && sudo apt-get install -y ca-certificates fonts-liberation libnss3 lsb-release xdg-utils
-          echo '{"args": ["--no-sandbox"]}' > puppeteer-config.json
-          node scripts/process-blogs.mjs
-        env:
-          PUPPETEER_CONFIG: ./puppeteer-config.json
-
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v2
+      - name: Setup Node & Process Blogs
+        uses: actions/setup-node@v4
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-      - name: Build and Push Docker Image
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Build & Push Docker Image
         run: |
-          # Dynamic naming based on branch (dev/prod)
-          TAG="${{ github.ref_name }}-${{ github.sha }}"
+          TAG="${{ env.TARGET_BRANCH }}-${{ github.sha }}"
           IMAGE_NAME="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/nucleus-blog:${TAG}"
           
           gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
@@ -63,7 +59,7 @@ jobs:
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
-          service: nucleus-blog-${{ github.ref_name }} # Creates dev and master services
+          service: nucleus-blog-${{ env.TARGET_BRANCH }}
           image: ${{ env.IMAGE_URL }}
           region: ${{ env.REGION }}
           flags: '--allow-unauthenticated'
