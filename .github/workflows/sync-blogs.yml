@@ -11,14 +11,8 @@ on:
       - 'public/images/blog/**'
 
 jobs:
-  sync-and-deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    # This runs the entire job inside a container that already has 
-    # Node, Chrome, and Mermaid CLI installed.
-    container:
-      image: ghcr.io/mermaid-js/mermaid-cli/mermaid-cli:latest
-      options: --user root # Ensure we have permissions to write files
-
     steps:
       - name: Checkout Main Repo
         uses: actions/checkout@v4
@@ -32,7 +26,6 @@ jobs:
           token: ${{ secrets.GH_PAT }}
           path: temp_blogs
 
-      # The container has Node 18, but Next.js 16 requires >= 20.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -41,13 +34,11 @@ jobs:
       - name: Install Project Deps
         run: npm ci
 
+      - name: Install Puppeteer System Dependencies
+        run: npx puppeteer browsers install chrome
+
       - name: Process Blogs
-        run: |
-          # Use the mmdc binary already present in the container
-          node scripts/process-blogs.mjs
-        env:
-          # We tell the script to use the container's Chromium
-          PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium-browser
+        run: node scripts/process-blogs.mjs
 
       - name: Build Project
         run: npm run build
