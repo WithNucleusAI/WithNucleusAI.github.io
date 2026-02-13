@@ -49,7 +49,6 @@ samp {
 #typing {
   font-size: 1.8rem;
   font-weight: 500;
-  /* Removed modern styles like letter-spacing, min-height, etc. */
 }
 
 #email {
@@ -58,14 +57,12 @@ samp {
   font-size: 1.3rem;
   font-weight: 100;
   opacity: 0;
-  color: black; /* Legacy assumed black text on white, ensuring visibility */
 }
 
 #caption {
   font-size: 2.5rem;
   font-weight: 500;
   opacity: 0;
-  color: black;
 }
 
 .fadeInAnimation {

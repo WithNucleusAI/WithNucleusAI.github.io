@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bird Illusion Lab — Static Motion Prototyping</title>
+    <style>
+        :root {
+            --page-bg: #000;
+            --page-fg: #e8edf7;
+            --panel-bg: rgba(10, 10, 16, 0.85);
+            --panel-border: rgba(255, 255, 255, 0.12);
+            --label-fg: #9fb2d9;
+            --status-fg: #9be7c4;
+            --button-bg: #2f8fda;
+            --button-bg-hover: #40a4ee;
+            --accent-a: #f0c040;
+            --accent-b: #8ca0c0;
+            --accent-align: #60d090;
+            --section-border: rgba(255,255,255,0.06);
+        }
+        body.light-theme {
+            --page-bg: #c8c8c8;
+            --page-fg: #111a2e;
+            --panel-bg: rgba(255, 255, 255, 0.9);
+            --panel-border: rgba(18, 28, 48, 0.14);
+            --label-fg: #435c8f;
+            --status-fg: #2e7d5e;
+            --button-bg: #2d7bd0;
+            --button-bg-hover: #3d90ea;
+            --accent-a: #b8900a;
+            --accent-b: #5a7090;
+            --accent-align: #2e8858;
+            --section-border: rgba(0,0,0,0.08);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: var(--page-bg);
+            color: var(--page-fg);
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        canvas { display: block; }
+
+        .panel {
+            position: fixed;
+            top: 128px;
+            left: 16px;
+            z-index: 10;
+            width: 320px;
+            max-height: calc(100vh - 80px);
+            overflow-y: auto;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 12px;
+            backdrop-filter: blur(10px);
+        }
+        .panel::-webkit-scrollbar { width: 4px; }
+        .panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin: 10px 0 4px;
+            padding-top: 8px;
+            border-top: 1px solid var(--section-border);
+        }
+        .section-title:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+        .section-title.bird-a { color: var(--accent-a); }
+        .section-title.bird-b { color: var(--accent-b); }
+        .section-title.align { color: var(--accent-align); }
+
+        .row { margin: 6px 0; }
+        .label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--label-fg);
+            margin-bottom: 2px;
+            display: block;
+        }
+        .value {
+            float: right;
+            color: var(--page-fg);
+            letter-spacing: normal;
+            text-transform: none;
+        }
+        input[type="range"] { width: 100%; margin: 1px 0; }
+        input[type="file"] { width: 100%; font-size: 10px; margin: 1px 0; }
+        button {
+            margin-top: 4px;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 6px;
+            padding: 7px 10px;
+            color: #fff;
+            background: var(--button-bg);
+            cursor: pointer;
+        }
+        button:hover { background: var(--button-bg-hover); }
+        .status {
+            margin-top: 4px;
+            font-size: 10px;
+            color: var(--status-fg);
+            line-height: 1.3;
+            word-break: break-word;
+        }
+        .inline-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+        .inline-btns button { flex: 1; min-width: 0; }
+        .checkbox-row {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 11px; color: var(--label-fg);
+            margin: 4px 0;
+        }
+        .checkbox-row input[type="checkbox"] { margin: 0; }
+        details summary {
+            cursor: pointer;
+            user-select: none;
+        }
+        select {
+            width: 100%;
+            font-size: 11px;
+            padding: 4px 6px;
+            border-radius: 4px;
+            background: var(--panel-bg);
+            color: var(--page-fg);
+            border: 1px solid var(--panel-border);
+            margin-top: 2px;
+        }
+        .hint {
+            font-size: 9px;
+            color: rgba(255,255,255,0.35);
+            margin: 2px 0 4px;
+            line-height: 1.3;
+        }
+        body.light-theme .hint { color: rgba(0,0,0,0.35); }
+        .value-input {
+            float: right;
+            width: 52px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            color: var(--page-fg);
+            font-size: 11px;
+            text-align: right;
+            padding: 0 2px;
+            font-family: inherit;
+            letter-spacing: normal;
+            text-transform: none;
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        .value-input::-webkit-inner-spin-button,
+        .value-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            appearance: none;
+            margin: 0;
+        }
+        .value-input:focus {
+            border: 1px solid var(--button-bg);
+            outline: none;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.06);
+        }
+        body.light-theme .value-input { border-bottom-color: rgba(0,0,0,0.15); }
+        body.light-theme .value-input:focus { background: rgba(0,0,0,0.04); }
+    </style>
+</head>
+<body>
+    <div class="panel">
+        <!-- ─── Bird A ─── -->
+        <div class="section-title bird-a">Bird A &mdash; Yellow</div>
+        <div class="row">
+            <input id="fileA" type="file" accept="image/png,image/webp,image/jpeg">
+            <div id="statusA" class="status">No image loaded.</div>
+        </div>
+
+        <!-- ─── Bird B ─── -->
+        <div class="section-title bird-b">Bird B &mdash; Grey</div>
+        <div class="row">
+            <input id="fileB" type="file" accept="image/png,image/webp,image/jpeg">
+            <div id="statusB" class="status">No image loaded.</div>
+        </div>
+
+        <!-- ─── Pair Alignment ─── -->
+        <div class="section-title align">Pair Alignment</div>
+        <details open>
+            <summary class="label" style="cursor:pointer;">Adjust alignment offsets (pre-tuned)</summary>
+            <div class="row">
+                <label class="label">Align Scale <span id="alignScaleVal" class="value">2.47</span></label>
+                <input id="alignScale" type="range" min="0.50" max="4.00" step="0.01" value="2.47">
+            </div>
+            <div class="row">
+                <label class="label">A Offset X <span id="axVal" class="value">475</span></label>
+                <input id="ax" type="range" min="-800" max="800" step="1" value="475">
+            </div>
+            <div class="row">
+                <label class="label">A Offset Y <span id="ayVal" class="value">-439</span></label>
+                <input id="ay" type="range" min="-800" max="800" step="1" value="-439">
+            </div>
+            <div class="row">
+                <label class="label">B Offset X <span id="bxVal" class="value">-479</span></label>
+                <input id="bx" type="range" min="-800" max="800" step="1" value="-479">
+            </div>
+            <div class="row">
+                <label class="label">B Offset Y <span id="byVal" class="value">-112</span></label>
+                <input id="by" type="range" min="-800" max="800" step="1" value="-112">
+            </div>
+            <div class="row">
+                <label class="label">Pair Spacing <span id="spacingVal" class="value">-4</span></label>
+                <input id="spacing" type="range" min="-400" max="400" step="1" value="-4">
+            </div>
+            <div class="checkbox-row">
+                <input type="checkbox" id="flipB"> <label for="flipB">Flip Bird B Horizontally</label>
+            </div>
+        </details>
+        <div id="compositeStatus" class="status">No composite yet.</div>
+
+        <!-- ─── Tessellation ─── -->
+        <div class="section-title" style="color: var(--page-fg);">Tessellation</div>
+        <details open>
+            <summary class="label" style="cursor:pointer;">Grid parameters</summary>
+            <div class="row">
+                <label class="label">Scale <span id="scaleVal" class="value">0.21</span></label>
+                <input id="scale" type="range" min="0.1" max="1.8" step="0.01" value="0.21">
+            </div>
+            <div class="row">
+                <label class="label">Interlock X Fine <span id="stepXVal" class="value">-0.04</span></label>
+                <input id="stepX" type="range" min="-0.35" max="0.35" step="0.01" value="-0.04">
+            </div>
+            <div class="row">
+                <label class="label">Interlock Y Fine <span id="stepYVal" class="value">-0.03</span></label>
+                <input id="stepY" type="range" min="-0.35" max="0.35" step="0.01" value="-0.03">
+            </div>
+            <div class="row">
+                <label class="label">Row Baseline <span id="baseYVal" class="value">0.50</span></label>
+                <input id="baseY" type="range" min="0.2" max="0.8" step="0.01" value="0.50">
+            </div>
+            <div class="row">
+                <label class="label">Row Overscan <span id="rowsVal" class="value">2</span></label>
+                <input id="rows" type="range" min="0" max="20" step="1" value="2">
+            </div>
+            <div class="row">
+                <label class="label">Row Distance Fine <span id="rowGapVal" class="value">-0.33</span></label>
+                <input id="rowGap" type="range" min="-0.50" max="0.50" step="0.01" value="-0.33">
+            </div>
+        </details>
+
+        <!-- ═══════════════════════════════════════════════
+             STATIC ILLUSION LAB
+             Kitaoka Peripheral Drift prototyping engine
+             ═══════════════════════════════════════════════ -->
+        <div class="section-title" style="color: #ff6090;">Static Illusion Lab</div>
+        <div class="checkbox-row">
+            <input type="checkbox" id="protoOn" checked> <label for="protoOn">Enable Illusion Processing</label>
+        </div>
+        <div class="row">
+            <label class="label">Mode</label>
+            <select id="protoMode">
+                <option value="outlines">1. Asymmetric Outlines</option>
+                <option value="gradient">2. Body Gradient (Sawtooth)</option>
+                <option value="stripes">3. Feather Microstripes</option>
+                <option value="edges">4. Edge Contrast</option>
+                <option value="combined" selected>5. Combined (All Effects)</option>
+            </select>
+        </div>
+        <div class="hint">Bird A (yellow) → rightward | Bird B (grey) → leftward</div>
+        <div class="row">
+            <label class="label">Outline Thickness (px) <span id="pOutlineVal" class="value">1</span></label>
+            <input id="pOutline" type="range" min="1" max="30" step="1" value="1">
+        </div>
+        <div class="row">
+            <label class="label">Gradient Strength <span id="pGradVal" class="value">74</span></label>
+            <input id="pGrad" type="range" min="0" max="100" step="1" value="74">
+        </div>
+        <div class="row">
+            <label class="label">Stripe Width (px) <span id="pStripeWVal" class="value">3</span></label>
+            <input id="pStripeW" type="range" min="3" max="40" step="1" value="3">
+        </div>
+        <div class="row">
+            <label class="label">Stripe Blend <span id="pStripeBVal" class="value">100</span></label>
+            <input id="pStripeB" type="range" min="0" max="100" step="1" value="100">
+        </div>
+        <div class="row">
+            <label class="label">Edge Width (%) <span id="pEdgeVal" class="value">50</span></label>
+            <input id="pEdge" type="range" min="5" max="50" step="1" value="50">
+        </div>
+        <div class="checkbox-row">
+            <input type="checkbox" id="showFixation" checked> <label for="showFixation">Show Fixation Crosshair</label>
+        </div>
+        <div class="checkbox-row">
+            <input type="checkbox" id="splitView"> <label for="splitView">Split Comparison (Original | Processed)</label>
+        </div>
+        <div id="protoStatus" class="status">Enable processing and load both birds.</div>
+
+        <!-- ─── Animated Counter-Motion (kickstarter) ─── -->
+        <div class="section-title" style="color: #c080ff;">Counter-Motion Boost</div>
+        <div class="checkbox-row">
+            <input type="checkbox" id="motionOn" checked> <label for="motionOn">Enable Counter-Motion Animation</label>
+        </div>
+        <div class="row">
+            <label class="label">Mode</label>
+            <select id="motionMode">
+                <option value="sine">Bird Counter-Oscillation (A&#x2192; B&#x2190;)</option>
+                <option value="linear">Linear Drift (A&#x2192; B&#x2190;)</option>
+            </select>
+        </div>
+        <div class="row">
+            <label class="label">Motion Speed <span id="mSpeedVal" class="value">0.11</span></label>
+            <input id="mSpeed" type="range" min="0.01" max="2.0" step="0.01" value="0.11">
+        </div>
+        <div class="row">
+            <label class="label">Wave Amplitude (px) <span id="mAmpVal" class="value">2</span></label>
+            <input id="mAmp" type="range" min="1" max="200" step="1" value="2">
+        </div>
+
+        <div class="row inline-btns" style="margin-top: 8px;">
+            <button id="themeToggleBtn">Switch To Light Theme</button>
+        </div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+    (() => {
+        /* ── Constants ── */
+        const BASE_INTERLOCK_X = 0.78;
+        const BASE_INTERLOCK_Y = -0.06;
+
+        /* ── DOM refs ── */
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        const compositeStatusEl = document.getElementById("compositeStatus");
+        const protoStatusEl = document.getElementById("protoStatus");
+
+        const fileAInput = document.getElementById("fileA");
+        const fileBInput = document.getElementById("fileB");
+        const statusAEl = document.getElementById("statusA");
+        const statusBEl = document.getElementById("statusB");
+        const themeToggleBtn = document.getElementById("themeToggleBtn");
+
+        // Alignment
+        const alignScaleSlider = document.getElementById("alignScale");
+        const axSlider  = document.getElementById("ax");
+        const aySlider  = document.getElementById("ay");
+        const bxSlider  = document.getElementById("bx");
+        const bySlider  = document.getElementById("by");
+        const spacingSlider = document.getElementById("spacing");
+        const flipBCheck = document.getElementById("flipB");
+
+        // Tessellation
+        const scaleSlider  = document.getElementById("scale");
+        const stepXSlider  = document.getElementById("stepX");
+        const stepYSlider  = document.getElementById("stepY");
+        const baseYSlider  = document.getElementById("baseY");
+        const rowsSlider   = document.getElementById("rows");
+        const rowGapSlider = document.getElementById("rowGap");
+
+        // Illusion Lab
+        const protoOnCheck   = document.getElementById("protoOn");
+        const protoModeSelect = document.getElementById("protoMode");
+        const outlineSlider  = document.getElementById("pOutline");
+        const gradSlider     = document.getElementById("pGrad");
+        const stripeWSlider  = document.getElementById("pStripeW");
+        const stripeBSlider  = document.getElementById("pStripeB");
+        const edgeSlider     = document.getElementById("pEdge");
+        const fixationCheck  = document.getElementById("showFixation");
+        const splitCheck     = document.getElementById("splitView");
+
+        // Counter-motion animation
+        const motionOnCheck    = document.getElementById("motionOn");
+        const motionModeSelect = document.getElementById("motionMode");
+        const mSpeedSlider     = document.getElementById("mSpeed");
+        const mAmpSlider       = document.getElementById("mAmp");
+        const mSpeedValEl      = document.getElementById("mSpeedVal");
+        const mAmpValEl        = document.getElementById("mAmpVal");
+
+        // Value displays
+        const alignScaleVal = document.getElementById("alignScaleVal");
+        const axVal = document.getElementById("axVal");
+        const ayVal = document.getElementById("ayVal");
+        const bxVal = document.getElementById("bxVal");
+        const byVal = document.getElementById("byVal");
+        const spacingVal = document.getElementById("spacingVal");
+
+        const scaleVal  = document.getElementById("scaleVal");
+        const stepXVal  = document.getElementById("stepXVal");
+        const stepYVal  = document.getElementById("stepYVal");
+        const baseYVal  = document.getElementById("baseYVal");
+        const rowsVal   = document.getElementById("rowsVal");
+        const rowGapVal = document.getElementById("rowGapVal");
+
+        const pOutlineVal = document.getElementById("pOutlineVal");
+        const pGradVal    = document.getElementById("pGradVal");
+        const pStripeWVal = document.getElementById("pStripeWVal");
+        const pStripeBVal = document.getElementById("pStripeBVal");
+        const pEdgeVal    = document.getElementById("pEdgeVal");
+
+        /* ── State ── */
+        let birdA = null;
+        let birdB = null;
+        let unitImage = null;
+        let unitMeta = null;
+        let unitImageA = null;
+        let unitImageB = null;
+
+        // Processed composites for illusion lab
+        let processedComposite = null;
+        let processedMeta = null;
+        let processedBirdA = null;  // separate processed Bird A (for motion)
+        let processedBirdB = null;  // separate processed Bird B (for motion)
+
+        let width = 0, height = 0;
+        let isDarkTheme = false;
+        let lastTimestampMs = performance.now();
+        let motionTime = 0;
+
+        /* ── Label updates (set .value since spans become inputs) ── */
+        function updateAlignLabels() {
+            alignScaleVal.value = Number(alignScaleSlider.value).toFixed(2);
+            axVal.value  = String(Math.round(Number(axSlider.value)));
+            ayVal.value  = String(Math.round(Number(aySlider.value)));
+            bxVal.value  = String(Math.round(Number(bxSlider.value)));
+            byVal.value  = String(Math.round(Number(bySlider.value)));
+            spacingVal.value = String(Math.round(Number(spacingSlider.value)));
+        }
+
+        function updateTileLabels() {
+            scaleVal.value  = Number(scaleSlider.value).toFixed(2);
+            stepXVal.value  = Number(stepXSlider.value).toFixed(2);
+            stepYVal.value  = Number(stepYSlider.value).toFixed(2);
+            baseYVal.value  = Number(baseYSlider.value).toFixed(2);
+            rowsVal.value   = String(Math.round(Number(rowsSlider.value)));
+            rowGapVal.value = Number(rowGapSlider.value).toFixed(2);
+        }
+
+        function updateLabLabels() {
+            pOutlineVal.value = outlineSlider.value;
+            pGradVal.value    = gradSlider.value;
+            pStripeWVal.value = stripeWSlider.value;
+            pStripeBVal.value = stripeBSlider.value;
+            pEdgeVal.value    = edgeSlider.value;
+        }
+
+        function updateMotionLabels() {
+            mSpeedValEl.value = Number(mSpeedSlider.value).toFixed(2);
+            mAmpValEl.value   = String(Math.round(Number(mAmpSlider.value)));
+        }
+
+        function resize() {
+            width  = canvas.width  = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        /* ══════════════════════════════════════════════════════════════
+           IMAGE ANALYSIS (same as dual-bird-aligner)
+           ══════════════════════════════════════════════════════════════ */
+        function analyzeOpaqueBounds(imgOrCanvas) {
+            const w = imgOrCanvas.width;
+            const h = imgOrCanvas.height;
+            const off = document.createElement("canvas");
+            off.width = w; off.height = h;
+            const octx = off.getContext("2d");
+            octx.drawImage(imgOrCanvas, 0, 0);
+            const data = octx.getImageData(0, 0, w, h).data;
+
+            let minX = w, minY = h, maxX = -1, maxY = -1;
+            let hasMeaningfulTransparency = false;
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const alpha = data[(y * w + x) * 4 + 3];
+                    if (alpha < 250) hasMeaningfulTransparency = true;
+                    if (alpha > 8) {
+                        if (x < minX) minX = x;
+                        if (y < minY) minY = y;
+                        if (x > maxX) maxX = x;
+                        if (y > maxY) maxY = y;
+                    }
+                }
+            }
+            if (maxX < minX || maxY < minY) {
+                minX = 0; minY = 0;
+                maxX = w - 1; maxY = h - 1;
+            }
+
+            const alphaCropW = maxX - minX + 1;
+            const alphaCropH = maxY - minY + 1;
+            const alphaAreaRatio = (alphaCropW * alphaCropH) / (w * h);
+            if (!hasMeaningfulTransparency || alphaAreaRatio > 0.95) {
+                const comp = getLargestForegroundComponentBounds(data, w, h);
+                if (comp) {
+                    minX = comp.minX; minY = comp.minY;
+                    maxX = comp.maxX; maxY = comp.maxY;
+                }
+            }
+
+            return {
+                sx: minX, sy: minY,
+                sw: maxX - minX + 1, sh: maxY - minY + 1,
+                cropW: maxX - minX + 1, cropH: maxY - minY + 1,
+            };
+        }
+
+        function getLargestForegroundComponentBounds(data, w, h) {
+            const mask = new Uint8Array(w * h);
+            for (let i = 0; i < mask.length; i++) {
+                const idx = i * 4;
+                const r = data[idx], g = data[idx+1], b = data[idx+2], a = data[idx+3];
+                const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+                mask[i] = (a > 16 && luminance < 235) ? 1 : 0;
+            }
+            const visited = new Uint8Array(mask.length);
+            const queue = [];
+            let best = null;
+            for (let i = 0; i < mask.length; i++) {
+                if (!mask[i] || visited[i]) continue;
+                let area = 0, mnX = w, mnY = h, mxX = 0, mxY = 0;
+                visited[i] = 1; queue.push(i); let q = 0;
+                while (q < queue.length) {
+                    const id = queue[q++]; area++;
+                    const x = id % w, y = (id / w) | 0;
+                    if (x < mnX) mnX = x; if (y < mnY) mnY = y;
+                    if (x > mxX) mxX = x; if (y > mxY) mxY = y;
+                    for (const [nx, ny] of [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]) {
+                        if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+                        const ni = ny * w + nx;
+                        if (!mask[ni] || visited[ni]) continue;
+                        visited[ni] = 1; queue.push(ni);
+                    }
+                }
+                queue.length = 0;
+                if (!best || area > best.area) best = { area, minX: mnX, minY: mnY, maxX: mxX, maxY: mxY };
+            }
+            if (!best || best.area < w * h * 0.005) return null;
+            return best;
+        }
+
+        /* ── Image loading ── */
+        function loadImageFromFile(file) {
+            return new Promise((resolve, reject) => {
+                const url = URL.createObjectURL(file);
+                const img = new Image();
+                img.onload = () => {
+                    const meta = analyzeOpaqueBounds(img);
+                    URL.revokeObjectURL(url);
+                    resolve({ img, meta });
+                };
+                img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Load failed")); };
+                img.src = url;
+            });
+        }
+
+        fileAInput.addEventListener("change", async () => {
+            if (!fileAInput.files[0]) return;
+            try {
+                birdA = await loadImageFromFile(fileAInput.files[0]);
+                statusAEl.textContent =
+                    `${fileAInput.files[0].name} (${birdA.img.width}x${birdA.img.height}) crop ${birdA.meta.cropW}x${birdA.meta.cropH}`;
+                buildComposite();
+            } catch (e) { statusAEl.textContent = "Failed to load."; console.error(e); }
+        });
+
+        fileBInput.addEventListener("change", async () => {
+            if (!fileBInput.files[0]) return;
+            try {
+                birdB = await loadImageFromFile(fileBInput.files[0]);
+                statusBEl.textContent =
+                    `${fileBInput.files[0].name} (${birdB.img.width}x${birdB.img.height}) crop ${birdB.meta.cropW}x${birdB.meta.cropH}`;
+                buildComposite();
+            } catch (e) { statusBEl.textContent = "Failed to load."; console.error(e); }
+        });
+
+        /* ══════════════════════════════════════════════════════════════
+           COMPOSITE BUILDER
+           ══════════════════════════════════════════════════════════════ */
+        function buildComposite() {
+            if (!birdA || !birdB) {
+                unitImage = null; unitMeta = null;
+                unitImageA = null; unitImageB = null;
+                processedComposite = null; processedMeta = null;
+                compositeStatusEl.textContent = "Load both birds to create composite.";
+                return;
+            }
+
+            const s       = Number(alignScaleSlider.value);
+            const sp      = Number(spacingSlider.value);
+            const halfGap = sp / 2;
+            const ax      = Number(axSlider.value);
+            const ay      = Number(aySlider.value);
+            const bx      = Number(bxSlider.value);
+            const by      = Number(bySlider.value);
+            const flip    = flipBCheck.checked;
+
+            const aW = birdA.meta.cropW * s;
+            const aH = birdA.meta.cropH * s;
+            const bW = birdB.meta.cropW * s;
+            const bH = birdB.meta.cropH * s;
+
+            const aX = -aW - halfGap + ax;
+            const aY = -aH / 2 + ay;
+            const bX = halfGap + bx;
+            const bY = -bH / 2 + by;
+
+            const left   = Math.floor(Math.min(aX, bX));
+            const top    = Math.floor(Math.min(aY, bY));
+            const right  = Math.ceil(Math.max(aX + aW, bX + bW));
+            const bottom = Math.ceil(Math.max(aY + aH, bY + bH));
+            const cw = right - left;
+            const ch = bottom - top;
+
+            if (cw <= 0 || ch <= 0) {
+                unitImage = null; unitMeta = null;
+                unitImageA = null; unitImageB = null;
+                processedComposite = null; processedMeta = null;
+                compositeStatusEl.textContent = "Invalid composite dimensions.";
+                return;
+            }
+
+            // ── Combined composite ──
+            const off = document.createElement("canvas");
+            off.width = cw; off.height = ch;
+            const offCtx = off.getContext("2d");
+            offCtx.drawImage(birdA.img,
+                birdA.meta.sx, birdA.meta.sy, birdA.meta.sw, birdA.meta.sh,
+                aX - left, aY - top, aW, aH);
+            if (flip) {
+                offCtx.save();
+                offCtx.translate(bX - left + bW, bY - top);
+                offCtx.scale(-1, 1);
+                offCtx.drawImage(birdB.img,
+                    birdB.meta.sx, birdB.meta.sy, birdB.meta.sw, birdB.meta.sh,
+                    0, 0, bW, bH);
+                offCtx.restore();
+            } else {
+                offCtx.drawImage(birdB.img,
+                    birdB.meta.sx, birdB.meta.sy, birdB.meta.sw, birdB.meta.sh,
+                    bX - left, bY - top, bW, bH);
+            }
+            unitImage = off;
+            unitMeta = analyzeOpaqueBounds(off);
+
+            // ── Separate Bird A ──
+            const offA = document.createElement("canvas");
+            offA.width = cw; offA.height = ch;
+            const ctxA = offA.getContext("2d");
+            ctxA.drawImage(birdA.img,
+                birdA.meta.sx, birdA.meta.sy, birdA.meta.sw, birdA.meta.sh,
+                aX - left, aY - top, aW, aH);
+            unitImageA = offA;
+
+            // ── Separate Bird B ──
+            const offB = document.createElement("canvas");
+            offB.width = cw; offB.height = ch;
+            const ctxB = offB.getContext("2d");
+            if (flip) {
+                ctxB.save();
+                ctxB.translate(bX - left + bW, bY - top);
+                ctxB.scale(-1, 1);
+                ctxB.drawImage(birdB.img,
+                    birdB.meta.sx, birdB.meta.sy, birdB.meta.sw, birdB.meta.sh,
+                    0, 0, bW, bH);
+                ctxB.restore();
+            } else {
+                ctxB.drawImage(birdB.img,
+                    birdB.meta.sx, birdB.meta.sy, birdB.meta.sw, birdB.meta.sh,
+                    bX - left, bY - top, bW, bH);
+            }
+            unitImageB = offB;
+
+            compositeStatusEl.textContent =
+                `Composite: ${cw}x${ch}px | crop ${unitMeta.cropW}x${unitMeta.cropH}`;
+
+            // Rebuild processed version if illusion lab is on
+            maybeRebuildProcessed();
+        }
+
+        /* ══════════════════════════════════════════════════════════════
+           KITAOKA ILLUSION PROCESSING ENGINE
+           Applies directional luminance treatments to each bird
+           to create static motion perception (Peripheral Drift Illusion)
+
+           Sequence for RIGHTWARD motion (left → right):
+             BLACK(8%) → DARK(28%) → WHITE(100%) → LIGHT(58%)
+           Sequence for LEFTWARD motion: reversed.
+           ══════════════════════════════════════════════════════════════ */
+
+        /**
+         * Create a solid-color silhouette of a bird canvas (preserves alpha shape).
+         */
+        function createSilhouette(birdCanvas, color) {
+            const w = birdCanvas.width, h = birdCanvas.height;
+            const sil = document.createElement("canvas");
+            sil.width = w; sil.height = h;
+            const sCtx = sil.getContext("2d");
+            sCtx.drawImage(birdCanvas, 0, 0);
+            sCtx.globalCompositeOperation = 'source-in';
+            sCtx.fillStyle = color;
+            sCtx.fillRect(0, 0, w, h);
+            return sil;
+        }
+
+        /**
+         * Kitaoka sawtooth luminance profile.
+         * t: 0 (left edge) to 1 (right edge) of the bird
+         * Returns luminance multiplier 0.0–1.0
+         *
+         * Profile for rightward motion (read left to right):
+         *   BLACK(0.08) → DARK(0.28) → WHITE(1.0) → LIGHT(0.58)
+         * Smooth ramps between zones.
+         */
+        function kitaokaProfile(t) {
+            // 4 zones, each 25% of bird width
+            if (t < 0.125) return 0.08;
+            if (t < 0.25)  return 0.08 + (t - 0.125) / 0.125 * 0.20;   // 0.08→0.28
+            if (t < 0.375) return 0.28;
+            if (t < 0.50)  return 0.28 + (t - 0.375) / 0.125 * 0.72;   // 0.28→1.00
+            if (t < 0.75)  return 1.00;
+            if (t < 0.875) return 1.00 - (t - 0.75) / 0.125 * 0.42;    // 1.00→0.58
+            return 0.58;
+        }
+
+        /**
+         * IDEA 1: Asymmetric Outlines
+         * Draws shifted silhouettes behind the bird to create directional outline bands.
+         * BLACK on trailing edge, DARK inner band, LIGHT on leading edge.
+         */
+        function applyAsymmetricOutlines(birdCanvas, isRight, thickness) {
+            const w = birdCanvas.width, h = birdCanvas.height;
+            const out = document.createElement("canvas");
+            out.width = w; out.height = h;
+            const oCtx = out.getContext("2d");
+
+            const dir = isRight ? 1 : -1;
+            const t = thickness;
+
+            // Layer 1 (back): BLACK outline on trailing side
+            const silBlack = createSilhouette(birdCanvas, '#080808');
+            oCtx.drawImage(silBlack, -dir * t, 0);
+
+            // Layer 2: DARK band (closer to bird, partially covers black)
+            const silDark = createSilhouette(birdCanvas, '#2a2a2a');
+            oCtx.drawImage(silDark, -dir * Math.round(t * 0.45), 0);
+
+            // Layer 3: LIGHT outline on leading side
+            const silLight = createSilhouette(birdCanvas, '#9a9a9a');
+            oCtx.drawImage(silLight, dir * Math.round(t * 0.35), 0);
+
+            // Layer 4 (front): Original bird on top
+            oCtx.drawImage(birdCanvas, 0, 0);
+
+            return out;
+        }
+
+        /**
+         * IDEA 2: Body Gradient (Sawtooth)
+         * Applies a horizontal Kitaoka luminance profile across the bird body.
+         * Pixel-level processing for precision.
+         */
+        function applyBodyGradient(birdCanvas, bounds, isRight, strength) {
+            const w = birdCanvas.width, h = birdCanvas.height;
+            const out = document.createElement("canvas");
+            out.width = w; out.height = h;
+            const oCtx = out.getContext("2d");
+            oCtx.drawImage(birdCanvas, 0, 0);
+
+            const imgData = oCtx.getImageData(0, 0, w, h);
+            const data = imgData.data;
+            const bx = bounds.sx, bw = Math.max(1, bounds.sw);
+
+            for (let py = bounds.sy; py < bounds.sy + bounds.sh; py++) {
+                for (let px = bounds.sx; px < bounds.sx + bounds.sw; px++) {
+                    const idx = (py * w + px) * 4;
+                    if (data[idx + 3] < 10) continue;
+
+                    let t = (px - bx) / bw;
+                    if (!isRight) t = 1 - t;
+                    t = Math.max(0, Math.min(1, t));
+
+                    const lum = kitaokaProfile(t);
+                    const mod = 1.0 - strength * (1.0 - lum);
+
+                    data[idx]     = Math.round(Math.min(255, Math.max(0, data[idx] * mod)));
+                    data[idx + 1] = Math.round(Math.min(255, Math.max(0, data[idx + 1] * mod)));
+                    data[idx + 2] = Math.round(Math.min(255, Math.max(0, data[idx + 2] * mod)));
+                }
+            }
+
+            oCtx.putImageData(imgData, 0, 0);
+            return out;
+        }
+
+        /**
+         * IDEA 3: Feather Microstripes
+         * Repeating vertical stripes following the 4-step Kitaoka sequence.
+         * Pixel-level processing for exact luminance control.
+         */
+        function applyMicrostripes(birdCanvas, bounds, isRight, stripeWidth, blend) {
+            const w = birdCanvas.width, h = birdCanvas.height;
+            const out = document.createElement("canvas");
+            out.width = w; out.height = h;
+            const oCtx = out.getContext("2d");
+            oCtx.drawImage(birdCanvas, 0, 0);
+
+            const imgData = oCtx.getImageData(0, 0, w, h);
+            const data = imgData.data;
+            const cycleW = stripeWidth * 4;
+
+            // Kitaoka 4-step luminance multipliers
+            // Rightward: black(0.08), dark(0.25), white(1.0), light(0.55)
+            const stepsR = [0.08, 0.25, 1.00, 0.55];
+            const stepsL = [0.55, 1.00, 0.25, 0.08]; // reversed for leftward
+            const steps = isRight ? stepsR : stepsL;
+
+            for (let py = bounds.sy; py < bounds.sy + bounds.sh; py++) {
+                for (let px = bounds.sx; px < bounds.sx + bounds.sw; px++) {
+                    const idx = (py * w + px) * 4;
+                    if (data[idx + 3] < 10) continue;
+
+                    // Which stripe in the cycle?
+                    const posInCycle = ((px - bounds.sx) % cycleW + cycleW) % cycleW;
+                    const stripeIdx = Math.min(3, Math.floor(posInCycle / stripeWidth));
+                    const target = steps[stripeIdx];
+
+                    const mod = 1.0 - blend * (1.0 - target);
+
+                    data[idx]     = Math.round(Math.min(255, Math.max(0, data[idx] * mod)));
+                    data[idx + 1] = Math.round(Math.min(255, Math.max(0, data[idx + 1] * mod)));
+                    data[idx + 2] = Math.round(Math.min(255, Math.max(0, data[idx + 2] * mod)));
+                }
+            }
+
+            oCtx.putImageData(imgData, 0, 0);
+            return out;
+        }
+
+        /**
+         * IDEA 4: Edge Contrast
+         * Only affects the outer edges of the bird (trailing edge darkened,
+         * leading edge kept bright). Middle region untouched.
+         */
+        function applyEdgeContrast(birdCanvas, bounds, isRight, edgeWidthPct, strength) {
+            const w = birdCanvas.width, h = birdCanvas.height;
+            const out = document.createElement("canvas");
+            out.width = w; out.height = h;
+            const oCtx = out.getContext("2d");
+            oCtx.drawImage(birdCanvas, 0, 0);
+
+            const imgData = oCtx.getImageData(0, 0, w, h);
+            const data = imgData.data;
+            const bx = bounds.sx, bw = Math.max(1, bounds.sw);
+            const edgeFrac = edgeWidthPct / 100;
+
+            for (let py = bounds.sy; py < bounds.sy + bounds.sh; py++) {
+                for (let px = bounds.sx; px < bounds.sx + bounds.sw; px++) {
+                    const idx = (py * w + px) * 4;
+                    if (data[idx + 3] < 10) continue;
+
+                    let t = (px - bx) / bw; // 0=left edge, 1=right edge
+                    if (!isRight) t = 1 - t;
+                    // t=0 is trailing edge (should be dark), t=1 is leading edge
+
+                    let mod = 1.0; // no change by default
+                    if (t < edgeFrac) {
+                        // Trailing edge zone: darken from 0.08 to 1.0
+                        const edgeT = t / edgeFrac;
+                        const lum = 0.08 + edgeT * 0.92;
+                        mod = 1.0 - strength * (1.0 - lum);
+                    } else if (t > 1.0 - edgeFrac) {
+                        // Leading edge zone: slight dim from 1.0 to 0.58
+                        const edgeT = (t - (1.0 - edgeFrac)) / edgeFrac;
+                        const lum = 1.0 - edgeT * 0.42;
+                        mod = 1.0 - strength * (1.0 - lum);
+                    }
+
+                    if (mod < 1.0) {
+                        data[idx]     = Math.round(Math.min(255, Math.max(0, data[idx] * mod)));
+                        data[idx + 1] = Math.round(Math.min(255, Math.max(0, data[idx + 1] * mod)));
+                        data[idx + 2] = Math.round(Math.min(255, Math.max(0, data[idx + 2] * mod)));
+                    }
+                }
+            }
+
+            oCtx.putImageData(imgData, 0, 0);
+            return out;
+        }
+
+        /**
+         * Dispatch processing for a single bird canvas based on mode.
+         */
+        function processBirdForDirection(birdCanvas, birdBounds, isRight, mode, params) {
+            switch (mode) {
+                case 'outlines':
+                    return applyAsymmetricOutlines(birdCanvas, isRight, params.outlineThickness);
+
+                case 'gradient':
+                    return applyBodyGradient(birdCanvas, birdBounds, isRight, params.gradientStrength);
+
+                case 'stripes':
+                    return applyMicrostripes(birdCanvas, birdBounds, isRight,
+                        params.stripeWidth, params.stripeBlend);
+
+                case 'edges':
+                    return applyEdgeContrast(birdCanvas, birdBounds, isRight,
+                        params.edgeWidth, params.gradientStrength);
+
+                case 'combined': {
+                    // Stack: gradient → stripes → outlines
+                    let result = applyBodyGradient(birdCanvas, birdBounds, isRight,
+                        params.gradientStrength * 0.7);
+                    // Recompute bounds for the gradient-processed version
+                    const gradBounds = analyzeOpaqueBounds(result);
+                    result = applyMicrostripes(result, gradBounds, isRight,
+                        params.stripeWidth, params.stripeBlend * 0.5);
+                    result = applyAsymmetricOutlines(result, isRight, params.outlineThickness);
+                    return result;
+                }
+
+                default:
+                    return birdCanvas;
+            }
+        }
+
+        /**
+         * Build the processed composite by processing each bird and combining.
+         * Also stores separate processed birds for counter-motion animation.
+         */
+        function buildProcessedComposite() {
+            if (!unitImageA || !unitImageB || !unitMeta) {
+                processedComposite = null;
+                processedMeta = null;
+                processedBirdA = null;
+                processedBirdB = null;
+                protoStatusEl.textContent = "Load both birds first.";
+                return;
+            }
+
+            const t0 = performance.now();
+
+            const mode = protoModeSelect.value;
+            const params = {
+                outlineThickness: Number(outlineSlider.value),
+                gradientStrength: Number(gradSlider.value) / 100,
+                stripeWidth: Number(stripeWSlider.value),
+                stripeBlend: Number(stripeBSlider.value) / 100,
+                edgeWidth: Number(edgeSlider.value),
+            };
+
+            // Get opaque bounds for each bird
+            const boundsA = analyzeOpaqueBounds(unitImageA);
+            const boundsB = analyzeOpaqueBounds(unitImageB);
+
+            // Process each bird for its intended direction
+            const pA = processBirdForDirection(unitImageA, boundsA, true,  mode, params);
+            const pB = processBirdForDirection(unitImageB, boundsB, false, mode, params);
+
+            // Store separate processed birds (for counter-motion)
+            processedBirdA = pA;
+            processedBirdB = pB;
+
+            // Combine into processed composite
+            const pc = document.createElement("canvas");
+            pc.width = unitImage.width;
+            pc.height = unitImage.height;
+            const pCtx = pc.getContext("2d");
+            pCtx.drawImage(pA, 0, 0);
+            pCtx.drawImage(pB, 0, 0);
+
+            processedComposite = pc;
+            processedMeta = analyzeOpaqueBounds(pc);
+
+            const elapsed = (performance.now() - t0).toFixed(0);
+            protoStatusEl.textContent =
+                `Mode: ${mode} | processed in ${elapsed}ms | crop ${processedMeta.cropW}x${processedMeta.cropH}`;
+        }
+
+        function maybeRebuildProcessed() {
+            if (protoOnCheck.checked && unitImageA && unitImageB) {
+                buildProcessedComposite();
+            } else {
+                processedComposite = null;
+                processedMeta = null;
+                processedBirdA = null;
+                processedBirdB = null;
+                if (!unitImageA || !unitImageB) {
+                    protoStatusEl.textContent = "Load both birds first.";
+                } else {
+                    protoStatusEl.textContent = "Processing disabled.";
+                }
+            }
+        }
+
+        /* ── Alignment slider wiring ── */
+        const alignSliders = [alignScaleSlider, axSlider, aySlider, bxSlider, bySlider, spacingSlider];
+        alignSliders.forEach(sl => {
+            sl.addEventListener("input", () => {
+                updateAlignLabels();
+                buildComposite();
+            });
+        });
+        flipBCheck.addEventListener("change", () => { buildComposite(); });
+
+        /* ── Tessellation slider wiring ── */
+        const tileSliders = [scaleSlider, stepXSlider, stepYSlider, baseYSlider, rowsSlider, rowGapSlider];
+        tileSliders.forEach(sl => {
+            sl.addEventListener("input", updateTileLabels);
+        });
+
+        /* ── Illusion Lab wiring ── */
+        protoOnCheck.addEventListener("change", maybeRebuildProcessed);
+        protoModeSelect.addEventListener("change", maybeRebuildProcessed);
+
+        /* ── Counter-motion wiring ── */
+        [mSpeedSlider, mAmpSlider].forEach(sl => {
+            sl.addEventListener("input", updateMotionLabels);
+        });
+        [outlineSlider, gradSlider, stripeWSlider, stripeBSlider, edgeSlider].forEach(sl => {
+            sl.addEventListener("input", () => {
+                updateLabLabels();
+                maybeRebuildProcessed();
+            });
+        });
+
+        /* ── Theme ── */
+        function applyTheme() {
+            document.body.classList.toggle("light-theme", !isDarkTheme);
+            themeToggleBtn.textContent = isDarkTheme ? "Switch To Light Theme" : "Switch To Dark Theme";
+        }
+        themeToggleBtn.addEventListener("click", () => {
+            isDarkTheme = !isDarkTheme;
+            applyTheme();
+        });
+
+        /* ══════════════════════════════════════════════════════════════
+           TESSELLATION DRAW LOOP
+
+           Pipeline (each layer is locked before the next applies):
+             1. Pair Alignment  → unitMeta (grid geometry, NEVER changes)
+             2. Tessellation     → grid params from unitMeta
+             3. Illusion Proc.   → processedComposite / processedBirdA/B
+             4. Counter-Motion   → animated offsets on the final birds
+
+           unitMeta is the single source of truth for grid layout.
+           ══════════════════════════════════════════════════════════════ */
+
+        /**
+         * Compute tessellation grid parameters.
+         * ALWAYS uses unitMeta so layout is locked regardless of processing.
+         */
+        function getGridParams() {
+            const scale      = Number(scaleSlider.value);
+            const stepXFine  = Number(stepXSlider.value);
+            const stepYFine  = Number(stepYSlider.value);
+            const baseYV     = Number(baseYSlider.value);
+            const rowOverscan = Math.max(0, Math.round(Number(rowsSlider.value)));
+            const rowGapFine = Number(rowGapSlider.value);
+
+            const unitW = unitMeta.cropW;
+            const unitH = unitMeta.cropH;
+            const stepX = unitW * (BASE_INTERLOCK_X + stepXFine);
+            const stepY = unitH * (BASE_INTERLOCK_Y + stepYFine);
+            const rowStepY = -unitH * (1 + rowGapFine);
+            const spacingX = Math.max(1, Math.abs(stepX));
+
+            const vW = width / scale;
+            const vH = height / scale;
+            const vLeft = width / 2 - vW / 2;
+
+            const startX = -unitW * 0.5;
+            const startY = height * baseYV - unitH * 0.5;
+            const rowStepAbs = Math.max(8, Math.abs(rowStepY));
+            const estimatedHalfRows = Math.ceil(vH / rowStepAbs) + rowOverscan;
+            const halfRows = Math.min(estimatedHalfRows, 140);
+
+            return { scale, unitW, unitH, stepY, rowStepY, spacingX,
+                     vW, vLeft, startX, startY, halfRows };
+        }
+
+        /**
+         * Draw a static tessellation (single composite tile).
+         * Grid layout ALWAYS from unitMeta. Source crop from unitMeta.
+         */
+        function drawTileGrid(tileImg) {
+            const g = getGridParams();
+
+            ctx.save();
+            ctx.translate(width / 2, height / 2);
+            ctx.scale(g.scale, g.scale);
+            ctx.translate(-width / 2, -height / 2);
+
+            const iMin = Math.floor((g.vLeft - g.startX - g.unitW) / g.spacingX) - 2;
+            const iMax = Math.ceil((g.vLeft + g.vW - g.startX + g.unitW) / g.spacingX) + 2;
+
+            for (let rowIndex = -g.halfRows; rowIndex <= g.halfRows; rowIndex++) {
+                const rowOffsetY = rowIndex * g.rowStepY;
+                for (let i = iMin; i <= iMax; i++) {
+                    const x = g.startX + i * g.spacingX;
+                    const y = g.startY + i * g.stepY + rowOffsetY;
+                    ctx.drawImage(tileImg,
+                        unitMeta.sx, unitMeta.sy, unitMeta.sw, unitMeta.sh,
+                        x, y, g.unitW, g.unitH);
+                }
+            }
+
+            ctx.restore();
+        }
+
+        /**
+         * Draw counter-motion tessellation.
+         * Uses processed birds when illusion processing is on,
+         * raw birds otherwise. Grid is ALWAYS locked to unitMeta.
+         */
+        function drawMotionGrid() {
+            const g = getGridParams();
+            const mMode  = motionModeSelect.value;
+            const mSpeed = Number(mSpeedSlider.value);
+            const mAmp   = Number(mAmpSlider.value);
+
+            // Pick bird images: processed (if available) or raw
+            const hasProcessed = protoOnCheck.checked && processedBirdA && processedBirdB;
+            const imgA = hasProcessed ? processedBirdA : unitImageA;
+            const imgB = hasProcessed ? processedBirdB : unitImageB;
+            if (!imgA || !imgB) return;
+
+            let offsetA = 0, offsetB = 0;
+            if (mMode === 'sine') {
+                const wave = mAmp * Math.sin(motionTime * mSpeed * Math.PI * 2);
+                offsetA = wave;
+                offsetB = -wave;
+            } else {
+                const drift = mSpeed * g.unitW * 0.8 * motionTime;
+                offsetA = drift;
+                offsetB = -drift;
+            }
+
+            const extra = Math.abs(offsetA) + g.unitW;
+
+            ctx.save();
+            ctx.translate(width / 2, height / 2);
+            ctx.scale(g.scale, g.scale);
+            ctx.translate(-width / 2, -height / 2);
+
+            const iMin = Math.floor((g.vLeft - g.startX - extra) / g.spacingX) - 2;
+            const iMax = Math.ceil((g.vLeft + g.vW - g.startX + extra) / g.spacingX) + 2;
+
+            // Always use unitMeta as source rect — grid stays locked
+            const sx = unitMeta.sx, sy = unitMeta.sy;
+            const sw = unitMeta.sw, sh = unitMeta.sh;
+
+            for (let rowIndex = -g.halfRows; rowIndex <= g.halfRows; rowIndex++) {
+                const rowOffsetY = rowIndex * g.rowStepY;
+                for (let i = iMin; i <= iMax; i++) {
+                    const baseX = g.startX + i * g.spacingX;
+                    const y = g.startY + i * g.stepY + rowOffsetY;
+                    ctx.drawImage(imgA, sx, sy, sw, sh,
+                        baseX + offsetA, y, g.unitW, g.unitH);
+                    ctx.drawImage(imgB, sx, sy, sw, sh,
+                        baseX + offsetB, y, g.unitW, g.unitH);
+                }
+            }
+
+            ctx.restore();
+        }
+
+        function drawFrame(deltaSec) {
+            const bg = getComputedStyle(document.body).getPropertyValue("--page-bg").trim() || "#000";
+            ctx.fillStyle = bg;
+            ctx.fillRect(0, 0, width, height);
+
+            if (!unitImage || !unitMeta) {
+                ctx.fillStyle = isDarkTheme ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.65)";
+                ctx.font = "18px Arial";
+                ctx.fillText("Upload both bird PNGs to begin.", 34, 72);
+                return;
+            }
+
+            // Advance counter-motion time
+            const motionActive = motionOnCheck.checked && unitImageA && unitImageB;
+            if (motionActive) {
+                motionTime += deltaSec;
+            }
+
+            const useProcessed = protoOnCheck.checked && processedComposite && processedMeta;
+            const useSplit = splitCheck.checked && useProcessed;
+
+            if (useSplit) {
+                // ── Left half: original (with motion if enabled) ──
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(0, 0, Math.floor(width / 2), height);
+                ctx.clip();
+                if (motionActive) {
+                    // Temporarily disable processed so motion uses raw birds
+                    const savedA = processedBirdA, savedB = processedBirdB;
+                    processedBirdA = null; processedBirdB = null;
+                    drawMotionGrid();
+                    processedBirdA = savedA; processedBirdB = savedB;
+                } else {
+                    drawTileGrid(unitImage);
+                }
+                ctx.restore();
+
+                // ── Right half: processed (with motion if enabled) ──
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(Math.floor(width / 2), 0, width - Math.floor(width / 2), height);
+                ctx.clip();
+                if (motionActive) {
+                    drawMotionGrid();
+                } else {
+                    drawTileGrid(processedComposite);
+                }
+                ctx.restore();
+
+                // Divider
+                ctx.strokeStyle = '#ff3060';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(Math.floor(width / 2), 0);
+                ctx.lineTo(Math.floor(width / 2), height);
+                ctx.stroke();
+
+                // Labels
+                ctx.font = 'bold 13px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = 'rgba(255,48,96,0.8)';
+                ctx.fillText('ORIGINAL', width / 4, 28);
+                ctx.fillText('PROCESSED', width * 3 / 4, 28);
+                ctx.textAlign = 'left';
+
+            } else if (motionActive) {
+                drawMotionGrid();
+            } else if (useProcessed) {
+                drawTileGrid(processedComposite);
+            } else {
+                drawTileGrid(unitImage);
+            }
+
+            // ── Fixation crosshair ──
+            if (fixationCheck.checked) {
+                const cx = Math.floor(width / 2);
+                const cy = Math.floor(height / 2);
+                const sz = 18;
+                ctx.strokeStyle = '#ff3060';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(cx - sz, cy); ctx.lineTo(cx + sz, cy);
+                ctx.moveTo(cx, cy - sz); ctx.lineTo(cx, cy + sz);
+                ctx.stroke();
+                ctx.fillStyle = '#ff3060';
+                ctx.beginPath();
+                ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function tick(nowMs) {
+            const deltaSec = Math.min(0.05, Math.max(0.001, (nowMs - lastTimestampMs) / 1000));
+            lastTimestampMs = nowMs;
+            drawFrame(deltaSec);
+            requestAnimationFrame(tick);
+        }
+
+        /* ── Init ── */
+
+        // Auto-wire: convert every .value span into an editable number input
+        // paired with its sibling range slider. Typing a number and pressing
+        // Enter/Tab syncs the slider; dragging the slider updates the input.
+        document.querySelectorAll('.value').forEach(span => {
+            const label = span.closest('label');
+            if (!label) return;
+            const row = label.closest('.row');
+            if (!row) return;
+            const slider = row.querySelector('input[type="range"]');
+            if (!slider) return;
+
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.id = span.id;
+            input.className = 'value-input';
+            input.min = slider.min;
+            input.max = slider.max;
+            input.step = slider.step;
+            input.value = span.textContent.trim();
+            span.replaceWith(input);
+
+            // number input → slider (on Enter / blur)
+            input.addEventListener('change', () => {
+                let v = Number(input.value);
+                if (isNaN(v)) return;
+                const lo = Number(slider.min), hi = Number(slider.max);
+                v = Math.max(lo, Math.min(hi, v));
+                slider.value = v;
+                input.value = v;
+                slider.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+        });
+
+        updateAlignLabels();
+        updateTileLabels();
+        updateLabLabels();
+        updateMotionLabels();
+        applyTheme();
+        window.addEventListener("resize", resize);
+        resize();
+        lastTimestampMs = performance.now();
+        requestAnimationFrame(tick);
+    })();
+    </script>
+</body>
+</html>
