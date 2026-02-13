@@ -4,7 +4,7 @@ import "./globals.css";
 import Image from "next/image";
 import { IBM_Plex_Mono, Inconsolata } from "next/font/google";
 import ScrollToTop from "@/components/ScrollToTop";
-import EscherBackground from "@/components/EscherBackground";
+import EscherBirdsBackground from "@/components/EscherBirdsBackground";
 
 const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -51,7 +51,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${plexMono.variable} ${inconsolata.variable} text-black bg-white flex flex-col items-center text-center min-h-screen m-0 p-0 overflow-x-hidden`}>
-        <EscherBackground />
+        <EscherBirdsBackground />
         <header className="relative w-full px-4 py-4 sm:px-8 sm:py-6 flex justify-between items-center box-border z-50 bg-transparent pointer-events-none">
           <div className="logo-container pointer-events-auto">
             <Link href="/" className="flex items-center gap-2 sm:gap-3 no-underline text-inherit font-bold text-lg sm:text-xl transition-opacity duration-200 hover:opacity-80">
