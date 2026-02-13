@@ -9,7 +9,7 @@ export default async function Home() {
 
   return (
     <main className="w-full">
-      <section className="min-h-[calc(100svh-6rem)] relative flex flex-col justify-center items-center w-full">
+      <section className="min-h-[calc(100svh-6rem)] relative flex flex-col justify-center items-center w-full overflow-hidden">
         <Typewriter />
         <ScrollDownButton />
       </section>

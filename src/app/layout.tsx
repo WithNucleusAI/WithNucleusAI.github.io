@@ -4,6 +4,7 @@ import "./globals.css";
 import Image from "next/image";
 import { IBM_Plex_Mono, Inconsolata } from "next/font/google";
 import ScrollToTop from "@/components/ScrollToTop";
+import EscherBackground from "@/components/EscherBackground";
 
 const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
     description: "Building the next generation of General Intelligence.",
     url: "https://withnucleus.ai",
     siteName: "Nucleus AI",
-    images: [ 
+    images: [
       {
         url: "/logo.png",
         width: 800,
@@ -50,6 +51,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${plexMono.variable} ${inconsolata.variable} text-[rgb(10,10,10)] bg-white flex flex-col items-center text-center min-h-screen m-0 p-0 overflow-x-hidden`}>
+        <EscherBackground />
         <header className="relative w-full px-4 py-4 sm:px-8 sm:py-6 flex justify-between items-center box-border z-50 bg-transparent">
           <div className="logo-container">
             <Link href="/" className="flex items-center gap-2 sm:gap-3 no-underline text-inherit font-bold text-lg sm:text-xl transition-opacity duration-200 hover:opacity-80">
