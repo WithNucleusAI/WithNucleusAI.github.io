@@ -252,11 +252,8 @@
             </div>
         </details>
 
-        <!-- ═══════════════════════════════════════════════
-             STATIC ILLUSION LAB
-             Kitaoka Peripheral Drift prototyping engine
-             ═══════════════════════════════════════════════ -->
-        <div class="section-title" style="color: #ff6090;">Static Illusion Lab</div>
+        <!-- ── Peripheral Drift ─── -->
+        <div class="section-title" style="color: #ff6090;">Peripheral Drift</div>
         <div class="checkbox-row">
             <input type="checkbox" id="protoOn" checked> <label for="protoOn">Enable Illusion Processing</label>
         </div>
@@ -299,7 +296,7 @@
         </div>
         <div id="protoStatus" class="status">Enable processing and load both birds.</div>
 
-        <!-- ─── Animated Counter-Motion (kickstarter) ─── -->
+        <!-- ── Counter-Motion Boost ─── -->
         <div class="section-title" style="color: #c080ff;">Counter-Motion Boost</div>
         <div class="checkbox-row">
             <input type="checkbox" id="motionOn" checked> <label for="motionOn">Enable Counter-Motion Animation</label>
@@ -458,9 +455,7 @@
             height = canvas.height = window.innerHeight;
         }
 
-        /* ══════════════════════════════════════════════════════════════
-           IMAGE ANALYSIS (same as dual-bird-aligner)
-           ══════════════════════════════════════════════════════════════ */
+        /* ── Image Analysis ─── */
         function analyzeOpaqueBounds(imgOrCanvas) {
             const w = imgOrCanvas.width;
             const h = imgOrCanvas.height;
@@ -681,7 +676,7 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-           KITAOKA ILLUSION PROCESSING ENGINE
+           KITAOKA ILLUSION PROCESSING
            Applies directional luminance treatments to each bird
            to create static motion perception (Peripheral Drift Illusion)
 
@@ -1040,10 +1035,10 @@
            TESSELLATION DRAW LOOP
 
            Pipeline (each layer is locked before the next applies):
-             1. Pair Alignment  → unitMeta (grid geometry, NEVER changes)
-             2. Tessellation     → grid params from unitMeta
-             3. Illusion Proc.   → processedComposite / processedBirdA/B
-             4. Counter-Motion   → animated offsets on the final birds
+             1. Pair Alignment   -> unitMeta (grid geometry, NEVER changes)
+             2. Tessellation     -> grid params from unitMeta
+             3. Illusion Proc.   -> processedComposite / processedBirdA/B
+             4. Counter-Motion   -> animated offsets on the final birds
 
            unitMeta is the single source of truth for grid layout.
            ══════════════════════════════════════════════════════════════ */
