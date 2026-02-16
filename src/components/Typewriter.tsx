@@ -189,7 +189,7 @@ export default function Typewriter() {
     }, []);
 
     return (
-        <>
+        <div className="max-w-[80%] w-full mx-auto flex flex-col items-center">
             <div id="typing" style={fontSize ? { fontSize } : undefined} className={text === "NUCLEUS." ? "final-text" : ""}>
                 <span id="text" dangerouslySetInnerHTML={{ __html: text }}></span>
                 <span className="cursor"></span>
@@ -203,6 +203,6 @@ export default function Typewriter() {
                     General Intelligence
                 </span>
             </div>
-        </>
+        </div>
     );
 }

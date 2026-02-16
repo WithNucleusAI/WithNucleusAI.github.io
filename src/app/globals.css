@@ -6,6 +6,8 @@
 
 body {
   font-family: var(--font-base), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 code,
@@ -47,8 +49,11 @@ samp {
 }
 
 #typing {
-  font-size: 1.8rem;
-  font-weight: 500;
+  font-size: 2.5rem;
+  font-weight: 600;
+  position: relative;
+  z-index: 20;
+  color: white;
 }
 
 #email {
@@ -63,6 +68,9 @@ samp {
   font-size: 2.5rem;
   font-weight: 500;
   opacity: 0;
+  position: relative;
+  z-index: 20;
+  color: white;
 }
 
 .fadeInAnimation {
@@ -90,13 +98,13 @@ samp {
 }
 
 .cursor {
-  border-right: 3px solid black;
+  border-right: 3px solid white;
   animation: blink 1s step-end infinite;
 }
 
 @keyframes blink {
   from, to { border-color: transparent; }
-  50% { border-color: black; }
+  50% { border-color: white; }
 }
 
 /* Media queries for responsive adjustments - EXACTLY matching legacy */

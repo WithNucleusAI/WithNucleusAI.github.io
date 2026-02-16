@@ -13,10 +13,10 @@ export default function ScrollDownButton() {
     return (
         <button
             onClick={scrollToBlogs}
-            className="absolute bottom-8 animate-bounce p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+            className="absolute bottom-12 animate-bounce p-4 rounded-full border border-white/20 bg-white/10 backdrop-blur-md shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:bg-white/20 transition-all duration-300"
             aria-label="Scroll down to blogs"
         >
-            <ChevronDown className="w-8 h-8 text-gray-600 dark:text-gray-300" />
+            <ChevronDown className="w-6 h-6 text-white" />
         </button>
     );
 }
