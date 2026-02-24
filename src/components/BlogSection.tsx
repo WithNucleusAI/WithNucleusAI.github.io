@@ -18,14 +18,14 @@ export default function BlogSection({ posts }: BlogSectionProps) {
     return (
         <section
             id="blog-section"
-            className="relative min-h-screen w-full flex flex-col justify-center py-24 bg-gradient-to-b from-transparent to-gray-50/50"
+            className="relative min-h-screen w-full flex flex-col justify-center py-24 bg-gradient-to-b from-transparent to-gray-50/50 dark:to-gray-900/50"
         >
             <div className="w-full max-w-7xl mx-auto px-6">
                 <div className="mb-12">
-                    <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
+                    <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400">
                         Engineering Intelligence
                     </h2>
-                    <p className="text-gray-500 mt-2">
+                    <p className="text-gray-500 dark:text-gray-400 mt-2">
                         Latest research and updates.
                     </p>
                 </div>
@@ -54,7 +54,7 @@ export default function BlogSection({ posts }: BlogSectionProps) {
                         }
 
                         return (
-                            <div key={post.slug} className="w-full border-b border-gray-100 pb-16 last:border-0 last:pb-0">
+                            <div key={post.slug} className="w-full border-b border-gray-100 dark:border-gray-800 pb-16 last:border-0 last:pb-0">
                                 <MiniBlogCard
                                     post={post}
                                     VisualComponent={VisualComponent}
@@ -70,7 +70,7 @@ export default function BlogSection({ posts }: BlogSectionProps) {
                 <div className="mt-8 flex justify-end">
                     <Link
                         href="/blog"
-                        className="group inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-black transition-colors"
+                        className="group inline-flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
                     >
                         View All Blogs
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   font-family: var(--font-base), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -52,20 +53,37 @@ samp {
   /* Removed modern styles like letter-spacing, min-height, etc. */
 }
 
+#typing.final-text {
+  line-height: 1;
+}
+
+#typing.final-text #text {
+  display: inline-block;
+  transform: translateY(-0.06em);
+}
+
 #email {
   position: fixed;
   bottom: 30px;
   font-size: 1.3rem;
   font-weight: 100;
   opacity: 0;
-  color: black; /* Legacy assumed black text on white, ensuring visibility */
+  color: rgb(10, 10, 10);
+}
+
+.dark #email {
+  color: #9ca3af; /* gray-400 */
 }
 
 #caption {
   font-size: 2.5rem;
   font-weight: 500;
   opacity: 0;
-  color: black;
+  color: rgb(10, 10, 10);
+}
+
+.dark #caption {
+  color: rgb(243, 244, 246); /* gray-100 */
 }
 
 .fadeInAnimation {
@@ -93,16 +111,37 @@ samp {
 }
 
 .cursor {
-  border-right: 3px solid black;
+  border-right: 3px solid rgb(10, 10, 10);
   animation: blink 1s step-end infinite;
+}
+
+.dark .cursor {
+  border-right: 3px solid rgb(243, 244, 246);
+  animation: blink-dark 1s step-end infinite;
 }
 
 @keyframes blink {
   from, to { border-color: transparent; }
-  50% { border-color: black; }
+  50% { border-color: rgb(10, 10, 10); }
+}
+
+@keyframes blink-dark {
+  from, to { border-color: transparent; }
+  50% { border-color: rgb(243, 244, 246); }
 }
 
 /* Media queries for responsive adjustments - EXACTLY matching legacy */
+@media (max-width: 768px) {
+  #typing {
+      font-size: 1.05rem;
+      line-height: 1.25;
+  }
+
+  #caption {
+      font-size: 1.55rem;
+  }
+}
+
 @media (max-width: 600px) {
   /* Legacy body font-size: 5vw is not applied to body here to avoid global side effects, 
      but we can apply scales if needed. 
@@ -113,39 +152,23 @@ samp {
   }
 }
 
-/* Custom scrollbar styles for image gallery */
-.scrollbar-thin {
-  scrollbar-width: thin;
-}
-
-.scrollbar-thumb-white\/30::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 9999px;
-}
-
-.scrollbar-thumb-white\/50:hover::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-.scrollbar-track-transparent::-webkit-scrollbar-track {
-  background-color: transparent;
-}
-
+/* Hide scrollbar globally for aesthetics */
 ::-webkit-scrollbar {
-  height: 6px;
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
+  background: transparent !important;
 }
 
-::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 9999px;
+* {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-::-webkit-scrollbar-track {
-  background-color: transparent;
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
 }
 
 /* Page transition styles */
@@ -223,6 +246,10 @@ samp {
   transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.dark .toc-dash {
+  background-color: white;
+}
+
 .toc-dash.w-8 {
   width: 2rem;
 }
@@ -266,6 +293,12 @@ samp {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
+.dark .toc-text-overlay-content {
+  background: #1f1d1d; /* gray-900 */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
 .toc-text-list {
   list-style: none;
   margin: 0;
@@ -298,6 +331,10 @@ samp {
   max-width: 240px;
   opacity: 0.4; /* Match dashes non-active state */
   transition: all 0.2s ease;
+}
+
+.dark .toc-text-link {
+  color: #f3f4f6; /* gray-100 */
 }
 
 .toc-text-link:hover {
@@ -347,9 +384,20 @@ samp {
   transition: all 0.2s ease;
 }
 
+.dark .contents-button button {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
 .contents-button button:hover {
   background: rgba(0, 0, 0, 0.95);
   transform: scale(1.05);
+}
+
+.dark .contents-button button:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 /* Mobile overlay */
@@ -369,6 +417,10 @@ samp {
   padding: 2rem;
 }
 
+.dark .toc-overlay {
+  background: rgba(0, 0, 0, 0.8);
+}
+
 .toc-overlay.open {
   opacity: 1;
   visibility: visible;
@@ -383,6 +435,11 @@ samp {
   overflow-y: auto;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   position: relative;
+}
+
+.dark .toc-overlay-content {
+  background: #111827; /* gray-900 */
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .toc-overlay-close {
@@ -402,8 +459,17 @@ samp {
   transition: all 0.2s ease;
 }
 
+.dark .toc-overlay-close {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
 .toc-overlay-close:hover {
   background: rgba(0, 0, 0, 0.1);
+}
+
+.dark .toc-overlay-close:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Hide mobile button on desktop */

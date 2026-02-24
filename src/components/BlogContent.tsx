@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useMemo, type ReactNode, type ComponentProps } from 'react';
+import { useState, useMemo, useEffect, type ReactNode, type ComponentProps } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { prism } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { prism, vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { useTheme } from 'next-themes';
 import ImageViewer from './ImageViewer';
 
 
@@ -48,10 +49,10 @@ function CodeBlock({ children, ...rest }: ComponentProps<'pre'>) {
     };
 
     return (
-        <div className="relative group my-6 rounded-lg overflow-hidden border border-gray-100">
+        <div className="relative group my-6 rounded-lg overflow-hidden border border-gray-100 dark:border-neutral-700">
             <button
                 onClick={handleCopy}
-                className="absolute right-3 top-3 p-2 text-gray-400 hover:text-gray-700 bg-white hover:bg-gray-50 border border-gray-200 rounded-md transition-all duration-200 z-10 shadow-sm"
+                className="absolute right-3 top-3 p-2 text-gray-400 hover:text-gray-700 dark:text-neutral-400 dark:hover:text-neutral-200 bg-white dark:bg-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-md transition-all duration-200 z-10 shadow-sm"
                 aria-label={copied ? 'Copied' : 'Copy code'}
                 title={copied ? 'Copied' : 'Copy code'}
             >
@@ -76,7 +77,7 @@ function CodeBlock({ children, ...rest }: ComponentProps<'pre'>) {
                     )}
                 </svg>
             </button>
-            <pre {...rest} className="!m-0 !p-0 !bg-transparent !border-0 overflow-x-auto">
+            <pre {...rest} className="m-0! p-0! bg-transparent! border-0! overflow-x-auto">
                 {children}
             </pre>
         </div>
@@ -84,6 +85,10 @@ function CodeBlock({ children, ...rest }: ComponentProps<'pre'>) {
 }
 
 export default function BlogContent({ content }: BlogContentProps) {
+    const { resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => { setMounted(true); }, []);
+    const isDark = mounted && resolvedTheme === 'dark';
     const [showViewer, setShowViewer] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     // Remove useState for images
@@ -138,16 +143,16 @@ export default function BlogContent({ content }: BlogContentProps) {
 
             return !inline && language ? (
                 <SyntaxHighlighter
-                    style={prism}
+                    style={isDark ? vscDarkPlus : prism}
                     language={language}
                     PreTag="div"
-                    customStyle={{ margin: 0, padding: '1.25rem', paddingRight: '3.5rem', backgroundColor: '#f5f7f9' }}
+                    customStyle={{ margin: 0, padding: '1.25rem', paddingRight: '3.5rem', backgroundColor: isDark ? '#1e1e1e' : '#f5f7f9' }}
                     {...props}
                 >
                     {String(children).replace(/\n$/, '')}
                 </SyntaxHighlighter>
             ) : (
-                <code className={`${className || ''} px-1.5 py-0.5 rounded bg-gray-100 text-[0.9em]`} {...props}>
+                <code className={`${className || ''} px-1.5 py-0.5 rounded bg-gray-100 dark:bg-neutral-800 dark:text-neutral-200 text-[0.9em]`} {...props}>
                     {children}
                 </code>
             );

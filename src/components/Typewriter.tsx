@@ -190,7 +190,11 @@ export default function Typewriter() {
 
     return (
         <>
-            <div id="typing" style={fontSize ? { fontSize } : undefined} className={text === "NUCLEUS." ? "final-text" : ""}>
+            <div
+                id="typing"
+                style={fontSize ? { fontSize } : undefined}
+                className={`mx-auto w-full max-w-68 px-3 text-center sm:max-w-xl sm:px-4 ${text === "NUCLEUS." ? "final-text" : ""}`}
+            >
                 <span id="text" dangerouslySetInnerHTML={{ __html: text }}></span>
                 <span className="cursor"></span>
             </div>
