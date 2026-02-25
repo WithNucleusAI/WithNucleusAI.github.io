@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 export default function EscherBackground() {
     const INITIAL_RADIUS_DESKTOP_PX = 0;
-    const INITIAL_RADIUS_MOBILE_PX = 150;
+    const INITIAL_RADIUS_MOBILE_PX = 0;
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -159,6 +159,8 @@ export default function EscherBackground() {
         let time = 0;
         let lastTime = performance.now();
         let isVisible = true;
+        let mouseX = -9999;
+        let mouseY = -9999;
 
         const targetFps = isMobile ? 24 : 30;
         const fpsInterval = 1000 / targetFps;
@@ -183,13 +185,20 @@ export default function EscherBackground() {
             uniform float u_gap;
             uniform float u_baseRadius;
             uniform float u_zoom;
+            uniform vec2 u_mouse;
 
             void main() {
                 vec2 pos = vec2(gl_FragCoord.x, u_resolution.y - gl_FragCoord.y);
                 vec2 cellCenter = floor(pos / u_gap + 0.5) * u_gap;
                 float dist = distance(pos, cellCenter);
 
-                if (dist > u_baseRadius + 0.5) {
+                // Cursor hover: scale dots near the mouse
+                float mouseDist = distance(pos, u_mouse);
+                float hoverRadius = 120.0;
+                float hoverScale = 1.0 + 1.2 * smoothstep(hoverRadius, 0.0, mouseDist);
+                float effectiveRadius = u_baseRadius * hoverScale;
+
+                if (dist > effectiveRadius + 0.5) {
                     gl_FragColor = vec4(0.0);
                     return;
                 }
@@ -214,7 +223,7 @@ export default function EscherBackground() {
                 vec2 screenCenter = u_resolution / 2.0;
                 vec2 diff = cellCenter - screenCenter;
 
-                float angle = u_time * 0.002;
+                float angle = -u_time * 0.002;
                 float s = sin(angle);
                 float c = cos(angle);
 
@@ -224,6 +233,9 @@ export default function EscherBackground() {
                 );
 
                 vec2 rotatedCenter = screenCenter + rotatedDiff;
+                
+                // Add a gentle hovering effect (bobbing up and down)
+                rotatedCenter.y += sin(u_time * 0.003) * 20.0;
 
                 float u = (rotatedCenter.x - offsetX) / drawWidth;
                 float v = (rotatedCenter.y - offsetY) / drawHeight;
@@ -238,7 +250,7 @@ export default function EscherBackground() {
                 }
 
                 float sizeFactor = (255.0 - brightness) / 255.0;
-                float dotSize = sizeFactor * u_baseRadius;
+                float dotSize = sizeFactor * effectiveRadius;
 
                 if (brightness < 240.0 && dotSize > 0.5) {
                     float alpha = 1.0 - smoothstep(dotSize - 0.5, dotSize + 0.5, dist);
@@ -298,10 +310,12 @@ export default function EscherBackground() {
         const uGap = gl.getUniformLocation(program, "u_gap");
         const uBaseRadius = gl.getUniformLocation(program, "u_baseRadius");
         const uZoom = gl.getUniformLocation(program, "u_zoom");
+        const uMouse = gl.getUniformLocation(program, "u_mouse");
 
         gl.uniform1f(uGap, gap);
         gl.uniform1f(uBaseRadius, baseRadius);
         gl.uniform1f(uZoom, iphoneCenterZoom);
+        gl.uniform2f(uMouse, -9999, -9999);
 
         const texture = gl.createTexture();
         let isTextureLoaded = false;
@@ -361,6 +375,10 @@ export default function EscherBackground() {
             if (uTime) {
                 gl.uniform1f(uTime, time);
             }
+            if (uMouse) {
+                const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? (isIPhone ? 2.25 : 1.6) : 2.0);
+                gl.uniform2f(uMouse, mouseX * dpr, mouseY * dpr);
+            }
             gl.drawArrays(gl.TRIANGLES, 0, 6);
         };
 
@@ -391,15 +409,23 @@ export default function EscherBackground() {
             }
         };
 
+        const handleMouseMove = (e: MouseEvent) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+        };
+
         observer.observe(container);
         window.addEventListener("resize", handleResize);
         window.visualViewport?.addEventListener("resize", handleResize);
+        document.addEventListener("mousemove", handleMouseMove);
         document.addEventListener("visibilitychange", handleVisibilityChange);
 
         return () => {
             observer.disconnect();
             window.removeEventListener("resize", handleResize);
             window.visualViewport?.removeEventListener("resize", handleResize);
+            document.removeEventListener("mousemove", handleMouseMove);
             document.removeEventListener("visibilitychange", handleVisibilityChange);
             cancelAnimationFrame(animationFrameId);
             gl.deleteProgram(program);
