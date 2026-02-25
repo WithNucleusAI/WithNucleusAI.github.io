@@ -55,6 +55,7 @@ samp {
 
 #typing.final-text {
   line-height: 1;
+  font-size: 2.5rem;
 }
 
 #typing.final-text #text {
@@ -149,6 +150,10 @@ samp {
   
   #typing, #email, #caption {
       font-size: 1.2rem;
+  }
+
+  #typing.final-text {
+    font-size: 0.4rem;
   }
 }
 

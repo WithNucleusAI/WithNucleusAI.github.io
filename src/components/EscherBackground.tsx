@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 
 export default function EscherBackground() {
-    const INITIAL_RADIUS_DESKTOP_PX = 340;
+    const INITIAL_RADIUS_DESKTOP_PX = 0;
     const INITIAL_RADIUS_MOBILE_PX = 150;
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -153,7 +153,7 @@ export default function EscherBackground() {
 
         const gl = probeGl;
         const image = new window.Image();
-        image.src = "/images/fish.jpg";
+        image.src = "/images/hands2.png";
 
         let animationFrameId = 0;
         let time = 0;
@@ -162,9 +162,9 @@ export default function EscherBackground() {
 
         const targetFps = isMobile ? 24 : 30;
         const fpsInterval = 1000 / targetFps;
-        const gap = isMobile ? 7.2 : 6.0;
-        const baseRadius = isMobile ? 1.8 : 2.0;
-        const scrollSpeed = isMobile ? 0.65 : 0.8;
+        const gap = isMobile ? 7.2 : 16.0;
+        const baseRadius = isMobile ? 1.8 : 6.0;
+        const scrollSpeed = 0.65;
         const iphoneCenterZoom = isIPhone ? 1.5 : 1.0;
 
         const vsSource = `
@@ -178,11 +178,10 @@ export default function EscherBackground() {
             precision highp float;
             uniform sampler2D u_image;
             uniform vec2 u_resolution;
-            uniform vec2 u_imageResolution;
-            uniform float u_time;
+            uniform vec4 u_drawParams;
+            uniform vec2 u_rotation;
             uniform float u_gap;
             uniform float u_baseRadius;
-            uniform float u_zoom;
 
             void main() {
                 vec2 pos = vec2(gl_FragCoord.x, u_resolution.y - gl_FragCoord.y);
@@ -194,44 +193,35 @@ export default function EscherBackground() {
                     return;
                 }
 
-                float imgAspect = u_imageResolution.x / u_imageResolution.y;
-                float canvasAspect = u_resolution.x / u_resolution.y;
+                vec2 screenCenter = u_resolution / 2.0;
+                vec2 diff = cellCenter - screenCenter;
 
-                float drawWidth;
-                float drawHeight;
-                float offsetY;
+                float s = u_rotation.x;
+                float c = u_rotation.y;
 
-                if (canvasAspect > imgAspect) {
-                    drawWidth = u_resolution.x;
-                    drawHeight = u_resolution.x / imgAspect;
-                    offsetY = (u_resolution.y - drawHeight) / 2.0;
-                } else {
-                    drawHeight = u_resolution.y;
-                    drawWidth = u_resolution.y * imgAspect;
-                    offsetY = 0.0;
-                }
+                vec2 rotatedDiff = vec2(
+                    diff.x * c - diff.y * s,
+                    diff.x * s + diff.y * c
+                );
 
-                float scrollOffset = mod(u_time, drawWidth);
-                float xInDraw = mod(cellCenter.x - scrollOffset, drawWidth);
-                if (xInDraw < 0.0) xInDraw += drawWidth;
+                vec2 rotatedCenter = screenCenter + rotatedDiff;
 
-                float yInDraw = cellCenter.y - offsetY;
-                float u = xInDraw / drawWidth;
-                float v = yInDraw / drawHeight;
-                vec2 uv = (vec2(u, v) - 0.5) / u_zoom + 0.5;
+                float u = (rotatedCenter.x - u_drawParams.z) / u_drawParams.x;
+                float v = (rotatedCenter.y - u_drawParams.w) / u_drawParams.y;
+                vec2 uv = vec2(u, v);
 
                 float brightness;
                 if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
-                    brightness = 0.0;
+                    brightness = 1.0;
                 } else {
                     vec4 color = texture2D(u_image, uv);
-                    brightness = dot(color.rgb, vec3(0.333333)) * 255.0;
+                    brightness = dot(color.rgb, vec3(0.333333));
                 }
 
-                float sizeFactor = (255.0 - brightness) / 255.0;
+                float sizeFactor = 1.0 - brightness;
                 float dotSize = sizeFactor * u_baseRadius;
 
-                if (brightness < 240.0 && dotSize > 0.5) {
+                if (brightness < 0.941 && dotSize > 0.5) {
                     float alpha = 1.0 - smoothstep(dotSize - 0.5, dotSize + 0.5, dist);
                     if (alpha > 0.0) {
                         gl_FragColor = vec4(0.0, 0.0, 0.0, alpha * 0.85);
@@ -284,29 +274,49 @@ export default function EscherBackground() {
         gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
         const uResolution = gl.getUniformLocation(program, "u_resolution");
-        const uImageResolution = gl.getUniformLocation(program, "u_imageResolution");
-        const uTime = gl.getUniformLocation(program, "u_time");
+        const uDrawParams = gl.getUniformLocation(program, "u_drawParams");
+        const uRotation = gl.getUniformLocation(program, "u_rotation");
         const uGap = gl.getUniformLocation(program, "u_gap");
         const uBaseRadius = gl.getUniformLocation(program, "u_baseRadius");
-        const uZoom = gl.getUniformLocation(program, "u_zoom");
 
         gl.uniform1f(uGap, gap);
         gl.uniform1f(uBaseRadius, baseRadius);
-        gl.uniform1f(uZoom, iphoneCenterZoom);
 
         const texture = gl.createTexture();
         let isTextureLoaded = false;
 
         const handleResize = () => {
-            const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? (isIPhone ? 2.25 : 1.6) : 2.0);
+            const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? (isIPhone ? 1.5 : 1.25) : 1.25);
             const width = Math.max(1, Math.floor(container.clientWidth * dpr));
             const height = Math.max(1, Math.floor(container.clientHeight * dpr));
             canvas.width = width;
             canvas.height = height;
 
-            gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+            const bw = gl.drawingBufferWidth || width;
+            const bh = gl.drawingBufferHeight || height;
+
+            gl.viewport(0, 0, bw, bh);
+
+            const imgAspect = (image.width && image.height) ? (image.width / image.height) : 1.0;
+            const canvasAspect = bw / bh;
+
+            let drawWidth, drawHeight;
+            if (canvasAspect > imgAspect) {
+                drawWidth = bw * iphoneCenterZoom;
+                drawHeight = (bw / imgAspect) * iphoneCenterZoom;
+            } else {
+                drawHeight = bh * iphoneCenterZoom;
+                drawWidth = (bh * imgAspect) * iphoneCenterZoom;
+            }
+
+            const offsetX = (bw - drawWidth) / 2.0;
+            const offsetY = (bh - drawHeight) / 2.0;
+
             if (uResolution) {
-                gl.uniform2f(uResolution, gl.drawingBufferWidth, gl.drawingBufferHeight);
+                gl.uniform2f(uResolution, bw, bh);
+            }
+            if (uDrawParams) {
+                gl.uniform4f(uDrawParams, drawWidth, drawHeight, offsetX, offsetY);
             }
 
             if (isTextureLoaded) {
@@ -322,10 +332,6 @@ export default function EscherBackground() {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-
-            if (uImageResolution) {
-                gl.uniform2f(uImageResolution, image.width, image.height);
-            }
 
             isTextureLoaded = true;
             handleResize();
@@ -349,8 +355,9 @@ export default function EscherBackground() {
             lastTime = now - (elapsed % fpsInterval);
             time += scrollSpeed * (elapsed / 16.666);
 
-            if (uTime) {
-                gl.uniform1f(uTime, time);
+            const angle = time * 0.002;
+            if (uRotation) {
+                gl.uniform2f(uRotation, Math.sin(angle), Math.cos(angle));
             }
             gl.drawArrays(gl.TRIANGLES, 0, 6);
         };
@@ -404,8 +411,8 @@ export default function EscherBackground() {
     const isMobileRadial = initialRadiusPx === INITIAL_RADIUS_MOBILE_PX;
     const fadeRadius = initialRadiusPx + fadeProgress * (maxRadiusPx - initialRadiusPx);
     const fadeEdge = isMobileRadial
-        ? Math.min(26, 10 + fadeProgress * 10)
-        : Math.min(48, 22 + fadeProgress * 20);
+        ? Math.min(0, 10 + fadeProgress * 10)
+        : Math.min(4, 22 + fadeProgress * 20);
 
     return (
         <div ref={containerRef} className="absolute inset-x-0 top-0 w-full h-svh -z-10 bg-white/50 dark:bg-neutral-900/50 pointer-events-none">

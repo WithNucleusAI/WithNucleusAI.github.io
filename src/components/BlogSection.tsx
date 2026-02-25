@@ -1,11 +1,8 @@
 "use client";
 
 import React from 'react';
-import StructuredNetworkAnimation from "@/components/StructuredNetworkAnimation";
 import MiniBlogCard from "@/components/MiniBlogCard";
 import { Post } from "@/lib/posts";
-import DataStreamAnimation from "@/components/DataStreamAnimation";
-import ServerlessScrapingAnimation from "@/components/ServerlessScrapingAnimation";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
@@ -35,29 +32,10 @@ export default function BlogSection({ posts }: BlogSectionProps) {
                 {/* Vertical Blog Gallery */}
                 <div className="flex flex-col gap-16 max-w-5xl mx-auto">
                     {posts.map((post, index) => {
-                        // Determine visual component based on metadata or slug fallback
-                        const ANIMATION_COMPONENTS: { [key: string]: React.ComponentType<any> } = {
-                            'structured-network': StructuredNetworkAnimation,
-                            'data-stream': DataStreamAnimation,
-                            'serverless-scraping': ServerlessScrapingAnimation,
-                        };
-
-                        let VisualComponent = post.animation ? ANIMATION_COMPONENTS[post.animation] : undefined;
-
-                        // Fallback logic for legacy posts without animation field
-                        if (!VisualComponent) {
-                            if (post.slug.includes('data-blog') || post.slug.includes('serverless-scraping')) {
-                                VisualComponent = DataStreamAnimation;
-                            } else {
-                                VisualComponent = StructuredNetworkAnimation;
-                            }
-                        }
-
                         return (
                             <div key={post.slug} className="w-full border-b border-gray-100 dark:border-gray-800 pb-16 last:border-0 last:pb-0">
                                 <MiniBlogCard
                                     post={post}
-                                    VisualComponent={VisualComponent}
                                     horizontal={true}
                                 />
                             </div>

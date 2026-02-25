@@ -9,7 +9,7 @@ export default async function BlogPage() {
     const posts = await getPosts();
 
     return (
-        <div className="max-w-[800px] mx-auto py-10 px-4 sm:py-16 sm:px-6 text-left w-full box-border text-gray-900 dark:text-gray-100">
+        <div className="max-w-5xl mx-auto py-10 px-4 sm:py-16 sm:px-6 text-left w-full box-border text-gray-900 dark:text-gray-100">
             <h1 className="text-3xl sm:text-5xl mb-8 sm:mb-12 pb-4 sm:pb-6 border-b border-[#eee] dark:border-gray-800 tracking-tight">Blogs</h1>
             <div className="posts-list">
                 {posts.map((post) => (

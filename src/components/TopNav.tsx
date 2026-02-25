@@ -24,7 +24,7 @@ export default function TopNav() {
   const backHref = isBlogPost ? "/blog" : "/";
 
   return (
-    <header className="fixed top-3 sm:top-4 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] max-w-5xl px-4 py-2 sm:px-6 sm:py-2 flex justify-between items-center box-border z-50 rounded-4xl border border-black/20 dark:border-white/20 bg-white/60 dark:bg-gray-900/50 backdrop-blur-md">
+    <header className=" top-3 w-full px-4 py-2 sm:px-6 sm:py-2 flex justify-between items-center box-border z-50  ">
       <div className="logo-container min-w-0">
         {isHome ? (
           <Link href="/" className="flex items-center gap-2 sm:gap-3 no-underline text-inherit font-bold text-lg sm:text-xl transition-opacity duration-200 hover:opacity-80">
