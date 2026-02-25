@@ -159,8 +159,10 @@ export default function EscherBackground() {
         let time = 0;
         let lastTime = performance.now();
         let isVisible = true;
-        let mouseX = -9999;
-        let mouseY = -9999;
+        let targetMouseX = -9999;
+        let targetMouseY = -9999;
+        let currentMouseX = -9999;
+        let currentMouseY = -9999;
 
         const targetFps = isMobile ? 24 : 30;
         const fpsInterval = 1000 / targetFps;
@@ -192,10 +194,16 @@ export default function EscherBackground() {
                 vec2 cellCenter = floor(pos / u_gap + 0.5) * u_gap;
                 float dist = distance(pos, cellCenter);
 
-                // Cursor hover: scale dots near the mouse
+                // Buttery smooth magnifying glass effect
+                float magRadius = 260.0;
                 float mouseDist = distance(pos, u_mouse);
-                float hoverRadius = 120.0;
-                float hoverScale = 1.0 + 1.2 * smoothstep(hoverRadius, 0.0, mouseDist);
+                
+                // Lens falloff for dot scaling
+                float lensFalloff = smoothstep(magRadius, 0.0, mouseDist);
+                // Slight easing for an organic, softer swell
+                float swellFalloff = lensFalloff * lensFalloff * (3.0 - 2.0 * lensFalloff);
+                
+                float hoverScale = 1.0 + 1.4 * swellFalloff;
                 float effectiveRadius = u_baseRadius * hoverScale;
 
                 if (dist > effectiveRadius + 0.5) {
@@ -221,7 +229,17 @@ export default function EscherBackground() {
                 float offsetY = (u_resolution.y - drawHeight) / 2.0;
 
                 vec2 screenCenter = u_resolution / 2.0;
-                vec2 diff = cellCenter - screenCenter;
+                
+                // Texture magnification / distortion map
+                vec2 cellMouseDiff = cellCenter - u_mouse;
+                float cellMouseDist = length(cellMouseDiff);
+                float cellLensFalloff = smoothstep(magRadius, 0.0, cellMouseDist);
+                float zoomFalloff = cellLensFalloff * cellLensFalloff * (3.0 - 2.0 * cellLensFalloff); // Cubic ease
+
+                // Shrink distance to mouse to "zoom in"
+                vec2 sampleCenter = mix(cellCenter, u_mouse + cellMouseDiff * 0.35, zoomFalloff);
+                
+                vec2 diff = sampleCenter - screenCenter;
 
                 float angle = -u_time * 0.002;
                 float s = sin(angle);
@@ -372,12 +390,21 @@ export default function EscherBackground() {
             lastTime = now - (elapsed % fpsInterval);
             time += scrollSpeed * (elapsed / 16.666);
 
+            // Buttery smooth mouse interpolation
+            if (currentMouseX === -9999 && targetMouseX !== -9999) {
+                currentMouseX = targetMouseX;
+                currentMouseY = targetMouseY;
+            } else if (targetMouseX !== -9999) {
+                currentMouseX += (targetMouseX - currentMouseX) * 0.12;
+                currentMouseY += (targetMouseY - currentMouseY) * 0.12;
+            }
+
             if (uTime) {
                 gl.uniform1f(uTime, time);
             }
             if (uMouse) {
                 const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? (isIPhone ? 2.25 : 1.6) : 2.0);
-                gl.uniform2f(uMouse, mouseX * dpr, mouseY * dpr);
+                gl.uniform2f(uMouse, currentMouseX * dpr, currentMouseY * dpr);
             }
             gl.drawArrays(gl.TRIANGLES, 0, 6);
         };
@@ -411,8 +438,8 @@ export default function EscherBackground() {
 
         const handleMouseMove = (e: MouseEvent) => {
             const rect = canvas.getBoundingClientRect();
-            mouseX = e.clientX - rect.left;
-            mouseY = e.clientY - rect.top;
+            targetMouseX = e.clientX - rect.left;
+            targetMouseY = e.clientY - rect.top;
         };
 
         observer.observe(container);
