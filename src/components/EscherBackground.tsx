@@ -10,10 +10,15 @@ export default function EscherBackground() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [isLoaded, setIsLoaded] = useState(false);
+    const isLoadedRef = useRef(false);
 
     // Compute scroll-based opacity and write directly to canvas.style — no React re-renders.
     const applyScrollOpacity = () => {
         if (!canvasRef.current) return;
+        if (!isLoadedRef.current) {
+            canvasRef.current.style.opacity = "0";
+            return;
+        }
         const isMobileViewport = window.matchMedia("(max-width: 768px)").matches;
         const scrollY = window.scrollY || window.pageYOffset || 0;
         const maxDistance = Math.max(window.innerHeight * (isMobileViewport ? 0.62 : 0.9), 1);
@@ -41,6 +46,7 @@ export default function EscherBackground() {
     // so all subsequent scroll updates are immediate (no CSS transition lag).
     useEffect(() => {
         if (!isLoaded || !canvasRef.current) return;
+        isLoadedRef.current = true;
         const c = canvasRef.current;
         c.style.transition = 'opacity 1s ease';
         applyScrollOpacity(); // sets correct opacity for current scroll position
