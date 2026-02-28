@@ -111,7 +111,7 @@ export default function EscherBackground() {
 
         const gl = probeGl;
         const image = new window.Image();
-        image.src = "/images/hands2.png";
+        image.src = "/images/hands2.webp";
 
         const targetFps = isMobile ? 24 : 60;
         const fpsInterval = 1000 / targetFps;
