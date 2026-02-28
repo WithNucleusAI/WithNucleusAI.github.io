@@ -57,7 +57,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <TopNav />
-          <main className="flex-1 flex flex-col w-full pt-24 sm:pt-28">{children}</main>
+          <main className="flex-1 flex flex-col w-full sm:pt-28">{children}</main>
           <div id="email" className="fixed bottom-7.5 text-base text-[#666] dark:text-gray-400 font-normal opacity-0 tracking-widest pointer-events-none">contact@withnucleus.ai</div>
           <ScrollToTop />
           <ThemeToggle />

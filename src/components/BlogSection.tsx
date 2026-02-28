@@ -15,9 +15,9 @@ export default function BlogSection({ posts }: BlogSectionProps) {
     return (
         <section
             id="blog-section"
-            className="relative min-h-screen w-full flex flex-col justify-center py-24 bg-gradient-to-b from-transparent to-gray-50/50 dark:to-gray-900/50"
+            className="relative min-h-screen w-full flex flex-col justify-center py-12 sm:py-24 bg-gradient-to-b from-transparent to-gray-50/50 dark:to-gray-900/50"
         >
-            <div className="w-full max-w-7xl mx-auto px-6">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6">
                 <div className="mb-12">
                     <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400">
                         Engineering Intelligence
@@ -30,10 +30,10 @@ export default function BlogSection({ posts }: BlogSectionProps) {
                 {/* Ultra-Minimalist Blog Grid */}
                 {/* Ultra-Minimalist Blog Grid */}
                 {/* Vertical Blog Gallery */}
-                <div className="flex flex-col gap-16 max-w-5xl mx-auto">
+                <div className="flex flex-col gap-8 sm:gap-16 max-w-5xl mx-auto">
                     {posts.map((post, index) => {
                         return (
-                            <div key={post.slug} className="w-full border-b border-gray-100 dark:border-gray-800 pb-16 last:border-0 last:pb-0">
+                            <div key={post.slug} className="w-full border-b border-gray-100 dark:border-gray-800 pb-8 sm:pb-16 last:border-0 last:pb-0">
                                 <MiniBlogCard
                                     post={post}
                                     horizontal={true}

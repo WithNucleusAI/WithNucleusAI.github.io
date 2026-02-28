@@ -16,7 +16,7 @@ export default function MiniBlogCard({ post, VisualComponent, horizontal = false
     return (
         <Link href={`/blog/${post.slug}`} className="group block h-full w-full">
             <div
-                className={`flex ${horizontal ? 'flex-row gap-8 items-center' : 'flex-col'} h-full overflow-hidden transition-all duration-300`}
+                className={`flex ${horizontal ? 'flex-col sm:flex-row gap-4 sm:gap-8 sm:items-center' : 'flex-col'} h-full overflow-hidden transition-all duration-300`}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
@@ -37,7 +37,7 @@ export default function MiniBlogCard({ post, VisualComponent, horizontal = false
                         </span>
                     </div>
 
-                    <h3 className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-gray-100 leading-tight mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 dark:text-gray-100 leading-tight mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
                         {post.title}
                     </h3>
 

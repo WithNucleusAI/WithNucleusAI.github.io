@@ -134,8 +134,12 @@ samp {
 /* Media queries for responsive adjustments - EXACTLY matching legacy */
 @media (max-width: 768px) {
   #typing {
-      font-size: 1.05rem;
-      line-height: 1.25;
+      font-size: 1.2rem;
+      line-height: 1.35;
+  }
+
+  #typing.final-text {
+      font-size: clamp(1.8rem, 8vw, 2.5rem);
   }
 
   #caption {
@@ -144,16 +148,12 @@ samp {
 }
 
 @media (max-width: 600px) {
-  /* Legacy body font-size: 5vw is not applied to body here to avoid global side effects, 
-     but we can apply scales if needed. 
-     For now, we stick to the component overrides. */
-  
   #typing, #email, #caption {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
   }
 
   #typing.final-text {
-    font-size: 0.4rem;
+    font-size: clamp(1.6rem, 7.5vw, 2.2rem);
   }
 }
 

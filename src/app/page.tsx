@@ -11,7 +11,7 @@ export default async function Home() {
   return (
     <main className="w-full">
       <EscherBackground />
-      <section className="min-h-[calc(100svh-6rem)] relative flex flex-col justify-center items-center w-full overflow-hidden pb-54">
+      <section className="h-svh sm:-mt-28 relative flex flex-col justify-center items-center w-full overflow-hidden">
         <Typewriter />
         <ScrollDownButton />
       </section>

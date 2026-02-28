@@ -10,85 +10,43 @@ export default function EscherBackground() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [isLoaded, setIsLoaded] = useState(false);
-    const [fadeProgress, setFadeProgress] = useState(0);
-    const [fadeCenter, setFadeCenter] = useState({ x: 50, y: 50 });
-    const [initialRadiusPx, setInitialRadiusPx] = useState(INITIAL_RADIUS_DESKTOP_PX);
-    const [maxRadiusPx, setMaxRadiusPx] = useState(2400);
+
+    // Compute scroll-based opacity and write directly to canvas.style — no React re-renders.
+    const applyScrollOpacity = () => {
+        if (!canvasRef.current) return;
+        const isMobileViewport = window.matchMedia("(max-width: 768px)").matches;
+        const scrollY = window.scrollY || window.pageYOffset || 0;
+        const maxDistance = Math.max(window.innerHeight * (isMobileViewport ? 0.62 : 0.9), 1);
+        const progress = Math.min(1, Math.max(0, scrollY / maxDistance));
+        canvasRef.current.style.opacity = String(0.6 * (1 - progress));
+    };
 
     useEffect(() => {
         let rafId = 0;
-
-        const updateFadeCenter = () => {
-            const typingElement = document.getElementById("typing");
-            const isMobileViewport = window.matchMedia("(max-width: 768px)").matches;
-            const viewportWidth = Math.max(window.innerWidth, 1);
-            const viewportHeight = Math.max(window.innerHeight, 1);
-            const baseRadius = isMobileViewport ? INITIAL_RADIUS_MOBILE_PX : INITIAL_RADIUS_DESKTOP_PX;
-            let centerX = viewportWidth / 2;
-            let centerY = viewportHeight / 2;
-
-            if (typingElement) {
-                const rect = typingElement.getBoundingClientRect();
-                centerX = rect.left + rect.width / 2;
-                centerY = rect.top + rect.height / 2;
-            }
-
-            const x = (centerX / viewportWidth) * 100;
-            const y = (centerY / viewportHeight) * 100;
-
-            const viewportCorners = [
-                { x: 0, y: 0 },
-                { x: viewportWidth, y: 0 },
-                { x: 0, y: viewportHeight },
-                { x: viewportWidth, y: viewportHeight },
-            ];
-            const fullCoverRadius = Math.max(
-                ...viewportCorners.map(corner => Math.sqrt((corner.x - centerX) ** 2 + (corner.y - centerY) ** 2))
-            ) + 80;
-
-            setFadeCenter({
-                x: Math.min(95, Math.max(5, x)),
-                y: Math.min(95, Math.max(5, y)),
-            });
-            setInitialRadiusPx(baseRadius);
-            setMaxRadiusPx(Math.max(baseRadius + 160, fullCoverRadius));
-        };
-
-        const updateFadeProgress = () => {
-            const isMobileViewport = window.matchMedia("(max-width: 768px)").matches;
-            const scrollY = window.scrollY || window.pageYOffset || 0;
-            const maxDistance = Math.max(window.innerHeight * (isMobileViewport ? 0.62 : 0.9), 1);
-            const progress = Math.min(1, Math.max(0, scrollY / maxDistance));
-            setFadeProgress(progress);
-            updateFadeCenter();
-        };
-
         const handleScroll = () => {
             cancelAnimationFrame(rafId);
-            rafId = requestAnimationFrame(updateFadeProgress);
+            rafId = requestAnimationFrame(applyScrollOpacity);
         };
-
-        updateFadeProgress();
-        updateFadeCenter();
+        applyScrollOpacity();
         window.addEventListener("scroll", handleScroll, { passive: true });
-        window.addEventListener("resize", updateFadeProgress);
-
-        const typingElement = document.getElementById("typing");
-        const resizeObserver =
-            typeof ResizeObserver !== "undefined" && typingElement
-                ? new ResizeObserver(() => {
-                    updateFadeCenter();
-                })
-                : null;
-        resizeObserver?.observe(typingElement as Element);
-
+        window.addEventListener("resize", applyScrollOpacity);
         return () => {
             cancelAnimationFrame(rafId);
             window.removeEventListener("scroll", handleScroll);
-            window.removeEventListener("resize", updateFadeProgress);
-            resizeObserver?.disconnect();
+            window.removeEventListener("resize", applyScrollOpacity);
         };
     }, []);
+
+    // When canvas first loads: fade it in with a one-shot transition, then remove it
+    // so all subsequent scroll updates are immediate (no CSS transition lag).
+    useEffect(() => {
+        if (!isLoaded || !canvasRef.current) return;
+        const c = canvasRef.current;
+        c.style.transition = 'opacity 1s ease';
+        applyScrollOpacity(); // sets correct opacity for current scroll position
+        const t = setTimeout(() => { c.style.transition = ''; }, 1100);
+        return () => clearTimeout(t);
+    }, [isLoaded]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -155,21 +113,17 @@ export default function EscherBackground() {
         const image = new window.Image();
         image.src = "/images/hands2.png";
 
-        let animationFrameId = 0;
-        let time = 0;
-        let lastTime = performance.now();
-        let isVisible = true;
-        let targetMouseX = -9999;
-        let targetMouseY = -9999;
-        let currentMouseX = -9999;
-        let currentMouseY = -9999;
-
-        const targetFps = isMobile ? 24 : 30;
+        const targetFps = isMobile ? 24 : 60;
         const fpsInterval = 1000 / targetFps;
         const gap = isMobile ? 7.2 : 16.0;
         const baseRadius = isMobile ? 1.8 : 6.0;
-        const scrollSpeed = 0.65;
-        const iphoneCenterZoom = isIPhone ? 1.5 : 1.0;
+        const scrollSpeed = 0;
+        const MOBILE_IMAGE_ZOOM = 1.4; // ← increase to zoom in on the image on mobile (e.g. 1.2 = 20% zoom)
+        const fitContain = isMobile ? 1.0 : 0.0;
+        const mobileZoom = isMobile ? MOBILE_IMAGE_ZOOM : 1.0;
+        // Cache DPR once — avoids recomputing on every render frame
+        const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? (isIPhone ? 2.25 : 1.6) : 2.0);
+        const floatPrecision = isMobile ? 'mediump' : 'highp';
 
         const vsSource = `
             attribute vec2 a_position;
@@ -178,33 +132,36 @@ export default function EscherBackground() {
             }
         `;
 
+        // On mobile: mediump precision (huge GPU win) + cheap tent shimmer instead of exp()
         const fsSource = `
-            precision highp float;
+            precision ${floatPrecision} float;
             uniform sampler2D u_image;
             uniform vec2 u_resolution;
             uniform vec2 u_imageResolution;
-            uniform float u_time;
             uniform float u_gap;
             uniform float u_baseRadius;
             uniform float u_zoom;
-            uniform vec2 u_mouse;
+            uniform float u_fitContain;
+            uniform float u_globalTime;
 
             void main() {
                 vec2 pos = vec2(gl_FragCoord.x, u_resolution.y - gl_FragCoord.y);
                 vec2 cellCenter = floor(pos / u_gap + 0.5) * u_gap;
                 float dist = distance(pos, cellCenter);
 
-                // Buttery smooth magnifying glass effect
-                float magRadius = 260.0;
-                float mouseDist = distance(pos, u_mouse);
-                
-                // Lens falloff for dot scaling
-                float lensFalloff = smoothstep(magRadius, 0.0, mouseDist);
-                // Slight easing for an organic, softer swell
-                float swellFalloff = lensFalloff * lensFalloff * (3.0 - 2.0 * lensFalloff);
-                
-                float hoverScale = 1.0 + 1.4 * swellFalloff;
-                float effectiveRadius = u_baseRadius * hoverScale;
+                // Radial wave shimmer from center to edges
+                vec2 screenCenter = u_resolution * 0.5;
+                float distFromCenter = distance(pos, screenCenter);
+                float shimmerCycle = 4500.0;
+                float progress = mod(u_globalTime, shimmerCycle) / shimmerCycle;
+                float ringPos = progress * (length(screenCenter) + 200.0);
+                float dr = distFromCenter - ringPos;
+                float bandWidth = 100.0;
+                // Desktop: smooth Gaussian. Mobile: cheap tent function (avoids exp())
+                float shimmer = ${isMobile
+                ? 'max(0.0, 1.0 - abs(dr) / bandWidth);'
+                : 'exp(-(dr * dr) / (2.0 * bandWidth * bandWidth));'}
+                float effectiveRadius = u_baseRadius * (1.0 + shimmer * 0.5);
 
                 if (dist > effectiveRadius + 0.5) {
                     gl_FragColor = vec4(0.0);
@@ -217,46 +174,30 @@ export default function EscherBackground() {
                 float drawWidth;
                 float drawHeight;
 
-                if (canvasAspect > imgAspect) {
-                    drawWidth = u_resolution.x * u_zoom;
-                    drawHeight = (u_resolution.x / imgAspect) * u_zoom;
+                if (u_fitContain < 0.5) {
+                    if (canvasAspect > imgAspect) {
+                        drawWidth = u_resolution.x * u_zoom;
+                        drawHeight = (u_resolution.x / imgAspect) * u_zoom;
+                    } else {
+                        drawHeight = u_resolution.y * u_zoom;
+                        drawWidth = (u_resolution.y * imgAspect) * u_zoom;
+                    }
                 } else {
-                    drawHeight = u_resolution.y * u_zoom;
-                    drawWidth = (u_resolution.y * imgAspect) * u_zoom;
+                    if (canvasAspect > imgAspect) {
+                        drawHeight = u_resolution.y * u_zoom;
+                        drawWidth = (u_resolution.y * imgAspect) * u_zoom;
+                    } else {
+                        drawWidth = u_resolution.x * u_zoom;
+                        drawHeight = (u_resolution.x / imgAspect) * u_zoom;
+                    }
                 }
 
-                float offsetX = (u_resolution.x - drawWidth) / 2.0;
-                float offsetY = (u_resolution.y - drawHeight) / 2.0;
+                float offsetX = (u_resolution.x - drawWidth) * 0.5;
+                float offsetY = (u_resolution.y - drawHeight) * 0.5;
 
-                vec2 screenCenter = u_resolution / 2.0;
-                
-                // Texture magnification / distortion map
-                vec2 cellMouseDiff = cellCenter - u_mouse;
-                float cellMouseDist = length(cellMouseDiff);
-                float cellLensFalloff = smoothstep(magRadius, 0.0, cellMouseDist);
-                float zoomFalloff = cellLensFalloff * cellLensFalloff * (3.0 - 2.0 * cellLensFalloff); // Cubic ease
-
-                // Shrink distance to mouse to "zoom in"
-                vec2 sampleCenter = mix(cellCenter, u_mouse + cellMouseDiff * 0.35, zoomFalloff);
-                
-                vec2 diff = sampleCenter - screenCenter;
-
-                float angle = -u_time * 0.002;
-                float s = sin(angle);
-                float c = cos(angle);
-
-                vec2 rotatedDiff = vec2(
-                    diff.x * c - diff.y * s,
-                    diff.x * s + diff.y * c
-                );
-
-                vec2 rotatedCenter = screenCenter + rotatedDiff;
-                
-                // Add a gentle hovering effect (bobbing up and down)
-                rotatedCenter.y += sin(u_time * 0.003) * 20.0;
-
-                float u = (rotatedCenter.x - offsetX) / drawWidth;
-                float v = (rotatedCenter.y - offsetY) / drawHeight;
+                // Sample UV directly from cellCenter (rotatedCenter was always == cellCenter)
+                float u = (cellCenter.x - offsetX) / drawWidth;
+                float v = (cellCenter.y - offsetY) / drawHeight;
                 vec2 uv = vec2(u, v);
 
                 float brightness;
@@ -324,35 +265,28 @@ export default function EscherBackground() {
 
         const uResolution = gl.getUniformLocation(program, "u_resolution");
         const uImageResolution = gl.getUniformLocation(program, "u_imageResolution");
-        const uTime = gl.getUniformLocation(program, "u_time");
         const uGap = gl.getUniformLocation(program, "u_gap");
         const uBaseRadius = gl.getUniformLocation(program, "u_baseRadius");
         const uZoom = gl.getUniformLocation(program, "u_zoom");
-        const uMouse = gl.getUniformLocation(program, "u_mouse");
+        const uFitContain = gl.getUniformLocation(program, "u_fitContain");
+        const uGlobalTime = gl.getUniformLocation(program, "u_globalTime");
 
         gl.uniform1f(uGap, gap);
         gl.uniform1f(uBaseRadius, baseRadius);
-        gl.uniform1f(uZoom, iphoneCenterZoom);
-        gl.uniform2f(uMouse, -9999, -9999);
+        gl.uniform1f(uZoom, mobileZoom);
+        gl.uniform1f(uFitContain, fitContain);
 
         const texture = gl.createTexture();
         let isTextureLoaded = false;
 
         const handleResize = () => {
-            const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? (isIPhone ? 2.25 : 1.6) : 2.0);
-            const width = Math.max(1, Math.floor(container.clientWidth * dpr));
-            const height = Math.max(1, Math.floor(container.clientHeight * dpr));
-            canvas.width = width;
-            canvas.height = height;
-
+            const w = Math.max(1, Math.floor(container.clientWidth * dpr));
+            const h = Math.max(1, Math.floor(container.clientHeight * dpr));
+            canvas.width = w;
+            canvas.height = h;
             gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-            if (uResolution) {
-                gl.uniform2f(uResolution, gl.drawingBufferWidth, gl.drawingBufferHeight);
-            }
-
-            if (isTextureLoaded) {
-                gl.drawArrays(gl.TRIANGLES, 0, 6);
-            }
+            if (uResolution) gl.uniform2f(uResolution, gl.drawingBufferWidth, gl.drawingBufferHeight);
+            if (isTextureLoaded) gl.drawArrays(gl.TRIANGLES, 0, 6);
         };
 
         image.onload = () => {
@@ -379,33 +313,19 @@ export default function EscherBackground() {
             }
         };
 
+        let animationFrameId = 0;
+        let time = 0;
+        let lastTime = performance.now();
+        let isVisible = true;
+
         const render = (now: number) => {
             if (!isTextureLoaded || !isVisible || document.hidden) return;
-
             animationFrameId = requestAnimationFrame(render);
-
             const elapsed = now - lastTime;
             if (elapsed < fpsInterval) return;
-
             lastTime = now - (elapsed % fpsInterval);
             time += scrollSpeed * (elapsed / 16.666);
-
-            // Buttery smooth mouse interpolation
-            if (currentMouseX === -9999 && targetMouseX !== -9999) {
-                currentMouseX = targetMouseX;
-                currentMouseY = targetMouseY;
-            } else if (targetMouseX !== -9999) {
-                currentMouseX += (targetMouseX - currentMouseX) * 0.12;
-                currentMouseY += (targetMouseY - currentMouseY) * 0.12;
-            }
-
-            if (uTime) {
-                gl.uniform1f(uTime, time);
-            }
-            if (uMouse) {
-                const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? (isIPhone ? 2.25 : 1.6) : 2.0);
-                gl.uniform2f(uMouse, currentMouseX * dpr, currentMouseY * dpr);
-            }
+            if (uGlobalTime) gl.uniform1f(uGlobalTime, now);
             gl.drawArrays(gl.TRIANGLES, 0, 6);
         };
 
@@ -436,23 +356,16 @@ export default function EscherBackground() {
             }
         };
 
-        const handleMouseMove = (e: MouseEvent) => {
-            const rect = canvas.getBoundingClientRect();
-            targetMouseX = e.clientX - rect.left;
-            targetMouseY = e.clientY - rect.top;
-        };
 
         observer.observe(container);
         window.addEventListener("resize", handleResize);
         window.visualViewport?.addEventListener("resize", handleResize);
-        document.addEventListener("mousemove", handleMouseMove);
         document.addEventListener("visibilitychange", handleVisibilityChange);
 
         return () => {
             observer.disconnect();
             window.removeEventListener("resize", handleResize);
             window.visualViewport?.removeEventListener("resize", handleResize);
-            document.removeEventListener("mousemove", handleMouseMove);
             document.removeEventListener("visibilitychange", handleVisibilityChange);
             cancelAnimationFrame(animationFrameId);
             gl.deleteProgram(program);
@@ -463,27 +376,16 @@ export default function EscherBackground() {
         };
     }, []);
 
-    const isMobileRadial = initialRadiusPx === INITIAL_RADIUS_MOBILE_PX;
-    const fadeRadius = initialRadiusPx + fadeProgress * (maxRadiusPx - initialRadiusPx);
-    const fadeEdge = isMobileRadial
-        ? Math.min(0, 10 + fadeProgress * 10)
-        : Math.min(4, 22 + fadeProgress * 20);
 
     return (
         <div ref={containerRef} className="absolute inset-x-0 top-0 w-full h-svh -z-10 bg-white/50 dark:bg-neutral-900/50 pointer-events-none">
-            <canvas
-                ref={canvasRef}
-                className="block w-full h-full opacity-60 dark:invert contrast-125 mix-blend-multiply dark:mix-blend-screen transition-opacity duration-1000"
-                style={{ opacity: isLoaded ? 0.6 : 0 }}
-            />
-            <div
-                aria-hidden="true"
-                className="absolute inset-0 bg-white dark:bg-black pointer-events-none transition-opacity duration-1000"
-                style={{
-                    maskImage: `radial-gradient(circle at ${fadeCenter.x}% ${fadeCenter.y}%, rgba(0,0,0,1) ${fadeRadius}px, rgba(0,0,0,0) ${fadeRadius + fadeEdge}px)`,
-                    WebkitMaskImage: `radial-gradient(circle at ${fadeCenter.x}% ${fadeCenter.y}%, rgba(0,0,0,1) ${fadeRadius}px, rgba(0,0,0,0) ${fadeRadius + fadeEdge}px)`,
-                }}
-            />
+            <div className="w-full h-full dark:opacity-[0.45]">
+                <canvas
+                    ref={canvasRef}
+                    className="block w-full h-full dark:invert dark:contrast-100 contrast-125 mix-blend-multiply dark:mix-blend-screen"
+                    style={{ opacity: 0, willChange: 'opacity' }}
+                />
+            </div>
         </div>
     );
 }
