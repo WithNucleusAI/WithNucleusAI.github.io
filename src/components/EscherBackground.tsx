@@ -125,6 +125,7 @@ export default function EscherBackground() {
         const baseRadius = isMobile ? 1.8 : 6.0;
         const scrollSpeed = 0;
         const MOBILE_IMAGE_ZOOM = 1.4; // ← increase to zoom in on the image on mobile (e.g. 1.2 = 20% zoom)
+        const IMAGE_ROTATION_DEG = -30.0; // ← angle in degrees to rotate the underlying image clockwise
         const fitContain = isMobile ? 1.0 : 0.0;
         const mobileZoom = isMobile ? MOBILE_IMAGE_ZOOM : 1.0;
         // Cache DPR once — avoids recomputing on every render frame
@@ -149,6 +150,10 @@ export default function EscherBackground() {
             uniform float u_zoom;
             uniform float u_fitContain;
             uniform float u_globalTime;
+            ${!isMobile ? `
+            uniform vec2 u_mouse;
+            uniform float u_hoverActive;
+            ` : ''}
 
             void main() {
                 vec2 pos = vec2(gl_FragCoord.x, u_resolution.y - gl_FragCoord.y);
@@ -167,7 +172,27 @@ export default function EscherBackground() {
                 float shimmer = ${isMobile
                 ? 'max(0.0, 1.0 - abs(dr) / bandWidth);'
                 : 'exp(-(dr * dr) / (2.0 * bandWidth * bandWidth));'}
-                float effectiveRadius = u_baseRadius * (1.0 + shimmer * 0.5);
+                
+                ${isMobile ? `
+                float magEffect = 0.0;
+                vec2 uvOffset = vec2(0.0);
+                ` : `
+                // Magnifying glass effect
+                float distToMouse = distance(pos, u_mouse);
+                float glassRadius = 250.0;
+                float magEffect = 0.0;
+                vec2 uvOffset = vec2(0.0);
+                
+                if (u_hoverActive > 0.0 && distToMouse < glassRadius && u_mouse.x >= 0.0) {
+                    float normDist = distToMouse / glassRadius;
+                    float lensShape = 1.0 - pow(normDist, 2.0); // Parabolic lens
+                    magEffect = lensShape * u_hoverActive;
+                    vec2 centerVector = cellCenter - u_mouse;
+                    uvOffset = -centerVector * (magEffect * 0.5); // Zoom distortion
+                }
+                `}
+
+                float effectiveRadius = u_baseRadius * (1.0 + shimmer * 0.5 + magEffect * 0.75);
 
                 if (dist > effectiveRadius + 0.5) {
                     gl_FragColor = vec4(0.0);
@@ -201,10 +226,18 @@ export default function EscherBackground() {
                 float offsetX = (u_resolution.x - drawWidth) * 0.5;
                 float offsetY = (u_resolution.y - drawHeight) * 0.5;
 
-                // Sample UV directly from cellCenter (rotatedCenter was always == cellCenter)
-                float u = (cellCenter.x - offsetX) / drawWidth;
-                float v = (cellCenter.y - offsetY) / drawHeight;
+                // Sample UV directly from cellCenter + uvOffset
+                float u = (cellCenter.x + uvOffset.x - offsetX) / drawWidth;
+                float v = (cellCenter.y + uvOffset.y - offsetY) / drawHeight;
                 vec2 uv = vec2(u, v);
+
+                // Rotate UV space counter-clockwise by the user-defined angle to rotate the image clockwise
+                float angle = ${(IMAGE_ROTATION_DEG * Math.PI) / 180}; // degrees to radians from config
+                float cosA = cos(angle);
+                float sinA = sin(angle);
+                uv -= vec2(0.5, 0.5);
+                uv = vec2(uv.x * cosA - uv.y * sinA, uv.x * sinA + uv.y * cosA);
+                uv += vec2(0.5, 0.5);
 
                 float brightness;
                 if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
@@ -276,6 +309,8 @@ export default function EscherBackground() {
         const uZoom = gl.getUniformLocation(program, "u_zoom");
         const uFitContain = gl.getUniformLocation(program, "u_fitContain");
         const uGlobalTime = gl.getUniformLocation(program, "u_globalTime");
+        const uMouse = gl.getUniformLocation(program, "u_mouse");
+        const uHoverActive = gl.getUniformLocation(program, "u_hoverActive");
 
         gl.uniform1f(uGap, gap);
         gl.uniform1f(uBaseRadius, baseRadius);
@@ -324,6 +359,28 @@ export default function EscherBackground() {
         let lastTime = performance.now();
         let isVisible = true;
 
+        let targetHover = 0;
+        let currentHover = 0;
+        let mouseX = -1000;
+        let mouseY = -1000;
+
+        const handleMouseMove = (e: MouseEvent) => {
+            if (isMobile || !canvas || !isVisible) return;
+            const rect = canvas.getBoundingClientRect();
+            mouseX = (e.clientX - rect.left) * dpr;
+            mouseY = (e.clientY - rect.top) * dpr;
+            targetHover = 1;
+        };
+
+        const handleMouseLeave = () => {
+            targetHover = 0;
+        };
+
+        if (!isMobile) {
+            window.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseleave', handleMouseLeave);
+        }
+
         const render = (now: number) => {
             if (!isTextureLoaded || !isVisible || document.hidden) return;
             animationFrameId = requestAnimationFrame(render);
@@ -332,6 +389,14 @@ export default function EscherBackground() {
             lastTime = now - (elapsed % fpsInterval);
             time += scrollSpeed * (elapsed / 16.666);
             if (uGlobalTime) gl.uniform1f(uGlobalTime, now);
+
+            if (!isMobile) {
+                currentHover += (targetHover - currentHover) * 0.15;
+                if (Math.abs(targetHover - currentHover) < 0.001) currentHover = targetHover;
+                if (uHoverActive) gl.uniform1f(uHoverActive, currentHover);
+                if (uMouse) gl.uniform2f(uMouse, mouseX, mouseY);
+            }
+
             gl.drawArrays(gl.TRIANGLES, 0, 6);
         };
 
@@ -369,6 +434,10 @@ export default function EscherBackground() {
         document.addEventListener("visibilitychange", handleVisibilityChange);
 
         return () => {
+            if (!isMobile) {
+                window.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseleave', handleMouseLeave);
+            }
             observer.disconnect();
             window.removeEventListener("resize", handleResize);
             window.visualViewport?.removeEventListener("resize", handleResize);

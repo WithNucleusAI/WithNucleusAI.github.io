@@ -134,7 +134,7 @@ samp {
 /* Media queries for responsive adjustments - EXACTLY matching legacy */
 @media (max-width: 768px) {
   #typing {
-      font-size: 1.2rem;
+      font-size: 1rem;
       line-height: 1.35;
   }
 
