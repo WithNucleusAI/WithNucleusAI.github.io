@@ -7,6 +7,10 @@ export default function EscherBackground() {
     const INITIAL_RADIUS_DESKTOP_PX = 0;
     const INITIAL_RADIUS_MOBILE_PX = 0;
 
+    // Image margin configuration
+    const IMAGE_TOP_MARGIN_VH = 5; // 10vh margin from top
+    const IMAGE_BOTTOM_MARGIN_VH = 5; // 10vh margin from bottom
+
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -117,7 +121,7 @@ export default function EscherBackground() {
 
         const gl = probeGl;
         const image = new window.Image();
-        image.src = "/images/hands2.webp";
+        image.src = "/images/hands2.png";
 
         const targetFps = isMobile ? 24 : 60;
         const fpsInterval = 1000 / targetFps;
@@ -126,8 +130,16 @@ export default function EscherBackground() {
         const scrollSpeed = 0;
         const MOBILE_IMAGE_ZOOM = 1.4; // ← increase to zoom in on the image on mobile (e.g. 1.2 = 20% zoom)
         const IMAGE_ROTATION_DEG = -30.0; // ← angle in degrees to rotate the underlying image clockwise
-        const fitContain = isMobile ? 1.0 : 0.0;
-        const mobileZoom = isMobile ? MOBILE_IMAGE_ZOOM : 1.0;
+        const WAVE_INTENSITY = 0.3; // ← adjust wave strength (e.g. 0.8 is strong, 0.3 is minimalist/subtle)
+        const HOVER_INTENSITY = 0.75; // ← adjust hover max strength
+        const fitContain = 1.0;
+        
+        // Calculate zoom accounting for padding
+        const totalPaddingVh = IMAGE_TOP_MARGIN_VH + IMAGE_BOTTOM_MARGIN_VH;
+        const availableHeightVh = 100 - totalPaddingVh;
+        const paddingZoomFactor = availableHeightVh / 100;
+        const baseZoom = isMobile ? MOBILE_IMAGE_ZOOM : 1.0;
+        const mobileZoom = baseZoom * paddingZoomFactor;
         // Cache DPR once — avoids recomputing on every render frame
         const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? (isIPhone ? 2.25 : 1.6) : 2.0);
         const floatPrecision = isMobile ? 'mediump' : 'highp';
@@ -192,9 +204,10 @@ export default function EscherBackground() {
                 }
                 `}
 
-                float effectiveRadius = u_baseRadius * (1.0 + shimmer * 0.5 + magEffect * 0.75);
+                // Max possible radius used for early exit cull padding to save performance
+                float maxPossibleRadius = u_baseRadius * (1.0 + shimmer * ${WAVE_INTENSITY.toFixed(2)} + magEffect * ${HOVER_INTENSITY.toFixed(2)});
 
-                if (dist > effectiveRadius + 0.5) {
+                if (dist > maxPossibleRadius + 0.5) {
                     gl_FragColor = vec4(0.0);
                     return;
                 }
@@ -224,7 +237,7 @@ export default function EscherBackground() {
                 }
 
                 float offsetX = (u_resolution.x - drawWidth) * 0.5;
-                float offsetY = (u_resolution.y - drawHeight) * 0.5;
+                float offsetY = (u_resolution.y - drawHeight) * 0.5 - (u_resolution.y * 0.03); // Move up by 5vh
 
                 // Sample UV directly from cellCenter + uvOffset
                 float u = (cellCenter.x + uvOffset.x - offsetX) / drawWidth;
@@ -241,16 +254,29 @@ export default function EscherBackground() {
 
                 float brightness;
                 if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
-                    brightness = 255.0;
+                    // Match the image's background (white) so the pattern flows seamlessly
+                    brightness = 255.0; 
                 } else {
                     vec4 color = texture2D(u_image, uv);
                     brightness = dot(color.rgb, vec3(0.333333)) * 255.0;
                 }
 
-                float sizeFactor = (255.0 - brightness) / 255.0;
-                float dotSize = sizeFactor * effectiveRadius;
+                float rawSizeFactor = (255.0 - brightness) / 255.0;
+                
+                // Base size for the dot (0.15 min keeps background dots alive)
+                float baseSize = max(0.15, rawSizeFactor) * u_baseRadius;
+                
+                // Apply hover effect exactly like the original formulation
+                float hoverBonus = baseSize * (magEffect * ${HOVER_INTENSITY.toFixed(2)});
+                
+                // Make wave effects heavily independent of the image brightness!
+                float effectScale = mix(0.65, 1.0, rawSizeFactor); 
+                float waveBonus = u_baseRadius * (shimmer * ${WAVE_INTENSITY.toFixed(2)}) * effectScale;
 
-                if (brightness < 240.0 && dotSize > 0.5) {
+                float dotSize = baseSize + waveBonus + hoverBonus;
+
+                // Always draw dots, but smaller ones for bright areas
+                if (dotSize > 0.1) {
                     float alpha = 1.0 - smoothstep(dotSize - 0.5, dotSize + 0.5, dist);
                     if (alpha > 0.0) {
                         gl_FragColor = vec4(0.0, 0.0, 0.0, alpha * 0.85);

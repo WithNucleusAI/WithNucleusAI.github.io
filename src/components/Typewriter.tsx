@@ -192,8 +192,8 @@ export default function Typewriter() {
         <div className={`w-full flex flex-col items-center -translate-y-10 transition-transform duration-1000 ease-in-out ${text === "NUCLEUS." ? "-translate-y-12 sm:!-translate-y-12 lg:!-translate-y-16" : ""}`}>
             <div
                 id="typing"
-                style={fontSize ? { fontSize: `clamp(1.8rem, 8vw, ${fontSize})` } : undefined}
-                className={`mx-auto w-full max-w-[60vw] sm:max-w-xl px-2 sm:px-4 text-center ${text === "NUCLEUS." ? "final-text" : ""}`}
+                style={fontSize ? { fontSize: `clamp(1.8rem, 6vw, ${fontSize})` } : undefined}
+                className={`mx-auto w-full max-w-[50vw] sm:max-w-xl px-2 sm:px-4 text-center ${text === "NUCLEUS." ? "final-text" : ""}`}
             >
                 <span id="text" dangerouslySetInnerHTML={{ __html: text }}></span>
                 <span className="cursor"></span>
