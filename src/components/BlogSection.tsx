@@ -15,7 +15,7 @@ export default function BlogSection({ posts }: BlogSectionProps) {
     return (
         <section
             id="blog-section"
-            className="relative min-h-screen w-full flex flex-col justify-center py-12 sm:py-24 bg-gradient-to-b from-transparent to-gray-50/50 dark:to-gray-900/50"
+            className="relative min-h-screen w-full flex flex-col justify-center py-12 sm:py-24"
         >
             <div className="w-full max-w-7xl mx-auto px-4 sm:px-6">
                 <div className="mb-12">

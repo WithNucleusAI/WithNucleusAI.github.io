@@ -43,24 +43,8 @@ samp {
 
 
 /* Legacy Animations & Styles */
-#typing, #email, #caption, .cursor {
-  font-family: 'Courier New', Courier, monospace;
-}
-
-#typing {
-  font-size: 1.8rem;
-  font-weight: 500;
-  /* Removed modern styles like letter-spacing, min-height, etc. */
-}
-
-#typing.final-text {
-  line-height: 1;
-  font-size: 2.5rem;
-}
-
-#typing.final-text #text {
-  display: inline-block;
-  transform: translateY(-0.06em);
+#email, #caption {
+  font-family: inherit;
 }
 
 #email {
@@ -77,14 +61,7 @@ samp {
 }
 
 #caption {
-  font-size: 2.5rem;
-  font-weight: 500;
   opacity: 0;
-  color: rgb(10, 10, 10);
-}
-
-.dark #caption {
-  color: rgb(243, 244, 246); /* gray-100 */
 }
 
 .fadeInAnimation {
@@ -132,28 +109,9 @@ samp {
 }
 
 /* Media queries for responsive adjustments - EXACTLY matching legacy */
-@media (max-width: 768px) {
-  #typing {
-      font-size: 1rem;
-      line-height: 1.35;
-  }
-
-  #typing.final-text {
-      font-size: clamp(1.8rem, 8vw, 2.5rem);
-  }
-
-  #caption {
-      font-size: 1.55rem;
-  }
-}
-
 @media (max-width: 600px) {
-  #typing, #email, #caption {
-      font-size: 1.1rem;
-  }
-
-  #typing.final-text {
-    font-size: clamp(1.6rem, 7.5vw, 2.2rem);
+  #email {
+      font-size: 0.875rem;
   }
 }
 

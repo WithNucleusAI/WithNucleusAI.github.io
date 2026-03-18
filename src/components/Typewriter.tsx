@@ -1,40 +1,36 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const phrases = [
+    // "Ayon,asdasd",
     "The answer, my friend, is blowin' in the wind. <br><br> -Bob Dylan",
     "Intelligence isn’t compressed memory, it’s the ability to find those answers in the wind.",
     "The fathers and the prodigies of AI have united, to help AI reach singularity.",
-    //"Perceptive, Creative, Efficient and Self-Evolving Intelligence.",
-    "NUCLEUS AI",
-    "NUCLEUS."
+    "NUCLEUS"
 ];
 
 const prefix = [0, 0, 0, 0, 0, 0];
 const commaOverrides: { [key: number]: { [key: number]: number } } = {
-    0: {
-        10: 0,
-    },
+    0: { 10: 0 },
 };
 const fullstopOverrides: { [key: number]: { [key: number]: number } } = {
-    5: {
-        7: 750,
-    }
+    5: { 7: 750 }
 };
 
 const typingSpeed = 30;
-const normalDeletingSpeed = 10;
+const normalDeletingSpeed = 15; // Slightly slower delete to make it smoother
 const delayAfterTyping = 3500;
-const delayAfterDeleting = 1500;
+const delayAfterDeleting = 1000; // Slightly faster pause after delete for snappiness
 const defaultDelayAfterComma = 1500;
 const defaultDelayAfterFullStop = 1500;
 
 function isStringWithPause(str: string) {
     const firstCommaIndex = str.indexOf(',');
     const firstFullstopIndex = str.indexOf('.');
-    const isValidComma = firstCommaIndex === -1 ? false : firstCommaIndex === str.length - 1 ? false : true;
-    const isValidFullStop = firstFullstopIndex === -1 ? false : firstFullstopIndex === str.length - 1 ? false : true;
+    const isValidComma = firstCommaIndex !== -1 && firstCommaIndex !== str.length - 1;
+    const isValidFullStop = firstFullstopIndex !== -1 && firstFullstopIndex !== str.length - 1;
     return isValidComma || isValidFullStop;
 }
 
@@ -42,7 +38,7 @@ const phrasesWithPause = phrases.map((str) => isStringWithPause(str));
 
 export default function Typewriter() {
     const [text, setText] = useState("");
-    const [fontSize, setFontSize] = useState<string | undefined>(undefined);
+    const [isNucleus, setIsNucleus] = useState(false);
     const [showCaption, setShowCaption] = useState(false);
 
     const currentPhraseIndexRef = useRef(0);
@@ -52,7 +48,6 @@ export default function Typewriter() {
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
-        // Reset state on mount
         currentPhraseIndexRef.current = 0;
         letterIndexRef.current = 0;
         isTypingRef.current = true;
@@ -62,22 +57,25 @@ export default function Typewriter() {
             const currentPhraseIndex = currentPhraseIndexRef.current;
             const currentPhrase = phrases[currentPhraseIndex];
 
-            // Legacy: if (currentPhraseIndex === phrases.length - 2) deletingSpeed = 65;
+            // Smoother deletion speed curve near the end
             if (currentPhraseIndex === phrases.length - 2) {
-                deletingSpeedRef.current = 65;
+                deletingSpeedRef.current = 40; // Less abrupt than 65
+            } else {
+                deletingSpeedRef.current = normalDeletingSpeed;
             }
 
             if (isTypingRef.current) {
-                // Legacy: if (currentPhraseIndex === phrases.length - 2) textElement.style.fontSize = '4rem';
-                if (currentPhraseIndex === phrases.length - 2) {
-                    setFontSize('4rem');
+                if (currentPhraseIndex === phrases.length - 1) {
+                    setIsNucleus(true);
+                    setText(currentPhrase); // Show NUCLEUS instantly
+                    setShowCaption(true); // Trigger framer-motion animation directly
+                    return; // Stop the typing loop entirely
                 }
 
                 let letterIndex = letterIndexRef.current;
                 let charToAdd = currentPhrase.charAt(letterIndex);
                 letterIndex++;
 
-                // Handling typing of HTML tags
                 if (charToAdd === '<') {
                     while (currentPhrase.charAt(letterIndex) !== '>') {
                         charToAdd += currentPhrase.charAt(letterIndex);
@@ -87,39 +85,11 @@ export default function Typewriter() {
                     letterIndex++;
                 }
 
-                // Update text
-                // In legacy: textElement.innerHTML += charToAdd;
-                // Here we reconstruct the string up to the new letterIndex
-                // Note: currentPhrase.substring(0, letterIndex) handles the tags correctly as they are part of the string indices
                 setText(currentPhrase.substring(0, letterIndex));
-
                 letterIndexRef.current = letterIndex;
 
                 if (letterIndex < currentPhrase.length) {
                     if (phrasesWithPause[currentPhraseIndex]) {
-                        // Check char at current position (which was just added? No, wait)
-                        // Legacy: 
-                        // charToAdd = ...; letterIndex++
-                        // textElement.innerHTML += charToAdd;
-                        // if (currentPhrase.charAt(letterIndex) === ',') ...
-                        // Wait, legacy checks `currentPhrase.charAt(letterIndex)` AFTER incrementing.
-                        // So it checks the NEXT char?
-
-                        // Let's re-read legacy carefully:
-                        // 58: let charToAdd = currentPhrase.charAt(letterIndex);
-                        // 59: letterIndex++;
-                        // ...
-                        // 71: textElement.innerHTML += charToAdd;
-                        // 73: if (letterIndex < currentPhrase.length) {
-                        // 75:    if (currentPhrase.charAt(letterIndex) === ',') {
-                        // 76:        textElement.innerHTML += ',';
-
-                        // Ah! If the NEXT char is a comma, it adds it immediately and pauses.
-                        // So the comma is NOT typed in the normal loop step, it's peeked and added.
-                        // Wait, if it adds it, does it increment letterIndex again?
-                        // 79: letterIndex++;
-                        // Yes.
-
                         const nextChar = currentPhrase.charAt(letterIndex);
                         if (nextChar === ',') {
                             setText(prev => prev + ',');
@@ -135,22 +105,17 @@ export default function Typewriter() {
                             return;
                         }
                     }
-                    timeoutRef.current = setTimeout(typeWriter, typingSpeed);
+                    // A tiny bit of randomness for authentic typing effect
+                    const randomSpeed = typingSpeed + (Math.random() * 20 - 10);
+                    timeoutRef.current = setTimeout(typeWriter, randomSpeed);
                 } else {
-                    if (currentPhraseIndex === phrases.length - 1) {
-                        // Finished
-                        setTimeout(() => setShowCaption(true), 1000); // 1s delay
-                    } else {
-                        isTypingRef.current = false;
-                        timeoutRef.current = setTimeout(typeWriter, delayAfterTyping);
-                    }
+                    isTypingRef.current = false;
+                    timeoutRef.current = setTimeout(typeWriter, delayAfterTyping);
                 }
             } else {
-                // Deleting
                 let letterIndex = letterIndexRef.current;
 
                 if (letterIndex > prefix[currentPhraseIndex]) {
-                    // Handling deletion of HTML tags
                     if (currentPhrase.charAt(letterIndex - 1) === '>') {
                         while (letterIndex > 0 && currentPhrase.charAt(letterIndex - 1) !== '<') {
                             letterIndex--;
@@ -158,15 +123,8 @@ export default function Typewriter() {
                         letterIndex--;
                     }
 
-                    // Legacy: textElement.innerHTML = currentPhrase.substring(0, letterIndex - 1); 
-                    // letterIndex--;
-
-                    // Logic check: if letterIndex is 5. 
-                    // substring(0, 4). Correct.
-
-                    setText(currentPhrase.substring(0, letterIndex - 1));
-                    letterIndex--;
-                    letterIndexRef.current = letterIndex;
+                    setText(currentPhrase.substring(0, Math.max(0, letterIndex - 1)));
+                    letterIndexRef.current = Math.max(0, letterIndex - 1);
 
                     timeoutRef.current = setTimeout(typeWriter, deletingSpeedRef.current);
                 } else {
@@ -185,24 +143,57 @@ export default function Typewriter() {
     }, []);
 
     return (
-        <div className={`w-full flex flex-col items-center -translate-y-10 transition-transform duration-1000 ease-in-out ${text === "NUCLEUS." ? "-translate-y-12 sm:-translate-y-12 lg:-translate-y-16" : ""}`}>
+        <div 
+            className="w-full flex mt-14 flex-col items-center -translate-y-10"
+        >
             <div
                 id="typing"
-                style={fontSize ? { fontSize: `clamp(1.8rem, 6vw, ${fontSize})` } : undefined}
-                className={`mx-auto w-full max-w-[50vw] sm:max-w-xl px-2 sm:px-4 text-center ${text === "NUCLEUS." ? "final-text" : ""}`}
+                style={{ fontFamily: isNucleus ? 'var(--font-playfair), serif' : undefined }}
+                className={`mx-auto w-full max-w-[85vw] sm:max-w-md px-2 sm:px-4 text-center tracking-tight origin-center md:leading-normal max-md:leading-[1.35] ${isNucleus ? "text-4xl sm:text-5xl lg:text-7xl font-bold leading-none" : "transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] font-inherit text-lg sm:text-xl font-bold"}`}
             >
-                <span id="text" dangerouslySetInnerHTML={{ __html: text }}></span>
-                <span className="cursor"></span>
+                {isNucleus ? (
+                    <motion.span
+                        key="nucleus"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                        className="inline-block"
+                    >
+                        NUCLEUS
+                    </motion.span>
+                ) : (
+                    <span 
+                        id="text" 
+                        className="transition-all duration-1000" 
+                        dangerouslySetInnerHTML={{ __html: text }}
+                    ></span>
+                )}
+                {!isNucleus && (
+                    <motion.span 
+                        animate={{ opacity: [1, 0] }} 
+                        transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
+                        className="inline-block w-[3px] h-[1.1em] ml-1 align-middle bg-current opacity-80"
+                    ></motion.span>
+                )}
             </div>
-            <div>
-                <span
-                    id="caption"
-                    className={showCaption ? "fadeInAnimation" : ""}
-                    style={{ animationDelay: '1s', opacity: 0 }}
-                >
-                    General Intelligence
-                </span>
-            </div>
+            
+            <AnimatePresence>
+                {showCaption && (
+                    <motion.div 
+                        key="caption"
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 1.2, ease: "easeOut", delay: 0.1 }}
+                        className="mt-2 sm:mt-2"
+                    >
+                        <span
+                            className="text-base sm:text-lg text-gray-900 dark:text-gray-100 font-medium tracking-wide"
+                        >
+                            General Intelligence
+                        </span>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
