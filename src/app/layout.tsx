@@ -4,6 +4,7 @@ import { IBM_Plex_Mono, Inconsolata } from "next/font/google";
 import ScrollToTop from "@/components/ScrollToTop";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import ThemeToggle from "@/components/ThemeToggle";
+import MuteButton from "@/components/MuteButton";
 import TopNav from "@/components/TopNav";
 const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -62,6 +63,7 @@ export default function RootLayout({
           <div id="email" className="fixed bottom-7.5 text-base text-[#666] dark:text-gray-400 font-normal opacity-0 tracking-widest pointer-events-none">contact@withnucleus.ai</div>
           <ScrollToTop />
           <ThemeToggle />
+          <MuteButton />
         </ThemeProvider>
       </body>
     </html>

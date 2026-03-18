@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getIntroPlayed } from "./IntroOverlay";
+import { getIntroPlayed, setIntroPlayed } from "./IntroOverlay";
 
 export default function TopNav() {
   const pathname = usePathname();
@@ -37,6 +37,7 @@ export default function TopNav() {
         }
     } else {
         setIsVisible(true);
+        setIntroPlayed(); // Automatically skip intro if user visits any other page first
         if (audio && !audio.paused) {
             const steps = 20;
             const stepTime = 50; // 50ms * 20 steps = 1000ms
