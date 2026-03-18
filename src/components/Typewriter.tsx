@@ -57,10 +57,6 @@ export default function Typewriter() {
         letterIndexRef.current = 0;
         isTypingRef.current = true;
         deletingSpeedRef.current = normalDeletingSpeed;
-        setText("");
-        setFontSize(undefined);
-        setShowCaption(false);
-        setShowCaption(false);
 
         const typeWriter = async () => {
             const currentPhraseIndex = currentPhraseIndexRef.current;
@@ -128,13 +124,13 @@ export default function Typewriter() {
                         if (nextChar === ',') {
                             setText(prev => prev + ',');
                             letterIndexRef.current++;
-                            let delay = commaOverrides[currentPhraseIndex]?.[letterIndex] ?? defaultDelayAfterComma;
+                            const delay = commaOverrides[currentPhraseIndex]?.[letterIndex] ?? defaultDelayAfterComma;
                             timeoutRef.current = setTimeout(typeWriter, delay);
                             return;
                         } else if (nextChar === '.') {
                             setText(prev => prev + '.');
                             letterIndexRef.current++;
-                            let delay = fullstopOverrides[currentPhraseIndex]?.[letterIndex] ?? defaultDelayAfterFullStop;
+                            const delay = fullstopOverrides[currentPhraseIndex]?.[letterIndex] ?? defaultDelayAfterFullStop;
                             timeoutRef.current = setTimeout(typeWriter, delay);
                             return;
                         }
@@ -189,7 +185,7 @@ export default function Typewriter() {
     }, []);
 
     return (
-        <div className={`w-full flex flex-col items-center -translate-y-10 transition-transform duration-1000 ease-in-out ${text === "NUCLEUS." ? "-translate-y-12 sm:!-translate-y-12 lg:!-translate-y-16" : ""}`}>
+        <div className={`w-full flex flex-col items-center -translate-y-10 transition-transform duration-1000 ease-in-out ${text === "NUCLEUS." ? "-translate-y-12 sm:-translate-y-12 lg:-translate-y-16" : ""}`}>
             <div
                 id="typing"
                 style={fontSize ? { fontSize: `clamp(1.8rem, 6vw, ${fontSize})` } : undefined}
