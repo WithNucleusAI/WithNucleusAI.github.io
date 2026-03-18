@@ -46,9 +46,9 @@ export default function IntroOverlay() {
 
   const finishIntro = useCallback(() => {
     setStep('fading');
-    setIntroPlayed();
     const tId = setTimeout(() => {
       setStep('done');
+      setIntroPlayed();
     }, 1000);
     return () => clearTimeout(tId);
   }, []);

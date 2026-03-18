@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { getIntroPlayed } from "./IntroOverlay";
 
 const phrases = [
     // "Ayon,asdasd",
@@ -19,7 +20,7 @@ const fullstopOverrides: { [key: number]: { [key: number]: number } } = {
     5: { 7: 750 }
 };
 
-const typingSpeed = 30;
+const typingSpeed = 60;
 const normalDeletingSpeed = 15; // Slightly slower delete to make it smoother
 const delayAfterTyping = 3500;
 const delayAfterDeleting = 1000; // Slightly faster pause after delete for snappiness
@@ -38,8 +39,8 @@ const phrasesWithPause = phrases.map((str) => isStringWithPause(str));
 
 export default function Typewriter() {
     const [text, setText] = useState("");
-    const [isNucleus, setIsNucleus] = useState(false);
-    const [showCaption, setShowCaption] = useState(false);
+    const [isNucleus, setIsNucleus] = useState(() => getIntroPlayed());
+    const [showCaption, setShowCaption] = useState(() => getIntroPlayed());
 
     const currentPhraseIndexRef = useRef(0);
     const letterIndexRef = useRef(0);
@@ -53,9 +54,18 @@ export default function Typewriter() {
         isTypingRef.current = true;
         deletingSpeedRef.current = normalDeletingSpeed;
 
+        const introAlreadyPlayed = getIntroPlayed();
+
+        if (introAlreadyPlayed) {
+            currentPhraseIndexRef.current = phrases.length - 1;
+        }
+
         const typeWriter = async () => {
             const currentPhraseIndex = currentPhraseIndexRef.current;
             const currentPhrase = phrases[currentPhraseIndex];
+            const isFinalPhrase = currentPhraseIndex === phrases.length - 1;
+
+            setIsNucleus(isFinalPhrase);
 
             // Smoother deletion speed curve near the end
             if (currentPhraseIndex === phrases.length - 2) {
@@ -65,13 +75,6 @@ export default function Typewriter() {
             }
 
             if (isTypingRef.current) {
-                if (currentPhraseIndex === phrases.length - 1) {
-                    setIsNucleus(true);
-                    setText(currentPhrase); // Show NUCLEUS instantly
-                    setShowCaption(true); // Trigger framer-motion animation directly
-                    return; // Stop the typing loop entirely
-                }
-
                 let letterIndex = letterIndexRef.current;
                 let charToAdd = currentPhrase.charAt(letterIndex);
                 letterIndex++;
@@ -109,6 +112,12 @@ export default function Typewriter() {
                     const randomSpeed = typingSpeed + (Math.random() * 20 - 10);
                     timeoutRef.current = setTimeout(typeWriter, randomSpeed);
                 } else {
+                    if (isFinalPhrase) {
+                        setIsNucleus(true);
+                        setShowCaption(true);
+                        return;
+                    }
+
                     isTypingRef.current = false;
                     timeoutRef.current = setTimeout(typeWriter, delayAfterTyping);
                 }
@@ -135,10 +144,29 @@ export default function Typewriter() {
             }
         };
 
-        timeoutRef.current = setTimeout(typeWriter, typingSpeed);
+        const startTypewriter = () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+            timeoutRef.current = setTimeout(typeWriter, typingSpeed);
+        };
+
+        let removeIntroListener: (() => void) | undefined;
+
+        if (introAlreadyPlayed) {
+            startTypewriter();
+        } else if (typeof window !== "undefined") {
+            const handleIntroDone = () => {
+                startTypewriter();
+            };
+
+            window.addEventListener("intro-done", handleIntroDone, { once: true });
+            removeIntroListener = () => window.removeEventListener("intro-done", handleIntroDone);
+        }
 
         return () => {
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            removeIntroListener?.();
         };
     }, []);
 
@@ -149,30 +177,18 @@ export default function Typewriter() {
             <div
                 id="typing"
                 style={{ fontFamily: isNucleus ? 'var(--font-playfair), serif' : undefined }}
-                className={`mx-auto w-full max-w-[85vw] sm:max-w-md px-2 sm:px-4 text-center tracking-tight origin-center md:leading-normal max-md:leading-[1.35] ${isNucleus ? "text-4xl sm:text-5xl lg:text-7xl font-bold leading-none" : "transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] font-inherit text-lg sm:text-xl font-bold"}`}
+                className={`mx-auto w-full max-w-[85vw] sm:max-w-md px-2 sm:px-4 text-center tracking-tight origin-center md:leading-normal max-md:leading-[1.35] ${isNucleus ? "transition-none text-4xl sm:text-5xl lg:text-7xl font-bold leading-none" : "transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] font-inherit text-lg sm:text-xl font-bold"}`}
             >
-                {isNucleus ? (
-                    <motion.span
-                        key="nucleus"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="inline-block"
-                    >
-                        NUCLEUS
-                    </motion.span>
-                ) : (
-                    <span 
-                        id="text" 
-                        className="transition-all duration-1000" 
-                        dangerouslySetInnerHTML={{ __html: text }}
-                    ></span>
-                )}
-                {!isNucleus && (
+                <span
+                    id="text"
+                    className={isNucleus ? "transition-none" : "transition-all duration-1000"}
+                    dangerouslySetInnerHTML={{ __html: text }}
+                ></span>
+                {!showCaption && (
                     <motion.span 
                         animate={{ opacity: [1, 0] }} 
                         transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
-                        className="inline-block w-[3px] h-[1.1em] ml-1 align-middle bg-current opacity-80"
+                        className="inline-block w-0.75 h-[1.1em] ml-1 align-middle bg-current opacity-80"
                     ></motion.span>
                 )}
             </div>
