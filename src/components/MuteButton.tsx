@@ -7,7 +7,13 @@ import { getIntroPlayed } from "./IntroOverlay";
 
 export default function MuteButton() {
     const [mounted, setMounted] = React.useState(false);
-    const [isMuted, setIsMuted] = React.useState(false);
+    const [isMuted, setIsMuted] = React.useState(() => {
+        if (typeof window !== "undefined") {
+            const saved = localStorage.getItem("bg-music-muted");
+            return saved ? JSON.parse(saved) : false;
+        }
+        return false;
+    });
     const pathname = usePathname();
     const [isVisible, setIsVisible] = React.useState(() => {
         if (typeof window !== "undefined") {
@@ -28,20 +34,18 @@ export default function MuteButton() {
             setIsVisible(true);
         }
 
-        const checkMuteState = () => {
-            const audio = document.getElementById("bg-music") as HTMLAudioElement | null;
-            if (audio) {
-                setIsMuted(audio.muted);
-            }
-        };
-
-        // Check initially
-        checkMuteState();
-
         const audio = document.getElementById("bg-music") as HTMLAudioElement | null;
         if (audio) {
-            const handleVolumeChange = () => {
+            const saved = localStorage.getItem("bg-music-muted");
+            if (saved !== null) {
+                audio.muted = JSON.parse(saved);
                 setIsMuted(audio.muted);
+            }
+
+            const handleVolumeChange = () => {
+                const newMutedState = audio.muted;
+                setIsMuted(newMutedState);
+                localStorage.setItem("bg-music-muted", JSON.stringify(newMutedState));
             };
             audio.addEventListener('volumechange', handleVolumeChange);
             return () => {
@@ -56,8 +60,10 @@ export default function MuteButton() {
     const toggleMute = () => {
         const audio = document.getElementById("bg-music") as HTMLAudioElement | null;
         if (audio) {
-            audio.muted = !audio.muted;
-            setIsMuted(audio.muted);
+            const newMutedState = !audio.muted;
+            audio.muted = newMutedState;
+            setIsMuted(newMutedState);
+            localStorage.setItem("bg-music-muted", JSON.stringify(newMutedState));
         }
     };
 
@@ -66,16 +72,23 @@ export default function MuteButton() {
     }
 
     return (
-        <button
-            onClick={toggleMute}
-            className={`fixed bottom-[30px] left-[90px] max-md:bottom-[10px] max-md:left-[65px] z-[50] flex justify-center items-center bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 border border-black/5 dark:border-white/10 shadow-sm backdrop-blur-sm transition-all duration-1000 text-[#666] dark:text-gray-300 rounded-full w-10 h-10 md:w-12 md:h-12 cursor-pointer hover:scale-110 hover:shadow-lg pointer-events-auto ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-            aria-label="Toggle mute"
-        >
-            {isMuted ? (
-                <VolumeX className="h-5 w-5 md:h-6 md:w-6" />
-            ) : (
-                <Volume2 className="h-5 w-5 md:h-6 md:w-6" />
-            )}
-        </button>
+        <div className={`fixed bottom-[30px] cursor-pointer left-[90px] max-md:bottom-[10px] max-md:left-[65px] z-[50] transition-all duration-1000 ${isVisible ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}>
+            <button className="btn btn--circle" onClick={toggleMute} aria-label="Toggle mute">
+                <div className="btn__content">
+                    {isMuted ? (
+                        <VolumeX className="h-5 w-5 md:h-6 md:w-6" />
+                    ) : (
+                        <Volume2 className="h-5 w-5 md:h-6 md:w-6" />
+                    )}
+                </div>
+                <svg className="btn__fill-layer" viewBox="0 0 60 60">
+                    <circle className="btn__fill-circle" fill="#FFFFFF" cx="30" cy="30" r="29" />
+                </svg>
+                <svg className="btn__border-layer" viewBox="0 0 60 60">
+                    <path className="btn__border-path btn__border-path--left" d="M30,59 A29,29 0 0,1 30,1" />
+                    <path className="btn__border-path btn__border-path--right" d="M30,59 A29,29 0 0,0 30,1" />
+                </svg>
+            </button>
+        </div>
     );
 }

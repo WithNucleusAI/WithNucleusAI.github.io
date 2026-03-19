@@ -63,7 +63,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
     }
 
     return (
-        <div className="max-w-[1200px] mx-auto py-10 px-4 sm:py-16 sm:px-8 text-left w-full box-border">
+        <div className="max-w-[1200px] mx-auto py-10 px-4 sm:py-16 sm:px-8 text-left w-full box-border select-text">
             <Link href="/blog" className="inline-flex items-center mb-6 sm:mb-8 no-underline text-[#666] dark:text-gray-400 text-[0.8rem] sm:text-[0.85rem] font-medium transition-colors duration-200 hover:text-black dark:hover:text-white">
                 ← Back to Blogs
             </Link>

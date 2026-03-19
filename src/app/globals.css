@@ -7,6 +7,11 @@
 
 body {
   font-family: var(--font-base), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  /* Disable text selection */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 code,
@@ -14,6 +19,203 @@ pre,
 kbd,
 samp {
   font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+
+
+.btn {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  /* Disable text selection */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.dark .btn {
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.05);
+}
+
+.btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.dark .btn:hover {
+  box-shadow: 0 8px 30px rgba(255, 255, 255, 0.1);
+}
+
+/* Text/Icon Label inside the button */
+.btn__content {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #111; /* Dark initially for light mode */
+  transition: color 0.3s ease-in-out;
+  /* font-weight: bold; */
+  letter-spacing: 0.05em;
+}
+
+.dark .btn__content {
+  color: #fff; /* White for dark mode */
+}
+
+/* The Hover Interaction - Changes Text Color */
+.btn:hover .btn__content {
+  color: #fff; /* White on hover for light mode */
+}
+
+.dark .btn:hover .btn__content {
+  color: #000; /* Black on hover for dark mode */
+}
+
+/* * THE FILL CIRCLE (The background that scales up)
+     */
+.btn__fill-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.btn__fill-circle {
+  transform-origin: 50% 50%;
+  transform: scale(0); /* Start hidden/tiny */
+  transition: transform 0.3s ease-in-out;
+  fill: #111; /* Dark fill for light mode */
+}
+
+.dark .btn__fill-circle {
+  fill: #fff; /* White fill for dark mode */
+}
+
+/* Scale up on hover */
+.btn:hover .btn__fill-circle {
+  transform: scale(1); /* Scale to fit within container */
+}
+
+/* * THE BORDER SVG (The lines that draw themselves)
+     */
+.btn__border-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.btn__border-path {
+  fill: none;
+  stroke: #111; /* Dark stroke for light mode */
+  stroke-width: 1; /* Slight thickness */
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.3s ease-in-out;
+}
+
+.dark .btn__border-path {
+  stroke: #fff; /* White stroke for dark mode */
+}
+
+/* -----------------------------------------------------------
+       SPECIFIC: CIRCULAR BUTTON 
+       ----------------------------------------------------------- */
+.btn--circle {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+}
+
+@media (min-width: 768px) {
+  .btn--circle {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+/* Circumference Calculation for radius 29 (60px viewbox - 1px stroke padding):
+       C = 2 * pi * 29 ≈ 182.2
+       Half Circle ≈ 91.1 
+    */
+.btn--circle .btn__border-path {
+  stroke-dasharray: 91.1 91.1;
+}
+
+/* Initial State: Lines pushed away */
+.btn--circle .btn__border-path--left {
+  stroke-dashoffset: -91.1;
+}
+.btn--circle .btn__border-path--right {
+  stroke-dashoffset: 91.1;
+}
+
+/* Hover State: Draw lines to 0 (center) */
+.btn--circle:hover .btn__border-path--left,
+.btn--circle:hover .btn__border-path--right {
+  stroke-dashoffset: 0;
+}
+/* -----------------------------------------------------------
+       SPECIFIC: ORIGINAL PILL BUTTON (For Comparison)
+       ----------------------------------------------------------- */
+.btn--pill {
+  width: 10vw;
+  height: 5vw;
+  border-radius: 1.5vw;
+}
+
+.btn--pill .btn__border-path {
+  stroke-dasharray: 62 62; /* From original code */
+}
+
+.btn--pill .btn__border-path--left {
+  stroke-dashoffset: -62;
+}
+.btn--pill .btn__border-path--right {
+  stroke-dashoffset: 62;
+}
+
+.btn--pill:hover .btn__border-path--left,
+.btn--pill:hover .btn__border-path--right {
+  stroke-dashoffset: 0;
+}
+/* -----------------------------------------------------------
+   SPECIFIC: PLAYGROUND BUTTON (190px x 50px)
+   ----------------------------------------------------------- */
+.btn--playground {
+  width: 190px;
+  height: 50px;
+  border-radius: 25px;
+}
+
+.btn--playground .btn__border-path {
+  stroke-dasharray: 216 216;
+}
+
+.btn--playground .btn__border-path--left {
+  stroke-dashoffset: -216;
+}
+
+.btn--playground .btn__border-path--right {
+  stroke-dashoffset: 216;
+}
+
+.btn--playground:hover .btn__border-path--left,
+.btn--playground:hover .btn__border-path--right {
+  stroke-dashoffset: 0;
 }
 
 /* KaTeX responsive equations */
@@ -233,19 +435,22 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
 /* Text overlay - slides in from right, covering over the dashes, vertically centered */
 .toc-text-overlay {
   position: absolute;
-  top: 50%;
+  top: 0;
   right: 0;
   width: 280px;
-  z-index: 30;
+  height: 100%;
+  z-index: 60;
   pointer-events: none;
   opacity: 0;
-  transform: translate(100%, -50%);
+  transform: translateX(100%);
   transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  align-items: center;
 }
 
 .toc-text-overlay.visible {
   opacity: 1;
-  transform: translate(0, -50%);
+  transform: translateX(0);
   pointer-events: auto;
 }
 

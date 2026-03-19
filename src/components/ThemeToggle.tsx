@@ -38,16 +38,23 @@ export default function ThemeToggle() {
     const currentTheme = theme === "system" ? systemTheme : theme;
 
     return (
-        <button
-            onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")}
-            className={`fixed bottom-[30px] left-[30px] max-md:bottom-[10px] max-md:left-[15px] z-[50] flex justify-center items-center bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 border border-black/5 dark:border-white/10 shadow-sm backdrop-blur-sm transition-all duration-1000 text-[#666] dark:text-gray-300 rounded-full w-10 h-10 md:w-12 md:h-12 cursor-pointer hover:scale-110 hover:shadow-lg pointer-events-auto ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-            aria-label="Toggle theme"
-        >
-            {currentTheme === "dark" ? (
-                <Sun className="h-5 w-5 md:h-6 md:w-6" />
-            ) : (
-                <Moon className="h-5 w-5 md:h-6 md:w-6" />
-            )}
-        </button>
+        <div className={`fixed bottom-[30px] left-[30px] max-md:bottom-[10px] max-md:left-[15px] z-[50] transition-all duration-1000 ${isVisible ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}>
+            <button className="btn btn--circle" onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")} aria-label="Toggle theme">
+                <div className="btn__content">
+                    {currentTheme === "dark" ? (
+                        <Sun className="h-5 w-5 md:h-6 md:w-6" />
+                    ) : (
+                        <Moon className="h-5 w-5 md:h-6 md:w-6" />
+                    )}
+                </div>
+                <svg className="btn__fill-layer" viewBox="0 0 60 60">
+                    <circle className="btn__fill-circle" fill="#FFFFFF" cx="30" cy="30" r="29" />
+                </svg>
+                <svg className="btn__border-layer" viewBox="0 0 60 60">
+                    <path className="btn__border-path btn__border-path--left" d="M30,59 A29,29 0 0,1 30,1" />
+                    <path className="btn__border-path btn__border-path--right" d="M30,59 A29,29 0 0,0 30,1" />
+                </svg>
+            </button>
+        </div>
     );
 }

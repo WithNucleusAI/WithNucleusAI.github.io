@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import ThemeToggle from "@/components/ThemeToggle";
 import MuteButton from "@/components/MuteButton";
 import TopNav from "@/components/TopNav";
+import Footer from "@/components/Footer";
 
 const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -64,10 +65,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <audio id="bg-music" loop src="/music.mp3" />
+          <audio id="bg-music" loop preload="none" src="/music.wav" />
           <TopNav />
           <main className="flex-1 flex flex-col w-full sm:pt-28">{children}</main>
-          <div id="email" className="fixed bottom-7.5 text-base text-[#666] dark:text-gray-400 font-normal opacity-0 tracking-widest pointer-events-none">contact@withnucleus.ai</div>
+          <Footer />
           <ScrollToTop />
           <ThemeToggle />
           <MuteButton />

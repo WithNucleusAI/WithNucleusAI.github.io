@@ -5,6 +5,7 @@ import MiniBlogCard from "@/components/MiniBlogCard";
 import { Post } from "@/lib/posts";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { fadeOutAudio } from "@/lib/audio";
 
 interface BlogSectionProps {
     posts: Post[];
@@ -31,7 +32,7 @@ export default function BlogSection({ posts }: BlogSectionProps) {
                 {/* Ultra-Minimalist Blog Grid */}
                 {/* Vertical Blog Gallery */}
                 <div className="flex flex-col gap-8 sm:gap-16 max-w-5xl mx-auto">
-                    {posts.map((post, index) => {
+                    {posts.map((post) => {
                         return (
                             <div key={post.slug} className="w-full border-b border-gray-100 dark:border-gray-800 pb-8 sm:pb-16 last:border-0 last:pb-0">
                                 <MiniBlogCard
@@ -48,6 +49,7 @@ export default function BlogSection({ posts }: BlogSectionProps) {
                 <div className="mt-8 flex justify-end">
                     <Link
                         href="/blog"
+                        onClick={fadeOutAudio}
                         className="group inline-flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
                     >
                         View All Blogs

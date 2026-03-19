@@ -72,7 +72,7 @@ export default function IntroOverlay() {
   }
 
   return (
-    <div 
+    <div
       className={`fixed inset-0 z-[60] flex flex-col items-center justify-center bg-white dark:bg-black transition-opacity duration-1000 
       ${step === 'fading' ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
     >
@@ -82,26 +82,72 @@ export default function IntroOverlay() {
 
       <div className="w-full flex flex-col items-center -translate-y-12 sm:!-translate-y-12 lg:!-translate-y-16 transition-transform duration-1000 ease-in-out">
         <div
-          style={{ fontSize: 'clamp(1.8rem, 6vw, 4rem)', fontFamily: 'var(--font-playfair), serif' }}
-          className="mx-auto w-full max-w-[50vw] sm:max-w-xl px-2 sm:px-4 text-center final-text"
+          style={{fontFamily: 'var(--font-geist-mono)' }}
+          className="mx-auto w-full text-3xl max-w-[50vw] text-neutral-700 sm:max-w-xl   px-2 sm:px-4 text-center final-text"
         >
           <span>NUCLEUS</span>
         </div>
         <div className="mt-4 text-center">
-          <span className="text-lg sm:text-xl font-light tracking-wider opacity-80" style={{ fontFamily: 'var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace' }}>
+          <span className="text-lg text-gray-400 sm:text-xl font-light tracking-wider opacity-80" style={{ fontFamily: 'var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace' }}>
             General Intelligence
           </span>
         </div>
       </div>
 
+      {/* <button 
+        type="button"
+        onClick={handleDiscoverClick}
+        style={{ position: 'fixed', bottom: '20vh', left: '50%', transform: 'translateX(-50%)' }}
+        className="px-8 py-3 border border-[rgb(10,10,10)] cursor-pointer dark:border-gray-100 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-md uppercase tracking-[0.2em] font-light transition-colors z-[101]"
+      >
+        Discover
+      </button> */}
       <button 
         type="button"
         onClick={handleDiscoverClick}
         style={{ position: 'fixed', bottom: '20vh', left: '50%', transform: 'translateX(-50%)' }}
-        className="px-8 py-3 border border-[rgb(10,10,10)] dark:border-gray-100 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-md uppercase tracking-[0.2em] font-light transition-colors z-[101]"
+        className="btn btn--playground relative overflow-hidden rounded-full z-[101] cursor-pointer"
       >
-        Discover
+        <div className='absolute inset-0 -z-10 backdrop-blur-md bg-white/80 dark:bg-black/80 rounded-full' />
+
+        <div className='btn__content flex items-center justify-center gap-2 w-full h-full absolute top-0 left-0 z-10 pointer-events-none'>
+          <span className='text-sm uppercase tracking-[0.2em] font-light'>
+            DISCOVER
+          </span>
+        </div>
+
+        <svg
+          className='btn__fill-layer absolute top-0 left-0 w-full h-full pointer-events-none'
+          viewBox='0 0 190 50'
+          preserveAspectRatio="none"
+        >
+
+          <circle
+            className='btn__fill-circle fill-black dark:fill-white'
+            cx="95"
+            cy="25"
+            r="95"
+          />
+        </svg>
+
+        <svg
+          className='btn__border-layer absolute top-0 left-0 w-full h-full pointer-events-none'
+          viewBox='0 0 190 50'
+          fill='none'
+          xmlns='http://www.w3.org/2000/svg'
+        >
+          <path
+            className='btn__border-path btn__border-path--left stroke-black dark:stroke-white'
+            d="M95 49 L25 49 A24 24 0 0 1 25 1 L95 1"
+          />
+          <path
+            className='btn__border-path btn__border-path--right stroke-black dark:stroke-white'
+            d="M95 49 L165 49 A24 24 0 0 0 165 1 L95 1"
+          />
+        </svg>
+
       </button>
+
     </div>
   );
 }

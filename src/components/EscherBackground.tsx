@@ -2,11 +2,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { getIntroPlayed } from "./IntroOverlay";
 
 export default function EscherBackground() {
-    const INITIAL_RADIUS_DESKTOP_PX = 0;
-    const INITIAL_RADIUS_MOBILE_PX = 0;
-
     // Image margin configuration
     const IMAGE_TOP_MARGIN_VH = 5; // 10vh margin from top
     const IMAGE_BOTTOM_MARGIN_VH = 5; // 10vh margin from bottom
@@ -14,7 +12,16 @@ export default function EscherBackground() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [isLoaded, setIsLoaded] = useState(false);
+    const [isIntroDone, setIsIntroDone] = useState(() => getIntroPlayed());
     const isLoadedRef = useRef(false);
+
+    useEffect(() => {
+        if (!isIntroDone) {
+            const handleIntroDone = () => setIsIntroDone(true);
+            window.addEventListener('intro-done', handleIntroDone, { once: true });
+            return () => window.removeEventListener('intro-done', handleIntroDone);
+        }
+    }, [isIntroDone]);
 
     // Keep opacity writes isolated from React so the canvas doesn't re-render on scroll.
     const applyCanvasOpacity = () => {
@@ -22,17 +29,22 @@ export default function EscherBackground() {
         canvasRef.current.style.opacity = isLoadedRef.current ? "0.7" : "0";
     };
 
-    // When canvas first loads: fade it in with a one-shot transition, then remove it
-    // so all subsequent scroll updates are immediate (no CSS transition lag).
+    // When canvas first loads and intro is done: fade it in with a delayed transition, 
+    // then remove it so all subsequent scroll updates are immediate.
     useEffect(() => {
-        if (!isLoaded || !canvasRef.current) return;
+        if (!isLoaded || !isIntroDone || !canvasRef.current || isLoadedRef.current) return;
         isLoadedRef.current = true;
         const c = canvasRef.current;
-        c.style.transition = 'opacity 1s ease';
-        applyCanvasOpacity();
-        const t = setTimeout(() => { c.style.transition = ''; }, 1100);
-        return () => clearTimeout(t);
-    }, [isLoaded]);
+        
+        const delayTimer = setTimeout(() => {
+            if (!c) return;
+            c.style.transition = 'opacity 2.5s ease-in-out';
+            applyCanvasOpacity();
+            setTimeout(() => { if (c) c.style.transition = ''; }, 2600);
+        }, 1200); // Wait 1.2s after intro is done before fading in
+
+        return () => clearTimeout(delayTimer);
+    }, [isLoaded, isIntroDone]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -41,7 +53,7 @@ export default function EscherBackground() {
 
         const isMobile = window.matchMedia("(max-width: 768px)").matches;
         const isIPhone = /iPhone/i.test(navigator.userAgent);
-        const disableScrollLinkedShaderOnIPhone = isMobile && isIPhone;
+        const disableScrollLinkedShaderOnIPhone = isMobile && !isIPhone;
         const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         const saveData = typeof navigator !== "undefined" && "connection" in navigator && (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
         const cores = typeof navigator !== "undefined" ? navigator.hardwareConcurrency ?? 4 : 4;
@@ -100,15 +112,13 @@ export default function EscherBackground() {
         const image = new window.Image();
         image.src = "/images/hands2.png";
 
-        const targetFps = isIPhone ? 45 : isMobile ? 30 : 60;
-        const fpsInterval = 1000 / targetFps;
         const gap = isMobile ? 7.2 : 16.0;
         const baseRadius = isMobile ? 1.8 : 6.0;
-        const scrollSpeed = 0;
         const MOBILE_IMAGE_ZOOM = 1.5; // ← increase to zoom in on the image on mobile (e.g. 1.2 = 20% zoom)
         const DESKTOP_IMAGE_ZOOM = 1.1; // ← increase to zoom in on desktop
         const IMAGE_ROTATION_DEG = -30.0; // ← angle in degrees to rotate the underlying image clockwise
         const WAVE_INTENSITY = 0.55; // ← adjust wave strength (e.g. 0.8 is strong, 0.3 is minimalist/subtle)
+        const WAVE_START_RADIUS = 250.0; // ← radius in pixels around center where waves start (to avoid obscuring center text)
         const HOVER_INTENSITY = 0.75; // ← adjust hover max strength
         const fitContain = 1.0;
         
@@ -119,7 +129,7 @@ export default function EscherBackground() {
         const baseZoom = isMobile ? MOBILE_IMAGE_ZOOM : DESKTOP_IMAGE_ZOOM;
         const mobileZoom = baseZoom * paddingZoomFactor;
         // Cache DPR once — avoids recomputing on every render frame
-        const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? (isIPhone ? 2.25 : 1.6) : 2.0);
+        const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? (isIPhone ? 1.75 : 1.5) : 1.75);
         const highFloatPrecision = gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT);
         const supportsHighpFragment = !!highFloatPrecision && highFloatPrecision.precision > 0;
         // Prefer highp on capable mobile GPUs to avoid scroll quantization jitter in long pages.
@@ -144,6 +154,7 @@ export default function EscherBackground() {
             uniform float u_fitContain;
             uniform float u_globalTime;
             uniform float u_scrollY;
+            uniform float u_imageFade;
             ${!isMobile ? `
             uniform vec2 u_mouse;
             uniform float u_hoverActive;
@@ -160,17 +171,25 @@ export default function EscherBackground() {
                 
                 // Base frequency and speed
                 float baseFreq = 0.012; 
-                float waveSpeed = 0.0025;
+                float waveSpeed = 0.0020;
                 
                 // Exponential falloff for frequency so waves "stretch out" at the edges
                 float freqDecay = exp(-distFromCenter * 0.001); 
                 float effectiveFreq = baseFreq * mix(0.4, 1.0, freqDecay);
                 
                 // Sine wave based on distance and time
-                float wave = sin(distFromCenter * effectiveFreq - u_globalTime * waveSpeed);
+                // Add a start radius so the wave effect only applies outside of it
+                float waveDist = max(0.0, distFromCenter - ${WAVE_START_RADIUS.toFixed(1)});
+                float wave = sin(waveDist * effectiveFreq - u_globalTime * waveSpeed);
+                // Ramp up the wave strength starting from WAVE_START_RADIUS to WAVE_START_RADIUS + 50.0
+                float waveMask = smoothstep(0.0, 50.0, distFromCenter - ${WAVE_START_RADIUS.toFixed(1)});
                 
                 // Remap [-1, 1] to [0, 1] and make the peaks sharper for a ripple look
-                float shimmer = pow((wave + 1.0) * 0.5, 3.0);
+                float shimmer = pow((wave + 1.0) * 0.5, 3.0) * waveMask;
+                
+                // Fade out waves as they go away from center
+                float waveFalloff = exp(-distFromCenter * 0.0001);
+                shimmer *= waveFalloff;
                 
                 ${isMobile ? `
                 float magEffect = 0.0;
@@ -240,13 +259,13 @@ export default function EscherBackground() {
                 uv += vec2(0.5, 0.5);
 
                 float brightness;
-                if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
-                    // Match the image's background (white) so the pattern flows seamlessly
-                    brightness = 255.0; 
-                } else {
+                float sampledBrightness = 255.0;
+                if (u_imageFade > 0.001 && uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0) {
                     vec4 color = texture2D(u_image, uv);
-                    brightness = dot(color.rgb, vec3(0.333333)) * 255.0;
+                    sampledBrightness = dot(color.rgb, vec3(0.333333)) * 255.0;
                 }
+                // When u_imageFade -> 0, treat the image as pure white (but keep waves).
+                brightness = mix(255.0, sampledBrightness, clamp(u_imageFade, 0.0, 1.0));
 
                 float rawSizeFactor = (255.0 - brightness) / 255.0;
                 
@@ -323,6 +342,7 @@ export default function EscherBackground() {
         const uFitContain = gl.getUniformLocation(program, "u_fitContain");
         const uGlobalTime = gl.getUniformLocation(program, "u_globalTime");
         const uScrollY = gl.getUniformLocation(program, "u_scrollY");
+        const uImageFade = gl.getUniformLocation(program, "u_imageFade");
         const uMouse = gl.getUniformLocation(program, "u_mouse");
         const uHoverActive = gl.getUniformLocation(program, "u_hoverActive");
 
@@ -360,30 +380,45 @@ export default function EscherBackground() {
             isTextureLoaded = true;
             handleResize();
             setIsLoaded(true);
+            if (uImageFade) {
+                gl.uniform1f(uImageFade, isMobile ? 1.0 : computeImageFade());
+            }
 
-            if (isVisible && !document.hidden) {
-                lastTime = performance.now();
+            if (isVisible && !document.hidden && isWindowFocused) {
                 cancelAnimationFrame(animationFrameId);
                 animationFrameId = requestAnimationFrame(render);
             }
         };
 
         let animationFrameId = 0;
-        let time = 0;
-        let lastTime = performance.now();
         let isVisible = true;
+        let isWindowFocused = true;
 
         let targetHover = 0;
         let currentHover = 0;
         let mouseX = -1000;
         let mouseY = -1000;
         const readScrollY = () => (window.scrollY || window.pageYOffset || 0) * dpr;
-        let targetScrollY = disableScrollLinkedShaderOnIPhone ? 0 : readScrollY();
-        let currentScrollY = targetScrollY;
-        const scrollLerp = isMobile ? 0.2 : 0.3;
+        let currentScrollY = disableScrollLinkedShaderOnIPhone ? 0 : readScrollY();
+        let lastRenderedCSSScrollY = disableScrollLinkedShaderOnIPhone ? 0 : (window.scrollY || 0);
+        const FRAME_INTERVAL = isMobile ? 1000 / 30 : 0; // 30fps cap on mobile, uncapped on desktop
+        let lastFrameTime = 0;
+        const computeImageFade = () => {
+            // Fade the *image influence* out as you scroll down, while waves keep running.
+            // 1.0 = full image, 0.0 = no image (treated as white).
+            const y = window.scrollY || 0;
+            const vh = window.innerHeight || 1;
+            const start = vh * 0.15;
+            const end = vh * 1.25;
+            if (y <= start) return 1;
+            if (y >= end) return 0;
+            const t = (y - start) / (end - start);
+            return 1 - t;
+        };
         const handleScroll = () => {
             if (disableScrollLinkedShaderOnIPhone) return;
-            targetScrollY = readScrollY();
+            const delta = (window.scrollY || 0) - lastRenderedCSSScrollY;
+            canvas.style.transform = `translate3d(0, ${-delta}px, 0)`;
         };
 
         const handleMouseMove = (e: MouseEvent) => {
@@ -407,20 +442,44 @@ export default function EscherBackground() {
             window.addEventListener("scroll", handleScroll, { passive: true });
         }
 
-        const render = (now: number) => {
-            if (!isTextureLoaded || !isVisible || document.hidden) return;
-            animationFrameId = requestAnimationFrame(render);
-            const elapsed = now - lastTime;
-            if (elapsed < fpsInterval) return;
-            lastTime = now - (elapsed % fpsInterval);
-            time += scrollSpeed * (elapsed / 16.666);
-            if (uGlobalTime) gl.uniform1f(uGlobalTime, now);
+        let introDone = getIntroPlayed();
+        let startTimeOffset = 0;
 
-            currentScrollY += (targetScrollY - currentScrollY) * scrollLerp;
-            if (Math.abs(targetScrollY - currentScrollY) < 0.1) {
-                currentScrollY = targetScrollY;
+        const handleIntroDone = () => {
+            introDone = true;
+            if (isVisible && isTextureLoaded && !document.hidden && isWindowFocused) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = requestAnimationFrame(render);
+            }
+        };
+
+        if (!introDone) {
+            window.addEventListener('intro-done', handleIntroDone, { once: true });
+        }
+
+        const render = (now: number) => {
+            if (!isTextureLoaded || !isVisible || document.hidden || !isWindowFocused) return;
+            if (!introDone) return;
+
+            animationFrameId = requestAnimationFrame(render);
+
+            if (FRAME_INTERVAL > 0) {
+                const elapsed = now - lastFrameTime;
+                if (elapsed < FRAME_INTERVAL) return;
+                lastFrameTime = now - (elapsed % FRAME_INTERVAL);
+            }
+            
+            const currentAnimTime = now - startTimeOffset;
+
+            if (uGlobalTime) gl.uniform1f(uGlobalTime, currentAnimTime);
+
+            if (!disableScrollLinkedShaderOnIPhone) {
+                currentScrollY = readScrollY();
             }
             if (uScrollY) gl.uniform1f(uScrollY, currentScrollY);
+            if (uImageFade) {
+                gl.uniform1f(uImageFade, isMobile ? 1.0 : computeImageFade());
+            }
 
             if (!isMobile) {
                 currentHover += (targetHover - currentHover) * 0.15;
@@ -430,6 +489,11 @@ export default function EscherBackground() {
             }
 
             gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+            if (!disableScrollLinkedShaderOnIPhone) {
+                lastRenderedCSSScrollY = (window.scrollY || 0);
+                canvas.style.transform = 'translate3d(0, 0, 0)';
+            }
         };
 
         const observer = new IntersectionObserver(
@@ -437,8 +501,7 @@ export default function EscherBackground() {
                 entries.forEach((entry) => {
                     const wasVisible = isVisible;
                     isVisible = entry.isIntersecting;
-                    if (!wasVisible && isVisible && isTextureLoaded && !document.hidden) {
-                        lastTime = performance.now();
+                    if (!wasVisible && isVisible && isTextureLoaded && !document.hidden && isWindowFocused) {
                         cancelAnimationFrame(animationFrameId);
                         animationFrameId = requestAnimationFrame(render);
                     }
@@ -448,23 +511,44 @@ export default function EscherBackground() {
         );
 
         const handleVisibilityChange = () => {
-            if (document.hidden) {
+            if (document.hidden || !isWindowFocused) {
                 cancelAnimationFrame(animationFrameId);
                 return;
             }
             if (isVisible && isTextureLoaded) {
-                lastTime = performance.now();
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = requestAnimationFrame(render);
+            }
+        };
+
+        const handleWindowBlur = () => {
+            isWindowFocused = false;
+            cancelAnimationFrame(animationFrameId);
+        };
+
+        const handleWindowFocus = () => {
+            isWindowFocused = true;
+            if (isVisible && isTextureLoaded && !document.hidden) {
                 cancelAnimationFrame(animationFrameId);
                 animationFrameId = requestAnimationFrame(render);
             }
         };
 
 
+        let resizeTimer = 0;
+        const debouncedResize = () => {
+            cancelAnimationFrame(resizeTimer);
+            resizeTimer = requestAnimationFrame(handleResize);
+        };
+
         observer.observe(container);
-        window.addEventListener("resize", handleResize);
+        window.addEventListener("resize", debouncedResize);
         document.addEventListener("visibilitychange", handleVisibilityChange);
+        window.addEventListener("blur", handleWindowBlur);
+        window.addEventListener("focus", handleWindowFocus);
 
         return () => {
+            window.removeEventListener('intro-done', handleIntroDone);
             if (!isMobile) {
                 window.removeEventListener('mousemove', handleMouseMove);
                 document.removeEventListener('mouseleave', handleMouseLeave);
@@ -473,8 +557,11 @@ export default function EscherBackground() {
                 window.removeEventListener("scroll", handleScroll);
             }
             observer.disconnect();
-            window.removeEventListener("resize", handleResize);
+            cancelAnimationFrame(resizeTimer);
+            window.removeEventListener("resize", debouncedResize);
             document.removeEventListener("visibilitychange", handleVisibilityChange);
+            window.removeEventListener("blur", handleWindowBlur);
+            window.removeEventListener("focus", handleWindowFocus);
             cancelAnimationFrame(animationFrameId);
             gl.deleteProgram(program);
             gl.deleteShader(vertexShader);

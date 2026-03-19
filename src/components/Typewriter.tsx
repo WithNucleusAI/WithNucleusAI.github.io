@@ -5,10 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getIntroPlayed } from "./IntroOverlay";
 
 const phrases = [
-    // "Ayon,asdasd",
-    "The answer, my friend, is blowin' in the wind. <br><br> -Bob Dylan",
-    "Intelligence isn’t compressed memory, it’s the ability to find those answers in the wind.",
-    "The fathers and the prodigies of AI have united, to help AI reach singularity.",
+    "Ayon,asdasd",
+    // "The answer, my friend, is blowin' in the wind. <br><br> -Bob Dylan",
+    // "Intelligence isn’t compressed memory, it’s the ability to find those answers in the wind.",
+    // "The fathers and the prodigies of AI have united, to help AI reach singularity.",
     "NUCLEUS"
 ];
 
@@ -176,8 +176,8 @@ export default function Typewriter() {
         >
             <div
                 id="typing"
-                style={{ fontFamily: isNucleus ? 'var(--font-playfair), serif' : undefined }}
-                className={`mx-auto w-full max-w-[85vw] sm:max-w-md px-2 sm:px-4 text-center tracking-tight origin-center md:leading-normal max-md:leading-[1.35] ${isNucleus ? "transition-none text-4xl sm:text-5xl lg:text-7xl font-bold leading-none" : "transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] font-inherit text-lg sm:text-xl font-bold"}`}
+                // style={{ fontFamily: isNucleus ? 'var(--font-playfair), serif' : undefined }}
+                className={`mx-auto w-full max-w-[85vw] sm:max-w-md px-2 sm:px-4 text-center tracking-tight origin-center md:leading-normal max-md:leading-[1.35] ${isNucleus ? "transition-none text-4xl sm:text-3xl font-bold leading-none" : "transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] font-inherit text-lg sm:text-xl font-bold"}`}
             >
                 <span
                     id="text"
@@ -203,7 +203,7 @@ export default function Typewriter() {
                         className="mt-2 sm:mt-2"
                     >
                         <span
-                            className="text-base sm:text-lg text-gray-900 dark:text-gray-100 font-medium tracking-wide"
+                            className="text-base sm:text-xl text-gray-900 dark:text-gray-100 font-medium tracking-wide"
                         >
                             General Intelligence
                         </span>

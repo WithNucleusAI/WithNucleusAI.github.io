@@ -20,9 +20,9 @@ export default async function Home() {
         <ScrollDownButton />
       </section>
 
-      <section className="min-h-[60vh] flex flex-col justify-center items-center px-6 sm:px-12 max-w-5xl mx-auto py-24 text-center z-10 relative">
+      <section id="intro-section" className="h-svh flex flex-col justify-center items-center px-6 sm:px-12 max-w-5xl mx-auto py-24 text-center z-10 relative">
         <h2 className="text-3xl sm:text-5xl lg:text-6xl leading-[1.3] sm:leading-[1.4] font-medium text-gray-900 dark:text-gray-100 tracking-tight">
-          We design systems that shape tomorrow. Exploring the frontiers of software, artificial intelligence, and resilient architectures to build the foundations of modern engineering.
+          We design systems that shape tomorrow. Exploring the frontiers of software, artificial intelligence, and <span className="whitespace-nowrap">resilient architectures</span> to build the foundations of modern engineering.
         </h2>
       </section>
 
