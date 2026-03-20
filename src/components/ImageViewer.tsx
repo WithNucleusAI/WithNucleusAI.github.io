@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
 
 interface ImageViewerProps {
     images: string[];
@@ -11,12 +10,44 @@ interface ImageViewerProps {
 
 export default function ImageViewer({ images, currentIndex, onClose }: ImageViewerProps) {
     const [index, setIndex] = useState(currentIndex);
-    const [touchStart, setTouchStart] = useState(0);
-    const [touchEnd, setTouchEnd] = useState(0);
+    const touchStartX = useRef<number | null>(null);
+    const touchCurrentX = useRef<number | null>(null);
 
     useEffect(() => {
         setIndex(currentIndex);
     }, [currentIndex]);
+
+    // Lock scroll while the lightbox is open (including iOS behavior)
+    useEffect(() => {
+        const scrollY = window.scrollY;
+        const scrollbarGap = window.innerWidth - document.documentElement.clientWidth;
+
+        const previousBodyStyle = {
+            overflow: document.body.style.overflow,
+            position: document.body.style.position,
+            top: document.body.style.top,
+            width: document.body.style.width,
+            paddingRight: document.body.style.paddingRight,
+        };
+
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.width = '100%';
+
+        if (scrollbarGap > 0) {
+            document.body.style.paddingRight = `${scrollbarGap}px`;
+        }
+
+        return () => {
+            document.body.style.overflow = previousBodyStyle.overflow;
+            document.body.style.position = previousBodyStyle.position;
+            document.body.style.top = previousBodyStyle.top;
+            document.body.style.width = previousBodyStyle.width;
+            document.body.style.paddingRight = previousBodyStyle.paddingRight;
+            window.scrollTo(0, scrollY);
+        };
+    }, []);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -34,23 +65,33 @@ export default function ImageViewer({ images, currentIndex, onClose }: ImageView
     }, [images.length, onClose]);
 
     const handleTouchStart = (e: React.TouchEvent) => {
-        setTouchStart(e.targetTouches[0].clientX);
+        touchStartX.current = e.changedTouches[0].clientX;
+        touchCurrentX.current = e.changedTouches[0].clientX;
     };
 
     const handleTouchMove = (e: React.TouchEvent) => {
-        setTouchEnd(e.targetTouches[0].clientX);
+        touchCurrentX.current = e.changedTouches[0].clientX;
     };
 
     const handleTouchEnd = () => {
-        if (touchStart - touchEnd > 25) {
+        if (touchStartX.current == null || touchCurrentX.current == null) {
+            return;
+        }
+
+        const deltaX = touchStartX.current - touchCurrentX.current;
+
+        if (deltaX > 30) {
             // Swipe left - go to next
             goToNext();
         }
 
-        if (touchStart - touchEnd < -25) {
+        if (deltaX < -30) {
             // Swipe right - go to previous
             goToPrevious();
         }
+
+        touchStartX.current = null;
+        touchCurrentX.current = null;
     };
 
     const goToPrevious = () => {
@@ -63,70 +104,97 @@ export default function ImageViewer({ images, currentIndex, onClose }: ImageView
 
     return (
         <div
-            className="fixed inset-0 z-50 bg-black bg-opacity-95 flex items-center justify-center"
+            className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-black/90 backdrop-blur-sm"
             onClick={onClose}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
         >
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.22),transparent_46%)]" />
+
             {/* Close button */}
             <button
-                onClick={onClose}
-                className="absolute top-4 right-4 text-white text-4xl font-light hover:text-gray-300 transition-colors z-10 w-10 h-10 flex items-center justify-center"
+                type="button"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onClose();
+                }}
+                className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/35 bg-black/35 text-3xl font-light leading-none text-white transition-all hover:bg-black/55 active:scale-95"
                 aria-label="Close"
             >
                 ×
             </button>
 
             {/* Image counter */}
-            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-white text-sm z-10">
+            <div className="absolute left-1/2 top-5 z-10 -translate-x-1/2 rounded-full border border-white/25 bg-black/35 px-3 py-1 text-xs tracking-wide text-white/90 md:text-sm">
                 {index + 1} / {images.length}
             </div>
 
-            {/* Previous button - hidden on mobile, visible on desktop */}
-            {images.length > 1 && (
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        goToPrevious();
-                    }}
-                    className="absolute left-4 text-white text-5xl font-light hover:text-gray-300 transition-colors hidden md:block"
-                    aria-label="Previous image"
-                >
-                    ‹
-                </button>
-            )}
-
             {/* Image */}
-            <div
-                className="relative max-w-[90vw] max-h-[90vh] flex items-center justify-center"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <img
-                    src={images[index]}
-                    alt={`Image ${index + 1}`}
-                    className="max-w-full max-h-[90vh] object-contain"
-                />
-            </div>
-
-            {/* Next button - hidden on mobile, visible on desktop */}
-            {images.length > 1 && (
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        goToNext();
-                    }}
-                    className="absolute right-4 text-white text-5xl font-light hover:text-gray-300 transition-colors hidden md:block"
-                    aria-label="Next image"
+            <div className="relative flex flex-1 items-center justify-center px-4 pb-3 pt-16">
+                <div
+                    className="relative flex h-full max-h-[78vh] w-full max-w-6xl items-center justify-center rounded-2xl border border-white/20 bg-white/5 p-2 shadow-[0_24px_60px_rgba(0,0,0,0.45)] md:p-4"
+                    onClick={(e) => e.stopPropagation()}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
                 >
-                    ›
-                </button>
-            )}
-
-            {/* Swipe indicator for mobile */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-xs opacity-50 md:hidden">
-                Swipe to navigate
+                    <img
+                        src={images[index]}
+                        alt={`Image ${index + 1}`}
+                        className="max-h-full max-w-full select-none object-contain"
+                    />
+                </div>
             </div>
+
+            {/* Navigation controls */}
+            {images.length > 1 && (
+                <div className="px-4 pb-[max(1rem,env(safe-area-inset-bottom))]" onClick={(e) => e.stopPropagation()}>
+                    <div className="mx-auto w-full max-w-xl rounded-2xl border border-white/25 bg-black/40 backdrop-blur-md shadow-2xl">
+                        <div className="flex items-center justify-between gap-2 p-2 sm:p-3">
+                            <button
+                                type="button"
+                                onClick={goToPrevious}
+                                className="touch-manipulation flex min-h-11 min-w-[6.8rem] items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/5 px-4 py-2 text-white transition-all hover:bg-white/15 active:scale-95"
+                                aria-label="Previous image"
+                            >
+                                <span className="text-lg leading-none">←</span>
+                                <span className="text-sm font-medium">Prev</span>
+                            </button>
+
+                            <div className="rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-medium tracking-wide text-white/90 sm:text-sm">
+                                {index + 1} / {images.length}
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={goToNext}
+                                className="touch-manipulation flex min-h-11 min-w-[6.8rem] items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/5 px-4 py-2 text-white transition-all hover:bg-white/15 active:scale-95"
+                                aria-label="Next image"
+                            >
+                                <span className="text-sm font-medium">Next</span>
+                                <span className="text-lg leading-none">→</span>
+                            </button>
+                        </div>
+
+                        <div className="px-3 pb-3">
+                            <div className="flex items-center justify-center gap-2 overflow-x-auto pb-1">
+                                {images.map((_, dotIndex) => (
+                                    <button
+                                        key={dotIndex}
+                                        type="button"
+                                        onClick={() => setIndex(dotIndex)}
+                                        className={`h-2.5 rounded-full transition-all ${dotIndex === index ? 'w-7 bg-white' : 'w-2.5 bg-white/45 hover:bg-white/70'}`}
+                                        aria-label={`Go to image ${dotIndex + 1}`}
+                                        aria-current={dotIndex === index ? 'true' : undefined}
+                                    />
+                                ))}
+                            </div>
+
+                            <p className="mt-1 text-center text-[11px] text-white/65 sm:text-xs">
+                                Swipe the image or use the buttons
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

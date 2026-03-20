@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
 import { getIntroPlayed, setIntroPlayed } from "./IntroOverlay";
-import { fadeOutAudio, fadeInAudio } from "@/lib/audio";
+import { fadeInAudio, fadeOutAudio } from "@/lib/audio";
 
 export default function TopNav() {
   const pathname = usePathname();
@@ -28,7 +28,7 @@ export default function TopNav() {
         }
     } else {
         setIntroPlayed(); // Automatically skip intro if user visits any other page first
-        fadeOutAudio();
+      fadeOutAudio();
     }
 
     return () => window.removeEventListener('intro-done', handleIntroDone);

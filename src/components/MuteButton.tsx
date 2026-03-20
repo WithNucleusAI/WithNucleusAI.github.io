@@ -4,6 +4,7 @@ import * as React from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { getIntroPlayed } from "./IntroOverlay";
+import { useFooterAwareBottomOffset } from "@/lib/useFooterAwareBottom";
 
 const STORAGE_KEY = "bg-music-muted";
 const EXPIRY_HOURS = 1;
@@ -31,6 +32,7 @@ function loadMutedState(): boolean {
 
 export default function MuteButton() {
     const [mounted, setMounted] = React.useState(false);
+    const bottomOffset = useFooterAwareBottomOffset(30, 10);
     const [isMuted, setIsMuted] = React.useState(() => {
         if (typeof window !== "undefined") {
             return loadMutedState();
@@ -93,7 +95,10 @@ export default function MuteButton() {
     }
 
     return (
-        <div className={`fixed bottom-[30px] cursor-pointer left-[90px] max-md:bottom-[10px] max-md:left-[65px] z-[50] transition-all duration-1000 ${isVisible ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}>
+        <div
+            className={`fixed cursor-pointer left-22.5 max-md:left-16.25 z-50 transition-all duration-1000 ${isVisible ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}
+            style={{ bottom: `${bottomOffset}px` }}
+        >
             <button className="btn btn--circle" onClick={toggleMute} aria-label="Toggle mute">
                 <div className="btn__content">
                     {isMuted ? (

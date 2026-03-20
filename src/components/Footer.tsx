@@ -3,8 +3,8 @@ import Image from "next/image";
 
 export default function Footer() {
     return (
-        <footer className="w-full bg-gray-50 dark:bg-neutral-900 border-t border-gray-200 dark:border-gray-800 mt-auto">
-            <div className="max-w-6xl mx-auto px-4 py-8">
+        <footer data-site-footer className="w-full bg-white dark:bg-black mt-auto">
+            <div className="max-w-5xl mx-auto px-4 py-8">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                     {/* Left side - Contact and About */}
                     <div className="flex gap-8">

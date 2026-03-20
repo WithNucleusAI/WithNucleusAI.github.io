@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
+import { fadeInAudio } from "@/lib/audio";
 
 /**
  * Extended Window interface to handle global intro state without 'any'
@@ -54,11 +55,7 @@ export default function IntroOverlay() {
   }, []);
 
   const handleDiscoverClick = () => {
-    const audio = document.getElementById("bg-music") as HTMLAudioElement | null;
-    if (audio) {
-      audio.volume = 0.5;
-      audio.play().catch((e) => console.error("Audio play failed:", e));
-    }
+    fadeInAudio();
     finishIntro();
   };
 
@@ -83,12 +80,12 @@ export default function IntroOverlay() {
       <div className="w-full flex flex-col items-center -translate-y-12 sm:!-translate-y-12 lg:!-translate-y-16 transition-transform duration-1000 ease-in-out">
         <div
           style={{fontFamily: 'var(--font-geist-mono)' }}
-          className="mx-auto w-full text-3xl max-w-[50vw] text-neutral-700 sm:max-w-xl   px-2 sm:px-4 text-center final-text"
+          className="mx-auto w-full text-3xl max-w-[50vw] text-neutral-700 dark:text-neutral-300 sm:max-w-xl   px-2 sm:px-4 text-center final-text"
         >
           <span>NUCLEUS</span>
         </div>
         <div className="mt-4 text-center">
-          <span className="text-lg text-gray-400 sm:text-xl font-light tracking-wider opacity-80" style={{ fontFamily: 'var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace' }}>
+          <span className="text-lg text-gray-400 dark:text-gray-400 sm:text-xl font-light tracking-wider opacity-80" style={{ fontFamily: 'var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace' }}>
             General Intelligence
           </span>
         </div>

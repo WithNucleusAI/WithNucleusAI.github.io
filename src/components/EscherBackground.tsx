@@ -130,6 +130,28 @@ export default function EscherBackground() {
         const mobileZoom = baseZoom * paddingZoomFactor;
         // Cache DPR once — avoids recomputing on every render frame
         const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? (isIPhone ? 1.75 : 1.5) : 1.75);
+        const computeImageFade = () => {
+            const y = window.scrollY || 0;
+            const vh = window.innerHeight || 1;
+            const start = vh * 0.15;
+            const end = vh * 1.25;
+            if (y <= start) return 1;
+            if (y >= end) return 0;
+            const t = (y - start) / (end - start);
+            return 1 - t;
+        };
+        // After ~two full-height sections (hero + intro), damp ripples so blog copy stays readable.
+        const computeWaveStrength = () => {
+            const y = window.scrollY || 0;
+            const vh = window.innerHeight || 1;
+            const fadeStart = vh * 1.55;
+            const fadeEnd = vh * 2.15;
+            const floor = 0.08;
+            if (y <= fadeStart) return 1;
+            if (y >= fadeEnd) return floor;
+            const t = (y - fadeStart) / (fadeEnd - fadeStart);
+            return 1 - t * (1 - floor);
+        };
         const highFloatPrecision = gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT);
         const supportsHighpFragment = !!highFloatPrecision && highFloatPrecision.precision > 0;
         // Prefer highp on capable mobile GPUs to avoid scroll quantization jitter in long pages.
@@ -155,6 +177,7 @@ export default function EscherBackground() {
             uniform float u_globalTime;
             uniform float u_scrollY;
             uniform float u_imageFade;
+            uniform float u_waveStrength;
             ${!isMobile ? `
             uniform vec2 u_mouse;
             uniform float u_hoverActive;
@@ -187,9 +210,9 @@ export default function EscherBackground() {
                 // Remap [-1, 1] to [0, 1] and make the peaks sharper for a ripple look
                 float shimmer = pow((wave + 1.0) * 0.5, 3.0) * waveMask;
                 
-                // Fade out waves as they go away from center
-                float waveFalloff = exp(-distFromCenter * 0.0001);
-                shimmer *= waveFalloff;
+                // Fade out waves as they go away from center (tighter = calmer outer rings)
+                float waveFalloff = exp(-distFromCenter * 0.00016);
+                shimmer *= waveFalloff * u_waveStrength;
                 
                 ${isMobile ? `
                 float magEffect = 0.0;
@@ -343,6 +366,7 @@ export default function EscherBackground() {
         const uGlobalTime = gl.getUniformLocation(program, "u_globalTime");
         const uScrollY = gl.getUniformLocation(program, "u_scrollY");
         const uImageFade = gl.getUniformLocation(program, "u_imageFade");
+        const uWaveStrength = gl.getUniformLocation(program, "u_waveStrength");
         const uMouse = gl.getUniformLocation(program, "u_mouse");
         const uHoverActive = gl.getUniformLocation(program, "u_hoverActive");
 
@@ -350,6 +374,7 @@ export default function EscherBackground() {
         gl.uniform1f(uBaseRadius, baseRadius);
         gl.uniform1f(uZoom, mobileZoom);
         gl.uniform1f(uFitContain, fitContain);
+        if (uWaveStrength) gl.uniform1f(uWaveStrength, 1);
 
         const texture = gl.createTexture();
         let isTextureLoaded = false;
@@ -383,6 +408,9 @@ export default function EscherBackground() {
             if (uImageFade) {
                 gl.uniform1f(uImageFade, isMobile ? 1.0 : computeImageFade());
             }
+            if (uWaveStrength) {
+                gl.uniform1f(uWaveStrength, computeWaveStrength());
+            }
 
             if (isVisible && !document.hidden && isWindowFocused) {
                 cancelAnimationFrame(animationFrameId);
@@ -403,18 +431,6 @@ export default function EscherBackground() {
         let lastRenderedCSSScrollY = disableScrollLinkedShaderOnIPhone ? 0 : (window.scrollY || 0);
         const FRAME_INTERVAL = isMobile ? 1000 / 30 : 0; // 30fps cap on mobile, uncapped on desktop
         let lastFrameTime = 0;
-        const computeImageFade = () => {
-            // Fade the *image influence* out as you scroll down, while waves keep running.
-            // 1.0 = full image, 0.0 = no image (treated as white).
-            const y = window.scrollY || 0;
-            const vh = window.innerHeight || 1;
-            const start = vh * 0.15;
-            const end = vh * 1.25;
-            if (y <= start) return 1;
-            if (y >= end) return 0;
-            const t = (y - start) / (end - start);
-            return 1 - t;
-        };
         const handleScroll = () => {
             if (disableScrollLinkedShaderOnIPhone) return;
             const delta = (window.scrollY || 0) - lastRenderedCSSScrollY;
@@ -479,6 +495,9 @@ export default function EscherBackground() {
             if (uScrollY) gl.uniform1f(uScrollY, currentScrollY);
             if (uImageFade) {
                 gl.uniform1f(uImageFade, isMobile ? 1.0 : computeImageFade());
+            }
+            if (uWaveStrength) {
+                gl.uniform1f(uWaveStrength, computeWaveStrength());
             }
 
             if (!isMobile) {

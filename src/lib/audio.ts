@@ -6,32 +6,52 @@ interface ExtendedWindow extends Window {
   __audioFadeInterval?: number;
 }
 
+const TARGET_VOLUME = 0.5;
+const FADE_STEPS = 20;
+const FADE_STEP_TIME = 50; // 50ms * 20 steps = 1000ms
+
+function clearFadeInterval(windowAny: ExtendedWindow) {
+  if (windowAny.__audioFadeInterval) {
+    clearInterval(windowAny.__audioFadeInterval);
+    windowAny.__audioFadeInterval = undefined;
+  }
+}
+
+/**
+ * Backward-compatible stop that now performs a fade-out.
+ */
+export function stopAudio(): void {
+  fadeOutAudio();
+}
+
 /**
  * Fade out audio over 1 second and pause
  */
 export function fadeOutAudio(): void {
   const audio = document.getElementById("bg-music") as HTMLAudioElement | null;
-  if (!audio || audio.paused) return;
+  if (!audio) return;
 
   const windowAny = window as ExtendedWindow;
-  if (windowAny.__audioFadeInterval) {
-    clearInterval(windowAny.__audioFadeInterval);
+  clearFadeInterval(windowAny);
+
+  if (audio.paused || audio.volume <= 0.01) {
+    audio.pause();
+    audio.volume = TARGET_VOLUME;
+    return;
   }
 
-  const steps = 20;
-  const stepTime = 50; // 50ms * 20 steps = 1000ms
-  const volumeStep = audio.volume / steps;
+  const volumeStep = audio.volume / FADE_STEPS;
 
   windowAny.__audioFadeInterval = window.setInterval(() => {
-    if (audio.volume - volumeStep > 0.01) {
-      audio.volume -= volumeStep;
+    const nextVolume = Math.max(0, audio.volume - volumeStep);
+    if (nextVolume > 0.01) {
+      audio.volume = nextVolume;
     } else {
       audio.pause();
-      audio.volume = 0.5; // Reset volume for next play
-      clearInterval(windowAny.__audioFadeInterval);
-      windowAny.__audioFadeInterval = undefined;
+      audio.volume = TARGET_VOLUME;
+      clearFadeInterval(windowAny);
     }
-  }, stepTime);
+  }, FADE_STEP_TIME);
 }
 
 /**
@@ -42,27 +62,27 @@ export function fadeInAudio(): void {
   if (!audio) return;
 
   const windowAny = window as ExtendedWindow;
-  if (windowAny.__audioFadeInterval) {
-    clearInterval(windowAny.__audioFadeInterval);
-  }
+  clearFadeInterval(windowAny);
 
   if (audio.paused) {
     audio.volume = 0;
     audio.play().catch(e => console.error("Audio play failed:", e));
   }
 
-  const targetVolume = 0.5;
-  const steps = 20;
-  const stepTime = 50; // 50ms * 20 steps = 1000ms
-  const volumeStep = targetVolume / steps;
+  const remainingVolume = Math.max(0, TARGET_VOLUME - audio.volume);
+  if (remainingVolume <= 0.01) {
+    audio.volume = TARGET_VOLUME;
+    return;
+  }
+
+  const volumeStep = remainingVolume / FADE_STEPS;
 
   windowAny.__audioFadeInterval = window.setInterval(() => {
-    if (audio.volume + volumeStep < targetVolume - 0.01) {
+    if (audio.volume + volumeStep < TARGET_VOLUME - 0.01) {
       audio.volume += volumeStep;
     } else {
-      audio.volume = targetVolume;
-      clearInterval(windowAny.__audioFadeInterval);
-      windowAny.__audioFadeInterval = undefined;
+      audio.volume = TARGET_VOLUME;
+      clearFadeInterval(windowAny);
     }
-  }, stepTime);
+  }, FADE_STEP_TIME);
 }

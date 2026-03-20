@@ -6,27 +6,54 @@ export default function ImagePageScrollButton() {
     const [visible, setVisible] = useState(true);
 
     useEffect(() => {
-        const handleScroll = () => {
-            const vh = window.innerHeight;
-            // Hide when scrolled past gallery section
-            setVisible(window.scrollY < vh * 6);
+        const updateVisibility = () => {
+            const gallerySection = document.getElementById("image-gallery");
+
+            if (!gallerySection) {
+                setVisible(true);
+                return;
+            }
+
+            const galleryTopInViewport = gallerySection.getBoundingClientRect().top;
+            // Hide once the gallery section reaches the viewport.
+            setVisible(galleryTopInViewport > window.innerHeight * 0.2);
         };
-        window.addEventListener("scroll", handleScroll, { passive: true });
-        handleScroll(); // Initial check
-        return () => window.removeEventListener("scroll", handleScroll);
+
+        window.addEventListener("scroll", updateVisibility, { passive: true });
+        window.addEventListener("resize", updateVisibility);
+        updateVisibility();
+
+        return () => {
+            window.removeEventListener("scroll", updateVisibility);
+            window.removeEventListener("resize", updateVisibility);
+        };
     }, []);
 
     const handleScroll = () => {
-        const vh = window.innerHeight;
-        const currentY = window.scrollY;
-        
-        // Scroll to next section based on current position
-        if (currentY < vh * 1.5) {
-            document.getElementById("image-technical")?.scrollIntoView({ behavior: "smooth" });
-        } else if (currentY < vh * 3) {
-            document.getElementById("image-graphs")?.scrollIntoView({ behavior: "smooth" });
-        } else if (currentY < vh * 4.5) {
-            document.getElementById("image-gallery")?.scrollIntoView({ behavior: "smooth" });
+        const heroSection = document.getElementById("image-hero");
+        const blogSection = document.getElementById("image-blog");
+        const gallerySection = document.getElementById("image-gallery");
+
+        if (!heroSection || !blogSection || !gallerySection) {
+            return;
+        }
+
+        const sections = [heroSection, blogSection, gallerySection];
+        const anchorY = window.innerHeight * 0.35;
+        let currentSectionIndex = 0;
+
+        sections.forEach((section, index) => {
+            const top = section.getBoundingClientRect().top;
+            if (top <= anchorY) {
+                currentSectionIndex = index;
+            }
+        });
+
+        const nextSectionIndex = Math.min(currentSectionIndex + 1, sections.length - 1);
+        const nextSection = sections[nextSectionIndex];
+
+        if (nextSection.id !== "image-gallery" || visible) {
+            nextSection.scrollIntoView({ behavior: "smooth", block: "start" });
         }
     };
 
