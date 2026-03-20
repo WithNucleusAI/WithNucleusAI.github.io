@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { getIntroPlayed } from "./IntroOverlay";
 
 const phrases = [
@@ -174,6 +173,22 @@ export default function Typewriter() {
         <div 
             className="w-full flex mt-14 flex-col items-center -translate-y-10"
         >
+            <style dangerouslySetInnerHTML={{__html: `
+                @keyframes typewriter-blink {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0; }
+                }
+                @keyframes fade-slide-up {
+                    0% {
+                        opacity: 0;
+                        transform: translateY(30px);
+                    }
+                    100% {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            `}} />
             <div
                 id="typing"
                 // style={{ fontFamily: isNucleus ? 'var(--font-playfair), serif' : undefined }}
@@ -185,31 +200,26 @@ export default function Typewriter() {
                     dangerouslySetInnerHTML={{ __html: text }}
                 ></span>
                 {!showCaption && (
-                    <motion.span 
-                        animate={{ opacity: [1, 0] }} 
-                        transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
+                    <span 
+                        style={{ animation: 'typewriter-blink 0.8s linear infinite' }}
                         className="inline-block w-0.75 h-[1.1em] ml-1 align-middle bg-current opacity-80"
-                    ></motion.span>
+                    ></span>
                 )}
             </div>
             
-            <AnimatePresence>
-                {showCaption && (
-                    <motion.div 
-                        key="caption"
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1.2, ease: "easeOut", delay: 0.1 }}
-                        className="mt-2 sm:mt-2"
+            {showCaption && (
+                <div 
+                    key="caption"
+                    style={{ animation: 'fade-slide-up 1.2s ease-out 0.1s both' }}
+                    className="mt-2 sm:mt-2"
+                >
+                    <span
+                        className="text-base sm:text-xl text-gray-500 dark:text-gray-100 font-medium tracking-wide"
                     >
-                        <span
-                            className="text-base sm:text-xl text-gray-900 dark:text-gray-100 font-medium tracking-wide"
-                        >
-                            General Intelligence
-                        </span>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                        General Intelligence
+                    </span>
+                </div>
+            )}
         </div>
     );
 }

@@ -106,46 +106,9 @@ export default function IntroOverlay() {
         type="button"
         onClick={handleDiscoverClick}
         style={{ position: 'fixed', bottom: '20vh', left: '50%', transform: 'translateX(-50%)' }}
-        className="btn btn--playground relative overflow-hidden rounded-full z-[101] cursor-pointer"
+        className="px-8 py-3 border border-neutral-300 dark:border-neutral-700 rounded-full z-[101] cursor-pointer hover:bg-gray-100 dark:hover:bg-neutral-900 uppercase tracking-[0.2em] font-light transition-colors duration-300"
       >
-        <div className='absolute inset-0 -z-10 backdrop-blur-md bg-white/80 dark:bg-black/80 rounded-full' />
-
-        <div className='btn__content flex items-center justify-center gap-2 w-full h-full absolute top-0 left-0 z-10 pointer-events-none'>
-          <span className='text-sm uppercase tracking-[0.2em] font-light'>
-            DISCOVER
-          </span>
-        </div>
-
-        <svg
-          className='btn__fill-layer absolute top-0 left-0 w-full h-full pointer-events-none'
-          viewBox='0 0 190 50'
-          preserveAspectRatio="none"
-        >
-
-          <circle
-            className='btn__fill-circle fill-black dark:fill-white'
-            cx="95"
-            cy="25"
-            r="95"
-          />
-        </svg>
-
-        <svg
-          className='btn__border-layer absolute top-0 left-0 w-full h-full pointer-events-none'
-          viewBox='0 0 190 50'
-          fill='none'
-          xmlns='http://www.w3.org/2000/svg'
-        >
-          <path
-            className='btn__border-path btn__border-path--left stroke-black dark:stroke-white'
-            d="M95 49 L25 49 A24 24 0 0 1 25 1 L95 1"
-          />
-          <path
-            className='btn__border-path btn__border-path--right stroke-black dark:stroke-white'
-            d="M95 49 L165 49 A24 24 0 0 0 165 1 L95 1"
-          />
-        </svg>
-
+        DISCOVER
       </button>
 
     </div>

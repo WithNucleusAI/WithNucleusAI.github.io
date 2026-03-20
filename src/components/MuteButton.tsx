@@ -5,12 +5,35 @@ import { Volume2, VolumeX } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { getIntroPlayed } from "./IntroOverlay";
 
+const STORAGE_KEY = "bg-music-muted";
+const EXPIRY_HOURS = 1;
+
+function saveMutedState(isMuted: boolean) {
+    const expiry = Date.now() + (EXPIRY_HOURS * 60 * 60 * 1000); // 1 hour from now
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ value: isMuted, expiry }));
+}
+
+function loadMutedState(): boolean {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return false;
+    
+    try {
+        const { value, expiry } = JSON.parse(saved);
+        if (Date.now() > expiry) {
+            localStorage.removeItem(STORAGE_KEY);
+            return false;
+        }
+        return value;
+    } catch {
+        return false;
+    }
+}
+
 export default function MuteButton() {
     const [mounted, setMounted] = React.useState(false);
     const [isMuted, setIsMuted] = React.useState(() => {
         if (typeof window !== "undefined") {
-            const saved = localStorage.getItem("bg-music-muted");
-            return saved ? JSON.parse(saved) : false;
+            return loadMutedState();
         }
         return false;
     });
@@ -36,16 +59,14 @@ export default function MuteButton() {
 
         const audio = document.getElementById("bg-music") as HTMLAudioElement | null;
         if (audio) {
-            const saved = localStorage.getItem("bg-music-muted");
-            if (saved !== null) {
-                audio.muted = JSON.parse(saved);
-                setIsMuted(audio.muted);
-            }
+            const savedMuted = loadMutedState();
+            audio.muted = savedMuted;
+            setIsMuted(savedMuted);
 
             const handleVolumeChange = () => {
                 const newMutedState = audio.muted;
                 setIsMuted(newMutedState);
-                localStorage.setItem("bg-music-muted", JSON.stringify(newMutedState));
+                saveMutedState(newMutedState);
             };
             audio.addEventListener('volumechange', handleVolumeChange);
             return () => {
@@ -63,7 +84,7 @@ export default function MuteButton() {
             const newMutedState = !audio.muted;
             audio.muted = newMutedState;
             setIsMuted(newMutedState);
-            localStorage.setItem("bg-music-muted", JSON.stringify(newMutedState));
+            saveMutedState(newMutedState);
         }
     };
 

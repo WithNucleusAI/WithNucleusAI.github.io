@@ -53,7 +53,7 @@ export default function TopNav() {
       <nav className="flex gap-4 font-semibold sm:gap-8">
         {pathname !== '/' && <Link href="/" className="no-underline text-[#555] dark:text-gray-400 font-medium text-sm sm:text-base transition-colors duration-200 hover:text-black dark:hover:text-white">Home</Link>}
         {pathname !== '/blog' && <Link href="/blog" className="no-underline text-[#555] dark:text-gray-400 font-medium text-sm sm:text-base transition-colors duration-200 hover:text-black dark:hover:text-white">Blogs</Link>}
-        <Link href="https://nucleus-michelangelo.vercel.app/" target="_blank" className="no-underline text-[#555] dark:text-gray-400 font-medium text-sm sm:text-base transition-colors duration-200 hover:text-black dark:hover:text-white">Image</Link>
+        {pathname !== '/image' && <Link href="/image"  className="no-underline text-[#555] dark:text-gray-400 font-medium text-sm sm:text-base transition-colors duration-200 hover:text-black dark:hover:text-white">Image</Link>}
       </nav>
     </header>
   );
