@@ -22,6 +22,11 @@ export default function Footer() {
                         </Link>
                     </div>
 
+                    <div className=" hidden md:block text-center">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            © 2026 Nucleus AI. All rights reserved.
+                        </p>
+                    </div>
                     {/* Right side - Social media icons */}
                     <div className="flex gap-6">
                         <a
@@ -73,7 +78,7 @@ export default function Footer() {
                 </div>
 
                 {/* Copyright */}
-                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800 text-center">
+                <div className="mt-6 pt-6 border-t border-gray-200  dark:border-gray-800 md:hidden text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                         © 2026 Nucleus AI. All rights reserved.
                     </p>
