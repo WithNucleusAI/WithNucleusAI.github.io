@@ -192,17 +192,17 @@ export default function Typewriter() {
             <div
                 id="typing"
                 // style={{ fontFamily: isNucleus ? 'var(--font-playfair), serif' : undefined }}
-                className={`mx-auto w-full max-w-[85vw] sm:max-w-md px-2 sm:px-4 text-center tracking-tight origin-center md:leading-normal max-md:leading-[1.35] ${isNucleus ? "transition-none text-4xl sm:text-3xl font-bold leading-none" : "transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] font-inherit text-lg sm:text-xl font-bold"}`}
+                className={`mx-auto w-full max-w-[85vw] sm:max-w-md px-2 sm:px-4 text-center text-neutral-700 dark:text-neutral-300 tracking-tight origin-center md:leading-normal max-md:leading-[1.35] ${isNucleus ? "transition-none text-4xl sm:text-3xl font-bold leading-none" : "transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] font-inherit text-lg sm:text-xl font-bold"}`}
             >
                 <span
                     id="text"
-                    className={isNucleus ? "transition-none" : "transition-all duration-1000"}
+                    className={isNucleus ? "transition-none text-neutral-700 dark:text-neutral-300" : "transition-all duration-1000 "}
                     dangerouslySetInnerHTML={{ __html: text }}
                 ></span>
                 {!showCaption && (
                     <span 
                         style={{ animation: 'typewriter-blink 0.8s linear infinite' }}
-                        className="inline-block w-0.75 h-[1.1em] ml-1 align-middle bg-current opacity-80"
+                        className="inline-block  w-0.75 h-[1.1em] ml-1 align-middle bg-current opacity-80"
                     ></span>
                 )}
             </div>
@@ -211,10 +211,10 @@ export default function Typewriter() {
                 <div 
                     key="caption"
                     style={{ animation: 'fade-slide-up 1.2s ease-out 0.1s both' }}
-                    className="mt-2 sm:mt-2"
+                    className="mt-2 sm:mt-2 "
                 >
                     <span
-                        className="text-base sm:text-xl text-gray-500 dark:text-gray-100 font-medium tracking-wide"
+                        className="text-base sm:text-xl text-gray-400 dark:text-gray-400 font-medium tracking-wide"
                     >
                         General Intelligence
                     </span>

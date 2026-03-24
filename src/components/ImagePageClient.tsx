@@ -19,7 +19,6 @@ const HOVER_TRANSITION = {
 } as const
 const EASE_OUT = [0.25, 0.46, 0.45, 0.94] as const
 const ORBIT_SECTION_COUNT = 6
-const BASE_VIEWPORT_WIDTH = 1440
 
 interface ImageConfig {
   src: string
@@ -279,9 +278,8 @@ function FloatingImage({
   )
 
   const minRem = Math.max(2.75, (config.w * 0.38) / 16)
-  const fluidVw = (config.w / BASE_VIEWPORT_WIDTH) * 100
-  const maxRem = (config.w * 1.2) / 16
-  const responsiveWidth = `clamp(${minRem.toFixed(2)}rem, ${fluidVw.toFixed(2)}vw, ${maxRem.toFixed(2)}rem)`
+  const desktopVw = (config.w / 1440) * 100
+  const responsiveWidth = `max(${minRem.toFixed(2)}rem, ${desktopVw.toFixed(2)}vw)`
 
   return (
     <motion.div

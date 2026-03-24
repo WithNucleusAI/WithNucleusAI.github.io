@@ -117,8 +117,9 @@ export default function EscherBackground() {
         const MOBILE_IMAGE_ZOOM = 1.5; // ← increase to zoom in on the image on mobile (e.g. 1.2 = 20% zoom)
         const DESKTOP_IMAGE_ZOOM = 1.1; // ← increase to zoom in on desktop
         const IMAGE_ROTATION_DEG = -30.0; // ← angle in degrees to rotate the underlying image clockwise
-        const WAVE_INTENSITY = 0.55; // ← adjust wave strength (e.g. 0.8 is strong, 0.3 is minimalist/subtle)
-        const WAVE_START_RADIUS = 250.0; // ← radius in pixels around center where waves start (to avoid obscuring center text)
+        const WAVE_INTENSITY = 0.50; // ← adjust wave strength (e.g. 0.8 is strong, 0.3 is minimalist/subtle)
+        const WAVE_START_RADIUS_X = 350.0; // ← horizontal radius of the ellipse where waves start
+        const WAVE_START_RADIUS_Y = 250.0; // ← vertical radius of the ellipse where waves start
         const HOVER_INTENSITY = 0.75; // ← adjust hover max strength
         const fitContain = 1.0;
         
@@ -190,11 +191,17 @@ export default function EscherBackground() {
 
                 // Continuous water ripples from center
                 vec2 screenCenter = vec2(u_resolution.x * 0.5, u_resolution.y * 0.5 - u_scrollY);
-                float distFromCenter = distance(pos, screenCenter);
+                vec2 diff = pos - screenCenter;
+                float distFromCenter = length(diff);
                 
-                // Base frequency and speed
-                float baseFreq = 0.012; 
-                float waveSpeed = 0.0020;
+                // Elliptical distance for wave masking and generation
+                float ellipseRatioY = ${WAVE_START_RADIUS_X.toFixed(1)} / ${WAVE_START_RADIUS_Y.toFixed(1)};
+                vec2 ellipticalDiff = vec2(diff.x, diff.y * ellipseRatioY);
+                float ellipticalDist = length(ellipticalDiff);
+                
+                // Base frequency and speed (lower freq = wider ripples, lower speed = slower)
+                float baseFreq = 0.009; 
+                float waveSpeed = 0.0015;
                 
                 // Exponential falloff for frequency so waves "stretch out" at the edges
                 float freqDecay = exp(-distFromCenter * 0.001); 
@@ -202,17 +209,22 @@ export default function EscherBackground() {
                 
                 // Sine wave based on distance and time
                 // Add a start radius so the wave effect only applies outside of it
-                float waveDist = max(0.0, distFromCenter - ${WAVE_START_RADIUS.toFixed(1)});
+                float waveDist = max(0.0, ellipticalDist - ${WAVE_START_RADIUS_X.toFixed(1)});
                 float wave = sin(waveDist * effectiveFreq - u_globalTime * waveSpeed);
-                // Ramp up the wave strength starting from WAVE_START_RADIUS to WAVE_START_RADIUS + 50.0
-                float waveMask = smoothstep(0.0, 50.0, distFromCenter - ${WAVE_START_RADIUS.toFixed(1)});
+                // Ramp up the wave strength over a very long smooth distance (150px) to hide the visible start boundary
+                float waveMask = smoothstep(0.0, 150.0 * max(1.0, ellipseRatioY), ellipticalDist - ${WAVE_START_RADIUS_X.toFixed(1)});
                 
-                // Remap [-1, 1] to [0, 1] and make the peaks sharper for a ripple look
-                float shimmer = pow((wave + 1.0) * 0.5, 3.0) * waveMask;
+                // Remap [-1, 1] to [0, 1] and make the peaks smoother (2.2) instead of sharp (3.0) for a minimal look
+                float shimmer = pow((wave + 1.0) * 0.5, 2.2) * waveMask;
                 
-                // Fade out waves as they go away from center (tighter = calmer outer rings)
-                float waveFalloff = exp(-distFromCenter * 0.00016);
-                shimmer *= waveFalloff * u_waveStrength;
+                // Fade out waves exponentially as they go away from center
+                float waveFalloff = exp(-distFromCenter * 0.00025);
+                
+                // Smoothly fade to exactly 0 towards the far edges of the screen to avoid abrupt endings
+                float maxScreenRadius = max(u_resolution.x, u_resolution.y) * 0.7;
+                float edgeFade = smoothstep(maxScreenRadius, maxScreenRadius * 0.4, distFromCenter);
+                
+                shimmer *= waveFalloff * edgeFade * u_waveStrength;
                 
                 ${isMobile ? `
                 float magEffect = 0.0;
