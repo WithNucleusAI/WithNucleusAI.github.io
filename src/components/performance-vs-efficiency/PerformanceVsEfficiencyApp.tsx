@@ -317,6 +317,7 @@ function SectionDivider({ delay = 0 }: { delay?: number }) {
   const { t, theme } = useTheme();
   const isDark = theme === "dark";
   const mob = useIsMobile();
+  const lineHeight = mob ? 1.5 : 2;
   return (
     <motion.div
       initial={{ opacity: 0, scaleX: 0 }}
@@ -343,27 +344,41 @@ function SectionDivider({ delay = 0 }: { delay?: number }) {
       <div style={{
         position: "relative",
         zIndex: 1,
-        flex: 1, height: 1,
+        flex: 1,
+        height: lineHeight,
         background: isDark
-          ? "linear-gradient(90deg, transparent, rgba(59,158,255,0.06) 40%, rgba(129,140,248,0.06) 100%)"
-          : "linear-gradient(90deg, transparent, rgba(0,102,220,0.07) 40%, rgba(79,70,229,0.06) 100%)",
+          ? "linear-gradient(90deg, transparent 0%, rgba(59,158,255,0.18) 28%, rgba(129,140,248,0.28) 52%, rgba(59,158,255,0.18) 76%, transparent 100%)"
+          : "linear-gradient(90deg, transparent 0%, rgba(0,102,220,0.2) 28%, rgba(79,70,229,0.3) 52%, rgba(0,102,220,0.2) 76%, transparent 100%)",
+        boxShadow: isDark
+          ? "0 0 10px rgba(59,158,255,0.16)"
+          : "0 0 8px rgba(0,102,220,0.12)",
       }} />
       <div style={{
         position: "relative",
         zIndex: 1,
-        width: 5, height: 5, borderRadius: 1.5,
+        width: mob ? 7 : 8,
+        height: mob ? 7 : 8,
+        borderRadius: 2,
         transform: "rotate(45deg)",
-        background: isDark ? "rgba(129,140,248,0.08)" : "rgba(79,70,229,0.1)",
-        border: `1px solid ${isDark ? "rgba(129,140,248,0.1)" : "rgba(79,70,229,0.12)"}`,
-        flexShrink: 0, margin: "0 2px",
+        background: isDark ? "rgba(129,140,248,0.34)" : "rgba(79,70,229,0.38)",
+        border: `1px solid ${isDark ? "rgba(167,180,255,0.55)" : "rgba(79,70,229,0.5)"}`,
+        boxShadow: isDark
+          ? "0 0 10px rgba(129,140,248,0.38), inset 0 0 0 1px rgba(255,255,255,0.06)"
+          : "0 0 8px rgba(79,70,229,0.24), inset 0 0 0 1px rgba(255,255,255,0.35)",
+        flexShrink: 0,
+        margin: mob ? "0 5px" : "0 7px",
       }} />
       <div style={{
         position: "relative",
         zIndex: 1,
-        flex: 1, height: 1,
+        flex: 1,
+        height: lineHeight,
         background: isDark
-          ? "linear-gradient(90deg, rgba(129,140,248,0.06) 0%, rgba(52,211,153,0.04) 60%, transparent)"
-          : "linear-gradient(90deg, rgba(79,70,229,0.06) 0%, rgba(5,150,105,0.05) 60%, transparent)",
+          ? "linear-gradient(90deg, transparent 0%, rgba(129,140,248,0.2) 24%, rgba(52,211,153,0.22) 52%, rgba(129,140,248,0.16) 76%, transparent 100%)"
+          : "linear-gradient(90deg, transparent 0%, rgba(79,70,229,0.24) 24%, rgba(5,150,105,0.24) 52%, rgba(79,70,229,0.2) 76%, transparent 100%)",
+        boxShadow: isDark
+          ? "0 0 10px rgba(52,211,153,0.14)"
+          : "0 0 8px rgba(5,150,105,0.1)",
       }} />
     </motion.div>
   );

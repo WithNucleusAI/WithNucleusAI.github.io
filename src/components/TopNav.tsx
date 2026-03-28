@@ -39,7 +39,7 @@ export default function TopNav() {
       <div className="logo-container min-w-0">
         <div className="flex items-center gap-2 sm:gap-3">
           <Link href="/" className="flex items-center gap-2 sm:gap-3 no-underline text-inherit font-bold text-lg sm:text-xl transition-opacity duration-200 hover:opacity-80">
-            <Image src="/logo.png" alt="Nucleus AI Logo" width={40} height={40} className="invert dark:invert-0 w-8 h-8 sm:w-10 sm:h-10" />
+            <Image src="/logo.webp" alt="Nucleus AI Logo" width={40} height={40} className="invert dark:invert-0 w-8 h-8 sm:w-10 sm:h-10" />
             <span className="tracking-tight hidden sm:inline">Nucleus AI</span>
             {(process.env.NODE_ENV === "development" || process.env.NEXT_PUBLIC_ENV === "dev") && (
               <span className="text-[0.7rem] sm:text-[0.8rem] bg-[#ff4444] text-white px-1.5 py-0.5 rounded ml-2 font-bold align-middle">

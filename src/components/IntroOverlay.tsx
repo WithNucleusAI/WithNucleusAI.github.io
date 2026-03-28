@@ -74,7 +74,7 @@ export default function IntroOverlay() {
       ${step === 'fading' ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
     >
       <div className="absolute top-8 left-1/2 -translate-x-1/2 transition-opacity duration-1000">
-        <Image src="/logo.png" alt="Nucleus Logo" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 invert dark:invert-0 object-contain" />
+        <Image src="/logo.webp" alt="Nucleus Logo" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 invert dark:invert-0 object-contain" />
       </div>
 
       <div className="w-full flex flex-col items-center -translate-y-12 sm:!-translate-y-12 lg:!-translate-y-16 transition-transform duration-1000 ease-in-out">

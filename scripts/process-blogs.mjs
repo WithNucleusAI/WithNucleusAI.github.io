@@ -4,6 +4,7 @@ import path from 'path';
 import { execSync } from 'child_process';
 import crypto from 'crypto';
 import matter from 'gray-matter';
+import sharp from 'sharp';
 
 // Allow processing a different directory via command line args
 // Usage: node scripts/process-blogs.mjs [path-to-blogs-repo]
@@ -206,17 +207,20 @@ async function processBlogs() {
                 const mermaidCode = m[1];
                 
                 const hash = crypto.createHash('md5').update(mermaidCode).digest('hex').substring(0, 8);
-                const imageName = `mermaid-${hash}.png`;
+                const imageName = `mermaid-${hash}.webp`;
                 const imagePath = path.join(blogImagesDir, imageName);
                 const publicPath = `/images/blog/${slug}/${imageName}`;
                 
                 if (!fs.existsSync(imagePath)) {
                     console.log(`  Generating Mermaid image: ${imageName}`);
                     const mmdPath = path.join(blogImagesDir, `temp-${hash}.mmd`);
+                    const tempPngPath = path.join(blogImagesDir, `temp-${hash}.png`);
                     fs.writeFileSync(mmdPath, mermaidCode);
                     try {
                         const puppeteerConfig = path.resolve(process.cwd(), 'puppeteer-config.json');
-                        execSync(`npx mmdc -p "${puppeteerConfig}" -i "${mmdPath}" -o "${imagePath}" -b transparent -s 3`, { stdio: 'inherit' });
+                        execSync(`npx mmdc -p "${puppeteerConfig}" -i "${mmdPath}" -o "${tempPngPath}" -b transparent -s 3`, { stdio: 'inherit' });
+                        await sharp(tempPngPath).webp({ quality: 92 }).toFile(imagePath);
+                        fs.unlinkSync(tempPngPath);
                         fs.unlinkSync(mmdPath);
                     } catch (e) {
                         console.error(`  Failed to generate mermaid for ${slug}`, e);

@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     siteName: "Nucleus AI",
     images: [
       {
-        url: "/logo.png",
+        url: "/logo.webp",
         width: 800,
         height: 600,
       },
