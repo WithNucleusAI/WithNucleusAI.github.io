@@ -110,7 +110,7 @@ export default function EscherBackground() {
 
         const gl = probeGl;
         const image = new window.Image();
-        image.src = "/images/hands2.png";
+        image.src = "/images/hands2.webp";
 
         const gap = isMobile ? 7.2 : 16.0;
         const baseRadius = isMobile ? 1.8 : 6.0;

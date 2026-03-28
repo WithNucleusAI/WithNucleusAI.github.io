@@ -14,7 +14,7 @@ export default async function Home() {
       <IntroOverlay />
       <EscherBackground />
       <section className="h-svh sm:-mt-28 relative flex flex-col justify-center items-center w-full overflow-hidden">
-        <div className="w-full flex flex-col items-center -translate-y-12 sm:!-translate-y-12 lg:!-translate-y-16">
+        <div className="w-full flex flex-col items-center mt-14 -translate-y-12 sm:!-translate-y-12 lg:!-translate-y-16">
           <Typewriter />
         </div>
         <ScrollDownButton />

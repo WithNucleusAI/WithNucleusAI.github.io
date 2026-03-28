@@ -7,6 +7,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import MuteButton from "@/components/MuteButton";
 import TopNav from "@/components/TopNav";
 import Footer from "@/components/Footer";
+import ThemeColorSync from "@/components/ThemeColorSync";
 
 const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -27,7 +28,10 @@ const playfair = Playfair_Display({
 });
 
 export const viewport: Viewport = {
-  themeColor: "#ffffff",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
 };
 
 export const metadata: Metadata = {
@@ -65,6 +69,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <ThemeColorSync />
           <audio id="bg-music" loop preload="none" src="/music.wav" />
           <TopNav />
           <main className="flex-1 flex flex-col w-full sm:pt-28">{children}</main>

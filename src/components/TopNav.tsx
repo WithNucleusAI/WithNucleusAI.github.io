@@ -35,7 +35,7 @@ export default function TopNav() {
   }, [pathname, introDone]);
 
   return (
-    <header className={`top-3 w-full px-4 py-2 sm:px-6 sm:py-2 flex justify-between items-center box-border z-50 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+    <header className={`absolute inset-x-0 top-0 w-full bg-transparent px-4 py-2 pt-[max(env(safe-area-inset-top),0.5rem)] sm:px-6 sm:py-2 flex justify-between items-center box-border z-50 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
       <div className="logo-container min-w-0">
         <div className="flex items-center gap-2 sm:gap-3">
           <Link href="/" className="flex items-center gap-2 sm:gap-3 no-underline text-inherit font-bold text-lg sm:text-xl transition-opacity duration-200 hover:opacity-80">

@@ -10,7 +10,8 @@ import {
   MotionValue,
 } from 'framer-motion'
 import ImagePageScrollButton from '@/components/ImagePageScrollButton'
-import BlogContent from '@/components/BlogContent'
+import PerformanceVsEfficiencyApp from '@/components/performance-vs-efficiency/PerformanceVsEfficiencyApp'
+
 
 const MOUSE_FACTOR = 120
 const HOVER_TRANSITION = {
@@ -19,9 +20,12 @@ const HOVER_TRANSITION = {
 } as const
 const EASE_OUT = [0.25, 0.46, 0.45, 0.94] as const
 const ORBIT_SECTION_COUNT = 6
+const MOBILE_BREAKPOINT = 768
+const MOBILE_GALLERY_MAX_IMAGES = 8
 
 interface ImageConfig {
   src: string
+  position: 'left' | 'right' | 'center'
   left?: string
   right?: string
   top: string
@@ -32,33 +36,224 @@ interface ImageConfig {
   mobileHidden?: boolean
 }
 
+const EXCLUDED_IMAGES = new Set([
+  '/final_images/image (1).webp',
+  '/final_images/image (2).webp',
+  '/final_images/image (3).webp',
+  '/final_images/image (4).webp',
+  '/final_images/image (6).webp',
+  '/final_images/image (7).webp',
+  '/final_images/image (8).webp',
+  '/final_images/image (9).webp',
+  '/final_images/image (10).webp',
+  '/final_images/image (11).webp',
+  '/final_images/image (14).webp',
+  '/final_images/image (15).webp',
+  '/final_images/image (17).webp',
+  '/final_images/image (19).webp',
+  '/final_images/image (20).webp',
+  '/final_images/image (21).webp',
+  '/final_images/image (22).webp',
+  '/final_images/image (23).webp',
+])
+
 const IMAGE_POOL = [
-  '/image_samples/image (1).png',
-  '/image_samples/image (2).webp',
-  '/image_samples/image (3).webp',
-  '/image_samples/image (4).webp',
-  '/image_samples/image (6).webp',
-  '/image_samples/image (7).webp',
-  '/image_samples/image (8).webp',
-  '/image_samples/image (9).webp',
-  '/image_samples/image (10).webp',
-  '/image_samples/image (11).webp',
-  '/image_samples/image (14).webp',
-  '/image_samples/image (15).webp',
-  '/image_samples/image (17).webp',
-  '/image_samples/image (19).webp',
-  '/image_samples/image (20).webp',
-  '/image_samples/image (21).webp',
-  '/image_samples/image (22).webp',
-  '/image_samples/image (23).webp',
-  '/image_samples/image (9).png',
-  '/image_samples/image (10).png',
-  '/image_samples/image (6).png',
-  '/image_samples/image (7).png',
-  '/image_samples/image (4).png',
-  '/image_samples/image (3).png',
-  '/image_samples/image (2).png',
-]
+  '/final_images/image (1) 2.webp',
+  '/final_images/image (1) 2.webp',
+  '/final_images/image (1).webp',
+  '/final_images/image (10).webp',
+  '/final_images/image (11) 2.webp',
+  '/final_images/image (11).webp',
+  '/final_images/image (11).webp',
+  '/final_images/image (12).webp',
+  '/final_images/image (13).webp',
+  '/final_images/image (13).webp',
+  '/final_images/image (14).webp',
+  '/final_images/image (14).webp',
+  '/final_images/image (15).webp',
+  '/final_images/image (15).webp',
+  '/final_images/image (16).webp',
+  '/final_images/image (17).webp',
+  '/final_images/image (17).webp',
+  '/final_images/image (18).webp',
+  '/final_images/image (19).webp',
+  '/final_images/image (2).webp',
+  '/final_images/image (2).webp',
+  '/final_images/image (20).webp',
+  '/final_images/image (21).webp',
+  '/final_images/image (21).webp',
+  '/final_images/image (22).webp',
+  '/final_images/image (23).webp',
+  '/final_images/image (24).webp',
+  '/final_images/image (3).webp',
+  '/final_images/image (3).webp',
+  '/final_images/image (4).webp',
+  '/final_images/image (4).webp',
+  '/final_images/image (5).webp',
+  '/final_images/image (6).webp',
+  '/final_images/image (7).webp',
+  '/final_images/image (8).webp',
+  '/final_images/image (8).webp',
+  '/final_images/image (9).webp',
+  '/final_images/image (9).webp',
+  '/final_images/image 2.webp',
+  '/final_images/image 3.webp',
+  '/final_images/image-2.webp',
+  '/final_images/image-3.webp',
+  '/final_images/image-4.webp',
+  '/final_images/image.webp',
+  '/final_images/masterpiece_10_aerial_view_of_an_iceland.webp',
+  '/final_images/masterpiece_10_high_detail_shot_of_a_mec.webp',
+  '/final_images/masterpiece_10_portrait_of_a_cat_with_st.webp',
+  '/final_images/masterpiece_11_a_serene_japanese_tea_hou.webp',
+  '/final_images/masterpiece_11_professional_food_photogr.webp',
+  '/final_images/masterpiece_12_clear_photograph_of_an_an.webp',
+  '/final_images/masterpiece_12_the_interior_of_a_futuris.webp',
+  '/final_images/masterpiece_12_wildlife_shot_of_a_snow_l.webp',
+  '/final_images/masterpiece_13_detailed_image_of_an_arti.webp',
+  '/final_images/masterpiece_13_macro_photography_of_a_hu.webp',
+  '/final_images/masterpiece_13_portrait_of_a_female_weld.webp',
+  '/final_images/masterpiece_14_a_majestic_bengal_tiger_d.webp',
+  '/final_images/masterpiece_14_minimalist_scandinavian_l.webp',
+  '/final_images/masterpiece_14_realistic_scene_of_a_bust.webp',
+  '/final_images/masterpiece_15_a_futuristic_space_statio.webp',
+  '/final_images/masterpiece_15_close_up_of_a_vintage_typ.webp',
+  '/final_images/masterpiece_15_the_grand_canyon_under_a_.webp',
+  '/final_images/masterpiece_16_close_up_of_a_weathered_l.webp',
+  '/final_images/masterpiece_16_detailed_photo_of_a_calm_.webp',
+  '/final_images/masterpiece_16_macro_shot_of_a_human_eye.webp',
+  '/final_images/masterpiece_17_a_cozy_cabin_interior_dur.webp',
+  '/final_images/masterpiece_17_candid_shot_of_a_street_f.webp',
+  '/final_images/masterpiece_17_portrait_of_a_dog_with_a_.webp',
+  '/final_images/masterpiece_18_aerial_photography_of_a_w.webp',
+  '/final_images/masterpiece_18_portrait_of_a_young_woman.webp',
+  '/final_images/masterpiece_18_realistic_depiction_of_a_.webp',
+  '/final_images/masterpiece_19_a_professional_product_sh.webp',
+  '/final_images/masterpiece_19_high_detail_image_of_a_mo.webp',
+  '/final_images/masterpiece_19_macro_shot_of_a_butterfly.webp',
+  '/final_images/masterpiece_1_architectural_shot_of_a_b.webp',
+  '/final_images/masterpiece_1_hyper_realistic_portrait_.webp',
+  '/final_images/masterpiece_1_portrait_of_a_young_man_w.webp',
+  '/final_images/masterpiece_20_a_dark_moody_library__sha.webp',
+  '/final_images/masterpiece_20_close_up_of_a_musician_pl.webp',
+  '/final_images/masterpiece_20_street_food_vendor_in_han.webp',
+  '/final_images/masterpiece_21_a_group_of_monks_in_saffr.webp',
+  '/final_images/masterpiece_21_nighttime_shot_of_a_futur.webp',
+  '/final_images/masterpiece_22_action_shot_of_a_surfer_i.webp',
+  '/final_images/masterpiece_22_extreme_close_up_of_a_dro.webp',
+  '/final_images/masterpiece_23_a_vintage_1960s_sports_ca.webp',
+  '/final_images/masterpiece_23_portrait_of_a_blacksmith_.webp',
+  '/final_images/masterpiece_24_macro_shot_of_a_circuit_b.webp',
+  '/final_images/masterpiece_24_portrait_of_a_young_man_w.webp',
+  '/final_images/masterpiece_25_a_foggy_morning_in_a_redw.webp',
+  '/final_images/masterpiece_26_extreme_close_up_of_a_dro.webp',
+  '/final_images/masterpiece_27_professional_product_shot.webp',
+  '/final_images/masterpiece_28_portrait_of_an_astronaut_.webp',
+  '/final_images/masterpiece_29_a_bustling_fish_market_in.webp',
+  '/final_images/masterpiece_2_cinematic_shot_of_a_rainy.webp',
+  '/final_images/masterpiece_2_interior_of_a_high_end_lu.webp',
+  '/final_images/masterpiece_2_macro_photography_of_a_fu (1).webp',
+  '/final_images/masterpiece_2_macro_photography_of_a_fu.webp',
+  '/final_images/masterpiece_2_macro_photography_of_a_me.webp',
+  '/final_images/masterpiece_30_architectural_shot_of_a_m.webp',
+  '/final_images/masterpiece_31_macro_photography_of_a_ho.webp',
+  '/final_images/masterpiece_32_portrait_of_an_artist_in_.webp',
+  '/final_images/masterpiece_33_a_remote_lighthouse_on_a_.webp',
+  '/final_images/masterpiece_34_candid_street_photography.webp',
+  '/final_images/masterpiece_35_macro_shot_of_a_human_thu.webp',
+  '/final_images/masterpiece_36_interior_of_an_old_wooden.webp',
+  '/final_images/masterpiece_37_portrait_of_a_young_man_w.webp',
+  '/final_images/masterpiece_38_macro_shot_of_a_blooming_.webp',
+  '/final_images/masterpiece_39_a_futuristic_medical_lab_.webp',
+  '/final_images/masterpiece_3_a_coastal_greek_village_w.webp',
+  '/final_images/masterpiece_3_candid_portrait_of_a_jazz.webp',
+  '/final_images/masterpiece_3_cinematic_street_shot_of_ (1).webp',
+  '/final_images/masterpiece_3_cinematic_street_shot_of_.webp',
+  '/final_images/masterpiece_3_high_fashion_editorial_sh.webp',
+  '/final_images/masterpiece_3_macro_photography_of_a_pe.webp',
+  '/final_images/masterpiece_40_action_shot_of_a_mountain.webp',
+  '/final_images/masterpiece_42_macro_photography_of_an_o.webp',
+  '/final_images/masterpiece_43_a_minimalist_concrete_sta.webp',
+  '/final_images/masterpiece_44_portrait_of_a_coal_miner_.webp',
+  '/final_images/masterpiece_45_macro_shot_of_a_peacock_s.webp',
+  '/final_images/masterpiece_46_a_desert_landscape_at_nig.webp',
+  '/final_images/masterpiece_47_professional_product_shot.webp',
+  '/final_images/masterpiece_48_portrait_of_a_samurai_in_.webp',
+  '/final_images/masterpiece_49_macro_shot_of_a_dandelion.webp',
+  '/final_images/masterpiece_4_a_professional_athlete_mi.webp',
+  '/final_images/masterpiece_4_aerial_view_of_an_iceland.webp',
+  '/final_images/masterpiece_4_an_ultra_sharp_architectu.webp',
+  '/final_images/masterpiece_4_portrait_of_a_young_woman.webp',
+  '/final_images/masterpiece_4_wide_angle_shot_of_the_do.webp',
+  '/final_images/masterpiece_50_a_close_up_of_a_freshly_p.webp',
+  '/final_images/masterpiece_5_extreme_close_up_of_a_sin.webp',
+  '/final_images/masterpiece_5_high_fashion_editorial_sh.webp',
+  '/final_images/masterpiece_5_realistic_landscape_of_ro.webp',
+  '/final_images/masterpiece_6_a_rustic_italian_kitchen_.webp',
+  '/final_images/masterpiece_6_cinematic_street_photogra.webp',
+  '/final_images/masterpiece_6_close_up_of_a_flower_in_b.webp',
+  '/final_images/masterpiece_6_extreme_macro_of_a_jumpin.webp',
+  '/final_images/masterpiece_7_architectural_shot_of_a_b.webp',
+  '/final_images/masterpiece_7_high_detail_image_of_a_ci.webp',
+  '/final_images/masterpiece_7_wildlife_portrait_of_a_sn.webp',
+  '/final_images/masterpiece_8_a_minimalist_concrete_vil.webp',
+  '/final_images/masterpiece_8_interior_design_shot_of_a.webp',
+  '/final_images/masterpiece_8_interior_of_a_high_end_lu.webp',
+  '/final_images/masterpiece_8_photo_of_a_mountain_range.webp',
+  '/final_images/masterpiece_9_a_detailed_shot_of_an_ast.webp',
+  '/final_images/masterpiece_9_candid_portrait_of_a_jazz.webp',
+  '/final_images/masterpiece_9_candid_street_shot_of_a_g.webp',
+  '/final_images/masterpiece_9_realistic_depiction_of_a_.webp',
+  '/final_images/pro_diffusion_10_close_up_portrait_of_mode.webp',
+  '/final_images/pro_diffusion_11_classic_car_in_desert_at_.webp',
+  '/final_images/pro_diffusion_12_indian_wedding_ceremony__.webp',
+  '/final_images/pro_diffusion_13_mountain_climber_on_ridge.webp',
+  '/final_images/pro_diffusion_14_coffee_shop_interior__mor.webp',
+  '/final_images/pro_diffusion_15_baby_laughing_with_eyes_c.webp',
+  '/final_images/pro_diffusion_16_street_musician_playing_s.webp',
+  '/final_images/pro_diffusion_17_golden_retriever_running_.webp',
+  '/final_images/pro_diffusion_18_real_estate_interior_of_l.webp',
+  '/final_images/pro_diffusion_19_fashion_model_on_paris_st.webp',
+  '/final_images/pro_diffusion_1_portrait_of_a_25_year_old.webp',
+  '/final_images/pro_diffusion_20_underwater_portrait__swim.webp',
+  '/final_images/pro_diffusion_21_street_food_market_in_mar.webp',
+  '/final_images/pro_diffusion_22_ballet_dancer_mid_leap_on.webp',
+  '/final_images/pro_diffusion_23_macro_of_honeybee_on_lave.webp',
+  '/final_images/pro_diffusion_24_construction_worker_high_.webp',
+  '/final_images/pro_diffusion_25_night_cityscape_from_roof.webp',
+  '/final_images/pro_diffusion_26_portrait_of_twins__identi.webp',
+  '/final_images/pro_diffusion_27_farmer_in_wheat_field_at_.webp',
+  '/final_images/pro_diffusion_28_newlyweds_first_dance__so.webp',
+  '/final_images/pro_diffusion_29_street_vendor_selling_fre.webp',
+  '/final_images/pro_diffusion_2_street_photography__nyc_t.webp',
+  '/final_images/pro_diffusion_30_athlete_doing_yoga_on_mou.webp',
+  '/final_images/pro_diffusion_31_raindrops_on_window_with_.webp',
+  '/final_images/pro_diffusion_32_portrait_of_african_woman.webp',
+  '/final_images/pro_diffusion_33_tech_startup_office__crea.webp',
+  '/final_images/pro_diffusion_34_grandfather_teaching_gran.webp',
+  '/final_images/pro_diffusion_35_industrial_factory_worker.webp',
+  '/final_images/pro_diffusion_36_fresh_sushi_platter_on_sl.webp',
+  '/final_images/pro_diffusion_37_surfer_riding_barrel_wave.webp',
+  '/final_images/pro_diffusion_38_old_bookshop_owner_surrou.webp',
+  '/final_images/pro_diffusion_39_aerial_drone_shot_of_rice.webp',
+  '/final_images/pro_diffusion_3_professional_headshot_of_.webp',
+  '/final_images/pro_diffusion_40_portrait_of_musician_with.webp',
+  '/final_images/pro_diffusion_41_children_playing_in_monso.webp',
+  '/final_images/pro_diffusion_42_fashion_flat_lay_on_marbl.webp',
+  '/final_images/pro_diffusion_43_firefighter_emerging_from.webp',
+  '/final_images/pro_diffusion_44_cat_sleeping_on_windowsil.webp',
+  '/final_images/pro_diffusion_45_marathon_runners_at_finis.webp',
+  '/final_images/pro_diffusion_46_snow_covered_village__chi.webp',
+  '/final_images/pro_diffusion_47_portrait_through_rain_str.webp',
+  '/final_images/pro_diffusion_48_artisan_potter_shaping_cl.webp',
+  '/final_images/pro_diffusion_4_candid_photo_of_a_barista.webp',
+  '/final_images/pro_diffusion_50_close_up_of_aged_hands_ho.webp',
+  '/final_images/pro_diffusion_5_elderly_fisherman_mending.webp',
+  '/final_images/pro_diffusion_6_mother_holding_newborn_ba.webp',
+  '/final_images/pro_diffusion_7_athletes_sprinting_on_tra.webp',
+  '/final_images/pro_diffusion_8_chef_plating_gourmet_food.webp',
+  '/final_images/pro_diffusion_9_couple_walking_through_au.webp',
+].filter(img => !EXCLUDED_IMAGES.has(img))
 
 function seededRandom(seed: number): number {
   const x = Math.sin(seed * 9301 + 49297) * 233280
@@ -67,50 +262,151 @@ function seededRandom(seed: number): number {
 
 // Hand-tuned hero images (first viewport screen)
 const HERO_IMAGES: ImageConfig[] = [
-  { src: '/image_samples/image (1).png', left: '3%', top: '18vh', w: 175, h: 235, depth: 0.35, alpha: 0.85 },
-  { src: '/image_samples/image (2).webp', right: '2%', top: '4vh', w: 205, h: 150, depth: 0.55, alpha: 0.65 },
-  { src: '/image_samples/image (3).webp', right: '5%', top: '52vh', w: 168, h: 128, depth: 0.4, alpha: 0.75 },
-  { src: '/image_samples/image (4).webp', left: '14%', top: '64vh', w: 105, h: 142, depth: 0.28, alpha: 0.6, mobileHidden: true },
-  { src: '/image_samples/image (6).webp', left: '46%', top: '84vh', w: 90, h: 90, depth: 0.45, alpha: 0.55, mobileHidden: true },
-  { src: '/image_samples/image (7).webp', left: '-3%', top: '35vh', w: 80, h: 110, depth: 0.6, alpha: 0.35 },
-  { src: '/image_samples/image (8).webp', right: '-2%', top: '70vh', w: 90, h: 72, depth: 0.3, alpha: 0.3, mobileHidden: true },
-  { src: '/image_samples/image (9).webp', left: '1%', top: '84vh', w: 68, h: 96, depth: 0.2, alpha: 0.45 },
-  { src: '/image_samples/image (10).webp', right: '0%', top: '16vh', w: 72, h: 92, depth: 0.5, alpha: 0.38, mobileHidden: true },
-  { src: '/image_samples/image (11).webp', left: '44%', top: '7vh', w: 95, h: 65, depth: 0.15, alpha: 0.3 },
-  { src: '/image_samples/image (14).webp', left: '20%', top: '25vh', w: 120, h: 120, depth: 0.7, alpha: 0.4, mobileHidden: true },
-  { src: '/image_samples/image (15).webp', right: '15%', top: '85vh', w: 80, h: 120, depth: 0.8, alpha: 0.5 },
+  { src: '/final_images/image (1).webp', position: 'left', left: '3%', top: '18vh', w: 175, h: 235, depth: 0.35, alpha: 0.85 },
+  { src: '/final_images/image (2).webp', position: 'right', right: '2%', top: '4vh', w: 205, h: 150, depth: 0.55, alpha: 0.65 },
+  { src: '/final_images/image (3).webp', position: 'right', right: '5%', top: '52vh', w: 168, h: 128, depth: 0.4, alpha: 0.75 },
+  { src: '/final_images/image (4).webp', position: 'left', left: '14%', top: '64vh', w: 105, h: 142, depth: 0.28, alpha: 0.6, mobileHidden: true },
+  { src: '/final_images/image (6).webp', position: 'left', left: '46%', top: '84vh', w: 90, h: 90, depth: 0.45, alpha: 0.55, mobileHidden: true },
+  { src: '/final_images/image (7).webp', position: 'left', left: '-3%', top: '35vh', w: 80, h: 110, depth: 0.6, alpha: 0.35 },
+  { src: '/final_images/image (8).webp', position: 'right', right: '-2%', top: '70vh', w: 90, h: 72, depth: 0.3, alpha: 0.3, mobileHidden: true },
+  { src: '/final_images/image (9).webp', position: 'left', left: '1%', top: '84vh', w: 68, h: 96, depth: 0.2, alpha: 0.45 },
+  { src: '/final_images/image (10).webp', position: 'right', right: '0%', top: '16vh', w: 72, h: 92, depth: 0.5, alpha: 0.38, mobileHidden: true },
+  { src: '/final_images/image (11).webp', position: 'left', left: '44%', top: '7vh', w: 95, h: 65, depth: 0.15, alpha: 0.3 },
+  { src: '/final_images/image (14).webp', position: 'left', left: '20%', top: '25vh', w: 120, h: 120, depth: 0.7, alpha: 0.4, mobileHidden: true },
+  { src: '/final_images/image (15).webp', position: 'right', right: '15%', top: '85vh', w: 80, h: 120, depth: 0.8, alpha: 0.5 },
 ]
 
-function generateDynamicImages(pageHeight: number, vh: number): ImageConfig[] {
-  const startY = vh + 80
-  const endY = pageHeight - vh * 0.3
+function generateDynamicImages(pageHeight: number, vh: number, isMobile: boolean): ImageConfig[] {
+  const startY = Math.max(vh * 0.8, vh - 120)
+  const endY = pageHeight - (isMobile ? vh * 0.18 : vh * 0.06)
   if (endY <= startY) return []
+  const centerBandStart = startY + (endY - startY) * 0.24
+  const centerBandEnd = startY + (endY - startY) * 0.8
 
   const images: ImageConfig[] = []
+  const lastYByLane: Record<'left' | 'center' | 'right', number> = {
+    left: Number.NEGATIVE_INFINITY,
+    center: Number.NEGATIVE_INFINITY,
+    right: Number.NEGATIVE_INFINITY,
+  }
+  const minLaneGap = isMobile ? 180 : 155
   let y = startY
   let i = 0
 
   while (y < endY) {
     const r = (s: number) => seededRandom(i * 13 + s)
-    const isLeft = i % 2 === 0
-    const edgePct = r(1) * 15
+    const positionType = Math.floor(r(9) * 4) // 0: left, 1-2: center, 3: right
+    const position: 'left' | 'right' | 'center' = positionType === 0 ? 'left' : positionType === 3 ? 'right' : 'center'
+    let placeY = y
+    if (placeY - lastYByLane[position] < minLaneGap) {
+      placeY = lastYByLane[position] + minLaneGap
+    }
+    if (placeY >= endY) break
+
+    const edgePct = isMobile ? 8 + r(1) * 14 : 4 + r(1) * 20
+    const size = isMobile ? 62 + Math.floor(r(2) * 68) : 64 + Math.floor(r(2) * 74)
 
     images.push({
-      src: IMAGE_POOL[i % IMAGE_POOL.length],
-      ...(isLeft ? { left: `${edgePct.toFixed(1)}%` } : { right: `${edgePct.toFixed(1)}%` }),
-      top: `${Math.round(y)}px`,
-      w: 72 + Math.floor(r(2) * 130),
-      h: 72 + Math.floor(r(3) * 160),
+      src: IMAGE_POOL[Math.floor(r(8) * IMAGE_POOL.length)],
+      position,
+      ...(position === 'left' ? { left: `${edgePct.toFixed(1)}%` } : position === 'right' ? { right: `${edgePct.toFixed(1)}%` } : { left: '50%' }),
+      top: `${Math.round(placeY)}px`,
+      w: size,
+      h: size,
       depth: 0.2 + r(4) * 0.6,
       alpha: 0.65 + r(5) * 0.4,
-      mobileHidden: r(6) > 0.62,
+      mobileHidden: r(6) > 0.45,
     })
+    lastYByLane[position] = placeY
 
-    y += 150 + r(7) * 190
+    y = placeY + (isMobile ? 220 + r(7) * 150 : 118 + r(7) * 95)
     i++
   }
 
+  if (!isMobile) {
+    // Add extra cards through the middle of the page so the center doesn't look sparse.
+    let centerY = centerBandStart
+    while (centerY < centerBandEnd) {
+      const r = (s: number) => seededRandom(i * 19 + s)
+      const size = 58 + Math.floor(r(1) * 56)
+      const positionType = Math.floor(r(2) * 5) // 0-1 left, 2-3 center, 4 right
+      const position: 'left' | 'right' | 'center' =
+        positionType <= 1 ? 'left' : positionType >= 4 ? 'right' : 'center'
+      let placeY = centerY
+      if (placeY - lastYByLane[position] < minLaneGap) {
+        placeY = lastYByLane[position] + minLaneGap
+      }
+      if (placeY >= centerBandEnd) break
+
+      images.push({
+        src: IMAGE_POOL[Math.floor(r(8) * IMAGE_POOL.length)],
+        position,
+        ...(position === 'left'
+          ? { left: `${6 + r(3) * 18}%` }
+          : position === 'right'
+            ? { right: `${6 + r(4) * 18}%` }
+            : { left: '50%' }),
+        top: `${Math.round(placeY)}px`,
+        w: size,
+        h: size,
+        depth: 0.18 + r(5) * 0.4,
+        alpha: 0.58 + r(6) * 0.25,
+        mobileHidden: false,
+      })
+      lastYByLane[position] = placeY
+
+      centerY = placeY + (120 + r(7) * 75)
+      i++
+    }
+  }
+
   return images
+}
+
+function createUniqueGalleryColumns(
+  columns: string[][],
+  reserved: Set<string>,
+): string[][] {
+  const used = new Set<string>(reserved)
+  const uniqueFromColumns = columns
+    .flat()
+    .filter((src) => {
+      if (used.has(src)) return false
+      used.add(src)
+      return true
+    })
+
+  for (const src of IMAGE_POOL) {
+    if (uniqueFromColumns.length >= columns.flat().length) break
+    if (used.has(src)) continue
+    used.add(src)
+    uniqueFromColumns.push(src)
+  }
+
+  const filled: string[][] = []
+  let cursor = 0
+  for (const col of columns) {
+    const nextCol: string[] = []
+    for (let i = 0; i < col.length && cursor < uniqueFromColumns.length; i++) {
+      nextCol.push(uniqueFromColumns[cursor])
+      cursor++
+    }
+    filled.push(nextCol)
+  }
+
+  return filled
+}
+
+function uniqueDynamicImages(
+  images: ImageConfig[],
+  reserved: Set<string>,
+): ImageConfig[] {
+  const used = new Set<string>(reserved)
+  return images.filter((img) => {
+    if (used.has(img.src)) return false
+    used.add(img.src)
+    return true
+  })
 }
 
 function topToPx(top: string, vh: number): number {
@@ -121,28 +417,28 @@ function topToPx(top: string, vh: number): number {
 
 const galleryColumns = [
   [
-    '/image_samples/image (1).png',
-    '/image_samples/image (4).webp',
-    '/image_samples/image (17).webp',
-    '/image_samples/image (21).webp',
-    '/image_samples/image (10).png',
-    '/image_samples/image (19).webp',
+    '/final_images/image (1).webp',
+    '/final_images/image (4).webp',
+    '/final_images/image (17).webp',
+    '/final_images/image (21).webp',
+    '/final_images/image (10).webp',
+    '/final_images/image (19).webp',
   ],
   [
-    '/image_samples/image (2).webp',
-    '/image_samples/image (6).webp',
-    '/image_samples/image (9).png',
-    '/image_samples/image (15).webp',
-    '/image_samples/image (22).webp',
-    '/image_samples/image (23).webp',
+    '/final_images/image (2).webp',
+    '/final_images/image (6).webp',
+    '/final_images/image (9).webp',
+    '/final_images/image (15).webp',
+    '/final_images/image (22).webp',
+    '/final_images/image (23).webp',
   ],
   [
-    '/image_samples/image (3).webp',
-    '/image_samples/image (7).webp',
-    '/image_samples/image (8).webp',
-    '/image_samples/image (14).webp',
-    '/image_samples/image (20).webp',
-    '/image_samples/image (11).webp',
+    '/final_images/image (3).webp',
+    '/final_images/image (7).webp',
+    '/final_images/image (8).webp',
+    '/final_images/image (14).webp',
+    '/final_images/image (20).webp',
+    '/final_images/image (11).webp',
   ],
 ]
 
@@ -291,6 +587,7 @@ function FloatingImage({
         top: config.top,
         width: responsiveWidth,
         aspectRatio: `${config.w} / ${config.h}`,
+        transform: config.position === 'center' ? 'translateX(-50%)' : undefined,
         x: finalX,
         y: finalY,
         rotate: finalRotation,
@@ -323,10 +620,9 @@ function FloatingImage({
 // ────────────────────────────────────────────
 
 interface ImagePageClientProps {
-  blogContent: string
 }
 
-export default function ImagePageClient({ blogContent }: ImagePageClientProps) {
+export default function ImagePageClient({ }: ImagePageClientProps) {
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
   const smoothX = useSpring(mouseX, { damping: 25, stiffness: 80, mass: 0.4 })
@@ -337,12 +633,21 @@ export default function ImagePageClient({ blogContent }: ImagePageClientProps) {
 
   const [pageHeight, setPageHeight] = useState(0)
   const [viewportHeight, setViewportHeight] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     setViewportHeight(window.innerHeight)
     const onResize = () => setViewportHeight(window.innerHeight)
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
+    const onChange = () => setIsMobile(mediaQuery.matches)
+    onChange()
+    mediaQuery.addEventListener('change', onChange)
+    return () => mediaQuery.removeEventListener('change', onChange)
   }, [])
 
   useEffect(() => {
@@ -356,10 +661,29 @@ export default function ImagePageClient({ blogContent }: ImagePageClientProps) {
     return () => observer.disconnect()
   }, [])
 
+  const heroSources = useMemo(() => new Set(HERO_IMAGES.map((img) => img.src)), [])
+
+  const desktopGalleryColumns = useMemo(
+    () => createUniqueGalleryColumns(galleryColumns, heroSources),
+    [heroSources],
+  )
+
+  const curatedSources = useMemo(
+    () => new Set(desktopGalleryColumns.flat()),
+    [desktopGalleryColumns],
+  )
+
+  const reservedSources = useMemo(() => {
+    const merged = new Set<string>(heroSources)
+    for (const src of curatedSources) merged.add(src)
+    return merged
+  }, [heroSources, curatedSources])
+
   const dynamicImages = useMemo(() => {
     if (!pageHeight || !viewportHeight) return []
-    return generateDynamicImages(pageHeight, viewportHeight)
-  }, [pageHeight, viewportHeight])
+    const generated = generateDynamicImages(pageHeight, viewportHeight, isMobile)
+    return uniqueDynamicImages(generated, reservedSources)
+  }, [pageHeight, viewportHeight, isMobile, reservedSources])
 
   const { scrollYProgress: galleryProgress } = useScroll({
     target: galleryRef,
@@ -375,6 +699,10 @@ export default function ImagePageClient({ blogContent }: ImagePageClientProps) {
   const y2 = useTransform(galleryProgress, [0, 1], [200, 50])
   const y3 = useTransform(galleryProgress, [0, 1], [0, -250])
   const colTransforms = [y1, y2, y3]
+  const mobileGallery = useMemo(() => {
+    const all = desktopGalleryColumns.flat()
+    return all.filter((_, idx) => idx % 2 === 0).slice(0, MOBILE_GALLERY_MAX_IMAGES)
+  }, [desktopGalleryColumns])
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -386,7 +714,7 @@ export default function ImagePageClient({ blogContent }: ImagePageClientProps) {
   }, [mouseX, mouseY])
 
   return (
-    <div ref={pageRef} className="relative w-full bg-white dark:bg-black text-foreground overflow-hidden sm:-mt-48">
+    <div ref={pageRef} id='imageMain' className="relative w-full bg-white dark:bg-black text-foreground overflow-hidden sm:-mt-48">
       {/* Hero floating images (always rendered, hand-tuned positions) */}
       {HERO_IMAGES.map((config, i) => (
         <FloatingImage
@@ -439,10 +767,11 @@ export default function ImagePageClient({ blogContent }: ImagePageClientProps) {
 
         {/* ═══ Blog ═══ */}
         <section id="image-blog" className="pointer-events-none">
-          <div className="max-w-[1200px] mx-auto py-10 px-4 sm:py-16 sm:px-8 text-left w-full box-border pointer-events-auto select-text">
-            <div className="min-w-0 text-[1rem] mx-auto max-w-[1000px] [&_h1]:mt-6 sm:[&_h1]:mt-8 [&_h1]:mb-3 [&_h1]:leading-tight [&_h1]:tracking-tight [&_h1]:font-semibold [&_h1]:text-[2.1em] sm:[&_h1]:text-[2.5em] [&_h2]:mt-6 sm:[&_h2]:mt-8 [&_h2]:mb-3 [&_h2]:leading-tight [&_h2]:tracking-tight [&_h2]:font-semibold [&_h2]:text-[1.6em] sm:[&_h2]:text-[2em] [&_h2]:pb-2 [&_h3]:mt-6 sm:[&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:leading-tight [&_h3]:tracking-tight [&_h3]:font-semibold [&_h3]:text-[1.25em] sm:[&_h3]:text-[1.5em] [&_h4]:mt-5 sm:[&_h4]:mt-6 [&_h4]:mb-2 [&_h4]:leading-snug [&_h4]:tracking-tight [&_h4]:font-semibold [&_h4]:text-[1.1em] sm:[&_h4]:text-[1.25em] [&_h5]:mt-4 sm:[&_h5]:mt-5 [&_h5]:mb-2 [&_h5]:leading-snug [&_h5]:font-semibold [&_h5]:text-[1em] [&_h6]:mt-4 sm:[&_h6]:mt-5 [&_h6]:mb-2 [&_h6]:leading-snug [&_h6]:font-semibold [&_h6]:text-[0.95em] [&_p]:mb-5 sm:[&_p]:mb-6 [&_p]:leading-relaxed [&_p]:text-[#333] dark:[&_p]:text-gray-300 [&_ul]:mb-5 sm:[&_ul]:mb-6 [&_ul]:pl-5 sm:[&_ul]:pl-6 [&_ul]:list-disc [&_ol]:mb-5 sm:[&_ol]:mb-6 [&_ol]:pl-5 sm:[&_ol]:pl-6 [&_ol]:list-decimal [&_li]:mb-2 [&_li]:ml-5 [&_li]:leading-relaxed [&_li::marker]:text-[#888] dark:[&_li::marker]:text-gray-500 [&_input[type=checkbox]]:mr-2 [&_input[type=checkbox]]:align-middle [&_code]:bg-[#f4f4f4] dark:[&_code]:bg-[#1a1a1a] [&_code]:px-2 [&_code]:py-1 [&_code]:rounded [&_code]:font-mono [&_code]:text-[1em] [&_code]:text-[#c7254e] dark:[&_code]:text-[#ff7b72] [&_pre]:bg-[#f8f8f8] dark:[&_pre]:bg-[#0d1117] [&_pre]:p-4 sm:[&_pre]:p-6 [&_pre]:overflow-auto [&_pre]:rounded-lg [&_pre]:mb-6 sm:[&_pre]:mb-8 [&_pre]:border [&_pre]:border-[#eee] dark:[&_pre]:border-[#30363d] [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:text-[1em] [&_pre_code]:text-[#333] dark:[&_pre_code]:text-[#e6edf3] [&_blockquote]:border-l-4 [&_blockquote]:border-black dark:[&_blockquote]:border-gray-500 [&_blockquote]:py-2 [&_blockquote]:px-0 [&_blockquote]:pl-4 sm:[&_blockquote]:pl-6 [&_blockquote]:text-[#555] dark:[&_blockquote]:text-gray-400 [&_blockquote]:italic [&_blockquote]:my-6 sm:[&_blockquote]:my-8 [&_blockquote]:bg-[#fdfdfd] dark:[&_blockquote]:bg-[#161b22] [&_table]:w-full [&_table]:border-collapse [&_table]:my-6 sm:[&_table]:my-8 [&_table]:text-sm sm:[&_table]:text-base [&_table]:overflow-x-auto [&_table]:block [&_table]:md:table [&_th]:border-[#eee] dark:[&_th]:border-gray-700 [&_th]:py-3 [&_th]:px-3 sm:[&_th]:px-4 [&_th]:text-left [&_th]:bg-white dark:[&_th]:bg-transparent [&_th]:font-bold [&_th]:border-b-2 [&_th]:border-b-black dark:[&_th]:border-b-gray-600 [&_td]:border-b [&_td]:border-[#eee] dark:[&_td]:border-gray-800 [&_td]:py-3 [&_td]:px-3 sm:[&_td]:px-4 [&_td]:text-left [&_tr:hover]:bg-[#fafafa] dark:[&_tr:hover]:bg-white/5 [&_a]:text-blue-600 dark:[&_a]:text-blue-400 [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-blue-800 dark:[&_a]:hover:text-blue-300 [&_strong]:font-semibold [&_em]:italic [&_del]:line-through [&_mark]:bg-yellow-200 dark:[&_mark]:bg-yellow-900/50 dark:[&_mark]:text-yellow-200 [&_mark]:px-1 [&_hr]:my-8 [&_hr]:border-[#eee] dark:[&_hr]:border-gray-800 [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-lg [&_img]:my-6 dark:[&_img]:invert-0 [&_figure]:my-8 [&_figure]:text-center [&_figcaption]:mt-2 [&_figcaption]:text-sm [&_figcaption]:text-[#666] dark:[&_figcaption]:text-gray-400 [&_sup]:text-[0.75em] [&_sup]:align-super [&_sub]:text-[0.75em] [&_sub]:align-sub [&_kbd]:bg-[#f4f4f4] dark:[&_kbd]:bg-gray-800 [&_kbd]:border [&_kbd]:border-[#ddd] dark:[&_kbd]:border-gray-700 [&_kbd]:px-1.5 [&_kbd]:py-0.5 [&_kbd]:rounded [&_kbd]:text-[0.85em]">
-              <BlogContent content={blogContent} />
-            </div>
+          <div className="max-w-5xl mx-auto py-10 px-4 sm:py-16 sm:px-8 text-left w-full box-border pointer-events-auto select-text">
+              <div className="w-full  pointer-events-auto">
+                <PerformanceVsEfficiencyApp disableAmbientBackground />
+              </div>
+            
           </div>
         </section>
 
@@ -450,10 +779,10 @@ export default function ImagePageClient({ blogContent }: ImagePageClientProps) {
         <section
           id="image-gallery"
           ref={galleryRef}
-          className="pt-32 pb-40 min-h-[150vh] pointer-events-auto relative"
+          className="pt-16 md:pt-32 pb-20 md:pb-40  min-h-[110vh] md:min-h-[150vh] pointer-events-auto relative"
         >
           <motion.h2
-            className="text-center f text-[clamp(3rem,6vw,5rem)] tracking-[-0.02em] mb-12 z-20 relative w-full"
+            className="text-center f text-[clamp(2.25rem,12vw,5rem)] tracking-[-0.02em] mb-8 md:mb-12 z-20 relative w-full max-w-5xl mx-auto px-4"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -464,43 +793,72 @@ export default function ImagePageClient({ blogContent }: ImagePageClientProps) {
             Gallery
           </motion.h2>
 
-          <div className="flex flex-row gap-3 md:gap-6 lg:gap-8 max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
-            {galleryColumns.map((col, colIndex) => (
-              <motion.div
-                key={colIndex}
-                className="flex-1 flex flex-col gap-3 md:gap-6 lg:gap-8"
-                style={{ y: colTransforms[colIndex] }}
-              >
-                {col.map((src, i) => (
+          {isMobile ? (
+            <div className="max-w-5xl w-full mx-auto px-4 relative z-10">
+              <div className="flex flex-col gap-4">
+                {mobileGallery.map((src, i) => (
                   <motion.div
-                    key={i}
+                    key={src + i}
                     className="relative w-full overflow-hidden rounded-lg group isolate"
-                    initial={{ opacity: 0, y: 50 }}
+                    initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: '-5%' }}
                     transition={{
-                      duration: 0.9,
+                      duration: 0.8,
                       ease: EASE_OUT,
-                      delay: i * 0.1,
+                      delay: i * 0.04,
                     }}
                   >
                     <img
                       src={src}
                       alt=""
-                      className="w-full h-auto object-cover transition-all duration-[1200ms] ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105 group-hover:-rotate-1 will-change-transform"
+                      className="w-full h-auto object-cover transition-all duration-1200 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-[1.03] group-hover:-rotate-[0.4deg] will-change-transform"
                       loading="lazy"
                       draggable={false}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-10" />
-                    <div className="absolute top-4 left-4 w-8 h-[1px] bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left z-20 delay-100" />
-                    <div className="absolute top-4 left-4 h-8 w-[1px] bg-white scale-y-0 group-hover:scale-y-100 transition-transform duration-700 origin-top z-20 delay-100" />
-                    <div className="absolute bottom-4 right-4 w-8 h-[1px] bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-right z-20 delay-100" />
-                    <div className="absolute bottom-4 right-4 h-8 w-[1px] bg-white scale-y-0 group-hover:scale-y-100 transition-transform duration-700 origin-bottom z-20 delay-100" />
                   </motion.div>
                 ))}
-              </motion.div>
-            ))}
-          </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-row gap-3 md:gap-6 lg:gap-8 w-full max-w-5xl mx-auto px-4 md:px-8 relative z-10">
+              {desktopGalleryColumns.map((col, colIndex) => (
+                <motion.div
+                  key={colIndex}
+                  className="flex-1 flex flex-col gap-3 md:gap-6 lg:gap-8"
+                  style={{ y: colTransforms[colIndex] }}
+                >
+                  {col.map((src, i) => (
+                    <motion.div
+                      key={i}
+                      className="relative w-full overflow-hidden rounded-lg group isolate"
+                      initial={{ opacity: 0, y: 50 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: '-5%' }}
+                      transition={{
+                        duration: 0.9,
+                        ease: EASE_OUT,
+                        delay: i * 0.1,
+                      }}
+                    >
+                      <img
+                        src={src}
+                        alt=""
+                        className="w-full h-auto object-cover transition-all duration-1200 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105 group-hover:-rotate-1 will-change-transform"
+                        loading="lazy"
+                        draggable={false}
+                      />
+                      {/* <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-10" />
+                      <div className="absolute top-4 left-4 w-8 h-[1px] bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left z-20 delay-100" />
+                      <div className="absolute top-4 left-4 h-8 w-[1px] bg-white scale-y-0 group-hover:scale-y-100 transition-transform duration-700 origin-top z-20 delay-100" />
+                      <div className="absolute bottom-4 right-4 w-8 h-[1px] bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-right z-20 delay-100" />
+                      <div className="absolute bottom-4 right-4 h-8 w-[1px] bg-white scale-y-0 group-hover:scale-y-100 transition-transform duration-700 origin-bottom z-20 delay-100" /> */}
+                    </motion.div>
+                  ))}
+                </motion.div>
+              ))}
+            </div>
+          )}
         </section>
       </div>
 
