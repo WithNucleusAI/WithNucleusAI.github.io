@@ -256,11 +256,7 @@ function StatCard({ label, value, sub, delay, accent, icon }: {
       style={{
         background: t.cardBg, backdropFilter: t.cardInset, WebkitBackdropFilter: t.cardInset,
         border: `1px solid ${t.cardBorder}`, borderRadius: 20, padding: "26px 28px 24px",
-        boxShadow: mob
-          ? (isDark
-            ? "inset 0 1px 0 rgba(255,255,255,0.03), 0 8px 20px -18px rgba(0,0,0,0.65)"
-            : "0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 20px -18px rgba(0,0,0,0.16)")
-          : t.cardShadow,
+        
         transition: "all 0.45s cubic-bezier(0.22,0.61,0.36,1)",
         position: "relative", overflow: "hidden",
       }}
@@ -600,14 +596,8 @@ function AppInner({ disableAmbientBackground }: { disableAmbientBackground?: boo
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.15, ease: [0.22, 0.61, 0.36, 1] }}
-          className={`relative overflow-hidden border border-[rgba(0,0,0,0.065)] dark:border-[rgba(255,255,255,0.08)] bg-white/10  shadow-[0_1px_0_rgba(255,255,255,0.3)_inset,0_24px_64px_-12px_rgba(0,0,0,0.08)] backdrop-blur-[24px] backdrop-saturate-[1.2] transition-colors dark:bg-white/[0.08] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_24px_80px_-16px_rgba(0,0,0,0.45)] ${mob ? "rounded-[18px]" : "rounded-3xl"}`}
-          style={{
-            boxShadow: mob
-              ? (isDark
-                ? "inset 0 1px 0 rgba(255,255,255,0.03), 0 10px 24px -20px rgba(0,0,0,0.68)"
-                : "0 1px 0 rgba(255,255,255,1) inset, 0 10px 24px -20px rgba(0,0,0,0.15)")
-              : undefined,
-          }}
+          className={`relative overflow-hidden border border-[rgba(0,0,0,0.065)] dark:border-[rgba(255,255,255,0.08)] bg-white/10   backdrop-blur-[24px] backdrop-saturate-[1.2] transition-colors dark:bg-white/[0.08] ${mob ? "rounded-[18px]" : "rounded-3xl"}`}
+          
         >
           {/* Top highlight */}
           <div className={`absolute left-0 right-0 top-0 z-[1] h-px bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.8)_20%,rgba(255,255,255,0.8)_80%,transparent)] dark:bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.05)_20%,rgba(255,255,255,0.05)_80%,transparent)] ${mob ? "rounded-t-[18px]" : "rounded-t-3xl"}`} />
@@ -630,7 +620,7 @@ function AppInner({ disableAmbientBackground }: { disableAmbientBackground?: boo
                   const c = isDark ? familyConfig[f].color : familyConfig[f].light;
                   return (
                     <div key={f} className="flex items-center gap-1.5">
-                      <span className="h-1.5 w-1.5 rounded-full opacity-85" style={{ background: c, boxShadow: `0 0 5px ${c}35` }} />
+                      <span className="h-1.5 w-1.5 rounded-full opacity-85"/>
                       <span className={`${mob ? "text-[9px]" : "text-[10.5px]"} font-medium tracking-[-0.01em] text-black/62 dark:text-white/62`}>{f}</span>
                     </div>
                   );
@@ -668,7 +658,12 @@ function AppInner({ disableAmbientBackground }: { disableAmbientBackground?: boo
                     position: "right",
                     style: { fill: isDark ? "rgba(120,191,255,0.68)" : "rgba(0,102,220,0.72)", fontSize: 9, fontFamily: "'Inter', sans-serif", fontWeight: 600, letterSpacing: "0.02em" },
                   }} />
-                  <Tooltip content={<ChartTooltipInner />} cursor={false} wrapperStyle={{ outline: "none" }} />
+                  <Tooltip
+                    content={<ChartTooltipInner />}
+                    cursor={false}
+                    isAnimationActive={false}
+                    wrapperStyle={{ outline: "none" }}
+                  />
                   <Scatter data={toChart(models)} shape={<ThemedDot />}>
                     {toChart(models).map((m) => (
                       <Cell key={`c-${m.id}`} />

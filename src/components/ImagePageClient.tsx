@@ -260,104 +260,71 @@ function seededRandom(seed: number): number {
   return x - Math.floor(x)
 }
 
-// Hand-tuned hero images (first viewport screen)
+// Hand-tuned hero images – evenly spaced ~8vh apart, alternating left/right
 const HERO_IMAGES: ImageConfig[] = [
-  { src: '/final_images/image (1).webp', position: 'left', left: '3%', top: '18vh', w: 175, h: 235, depth: 0.35, alpha: 0.85 },
-  { src: '/final_images/image (2).webp', position: 'right', right: '2%', top: '4vh', w: 205, h: 150, depth: 0.55, alpha: 0.65 },
-  { src: '/final_images/image (3).webp', position: 'right', right: '5%', top: '52vh', w: 168, h: 128, depth: 0.4, alpha: 0.75 },
-  { src: '/final_images/image (4).webp', position: 'left', left: '14%', top: '64vh', w: 105, h: 142, depth: 0.28, alpha: 0.6, mobileHidden: true },
-  { src: '/final_images/image (6).webp', position: 'left', left: '46%', top: '84vh', w: 90, h: 90, depth: 0.45, alpha: 0.55, mobileHidden: true },
-  { src: '/final_images/image (7).webp', position: 'left', left: '-3%', top: '35vh', w: 80, h: 110, depth: 0.6, alpha: 0.35 },
-  { src: '/final_images/image (8).webp', position: 'right', right: '-2%', top: '70vh', w: 90, h: 72, depth: 0.3, alpha: 0.3, mobileHidden: true },
-  { src: '/final_images/image (9).webp', position: 'left', left: '1%', top: '84vh', w: 68, h: 96, depth: 0.2, alpha: 0.45 },
-  { src: '/final_images/image (10).webp', position: 'right', right: '0%', top: '16vh', w: 72, h: 92, depth: 0.5, alpha: 0.38, mobileHidden: true },
-  { src: '/final_images/image (11).webp', position: 'left', left: '44%', top: '7vh', w: 95, h: 65, depth: 0.15, alpha: 0.3 },
-  { src: '/final_images/image (14).webp', position: 'left', left: '20%', top: '25vh', w: 120, h: 120, depth: 0.7, alpha: 0.4, mobileHidden: true },
-  { src: '/final_images/image (15).webp', position: 'right', right: '15%', top: '85vh', w: 80, h: 120, depth: 0.8, alpha: 0.5 },
+  { src: '/final_images/image (1).webp', position: 'left', left: '3%', top: '4vh', w: 175, h: 235, depth: 0.35, alpha: 0.85 },
+  { src: '/final_images/image (2).webp', position: 'right', right: '3%', top: '12vh', w: 195, h: 145, depth: 0.55, alpha: 0.65 },
+  { src: '/final_images/image (14).webp', position: 'left', left: '18%', top: '20vh', w: 115, h: 115, depth: 0.7, alpha: 0.4, mobileHidden: true },
+  { src: '/final_images/image (11).webp', position: 'right', right: '16%', top: '28vh', w: 90, h: 62, depth: 0.15, alpha: 0.3, mobileHidden: true },
+  { src: '/final_images/image (7).webp', position: 'left', left: '-2%', top: '36vh', w: 80, h: 110, depth: 0.6, alpha: 0.35 },
+  { src: '/final_images/image (10).webp', position: 'right', right: '1%', top: '44vh', w: 72, h: 92, depth: 0.5, alpha: 0.38, mobileHidden: true },
+  { src: '/final_images/image (4).webp', position: 'left', left: '12%', top: '52vh', w: 105, h: 142, depth: 0.28, alpha: 0.6, mobileHidden: true },
+  { src: '/final_images/image (3).webp', position: 'right', right: '5%', top: '60vh', w: 168, h: 128, depth: 0.4, alpha: 0.75 },
+  { src: '/final_images/image (9).webp', position: 'left', left: '1%', top: '68vh', w: 68, h: 96, depth: 0.2, alpha: 0.45 },
+  { src: '/final_images/image (8).webp', position: 'right', right: '0%', top: '76vh', w: 85, h: 68, depth: 0.3, alpha: 0.3, mobileHidden: true },
+  { src: '/final_images/image (6).webp', position: 'left', left: '38%', top: '84vh', w: 90, h: 90, depth: 0.45, alpha: 0.55, mobileHidden: true },
+  { src: '/final_images/image (15).webp', position: 'right', right: '15%', top: '92vh', w: 80, h: 120, depth: 0.8, alpha: 0.5 },
 ]
 
 function generateDynamicImages(pageHeight: number, vh: number, isMobile: boolean): ImageConfig[] {
   const startY = Math.max(vh * 0.8, vh - 120)
   const endY = pageHeight - (isMobile ? vh * 0.18 : vh * 0.06)
   if (endY <= startY) return []
-  const centerBandStart = startY + (endY - startY) * 0.24
-  const centerBandEnd = startY + (endY - startY) * 0.8
 
   const images: ImageConfig[] = []
-  const lastYByLane: Record<'left' | 'center' | 'right', number> = {
-    left: Number.NEGATIVE_INFINITY,
-    center: Number.NEGATIVE_INFINITY,
-    right: Number.NEGATIVE_INFINITY,
-  }
-  const minLaneGap = isMobile ? 180 : 155
+  const baseGap = isMobile ? 260 : 165
+  const positionCycle: ('left' | 'right' | 'center')[] = [
+    'left', 'right', 'center', 'right', 'left', 'center', 'left', 'right',
+  ]
+
   let y = startY
   let i = 0
 
   while (y < endY) {
     const r = (s: number) => seededRandom(i * 13 + s)
-    const positionType = Math.floor(r(9) * 4) // 0: left, 1-2: center, 3: right
-    const position: 'left' | 'right' | 'center' = positionType === 0 ? 'left' : positionType === 3 ? 'right' : 'center'
-    let placeY = y
-    if (placeY - lastYByLane[position] < minLaneGap) {
-      placeY = lastYByLane[position] + minLaneGap
-    }
-    if (placeY >= endY) break
-
-    const edgePct = isMobile ? 8 + r(1) * 14 : 4 + r(1) * 20
+    const position = positionCycle[i % positionCycle.length]
     const size = isMobile ? 62 + Math.floor(r(2) * 68) : 64 + Math.floor(r(2) * 74)
+
+    let posProps: { left?: string; right?: string }
+    if (position === 'left') {
+      const pct = isMobile ? 4 + r(1) * 16 : 2 + r(1) * 22
+      posProps = { left: `${pct.toFixed(1)}%` }
+    } else if (position === 'right') {
+      const pct = isMobile ? 4 + r(1) * 16 : 2 + r(1) * 22
+      posProps = { right: `${pct.toFixed(1)}%` }
+    } else {
+      const pct = 35 + r(1) * 30
+      posProps = { left: `${pct.toFixed(1)}%` }
+    }
+
+    const jitter = (r(3) - 0.5) * (baseGap * 0.2)
+    const placeY = Math.round(y + jitter)
+    if (placeY >= endY) break
 
     images.push({
       src: IMAGE_POOL[Math.floor(r(8) * IMAGE_POOL.length)],
       position,
-      ...(position === 'left' ? { left: `${edgePct.toFixed(1)}%` } : position === 'right' ? { right: `${edgePct.toFixed(1)}%` } : { left: '50%' }),
-      top: `${Math.round(placeY)}px`,
+      ...posProps,
+      top: `${placeY}px`,
       w: size,
       h: size,
       depth: 0.2 + r(4) * 0.6,
       alpha: 0.65 + r(5) * 0.4,
       mobileHidden: r(6) > 0.45,
     })
-    lastYByLane[position] = placeY
 
-    y = placeY + (isMobile ? 220 + r(7) * 150 : 118 + r(7) * 95)
+    y += baseGap + r(7) * (baseGap * 0.35)
     i++
-  }
-
-  if (!isMobile) {
-    // Add extra cards through the middle of the page so the center doesn't look sparse.
-    let centerY = centerBandStart
-    while (centerY < centerBandEnd) {
-      const r = (s: number) => seededRandom(i * 19 + s)
-      const size = 58 + Math.floor(r(1) * 56)
-      const positionType = Math.floor(r(2) * 5) // 0-1 left, 2-3 center, 4 right
-      const position: 'left' | 'right' | 'center' =
-        positionType <= 1 ? 'left' : positionType >= 4 ? 'right' : 'center'
-      let placeY = centerY
-      if (placeY - lastYByLane[position] < minLaneGap) {
-        placeY = lastYByLane[position] + minLaneGap
-      }
-      if (placeY >= centerBandEnd) break
-
-      images.push({
-        src: IMAGE_POOL[Math.floor(r(8) * IMAGE_POOL.length)],
-        position,
-        ...(position === 'left'
-          ? { left: `${6 + r(3) * 18}%` }
-          : position === 'right'
-            ? { right: `${6 + r(4) * 18}%` }
-            : { left: '50%' }),
-        top: `${Math.round(placeY)}px`,
-        w: size,
-        h: size,
-        depth: 0.18 + r(5) * 0.4,
-        alpha: 0.58 + r(6) * 0.25,
-        mobileHidden: false,
-      })
-      lastYByLane[position] = placeY
-
-      centerY = placeY + (120 + r(7) * 75)
-      i++
-    }
   }
 
   return images

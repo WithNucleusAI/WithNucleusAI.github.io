@@ -173,11 +173,7 @@ export function GenEvalBench() {
         backdropFilter: "blur(24px) saturate(1.3)",
         WebkitBackdropFilter: "blur(24px) saturate(1.3)",
         border: `1px solid ${t.panelBorder}`,
-        boxShadow: mob
-          ? (isDark
-            ? "inset 0 1px 0 rgba(255,255,255,0.03), 0 10px 24px -20px rgba(0,0,0,0.68)"
-            : "0 1px 0 rgba(255,255,255,1) inset, 0 10px 24px -20px rgba(0,0,0,0.15)")
-          : t.panelShadow,
+      
         overflow: "hidden",
         position: "relative" as const,
       }}

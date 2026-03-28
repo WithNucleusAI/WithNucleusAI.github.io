@@ -286,11 +286,7 @@ export function ParamInfographic() {
         WebkitBackdropFilter: "blur(24px) saturate(1.3)",
         border: `1px solid ${t.panelBorder}`,
         borderRadius: mob ? 18 : 24,
-        boxShadow: mob
-          ? (isDark
-            ? "inset 0 1px 0 rgba(255,255,255,0.03), 0 10px 24px -20px rgba(0,0,0,0.68)"
-            : "0 1px 0 rgba(255,255,255,1) inset, 0 10px 24px -20px rgba(0,0,0,0.15)")
-          : t.panelShadow,
+       
         padding: mob ? "28px 20px 32px" : "44px 44px 48px",
         transition: "background 0.5s, border-color 0.5s, box-shadow 0.5s",
         position: "relative" as const,
