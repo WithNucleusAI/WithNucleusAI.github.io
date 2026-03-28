@@ -21,7 +21,9 @@ const HOVER_TRANSITION = {
 const EASE_OUT = [0.25, 0.46, 0.45, 0.94] as const
 const ORBIT_SECTION_COUNT = 6
 const MOBILE_BREAKPOINT = 768
-const MOBILE_GALLERY_MAX_IMAGES = 8
+const MOBILE_GALLERY_MAX_IMAGES = 16
+const INFOGRAPHIC_CLEAR_PADDING_PX = 120
+const SIDE_DENSITY_BOOST = 1.22
 
 interface ImageConfig {
   src: string
@@ -264,15 +266,27 @@ function seededRandom(seed: number): number {
 const HERO_IMAGES: ImageConfig[] = [
   { src: '/final_images/image (1).webp', position: 'left', left: '3%', top: '4vh', w: 175, h: 235, depth: 0.35, alpha: 0.85 },
   { src: '/final_images/image (2).webp', position: 'right', right: '3%', top: '12vh', w: 195, h: 145, depth: 0.55, alpha: 0.65 },
+  { src: '/final_images/image (23).webp', position: 'left', left: '2%', top: '10vh', w: 76, h: 110, depth: 0.38, alpha: 0.42, mobileHidden: true },
+  { src: '/final_images/image (20).webp', position: 'left', left: '7%', top: '16vh', w: 104, h: 84, depth: 0.48, alpha: 0.44, mobileHidden: true },
+  { src: '/final_images/image (18).webp', position: 'right', right: '8%', top: '18vh', w: 88, h: 126, depth: 0.5, alpha: 0.42, mobileHidden: true },
   { src: '/final_images/image (14).webp', position: 'left', left: '18%', top: '20vh', w: 115, h: 115, depth: 0.7, alpha: 0.4, mobileHidden: true },
   { src: '/final_images/image (11).webp', position: 'right', right: '16%', top: '28vh', w: 90, h: 62, depth: 0.15, alpha: 0.3, mobileHidden: true },
+  { src: '/final_images/image (19).webp', position: 'right', right: '11%', top: '32vh', w: 96, h: 66, depth: 0.62, alpha: 0.52, mobileHidden: true },
+  { src: '/final_images/image (16).webp', position: 'left', left: '2%', top: '30vh', w: 74, h: 106, depth: 0.42, alpha: 0.39, mobileHidden: true },
+  { src: '/final_images/image (5).webp', position: 'left', left: '4%', top: '34vh', w: 92, h: 128, depth: 0.44, alpha: 0.4, mobileHidden: true },
   { src: '/final_images/image (7).webp', position: 'left', left: '-2%', top: '36vh', w: 80, h: 110, depth: 0.6, alpha: 0.35 },
   { src: '/final_images/image (10).webp', position: 'right', right: '1%', top: '44vh', w: 72, h: 92, depth: 0.5, alpha: 0.38, mobileHidden: true },
+  { src: '/final_images/image (17).webp', position: 'left', left: '8%', top: '48vh', w: 82, h: 120, depth: 0.5, alpha: 0.46, mobileHidden: true },
   { src: '/final_images/image (4).webp', position: 'left', left: '12%', top: '52vh', w: 105, h: 142, depth: 0.28, alpha: 0.6, mobileHidden: true },
   { src: '/final_images/image (3).webp', position: 'right', right: '5%', top: '60vh', w: 168, h: 128, depth: 0.4, alpha: 0.75 },
+  { src: '/final_images/image (22).webp', position: 'right', right: '12%', top: '64vh', w: 72, h: 102, depth: 0.36, alpha: 0.4, mobileHidden: true },
+  { src: '/final_images/image (12).webp', position: 'left', left: '2%', top: '62vh', w: 66, h: 96, depth: 0.31, alpha: 0.37, mobileHidden: true },
+  { src: '/final_images/image (24).webp', position: 'left', left: '6%', top: '66vh', w: 84, h: 84, depth: 0.33, alpha: 0.42, mobileHidden: true },
   { src: '/final_images/image (9).webp', position: 'left', left: '1%', top: '68vh', w: 68, h: 96, depth: 0.2, alpha: 0.45 },
   { src: '/final_images/image (8).webp', position: 'right', right: '0%', top: '76vh', w: 85, h: 68, depth: 0.3, alpha: 0.3, mobileHidden: true },
+  { src: '/final_images/image (21).webp', position: 'right', right: '2%', top: '82vh', w: 70, h: 98, depth: 0.47, alpha: 0.44, mobileHidden: true },
   { src: '/final_images/image (6).webp', position: 'left', left: '38%', top: '84vh', w: 90, h: 90, depth: 0.45, alpha: 0.55, mobileHidden: true },
+  { src: '/final_images/image (13).webp', position: 'right', right: '7%', top: '88vh', w: 78, h: 112, depth: 0.52, alpha: 0.46, mobileHidden: true },
   { src: '/final_images/image (15).webp', position: 'right', right: '15%', top: '92vh', w: 80, h: 120, depth: 0.8, alpha: 0.5 },
 ]
 
@@ -282,9 +296,9 @@ function generateDynamicImages(pageHeight: number, vh: number, isMobile: boolean
   if (endY <= startY) return []
 
   const images: ImageConfig[] = []
-  const baseGap = isMobile ? 260 : 165
+  const baseGap = isMobile ? 150 : 92
   const positionCycle: ('left' | 'right' | 'center')[] = [
-    'left', 'right', 'center', 'right', 'left', 'center', 'left', 'right',
+    'left', 'right', 'left', 'right', 'left', 'right', 'center', 'left', 'right', 'left', 'right', 'left', 'right',
   ]
 
   let y = startY
@@ -297,13 +311,13 @@ function generateDynamicImages(pageHeight: number, vh: number, isMobile: boolean
 
     let posProps: { left?: string; right?: string }
     if (position === 'left') {
-      const pct = isMobile ? 4 + r(1) * 16 : 2 + r(1) * 22
+      const pct = isMobile ? 2 + r(1) * 14 : 1 + r(1) * 16
       posProps = { left: `${pct.toFixed(1)}%` }
     } else if (position === 'right') {
-      const pct = isMobile ? 4 + r(1) * 16 : 2 + r(1) * 22
+      const pct = isMobile ? 2 + r(1) * 14 : 1 + r(1) * 16
       posProps = { right: `${pct.toFixed(1)}%` }
     } else {
-      const pct = 35 + r(1) * 30
+      const pct = 41 + r(1) * 18
       posProps = { left: `${pct.toFixed(1)}%` }
     }
 
@@ -316,14 +330,14 @@ function generateDynamicImages(pageHeight: number, vh: number, isMobile: boolean
       position,
       ...posProps,
       top: `${placeY}px`,
-      w: size,
-      h: size,
+      w: position === 'center' ? size : Math.round(size * SIDE_DENSITY_BOOST),
+      h: position === 'center' ? size : Math.round(size * SIDE_DENSITY_BOOST),
       depth: 0.2 + r(4) * 0.6,
       alpha: 0.65 + r(5) * 0.4,
-      mobileHidden: r(6) > 0.45,
+      mobileHidden: r(6) > 0.78,
     })
 
-    y += baseGap + r(7) * (baseGap * 0.35)
+    y += baseGap + r(7) * (baseGap * 0.22)
     i++
   }
 
@@ -390,6 +404,10 @@ const galleryColumns = [
     '/final_images/image (21).webp',
     '/final_images/image (10).webp',
     '/final_images/image (19).webp',
+    '/final_images/image (24).webp',
+    '/final_images/image (12).webp',
+    '/final_images/image (13).webp',
+    '/final_images/image (18).webp',
   ],
   [
     '/final_images/image (2).webp',
@@ -398,6 +416,10 @@ const galleryColumns = [
     '/final_images/image (15).webp',
     '/final_images/image (22).webp',
     '/final_images/image (23).webp',
+    '/final_images/image (13).webp',
+    '/final_images/image (5).webp',
+    '/final_images/image (20).webp',
+    '/final_images/image (24).webp',
   ],
   [
     '/final_images/image (3).webp',
@@ -406,6 +428,10 @@ const galleryColumns = [
     '/final_images/image (14).webp',
     '/final_images/image (20).webp',
     '/final_images/image (11).webp',
+    '/final_images/image (18).webp',
+    '/final_images/image (16).webp',
+    '/final_images/image (12).webp',
+    '/final_images/image (5).webp',
   ],
 ]
 
@@ -596,11 +622,13 @@ export default function ImagePageClient({ }: ImagePageClientProps) {
   const smoothY = useSpring(mouseY, { damping: 25, stiffness: 80, mass: 0.4 })
 
   const pageRef = useRef<HTMLDivElement>(null)
+  const blogRef = useRef<HTMLElement>(null)
   const galleryRef = useRef<HTMLElement>(null)
 
   const [pageHeight, setPageHeight] = useState(0)
   const [viewportHeight, setViewportHeight] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
+  const [blogBand, setBlogBand] = useState({ start: 0, end: 0 })
 
   useEffect(() => {
     setViewportHeight(window.innerHeight)
@@ -628,6 +656,32 @@ export default function ImagePageClient({ }: ImagePageClientProps) {
     return () => observer.disconnect()
   }, [])
 
+  useEffect(() => {
+    if (!blogRef.current || !pageRef.current) return
+
+    const updateBlogBand = () => {
+      if (!blogRef.current || !pageRef.current) return
+      const blogRect = blogRef.current.getBoundingClientRect()
+      const pageRect = pageRef.current.getBoundingClientRect()
+
+      const start = Math.max(0, blogRect.top - pageRect.top - INFOGRAPHIC_CLEAR_PADDING_PX)
+      const end = Math.max(0, blogRect.bottom - pageRect.top + INFOGRAPHIC_CLEAR_PADDING_PX)
+      setBlogBand({ start, end })
+    }
+
+    updateBlogBand()
+    window.addEventListener('resize', updateBlogBand)
+
+    const observer = new ResizeObserver(() => updateBlogBand())
+    observer.observe(blogRef.current)
+    observer.observe(pageRef.current)
+
+    return () => {
+      window.removeEventListener('resize', updateBlogBand)
+      observer.disconnect()
+    }
+  }, [])
+
   const heroSources = useMemo(() => new Set(HERO_IMAGES.map((img) => img.src)), [])
 
   const desktopGalleryColumns = useMemo(
@@ -649,8 +703,19 @@ export default function ImagePageClient({ }: ImagePageClientProps) {
   const dynamicImages = useMemo(() => {
     if (!pageHeight || !viewportHeight) return []
     const generated = generateDynamicImages(pageHeight, viewportHeight, isMobile)
-    return uniqueDynamicImages(generated, reservedSources)
-  }, [pageHeight, viewportHeight, isMobile, reservedSources])
+    const unique = uniqueDynamicImages(generated, reservedSources)
+
+    if (blogBand.end <= blogBand.start) return unique
+
+    return unique.filter((img) => {
+      const y = topToPx(img.top, viewportHeight)
+      const insideInfographicBand = y >= blogBand.start && y <= blogBand.end
+
+      // Keep side imagery visible; only suppress center/background clutter behind infographics.
+      if (!insideInfographicBand) return true
+      return img.position !== 'center'
+    })
+  }, [pageHeight, viewportHeight, isMobile, reservedSources, blogBand])
 
   const { scrollYProgress: galleryProgress } = useScroll({
     target: galleryRef,
@@ -733,7 +798,7 @@ export default function ImagePageClient({ }: ImagePageClientProps) {
         </section>
 
         {/* ═══ Blog ═══ */}
-        <section id="image-blog" className="pointer-events-none">
+        <section id="image-blog" ref={blogRef} className="pointer-events-none">
           <div className="max-w-5xl mx-auto py-10 px-4 sm:py-16 sm:px-8 text-left w-full box-border pointer-events-auto select-text">
               <div className="w-full  pointer-events-auto">
                 <PerformanceVsEfficiencyApp disableAmbientBackground />
