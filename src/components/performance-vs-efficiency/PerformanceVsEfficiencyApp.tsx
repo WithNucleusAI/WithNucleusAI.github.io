@@ -168,6 +168,7 @@ const BubbleDot = (props: any) => {
 
 function ChartTooltipInner({ active, payload }: any) {
   const { t, theme } = useTheme();
+  const mob = useIsMobile();
   if (!active || !payload?.length) return null;
   const d = payload[0].payload as Model;
   const cfg = familyConfig[d.family];
@@ -178,7 +179,12 @@ function ChartTooltipInner({ active, payload }: any) {
   return (
     <div style={{
       background: t.tooltipBg,
-      backdropFilter: "blur(28px) saturate(1.4)", WebkitBackdropFilter: "blur(28px) saturate(1.4)",
+      ...(mob
+        ? {}
+        : {
+            backdropFilter: "blur(28px) saturate(1.4)",
+            WebkitBackdropFilter: "blur(28px) saturate(1.4)",
+          }),
       border: `1px solid ${t.tooltipBorder}`, borderRadius: 16,
       boxShadow: t.tooltipShadow, minWidth: 220, overflow: "hidden",
     }}>
@@ -254,7 +260,13 @@ function StatCard({ label, value, sub, delay, accent, icon }: {
       transition={{ duration: 0.9, delay, ease: [0.22, 0.61, 0.36, 1] }}
       className="flex-1 min-w-0"
       style={{
-        background: t.cardBg, backdropFilter: t.cardInset, WebkitBackdropFilter: t.cardInset,
+        background: t.cardBg,
+        ...(mob
+          ? {}
+          : {
+              backdropFilter: t.cardInset,
+              WebkitBackdropFilter: t.cardInset,
+            }),
         border: `1px solid ${t.cardBorder}`, borderRadius: 20, padding: "26px 28px 24px",
         
         transition: "all 0.45s cubic-bezier(0.22,0.61,0.36,1)",
@@ -386,6 +398,7 @@ function SectionDivider({ delay = 0 }: { delay?: number }) {
 
 function ThemeToggle() {
   const { theme, toggle, t } = useTheme();
+  const mob = useIsMobile();
   const isDark = theme === "dark";
   return (
     <button
@@ -398,7 +411,12 @@ function ThemeToggle() {
         color: t.toggleColor,
         transition: "all 0.45s cubic-bezier(0.22,0.61,0.36,1)",
         flexShrink: 0,
-        backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
+        ...(mob
+          ? {}
+          : {
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+            }),
       }}
       aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
     >
@@ -473,7 +491,7 @@ function AppInner({ disableAmbientBackground }: { disableAmbientBackground?: boo
 
   if (!mounted) {
     return (
-      <div className="size-full flex flex-col items-center overflow-y-auto overflow-x-hidden bg-transparent [scroll-behavior:smooth] antialiased">
+      <div className={`size-full flex flex-col items-center overflow-y-auto overflow-x-hidden [scroll-behavior:smooth] antialiased ${mob ? "bg-white dark:bg-[#0b0f16]" : "bg-transparent"}`}>
         <div className="w-full max-w-5xl relative z-10  md:py-20">
           <div className="mb-10 h-4 w-36 rounded-full bg-black/10 dark:bg-white/10" />
           <div className="h-14 w-64 rounded-xl bg-black/10 dark:bg-white/10 md:h-20 md:w-96" />
@@ -485,16 +503,16 @@ function AppInner({ disableAmbientBackground }: { disableAmbientBackground?: boo
   }
 
   return (
-    <div className="size-full flex flex-col items-center overflow-y-auto overflow-x-hidden bg-transparent [scroll-behavior:smooth] antialiased">
-      {!disableAmbientBackground && (
+    <div className={`size-full flex flex-col items-center overflow-y-auto overflow-x-hidden [scroll-behavior:smooth] antialiased ${mob ? "bg-white dark:bg-black" : "bg-transparent"}`}>
+      {!disableAmbientBackground && !mob && (
         <>
           {/* Ambient blooms — asymmetric for organic feel */}
-          <div className="fixed inset-0 pointer-events-none overflow-hidden transition-opacity duration-500" aria-hidden>
+          {/* <div className="fixed inset-0 pointer-events-none overflow-hidden transition-opacity duration-500" aria-hidden>
             <div className="absolute -left-[5%] -top-[25%] h-[900px] w-[1000px] blur-[120px] bg-[radial-gradient(ellipse_80%_60%_at_10%_20%,rgba(0,102,220,0.05)_0%,transparent_55%)] dark:bg-[radial-gradient(ellipse_80%_60%_at_10%_20%,rgba(59,158,255,0.05)_0%,transparent_60%)]" />
             <div className="absolute -bottom-[15%] -right-[8%] h-[700px] w-[800px] blur-[100px] bg-[radial-gradient(ellipse_70%_50%_at_90%_80%,rgba(147,51,234,0.04)_0%,transparent_50%)] dark:bg-[radial-gradient(ellipse_70%_50%_at_90%_80%,rgba(192,132,252,0.04)_0%,transparent_55%)]" />
             <div className="absolute left-[45%] top-[30%] h-[500px] w-[900px] -translate-x-1/2 blur-[110px] bg-[radial-gradient(ellipse_90%_40%_at_50%_40%,rgba(5,150,105,0.03)_0%,transparent_50%)] dark:bg-[radial-gradient(ellipse_90%_40%_at_50%_40%,rgba(52,211,153,0.02)_0%,transparent_55%)]" />
             <div className="absolute right-[10%] top-[5%] h-[400px] w-[600px] blur-[90px] bg-[radial-gradient(ellipse_60%_40%_at_70%_10%,rgba(194,65,12,0.025)_0%,transparent_50%)] dark:bg-[radial-gradient(ellipse_60%_40%_at_70%_10%,rgba(251,146,60,0.02)_0%,transparent_50%)]" />
-          </div>
+          </div> */}
 
           {/* Subtle noise grain overlay */}
           <div
@@ -519,7 +537,7 @@ function AppInner({ disableAmbientBackground }: { disableAmbientBackground?: boo
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               {/* Pill badge with subtle shimmer */}
-              <div className="relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-[#0066DC]/10  px-4 py-[5px] pl-[10px] backdrop-blur-[12px] dark:border-[#3B9EFF]/10 dark:bg-[#3B9EFF]/[0.06]">
+              <div className="relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-[#0066DC]/10  px-4 py-[5px] pl-[10px] md:backdrop-blur-[12px] dark:border-[#3B9EFF]/10">
                 {/* Shimmer */}
                 <div className="absolute left-[-100%] top-0 h-full w-[200%] animate-[shimmer_4s_ease-in-out_infinite] bg-[linear-gradient(90deg,transparent_40%,rgba(0,102,220,0.06)_50%,transparent_60%)] dark:bg-[linear-gradient(90deg,transparent_40%,rgba(59,158,255,0.08)_50%,transparent_60%)]" />
                 <span className="h-1.5 w-1.5 animate-[pulse_2.5s_ease-in-out_infinite] rounded-full bg-[#0066DC] shadow-[0_0_10px_rgba(0,102,220,0.5)] dark:bg-[#3B9EFF] dark:shadow-[0_0_12px_rgba(59,158,255,0.7)]" />
@@ -536,7 +554,7 @@ function AppInner({ disableAmbientBackground }: { disableAmbientBackground?: boo
                 <span className={`${mob ? "text-4xl ml-[6px]" : "text-[60px] ml-[10px]"} inline bg-[linear-gradient(135deg,#0055CC_0%,#4F46E5_40%,#7C3AED_80%,#9333EA_100%)] bg-clip-text font-bold text-transparent dark:bg-[linear-gradient(135deg,#3B9EFF_0%,#818cf8_40%,#c084fc_80%,#f0abfc_100%)]`}>
                   Image
                 </span>
-                <span className={`relative inline-block align-super ${mob ? "top-[-6px] ml-2 rounded-[5px] px-2 py-[3px] text-[11px]" : "top-[-12px] ml-[14px] rounded-[7px] px-3 py-1 text-base"} border border-[#0066DC]/25 bg-[#0066DC]/[0.06] font-semibold uppercase tracking-[0.15em] text-[#0057C8] backdrop-blur-[8px] dark:border-[#3B9EFF]/30 dark:bg-[#3B9EFF]/[0.1] dark:text-[#82C4FF]`}>
+                <span className={`relative inline-block align-super ${mob ? "top-[-6px] ml-2 rounded-[5px] px-2 py-[3px] text-[11px]" : "top-[-12px] ml-[14px] rounded-[7px] px-3 py-1 text-base"} border border-[#0066DC]/25 bg-[#0066DC]/[0.06] font-semibold uppercase tracking-[0.15em] text-[#0057C8] md:backdrop-blur-[8px] dark:border-[#3B9EFF]/30 dark:bg-[#3B9EFF]/[0.1] dark:text-[#82C4FF]`}>
                   MoE
                 </span>
               </h1>
@@ -596,7 +614,7 @@ function AppInner({ disableAmbientBackground }: { disableAmbientBackground?: boo
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.15, ease: [0.22, 0.61, 0.36, 1] }}
-          className={`relative overflow-hidden border border-[rgba(0,0,0,0.065)] dark:border-[rgba(255,255,255,0.08)] bg-white/10   backdrop-blur-[24px] backdrop-saturate-[1.2] transition-colors dark:bg-white/[0.08] ${mob ? "rounded-[18px]" : "rounded-3xl"}`}
+          className={`relative overflow-hidden border border-[rgba(0,0,0,0.065)] dark:border-[rgba(255,255,255,0.08)] md:backdrop-blur-[24px] md:backdrop-saturate-[1.2] transition-colors ${mob ? "rounded-[18px] bg-white dark:bg-[#10141c]" : "rounded-3xl bg-white/10 dark:bg-white/[0.08]"}`}
           
         >
           {/* Top highlight */}
@@ -615,7 +633,7 @@ function AppInner({ disableAmbientBackground }: { disableAmbientBackground?: boo
                 </p>
               </div>
               {/* Color legend — frosted strip */}
-              <div className={`flex flex-wrap ${mob ? "gap-2 rounded-[10px] px-[10px] py-[6px]" : "gap-4 rounded-[10px] px-[14px] py-[7px]"} border border-black/5 bg-black/[0.012] dark:border-white/[0.03] dark:bg-white/[0.015]`}>
+              <div className={`flex flex-wrap ${mob ? "gap-2 rounded-[10px] px-[10px] py-[6px] border-black/8 bg-white dark:border-white/10 dark:bg-[#151b27]" : "gap-4 rounded-[10px] px-[14px] py-[7px] border-black/5 bg-black/[0.012] dark:border-white/[0.03] dark:bg-white/[0.015]"} border`}>
                 {families.filter(f => f !== "Other").map((f) => {
                   const c = isDark ? familyConfig[f].color : familyConfig[f].light;
                   return (

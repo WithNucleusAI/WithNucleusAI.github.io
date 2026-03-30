@@ -104,7 +104,7 @@ export default function ImageViewer({ images, currentIndex, onClose }: ImageView
 
     return (
         <div
-            className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-black/90 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-black/90 md:backdrop-blur-sm"
             onClick={onClose}
         >
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.22),transparent_46%)]" />
@@ -147,7 +147,7 @@ export default function ImageViewer({ images, currentIndex, onClose }: ImageView
             {/* Navigation controls */}
             {images.length > 1 && (
                 <div className="px-4 pb-[max(1rem,env(safe-area-inset-bottom))]" onClick={(e) => e.stopPropagation()}>
-                    <div className="mx-auto w-full max-w-xl rounded-2xl border border-white/25 bg-black/40 backdrop-blur-md shadow-2xl">
+                    <div className="mx-auto w-full max-w-xl rounded-2xl border border-white/25 bg-black/40 md:backdrop-blur-md shadow-2xl">
                         <div className="flex items-center justify-between gap-2 p-2 sm:p-3">
                             <button
                                 type="button"

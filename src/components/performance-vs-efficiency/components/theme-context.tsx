@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useTheme as useNextTheme } from "next-themes";
+import { useIsMobile } from "./use-mobile";
 
 export type Theme = "dark" | "light";
 
@@ -196,8 +197,33 @@ export const tokens = { dark, light };
 
 export function useTheme(): { theme: Theme; t: ThemeTokens; toggle: () => void } {
   const { resolvedTheme, setTheme } = useNextTheme();
+  const mob = useIsMobile();
   const theme: Theme = resolvedTheme === "light" ? "light" : "dark";
-  const t = tokens[theme];
+  const baseTokens = tokens[theme];
+
+  const t = useMemo(() => {
+    if (!mob) return baseTokens;
+
+    if (theme === "dark") {
+      return {
+        ...baseTokens,
+        cardBg: "#10141c",
+        panelBg: "#10141c",
+        tooltipBg: "#111722",
+        toggleBg: "#161d2a",
+        cardInset: "none",
+      };
+    }
+
+    return {
+      ...baseTokens,
+      cardBg: "#ffffff",
+      panelBg: "#ffffff",
+      tooltipBg: "#ffffff",
+      toggleBg: "#f3f5f8",
+      cardInset: "none",
+    };
+  }, [baseTokens, mob, theme]);
 
   return useMemo(
     () => ({

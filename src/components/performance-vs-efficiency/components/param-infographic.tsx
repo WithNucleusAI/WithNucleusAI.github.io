@@ -282,8 +282,12 @@ export function ParamInfographic() {
       transition={{ duration: 1, delay: 0.3, ease: [0.22, 0.61, 0.36, 1] }}
       style={{
         background: t.panelBg,
-        backdropFilter: "blur(24px) saturate(1.3)",
-        WebkitBackdropFilter: "blur(24px) saturate(1.3)",
+        ...(mob
+          ? {}
+          : {
+              backdropFilter: "blur(24px) saturate(1.3)",
+              WebkitBackdropFilter: "blur(24px) saturate(1.3)",
+            }),
         border: `1px solid ${t.panelBorder}`,
         borderRadius: mob ? 18 : 24,
        

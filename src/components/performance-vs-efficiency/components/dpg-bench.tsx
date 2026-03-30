@@ -194,8 +194,12 @@ export function DpgBench() {
       style={{
         borderRadius: mob ? 18 : 24,
         background: t.panelBg,
-        backdropFilter: "blur(24px) saturate(1.3)",
-        WebkitBackdropFilter: "blur(24px) saturate(1.3)",
+        ...(mob
+          ? {}
+          : {
+              backdropFilter: "blur(24px) saturate(1.3)",
+              WebkitBackdropFilter: "blur(24px) saturate(1.3)",
+            }),
         border: `1px solid ${t.panelBorder}`,
       
         overflow: "hidden",

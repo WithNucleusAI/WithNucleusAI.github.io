@@ -14,16 +14,60 @@ import PerformanceVsEfficiencyApp from '@/components/performance-vs-efficiency/P
 
 
 const MOUSE_FACTOR = 120
-const HOVER_TRANSITION = {
-  duration: 0.5,
-  ease: [0.39, 0.575, 0.565, 1],
-} as const
 const EASE_OUT = [0.25, 0.46, 0.45, 0.94] as const
 const ORBIT_SECTION_COUNT = 6
 const MOBILE_BREAKPOINT = 768
 const MOBILE_GALLERY_MAX_IMAGES = 16
 const INFOGRAPHIC_CLEAR_PADDING_PX = 120
 const SIDE_DENSITY_BOOST = 1.22
+
+const FLOATING_IMAGE_CONFIG = {
+  size: {
+    minWidthPx: 110,
+    minHeightPx: 100,
+    maxWidthPx: 150,
+    maxHeightPx: 150,
+  },
+  overlap: {
+    maxOverlapRatio: 0.1,
+    resolveStepPx: 12,
+    maxResolveIterations: 140,
+  },
+  geometry: {
+    heroFrame: {
+      widthUnits: 100,
+      heightUnits: 60,
+      centerNoImageZone: {
+        xStart: 25,
+        xEnd: 75,
+        yStart: 25,
+        yEnd: 55,
+      },
+      sideSequence: ['left', 'right', 'top', 'bottom'] as const,
+    },
+    postHero: {
+      centerNoImageZoneX: {
+        xStart: 35,
+        xEnd: 75,
+      },
+    },
+  },
+  hero: {
+    topCoverageVh: 92,
+    topStartVh: 0,
+    desktopCount: 16,
+    mobileVisibleCount: 10,
+    topJitterRatio: 0.2,
+  },
+  dynamic: {
+    leftRangePct: [2, 16] as const,
+    rightRangePct: [2, 16] as const,
+    positionCycle: ['left', 'right'] as const,
+  },
+  interaction: {
+    enableHoverEffects: true,
+  },
+} as const
 
 interface ImageConfig {
   src: string
@@ -262,44 +306,386 @@ function seededRandom(seed: number): number {
   return x - Math.floor(x)
 }
 
-// Hand-tuned hero images – evenly spaced ~8vh apart, alternating left/right
-const HERO_IMAGES: ImageConfig[] = [
-  { src: '/final_images/image (1).webp', position: 'left', left: '3%', top: '4vh', w: 175, h: 235, depth: 0.35, alpha: 0.85 },
-  { src: '/final_images/image (2).webp', position: 'right', right: '3%', top: '12vh', w: 195, h: 145, depth: 0.55, alpha: 0.65 },
-  { src: '/final_images/image (23).webp', position: 'left', left: '2%', top: '10vh', w: 76, h: 110, depth: 0.38, alpha: 0.42, mobileHidden: true },
-  { src: '/final_images/image (20).webp', position: 'left', left: '7%', top: '16vh', w: 104, h: 84, depth: 0.48, alpha: 0.44, mobileHidden: true },
-  { src: '/final_images/image (18).webp', position: 'right', right: '8%', top: '18vh', w: 88, h: 126, depth: 0.5, alpha: 0.42, mobileHidden: true },
-  { src: '/final_images/image (14).webp', position: 'left', left: '18%', top: '20vh', w: 115, h: 115, depth: 0.7, alpha: 0.4, mobileHidden: true },
-  { src: '/final_images/image (11).webp', position: 'right', right: '16%', top: '28vh', w: 90, h: 62, depth: 0.15, alpha: 0.3, mobileHidden: true },
-  { src: '/final_images/image (19).webp', position: 'right', right: '11%', top: '32vh', w: 96, h: 66, depth: 0.62, alpha: 0.52, mobileHidden: true },
-  { src: '/final_images/image (16).webp', position: 'left', left: '2%', top: '30vh', w: 74, h: 106, depth: 0.42, alpha: 0.39, mobileHidden: true },
-  { src: '/final_images/image (5).webp', position: 'left', left: '4%', top: '34vh', w: 92, h: 128, depth: 0.44, alpha: 0.4, mobileHidden: true },
-  { src: '/final_images/image (7).webp', position: 'left', left: '-2%', top: '36vh', w: 80, h: 110, depth: 0.6, alpha: 0.35 },
-  { src: '/final_images/image (10).webp', position: 'right', right: '1%', top: '44vh', w: 72, h: 92, depth: 0.5, alpha: 0.38, mobileHidden: true },
-  { src: '/final_images/image (17).webp', position: 'left', left: '8%', top: '48vh', w: 82, h: 120, depth: 0.5, alpha: 0.46, mobileHidden: true },
-  { src: '/final_images/image (4).webp', position: 'left', left: '12%', top: '52vh', w: 105, h: 142, depth: 0.28, alpha: 0.6, mobileHidden: true },
-  { src: '/final_images/image (3).webp', position: 'right', right: '5%', top: '60vh', w: 168, h: 128, depth: 0.4, alpha: 0.75 },
-  { src: '/final_images/image (22).webp', position: 'right', right: '12%', top: '64vh', w: 72, h: 102, depth: 0.36, alpha: 0.4, mobileHidden: true },
-  { src: '/final_images/image (12).webp', position: 'left', left: '2%', top: '62vh', w: 66, h: 96, depth: 0.31, alpha: 0.37, mobileHidden: true },
-  { src: '/final_images/image (24).webp', position: 'left', left: '6%', top: '66vh', w: 84, h: 84, depth: 0.33, alpha: 0.42, mobileHidden: true },
-  { src: '/final_images/image (9).webp', position: 'left', left: '1%', top: '68vh', w: 68, h: 96, depth: 0.2, alpha: 0.45 },
-  { src: '/final_images/image (8).webp', position: 'right', right: '0%', top: '76vh', w: 85, h: 68, depth: 0.3, alpha: 0.3, mobileHidden: true },
-  { src: '/final_images/image (21).webp', position: 'right', right: '2%', top: '82vh', w: 70, h: 98, depth: 0.47, alpha: 0.44, mobileHidden: true },
-  { src: '/final_images/image (6).webp', position: 'left', left: '38%', top: '84vh', w: 90, h: 90, depth: 0.45, alpha: 0.55, mobileHidden: true },
-  { src: '/final_images/image (13).webp', position: 'right', right: '7%', top: '88vh', w: 78, h: 112, depth: 0.52, alpha: 0.46, mobileHidden: true },
-  { src: '/final_images/image (15).webp', position: 'right', right: '15%', top: '92vh', w: 80, h: 120, depth: 0.8, alpha: 0.5 },
+const HERO_IMAGE_SOURCES = [
+  '/final_images/image (1).webp',
+  '/final_images/image (2).webp',
+  '/final_images/image (23).webp',
+  '/final_images/image (20).webp',
+  '/final_images/image (18).webp',
+  '/final_images/image (14).webp',
+  '/final_images/image (11).webp',
+  '/final_images/image (19).webp',
+  '/final_images/image (16).webp',
+  '/final_images/image (5).webp',
+  '/final_images/image (7).webp',
+  '/final_images/image (10).webp',
+  '/final_images/image (17).webp',
+  '/final_images/image (4).webp',
+  '/final_images/image (3).webp',
+  '/final_images/image (22).webp',
+  '/final_images/image (12).webp',
+  '/final_images/image (24).webp',
+  '/final_images/image (9).webp',
+  '/final_images/image (8).webp',
+  '/final_images/image (21).webp',
+  '/final_images/image (6).webp',
+  '/final_images/image (13).webp',
+  '/final_images/image (15).webp',
 ]
 
+function clamp(n: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, n))
+}
+
+function clampImageSize(w: number, h: number): { w: number; h: number } {
+  const cfg = FLOATING_IMAGE_CONFIG.size
+  let nextW = w
+  let nextH = h
+
+  const shrink = Math.min(cfg.maxWidthPx / nextW, cfg.maxHeightPx / nextH, 1)
+  nextW *= shrink
+  nextH *= shrink
+
+  const grow = Math.max(cfg.minWidthPx / nextW, cfg.minHeightPx / nextH, 1)
+  nextW *= grow
+  nextH *= grow
+
+  return {
+    w: Math.round(clamp(nextW, cfg.minWidthPx, cfg.maxWidthPx)),
+    h: Math.round(clamp(nextH, cfg.minHeightPx, cfg.maxHeightPx)),
+  }
+}
+
+function getHorizontalPlacement(
+  position: 'left' | 'right' | 'center',
+  seed: number,
+): { left?: string; right?: string } {
+  const r = seededRandom(seed)
+
+  if (position === 'left') {
+    const [min, max] = FLOATING_IMAGE_CONFIG.dynamic.leftRangePct
+    const pct = min + r * (max - min)
+    return { left: `${pct.toFixed(1)}%` }
+  }
+
+  if (position === 'right') {
+    const [min, max] = FLOATING_IMAGE_CONFIG.dynamic.rightRangePct
+    const pct = min + r * (max - min)
+    return { right: `${pct.toFixed(1)}%` }
+  }
+
+  const center = (FLOATING_IMAGE_CONFIG.geometry.postHero.centerNoImageZoneX.xStart + FLOATING_IMAGE_CONFIG.geometry.postHero.centerNoImageZoneX.xEnd) / 2
+  return { left: `${center.toFixed(1)}%` }
+}
+
+function heroSidePlacement(
+  side: 'left' | 'right' | 'top' | 'bottom',
+  seed: number,
+): { position: 'left' | 'right' | 'center'; left?: string; right?: string; topVh: number } {
+  const frame = FLOATING_IMAGE_CONFIG.geometry.heroFrame
+  const r = (s: number) => seededRandom(seed * 17 + s)
+  const yJitter = (r(5) - 0.5) * 1.1
+
+  if (side === 'left') {
+    const leftPct = 1 + r(1) * (frame.centerNoImageZone.xStart - 5)
+    const y = frame.centerNoImageZone.yStart + r(2) * (frame.centerNoImageZone.yEnd - frame.centerNoImageZone.yStart)
+    return { position: 'left', left: `${leftPct.toFixed(1)}%`, topVh: y + yJitter }
+  }
+
+  if (side === 'right') {
+    const rightPct = 1 + r(1) * (frame.widthUnits - frame.centerNoImageZone.xEnd - 5)
+    const y = frame.centerNoImageZone.yStart + r(2) * (frame.centerNoImageZone.yEnd - frame.centerNoImageZone.yStart)
+    return { position: 'right', right: `${rightPct.toFixed(1)}%`, topVh: y + yJitter }
+  }
+
+  if (side === 'top') {
+    const x = frame.centerNoImageZone.xStart + r(3) * (frame.centerNoImageZone.xEnd - frame.centerNoImageZone.xStart)
+    const y = 1 + r(4) * (frame.centerNoImageZone.yStart - 2)
+    return { position: 'center', left: `${x.toFixed(1)}%`, topVh: y + yJitter }
+  }
+
+  const x = frame.centerNoImageZone.xStart + r(3) * (frame.centerNoImageZone.xEnd - frame.centerNoImageZone.xStart)
+  const y = frame.centerNoImageZone.yEnd + r(4) * (frame.heightUnits - frame.centerNoImageZone.yEnd - 2)
+  return { position: 'center', left: `${x.toFixed(1)}%`, topVh: y + yJitter }
+}
+
+function heroBalancedSlot(
+  side: 'left' | 'right' | 'top' | 'bottom',
+  sideIndex: number,
+): { position: 'left' | 'right' | 'center'; left?: string; right?: string; topVh: number } {
+  // Left/right border images — spread across full vertical height
+  const leftSlots = [
+    { left: -5, y: 2 },
+    { left: 8, y: 22 },
+    { left: -2, y: 50 },
+    { left: 10, y: 72 },
+  ]
+  const rightSlots = [
+    { right: 10, y: 5 },
+    { right: -6, y: 28 },
+    { right: 5, y: 55 },
+    { right: -4, y: 78 },
+  ]
+  // Top-area images, distributed across the upper viewport
+  const topSlots = [
+    { left: 15, y: 4 },
+    { left: 40, y: 8 },
+    { left: 60, y: 3 },
+    { left: 85, y: 10 },
+  ]
+  // Bottom images — placed in the center-bottom zone BELOW the heading text
+  // The heading occupies ~25–55 vh, so these sit at 60–82 vh in the center column
+  const bottomSlots = [
+    { left: 20, y: 63 },
+    { left: 42, y: 72 },
+    { left: 62, y: 66 },
+    { left: 82, y: 78 },
+  ]
+
+  if (side === 'left') {
+    const slot = leftSlots[sideIndex % leftSlots.length]
+    return { position: 'left', left: `${slot.left}%`, topVh: slot.y }
+  }
+  if (side === 'right') {
+    const slot = rightSlots[sideIndex % rightSlots.length]
+    return { position: 'right', right: `${slot.right}%`, topVh: slot.y }
+  }
+  if (side === 'top') {
+    const slot = topSlots[sideIndex % topSlots.length]
+    return { position: 'center', left: `${slot.left}%`, topVh: slot.y }
+  }
+
+  const slot = bottomSlots[sideIndex % bottomSlots.length]
+  return { position: 'center', left: `${slot.left}%`, topVh: slot.y }
+}
+
+function overlapRatio(a: { x: number; y: number; w: number; h: number }, b: { x: number; y: number; w: number; h: number }): number {
+  const x1 = Math.max(a.x, b.x)
+  const y1 = Math.max(a.y, b.y)
+  const x2 = Math.min(a.x + a.w, b.x + b.w)
+  const y2 = Math.min(a.y + a.h, b.y + b.h)
+
+  if (x2 <= x1 || y2 <= y1) return 0
+  const area = (x2 - x1) * (y2 - y1)
+  const minArea = Math.min(a.w * a.h, b.w * b.h)
+  if (minArea <= 0) return 0
+  return area / minArea
+}
+
+function getImageLeftPx(img: ImageConfig, viewportWidth: number): number {
+  const w = img.w
+  if (img.position === 'center') {
+    const centerPct = parseFloat(img.left || '50')
+    return (centerPct / 100) * viewportWidth - w / 2
+  }
+  if (img.left) return (parseFloat(img.left) / 100) * viewportWidth
+  if (img.right) return viewportWidth - (parseFloat(img.right) / 100) * viewportWidth - w
+  return 0
+}
+
+function enforceNoImageZones(
+  images: ImageConfig[],
+  vh: number,
+  viewportWidth: number,
+): ImageConfig[] {
+  const heroFrame = FLOATING_IMAGE_CONFIG.geometry.heroFrame
+  const postHero = FLOATING_IMAGE_CONFIG.geometry.postHero
+
+  return images.map((img) => {
+    const topPx = topToPx(img.top, vh)
+    const yVh = (topPx / vh) * 100
+    const xPx = getImageLeftPx(img, viewportWidth)
+    const widthPct = (img.w / viewportWidth) * 100
+    const xStart = (xPx / viewportWidth) * 100
+    const xEnd = xStart + widthPct
+
+    const overlapsCenter = (zoneStart: number, zoneEnd: number) => xEnd > zoneStart && xStart < zoneEnd
+
+    const inHeroCenterY = yVh >= heroFrame.centerNoImageZone.yStart && yVh <= heroFrame.centerNoImageZone.yEnd
+    const inHeroBand = yVh <= FLOATING_IMAGE_CONFIG.hero.topCoverageVh
+
+    const blockCenterX = inHeroBand
+      ? (inHeroCenterY ? heroFrame.centerNoImageZone : null)
+      : postHero.centerNoImageZoneX
+
+    if (!blockCenterX) return img
+
+    if (!overlapsCenter(blockCenterX.xStart, blockCenterX.xEnd)) return img
+
+    const leftMax = Math.max(1, blockCenterX.xStart - widthPct - 1)
+    const rightMax = Math.max(1, 100 - blockCenterX.xEnd - widthPct - 1)
+    const imageMid = xStart + widthPct / 2
+
+    if (imageMid <= 50) {
+      return {
+        ...img,
+        position: 'left',
+        left: `${leftMax.toFixed(1)}%`,
+        right: undefined,
+      }
+    }
+
+    return {
+      ...img,
+      position: 'right',
+      right: `${rightMax.toFixed(1)}%`,
+      left: undefined,
+    }
+  })
+}
+
+function enforceMaxOverlap(
+  images: ImageConfig[],
+  vh: number,
+  viewportWidth: number,
+): ImageConfig[] {
+  const cfg = FLOATING_IMAGE_CONFIG.overlap
+  const sorted = [...images].sort((a, b) => topToPx(a.top, vh) - topToPx(b.top, vh))
+  const accepted: ImageConfig[] = []
+  const acceptedTopPx: number[] = []
+
+  for (const img of sorted) {
+    let topPx = topToPx(img.top, vh)
+    let iterations = 0
+
+    while (iterations < cfg.maxResolveIterations) {
+      const currentBox = {
+        x: getImageLeftPx(img, viewportWidth),
+        y: topPx,
+        w: img.w,
+        h: img.h,
+      }
+
+      const hasTooMuchOverlap = accepted.some((prev, prevIndex) => {
+        const prevBox = {
+          x: getImageLeftPx(prev, viewportWidth),
+          y: acceptedTopPx[prevIndex],
+          w: prev.w,
+          h: prev.h,
+        }
+        return overlapRatio(currentBox, prevBox) > cfg.maxOverlapRatio
+      })
+
+      if (!hasTooMuchOverlap) break
+      topPx += cfg.resolveStepPx
+      iterations += 1
+    }
+
+    accepted.push({ ...img, top: `${Math.round(topPx)}px` })
+    acceptedTopPx.push(topPx)
+  }
+
+  return accepted
+}
+
+// Mobile hero: 10 images — 4 top, 1 left side, 1 right side, 4 bottom.
+// Top/bottom images spread across the full width since they're above/below
+// the heading. Side images hug the edges at heading height.
+const MOBILE_HERO_SLOTS: Array<{
+  position: 'left' | 'right'
+  left?: string
+  right?: string
+  topVh: number
+}> = [
+  // — Top 4 (above heading, ~2–22vh) —
+  { position: 'left',  left:  '0%',  topVh:  2 },
+  { position: 'right', right: '0%',  topVh:  6 },
+  { position: 'left',  left:  '28%', topVh: 14 },
+  { position: 'right', right: '26%', topVh: 20 },
+  // — Side 2 (beside heading, ~38–44vh) —
+  { position: 'left',  left:  '0%',  topVh: 38 },
+  { position: 'right', right: '0%',  topVh: 44 },
+  // — Bottom 4 (below heading, ~62–82vh) —
+  { position: 'left',  left:  '0%',  topVh: 62 },
+  { position: 'right', right: '0%',  topVh: 66 },
+  { position: 'left',  left:  '28%', topVh: 74 },
+  { position: 'right', right: '26%', topVh: 80 },
+]
+
+function buildHeroImages(isMobile: boolean): ImageConfig[] {
+  if (isMobile) {
+    // Use fixed slots so images frame the hero text from both sides without
+    // touching the center. config.w ~220-260 makes the rendered size ~84-99px
+    // via the max(minRem, desktopVw) formula — good for a ~390px mobile screen.
+    return MOBILE_HERO_SLOTS.map((slot, i) => {
+      const r = (s: number) => seededRandom((i + 1) * 41 + s)
+      const w = 220 + Math.round(r(2) * 40)
+      const ratio = 0.78 + r(3) * 0.44
+      const h = Math.round(w * ratio)
+      return {
+        src: HERO_IMAGE_SOURCES[i],
+        position: slot.position,
+        left: slot.left,
+        right: slot.right,
+        top: `${slot.topVh}vh`,
+        w,
+        h,
+        depth: 0.28 + r(6) * 0.42,
+        alpha: 1,
+        mobileHidden: false,
+      }
+    })
+  }
+
+  const cfg = FLOATING_IMAGE_CONFIG.hero
+  const count = Math.min(cfg.desktopCount, HERO_IMAGE_SOURCES.length)
+  const zones = FLOATING_IMAGE_CONFIG.geometry.heroFrame.sideSequence
+
+  const images: ImageConfig[] = []
+  const sideCounters: Record<'left' | 'right' | 'top' | 'bottom', number> = {
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  }
+
+  for (let i = 0; i < count; i++) {
+    const r = (s: number) => seededRandom((i + 1) * 41 + s)
+    const zone = zones[i % zones.length]
+    const sizeBase = FLOATING_IMAGE_CONFIG.size.minWidthPx
+      + Math.round(r(2) * (FLOATING_IMAGE_CONFIG.size.maxWidthPx - FLOATING_IMAGE_CONFIG.size.minWidthPx))
+
+    const ratio = 0.75 + r(3) * 0.55
+    const raw = clampImageSize(sizeBase, Math.round(sizeBase * ratio))
+
+    const placement = heroBalancedSlot(zone, sideCounters[zone])
+    sideCounters[zone] += 1
+
+    const fallback = heroSidePlacement(zone, i + 1)
+    const placeLeft = placement.left ?? fallback.left
+    const placeRight = placement.right ?? fallback.right
+
+    const topVh = clamp(
+      placement.topVh + (r(5) - 0.5) * 0.35,
+      cfg.topStartVh,
+      cfg.topCoverageVh,
+    )
+
+    images.push({
+      src: HERO_IMAGE_SOURCES[i],
+      position: placement.position,
+      left: placeLeft,
+      right: placeRight,
+      top: `${topVh.toFixed(2)}vh`,
+      w: raw.w,
+      h: raw.h,
+      depth: 0.2 + r(6) * 0.65,
+      alpha: 1,
+      mobileHidden: r(8) > 0.7,
+    })
+  }
+
+  return images
+}
+
 function generateDynamicImages(pageHeight: number, vh: number, isMobile: boolean): ImageConfig[] {
-  const startY = Math.max(vh * 0.8, vh - 120)
+  const startY = Math.max(vh * 0.62, vh - 220)
   const endY = pageHeight - (isMobile ? vh * 0.18 : vh * 0.06)
   if (endY <= startY) return []
 
   const images: ImageConfig[] = []
   const baseGap = isMobile ? 150 : 92
-  const positionCycle: ('left' | 'right' | 'center')[] = [
-    'left', 'right', 'left', 'right', 'left', 'right', 'center', 'left', 'right', 'left', 'right', 'left', 'right',
-  ]
+  const positionCycle = FLOATING_IMAGE_CONFIG.dynamic.positionCycle
 
   let y = startY
   let i = 0
@@ -307,19 +693,15 @@ function generateDynamicImages(pageHeight: number, vh: number, isMobile: boolean
   while (y < endY) {
     const r = (s: number) => seededRandom(i * 13 + s)
     const position = positionCycle[i % positionCycle.length]
-    const size = isMobile ? 62 + Math.floor(r(2) * 68) : 64 + Math.floor(r(2) * 74)
+    const size = isMobile ? 95 + Math.floor(r(2) * 58) : 100 + Math.floor(r(2) * 56)
+    const ratio = 0.78 + r(9) * 0.48
+    const clamped = clampImageSize(size, Math.round(size * ratio))
+    const boosted = clampImageSize(
+      Math.round(clamped.w * SIDE_DENSITY_BOOST),
+      Math.round(clamped.h * SIDE_DENSITY_BOOST),
+    )
 
-    let posProps: { left?: string; right?: string }
-    if (position === 'left') {
-      const pct = isMobile ? 2 + r(1) * 14 : 1 + r(1) * 16
-      posProps = { left: `${pct.toFixed(1)}%` }
-    } else if (position === 'right') {
-      const pct = isMobile ? 2 + r(1) * 14 : 1 + r(1) * 16
-      posProps = { right: `${pct.toFixed(1)}%` }
-    } else {
-      const pct = 41 + r(1) * 18
-      posProps = { left: `${pct.toFixed(1)}%` }
-    }
+    const posProps = getHorizontalPlacement(position, i * 17 + 1)
 
     const jitter = (r(3) - 0.5) * (baseGap * 0.2)
     const placeY = Math.round(y + jitter)
@@ -330,10 +712,10 @@ function generateDynamicImages(pageHeight: number, vh: number, isMobile: boolean
       position,
       ...posProps,
       top: `${placeY}px`,
-      w: position === 'center' ? size : Math.round(size * SIDE_DENSITY_BOOST),
-      h: position === 'center' ? size : Math.round(size * SIDE_DENSITY_BOOST),
+      w: boosted.w,
+      h: boosted.h,
       depth: 0.2 + r(4) * 0.6,
-      alpha: 0.65 + r(5) * 0.4,
+      alpha: 1,
       mobileHidden: r(6) > 0.78,
     })
 
@@ -408,6 +790,7 @@ const galleryColumns = [
     '/final_images/image (12).webp',
     '/final_images/image (13).webp',
     '/final_images/image (18).webp',
+    '/final_images/image (6).webp',
   ],
   [
     '/final_images/image (2).webp',
@@ -455,42 +838,6 @@ function FloatingImage({
   viewportHeight: number
 }) {
   const ref = useRef<HTMLDivElement>(null)
-  const [isHovered, setIsHovered] = useState(false)
-  const [hoverOffset, setHoverOffset] = useState({ x: 0, y: 0 })
-
-  const springOffsetX = useSpring(0, { stiffness: 100, damping: 20 })
-  const springOffsetY = useSpring(0, { stiffness: 100, damping: 20 })
-
-  useEffect(() => {
-    springOffsetX.set(isHovered ? hoverOffset.x : 0)
-    springOffsetY.set(isHovered ? hoverOffset.y : 0)
-  }, [isHovered, hoverOffset, springOffsetX, springOffsetY])
-
-  const handleMouseEnter = () => {
-    setIsHovered(true)
-    if (ref.current) {
-      const rect = ref.current.getBoundingClientRect()
-      const wDelta = (rect.width * 1.4 - rect.width) / 2
-      const hDelta = (rect.height * 1.4 - rect.height) / 2
-
-      const left = rect.left - wDelta
-      const right = rect.right + wDelta
-      const top = rect.top - hDelta
-      const bottom = rect.bottom + hDelta
-
-      let dx = 0
-      let dy = 0
-      const pad = 16
-
-      if (left < pad) dx = pad - left
-      else if (right > window.innerWidth - pad) dx = window.innerWidth - pad - right
-
-      if (top < pad) dy = pad - top
-      else if (bottom > window.innerHeight - pad) dy = window.innerHeight - pad - bottom
-
-      setHoverOffset({ x: dx, y: dy })
-    }
-  }
 
   const mx = useTransform(mouseX, (v) => v * config.depth * MOUSE_FACTOR)
   const rawMy = useTransform(mouseY, (v) => v * config.depth * MOUSE_FACTOR)
@@ -540,9 +887,13 @@ function FloatingImage({
     [-25 * config.depth, 25 * config.depth],
   )
 
+  const [isHovered, setIsHovered] = useState(false)
+
   const hoverFactor = useSpring(0, { stiffness: 100, damping: 20 })
   useEffect(() => {
-    hoverFactor.set(isHovered ? 1 : 0)
+    if (FLOATING_IMAGE_CONFIG.interaction.enableHoverEffects) {
+      hoverFactor.set(isHovered ? 1 : 0)
+    }
   }, [isHovered, hoverFactor])
 
   const finalRotation = useTransform(
@@ -557,14 +908,10 @@ function FloatingImage({
     ([mouse, scroll, entry, orbit]: number[]) => mouse + scroll + entry + orbit,
   )
 
-  const finalX = useTransform([mx, springOffsetX, orbitX], ([m, h, orbit]: number[]) => m + h + orbit)
-  const finalY = useTransform([combinedY, springOffsetY], ([c, h]: number[]) => c + h)
+  const finalX = useTransform([mx, orbitX], ([m, orbit]: number[]) => m + orbit)
+  const finalY = useTransform([combinedY], ([c]: number[]) => c)
 
-  const scrollOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.08, 0.92, 1],
-    [0, 1, 1, 0],
-  )
+  const scrollOpacity = 1
 
   const minRem = Math.max(2.75, (config.w * 0.38) / 16)
   const desktopVw = (config.w / 1440) * 100
@@ -585,16 +932,17 @@ function FloatingImage({
         y: finalY,
         rotate: finalRotation,
         opacity: scrollOpacity,
-        zIndex: isHovered ? 10 : 0,
+        zIndex: isHovered ? 50 : Math.round(config.depth * 10),
       }}
-      onMouseEnter={handleMouseEnter}
+      onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <motion.div
         className="w-full h-full cursor-pointer overflow-hidden"
-        initial={{ opacity: config.alpha, scale: 1 }}
-        whileHover={{ opacity: 1, scale: 2 }}
-        transition={HOVER_TRANSITION}
+        initial={{ scale: 1 }}
+        animate={{ scale: 1 }}
+        whileHover={{ scale: 1.2 }}
+        transition={{ duration: 0.3 }}
       >
         <img
           src={config.src}
@@ -612,8 +960,7 @@ function FloatingImage({
 // Page
 // ────────────────────────────────────────────
 
-interface ImagePageClientProps {
-}
+type ImagePageClientProps = Record<string, never>
 
 export default function ImagePageClient({ }: ImagePageClientProps) {
   const mouseX = useMotionValue(0)
@@ -627,12 +974,17 @@ export default function ImagePageClient({ }: ImagePageClientProps) {
 
   const [pageHeight, setPageHeight] = useState(0)
   const [viewportHeight, setViewportHeight] = useState(0)
+  const [viewportWidth, setViewportWidth] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
   const [blogBand, setBlogBand] = useState({ start: 0, end: 0 })
 
   useEffect(() => {
     setViewportHeight(window.innerHeight)
-    const onResize = () => setViewportHeight(window.innerHeight)
+    setViewportWidth(window.innerWidth)
+    const onResize = () => {
+      setViewportHeight(window.innerHeight)
+      setViewportWidth(window.innerWidth)
+    }
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
   }, [])
@@ -682,7 +1034,22 @@ export default function ImagePageClient({ }: ImagePageClientProps) {
     }
   }, [])
 
-  const heroSources = useMemo(() => new Set(HERO_IMAGES.map((img) => img.src)), [])
+  const heroImages = useMemo(() => {
+    if (!viewportHeight || !viewportWidth) return []
+    const generated = buildHeroImages(isMobile)
+
+    // Mobile positions are pre-calibrated via MOBILE_HERO_SLOTS — skip zone
+    // enforcement entirely. The zone math uses config.w (algo pixels) but the
+    // actual rendered size on mobile is ~38% of that, so enforcement would
+    // incorrectly push images to bad positions.
+    if (isMobile) return generated
+
+    const zoned = enforceNoImageZones(generated, viewportHeight, viewportWidth)
+    const spread = enforceMaxOverlap(zoned, viewportHeight, viewportWidth)
+    return enforceNoImageZones(spread, viewportHeight, viewportWidth)
+  }, [viewportHeight, viewportWidth, isMobile])
+
+  const heroSources = useMemo(() => new Set(heroImages.map((img) => img.src)), [heroImages])
 
   const desktopGalleryColumns = useMemo(
     () => createUniqueGalleryColumns(galleryColumns, heroSources),
@@ -701,13 +1068,13 @@ export default function ImagePageClient({ }: ImagePageClientProps) {
   }, [heroSources, curatedSources])
 
   const dynamicImages = useMemo(() => {
-    if (!pageHeight || !viewportHeight) return []
+    if (!pageHeight || !viewportHeight || !viewportWidth) return []
     const generated = generateDynamicImages(pageHeight, viewportHeight, isMobile)
     const unique = uniqueDynamicImages(generated, reservedSources)
 
-    if (blogBand.end <= blogBand.start) return unique
-
-    return unique.filter((img) => {
+    const filtered = blogBand.end <= blogBand.start
+      ? unique
+      : unique.filter((img) => {
       const y = topToPx(img.top, viewportHeight)
       const insideInfographicBand = y >= blogBand.start && y <= blogBand.end
 
@@ -715,7 +1082,11 @@ export default function ImagePageClient({ }: ImagePageClientProps) {
       if (!insideInfographicBand) return true
       return img.position !== 'center'
     })
-  }, [pageHeight, viewportHeight, isMobile, reservedSources, blogBand])
+
+    const zoned = enforceNoImageZones(filtered, viewportHeight, viewportWidth)
+    const spread = enforceMaxOverlap(zoned, viewportHeight, viewportWidth)
+    return enforceNoImageZones(spread, viewportHeight, viewportWidth)
+  }, [pageHeight, viewportHeight, viewportWidth, isMobile, reservedSources, blogBand])
 
   const { scrollYProgress: galleryProgress } = useScroll({
     target: galleryRef,
@@ -733,7 +1104,14 @@ export default function ImagePageClient({ }: ImagePageClientProps) {
   const colTransforms = [y1, y2, y3]
   const mobileGallery = useMemo(() => {
     const all = desktopGalleryColumns.flat()
-    return all.filter((_, idx) => idx % 2 === 0).slice(0, MOBILE_GALLERY_MAX_IMAGES)
+    const selected = all.filter((_, idx) => idx % 2 === 0).slice(0, MOBILE_GALLERY_MAX_IMAGES)
+
+    if (selected.length % 2 === 0) return selected
+
+    const fallback = all.find((src, idx) => idx % 2 === 1 && !selected.includes(src))
+      ?? all.find((src) => !selected.includes(src))
+
+    return fallback ? [...selected, fallback] : selected.slice(0, -1)
   }, [desktopGalleryColumns])
 
   useEffect(() => {
@@ -745,10 +1123,50 @@ export default function ImagePageClient({ }: ImagePageClientProps) {
     return () => window.removeEventListener('mousemove', handler)
   }, [mouseX, mouseY])
 
+  // Gyroscope-driven parallax for mobile devices.
+  // Maps device tilt (gamma → X, beta → Y) to the same motion values that
+  // the desktop mouse handler writes to, so FloatingImage picks it up for free.
+  useEffect(() => {
+    if (!isMobile || typeof DeviceOrientationEvent === 'undefined') return
+
+    const handleOrientation = (e: DeviceOrientationEvent) => {
+      if (e.gamma == null || e.beta == null) return
+      const x = clamp(e.gamma / 30, -1, 1)
+      // beta ~45° is the natural phone-hold angle; offset so 45° → 0
+      const y = clamp((e.beta - 45) / 30, -1, 1)
+      mouseX.set(x)
+      mouseY.set(y)
+    }
+
+    const DOE = DeviceOrientationEvent as unknown as {
+      requestPermission?: () => Promise<'granted' | 'denied'>
+    }
+
+    if (typeof DOE.requestPermission === 'function') {
+      // iOS 13+ requires a user-gesture to grant permission
+      const requestOnTouch = async () => {
+        try {
+          const response = await DOE.requestPermission!()
+          if (response === 'granted') {
+            window.addEventListener('deviceorientation', handleOrientation)
+          }
+        } catch { /* permission denied */ }
+      }
+      window.addEventListener('touchstart', requestOnTouch, { once: true, capture: true })
+      return () => {
+        window.removeEventListener('touchstart', requestOnTouch, true)
+        window.removeEventListener('deviceorientation', handleOrientation)
+      }
+    }
+
+    window.addEventListener('deviceorientation', handleOrientation)
+    return () => window.removeEventListener('deviceorientation', handleOrientation)
+  }, [isMobile, mouseX, mouseY])
+
   return (
     <div ref={pageRef} id='imageMain' className="relative w-full bg-white dark:bg-black text-foreground overflow-hidden sm:-mt-48">
       {/* Hero floating images (always rendered, hand-tuned positions) */}
-      {HERO_IMAGES.map((config, i) => (
+      {heroImages.map((config, i) => (
         <FloatingImage
           key={`hero-${i}`}
           config={config}
@@ -760,8 +1178,8 @@ export default function ImagePageClient({ }: ImagePageClientProps) {
         />
       ))}
 
-      {/* Dynamic floating images (generated to fill the full page) */}
-      {dynamicImages.map((config, i) => (
+      {/* Dynamic floating images (desktop/tablet only) */}
+      {!isMobile && dynamicImages.map((config, i) => (
         <FloatingImage
           key={`dyn-${i}`}
           config={config}
@@ -827,7 +1245,7 @@ export default function ImagePageClient({ }: ImagePageClientProps) {
 
           {isMobile ? (
             <div className="max-w-5xl w-full mx-auto px-4 relative z-10">
-              <div className="flex flex-col gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 {mobileGallery.map((src, i) => (
                   <motion.div
                     key={src + i}
@@ -844,7 +1262,7 @@ export default function ImagePageClient({ }: ImagePageClientProps) {
                     <img
                       src={src}
                       alt=""
-                      className="w-full h-auto object-cover transition-all duration-1200 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-[1.03] group-hover:-rotate-[0.4deg] will-change-transform"
+                      className="w-full h-auto object-cover"
                       loading="lazy"
                       draggable={false}
                     />
@@ -876,7 +1294,7 @@ export default function ImagePageClient({ }: ImagePageClientProps) {
                       <img
                         src={src}
                         alt=""
-                        className="w-full h-auto object-cover transition-all duration-1200 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105 group-hover:-rotate-1 will-change-transform"
+                        className="w-full h-auto object-cover"
                         loading="lazy"
                         draggable={false}
                       />
