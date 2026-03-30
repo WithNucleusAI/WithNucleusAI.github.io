@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect, useState, useMemo } from 'react'
+import { useRef, useEffect, useState, useMemo, useCallback } from 'react'
 import {
   motion,
   useMotionValue,
@@ -962,6 +962,9 @@ function FloatingImage({
 
 type ImagePageClientProps = Record<string, never>
 
+type GyroPermissionState = 'idle' | 'requesting' | 'granted' | 'denied'
+type IOSMotionPermissionResponse = 'granted' | 'denied' | 'prompt'
+
 export default function ImagePageClient({ }: ImagePageClientProps) {
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
@@ -977,6 +980,13 @@ export default function ImagePageClient({ }: ImagePageClientProps) {
   const [viewportWidth, setViewportWidth] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
   const [blogBand, setBlogBand] = useState({ start: 0, end: 0 })
+  const [gyroPermissionState, setGyroPermissionState] = useState<GyroPermissionState>('idle')
+
+  const canRequestGyroPermission = isMobile
+    && typeof DeviceOrientationEvent !== 'undefined'
+    && typeof (DeviceOrientationEvent as unknown as {
+      requestPermission?: () => Promise<IOSMotionPermissionResponse>
+    }).requestPermission === 'function'
 
   useEffect(() => {
     setViewportHeight(window.innerHeight)
@@ -993,8 +1003,14 @@ export default function ImagePageClient({ }: ImagePageClientProps) {
     const mediaQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
     const onChange = () => setIsMobile(mediaQuery.matches)
     onChange()
-    mediaQuery.addEventListener('change', onChange)
-    return () => mediaQuery.removeEventListener('change', onChange)
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', onChange)
+      return () => mediaQuery.removeEventListener('change', onChange)
+    }
+
+    mediaQuery.addListener(onChange)
+    return () => mediaQuery.removeListener(onChange)
   }, [])
 
   useEffect(() => {
@@ -1123,6 +1139,41 @@ export default function ImagePageClient({ }: ImagePageClientProps) {
     return () => window.removeEventListener('mousemove', handler)
   }, [mouseX, mouseY])
 
+  const requestGyroPermission = useCallback(async () => {
+    if (typeof DeviceOrientationEvent === 'undefined') return
+
+    const DOE = DeviceOrientationEvent as unknown as {
+      requestPermission?: () => Promise<IOSMotionPermissionResponse>
+    }
+    const DME = (window as Window & {
+      DeviceMotionEvent?: {
+        requestPermission?: () => Promise<IOSMotionPermissionResponse>
+      }
+    }).DeviceMotionEvent
+
+    if (typeof DOE.requestPermission !== 'function') {
+      setGyroPermissionState('granted')
+      return
+    }
+
+    setGyroPermissionState('requesting')
+
+    try {
+      const orientation = await DOE.requestPermission()
+      const motion = typeof DME?.requestPermission === 'function'
+        ? await DME.requestPermission()
+        : 'granted'
+
+      if (orientation === 'granted' && motion === 'granted') {
+        setGyroPermissionState('granted')
+      } else {
+        setGyroPermissionState('denied')
+      }
+    } catch {
+      setGyroPermissionState('denied')
+    }
+  }, [])
+
   // Gyroscope-driven parallax for mobile devices.
   // Maps device tilt (gamma → X, beta → Y) to the same motion values that
   // the desktop mouse handler writes to, so FloatingImage picks it up for free.
@@ -1139,29 +1190,18 @@ export default function ImagePageClient({ }: ImagePageClientProps) {
     }
 
     const DOE = DeviceOrientationEvent as unknown as {
-      requestPermission?: () => Promise<'granted' | 'denied'>
+      requestPermission?: () => Promise<IOSMotionPermissionResponse>
     }
 
-    if (typeof DOE.requestPermission === 'function') {
-      // iOS 13+ requires a user-gesture to grant permission
-      const requestOnTouch = async () => {
-        try {
-          const response = await DOE.requestPermission!()
-          if (response === 'granted') {
-            window.addEventListener('deviceorientation', handleOrientation)
-          }
-        } catch { /* permission denied */ }
-      }
-      window.addEventListener('touchstart', requestOnTouch, { once: true, capture: true })
-      return () => {
-        window.removeEventListener('touchstart', requestOnTouch, true)
-        window.removeEventListener('deviceorientation', handleOrientation)
-      }
+    if (typeof DOE.requestPermission === 'function' && gyroPermissionState !== 'granted') {
+      return
     }
 
     window.addEventListener('deviceorientation', handleOrientation)
     return () => window.removeEventListener('deviceorientation', handleOrientation)
-  }, [isMobile, mouseX, mouseY])
+  }, [isMobile, mouseX, mouseY, gyroPermissionState])
+
+  const showGyroPrompt = canRequestGyroPermission && gyroPermissionState !== 'granted'
 
   return (
     <div ref={pageRef} id='imageMain' className="relative w-full bg-white dark:bg-black text-foreground overflow-hidden sm:-mt-48">
@@ -1190,6 +1230,27 @@ export default function ImagePageClient({ }: ImagePageClientProps) {
           viewportHeight={viewportHeight}
         />
       ))}
+
+      {showGyroPrompt && (
+        <div className="fixed inset-x-4 bottom-5 z-40 pointer-events-auto sm:hidden">
+          <div className="rounded-xl border border-black/10 dark:border-white/20 bg-white/90 dark:bg-black/80 backdrop-blur px-4 py-3 shadow-lg">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-black/70 dark:text-white/65">
+              Tilt Parallax
+            </p>
+            <p className="mt-1 text-sm text-black/80 dark:text-white/80">
+              Enable motion access to control floating images with your phone tilt.
+            </p>
+            <button
+              type="button"
+              onClick={requestGyroPermission}
+              disabled={gyroPermissionState === 'requesting'}
+              className="mt-3 h-10 px-4 rounded-lg bg-black text-white dark:bg-white dark:text-black text-sm font-medium tracking-[0.03em] disabled:opacity-50"
+            >
+              {gyroPermissionState === 'requesting' ? 'Requesting...' : 'Enable Motion'}
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="relative z-10 pointer-events-none">
         {/* ═══ Hero ═══ */}
