@@ -58,7 +58,7 @@ export default function ImagePageScrollButton() {
     };
 
     return (
-        <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-20 transition-all duration-300 ${visible ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
+        <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${visible ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
             <button className="btn btn--circle" onClick={handleScroll} aria-label="Scroll down">
                 <div className="btn__content">
                     <svg

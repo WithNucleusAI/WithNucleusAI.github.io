@@ -633,17 +633,7 @@ function AppInner({ disableAmbientBackground }: { disableAmbientBackground?: boo
                 </p>
               </div>
               {/* Color legend — frosted strip */}
-              <div className={`flex flex-wrap ${mob ? "gap-2 rounded-[10px] px-[10px] py-[6px] border-black/8 bg-white dark:border-white/10 dark:bg-[#151b27]" : "gap-4 rounded-[10px] px-[14px] py-[7px] border-black/5 bg-black/[0.012] dark:border-white/[0.03] dark:bg-white/[0.015]"} border`}>
-                {families.filter(f => f !== "Other").map((f) => {
-                  const c = isDark ? familyConfig[f].color : familyConfig[f].light;
-                  return (
-                    <div key={f} className="flex items-center gap-1.5">
-                      <span className="h-1.5 w-1.5 rounded-full opacity-85"/>
-                      <span className={`${mob ? "text-[9px]" : "text-[10.5px]"} font-medium tracking-[-0.01em] text-black/62 dark:text-white/62`}>{f}</span>
-                    </div>
-                  );
-                })}
-              </div>
+             
             </div>
 
             <div style={{ marginLeft: mob ? -8 : 0, marginRight: mob ? -8 : 0 }}>

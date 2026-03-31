@@ -15,19 +15,20 @@ export default function ScrollDownButton() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    const handleScroll = () => {
-        const vh = window.innerHeight;
-        const currentY = window.scrollY;
-        if (currentY < vh) {
-            document.getElementById("intro-section")?.scrollIntoView({ behavior: "smooth" });
-        } else if (currentY < vh * 2) {
-            document.getElementById("blog-section")?.scrollIntoView({ behavior: "smooth" });
+    const handleClick = () => {
+        const introSection = document.getElementById("intro-section");
+        const blogSection = document.getElementById("blog-section");
+
+        if (introSection && introSection.getBoundingClientRect().top > 50) {
+            introSection.scrollIntoView({ behavior: "smooth" });
+        } else if (blogSection && blogSection.getBoundingClientRect().top > 50) {
+            blogSection.scrollIntoView({ behavior: "smooth" });
         }
     };
 
     return (
         <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-20 transition-all duration-300 ${visible ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
-            <button className="btn btn--circle" onClick={handleScroll} aria-label="Scroll down">
+            <button className="btn btn--circle" onClick={handleClick} aria-label="Scroll down">
                 <div className="btn__content">
                     <svg
                         className="h-5 w-5 md:h-6 md:w-6"
