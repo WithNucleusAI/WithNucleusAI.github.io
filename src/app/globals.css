@@ -1,8 +1,34 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
+@custom-variant pointer-fine (@media (pointer: fine));
+
+@theme {
+  --color-accent: #4F7CFF;
+  --color-accent-glow: rgba(79, 124, 255, 0.3);
+  --color-accent-soft: rgba(79, 124, 255, 0.15);
+  --color-accent-muted: rgba(79, 124, 255, 0.08);
+}
 
 :root {
   font-family: var(--font-base), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --accent: #4F7CFF;
+  --accent-rgb: 79, 124, 255;
+  --accent-glow: rgba(79, 124, 255, 0.3);
+  --accent-soft: rgba(79, 124, 255, 0.15);
+  --accent-muted: rgba(79, 124, 255, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.06);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.dark {
+  --glass-bg: rgba(8, 8, 16, 0.7);
+  --glass-border: rgba(79, 124, 255, 0.06);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -55,7 +81,8 @@ samp {
 }
 
 .dark .btn:hover {
-  box-shadow: 0 8px 30px rgba(255, 255, 255, 0.1);
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 20px var(--accent-soft), 0 8px 30px rgba(255, 255, 255, 0.05);
 }
 
 /* Text/Icon Label inside the button */
@@ -105,7 +132,7 @@ samp {
 }
 
 .dark .btn__fill-circle {
-  fill: #fff; /* White fill for dark mode */
+  fill: var(--accent); /* Accent blue fill for dark mode */
 }
 
 /* Scale up on hover */
@@ -133,7 +160,7 @@ samp {
 }
 
 .dark .btn__border-path {
-  stroke: #fff; /* White stroke for dark mode */
+  stroke: var(--accent); /* Accent blue stroke for dark mode */
 }
 
 /* -----------------------------------------------------------
@@ -675,4 +702,50 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
   .toc-container {
     display: none;
   }
+}
+
+/* ============================================
+   Glass Panel Utility
+   ============================================ */
+.glass-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+@media (min-width: 768px) {
+  .glass-panel {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+}
+
+/* ============================================
+   Link Underline Animation (center → outward)
+   ============================================ */
+.link-underline {
+  position: relative;
+}
+
+.link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 1.5px;
+  background: var(--accent);
+  transition: width 0.3s ease, left 0.3s ease;
+}
+
+.link-underline:hover::after {
+  width: 100%;
+  left: 0;
+}
+
+/* ============================================
+   Accent Glow Utility
+   ============================================ */
+.accent-glow {
+  box-shadow: 0 0 20px var(--accent-glow), 0 0 60px var(--accent-soft);
 }

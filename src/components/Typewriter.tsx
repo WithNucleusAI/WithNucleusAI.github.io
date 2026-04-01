@@ -4,20 +4,16 @@ import { useEffect, useState, useRef } from "react";
 import { getIntroPlayed } from "./IntroOverlay";
 
 const phrases = [
-    "Ayon,asdasd",
-    // "The answer, my friend, is blowin' in the wind. <br><br> -Bob Dylan",
-    // "Intelligence isn’t compressed memory, it’s the ability to find those answers in the wind.",
-    // "The fathers and the prodigies of AI have united, to help AI reach singularity.",
+    "The answer, my friend, is blowin' in the wind. <br><br> -Bob Dylan",
+    "Intelligence isn't compressed memory, it's the ability to find those answers in the wind.",
     "NUCLEUS"
 ];
 
-const prefix = [0, 0, 0, 0, 0, 0];
+const prefix = [0, 0, 0];
 const commaOverrides: { [key: number]: { [key: number]: number } } = {
     0: { 10: 0 },
 };
-const fullstopOverrides: { [key: number]: { [key: number]: number } } = {
-    5: { 7: 750 }
-};
+const fullstopOverrides: { [key: number]: { [key: number]: number } } = {};
 
 const typingSpeed = 60;
 const normalDeletingSpeed = 15; // Slightly slower delete to make it smoother
@@ -107,8 +103,9 @@ export default function Typewriter() {
                             return;
                         }
                     }
-                    // A tiny bit of randomness for authentic typing effect
-                    const randomSpeed = typingSpeed + (Math.random() * 20 - 10);
+                    // Final phrase (NUCLEUS) types slower and more deliberately
+                    const baseSpeed = isFinalPhrase ? 180 : typingSpeed;
+                    const randomSpeed = baseSpeed + (Math.random() * (isFinalPhrase ? 60 : 20) - (isFinalPhrase ? 30 : 10));
                     timeoutRef.current = setTimeout(typeWriter, randomSpeed);
                 } else {
                     if (isFinalPhrase) {
@@ -170,7 +167,7 @@ export default function Typewriter() {
     }, []);
 
     return (
-        <div 
+        <div
             className="w-full flex mt-14 flex-col items-center -translate-y-10"
         >
             <style dangerouslySetInnerHTML={{__html: `
@@ -179,42 +176,53 @@ export default function Typewriter() {
                     50% { opacity: 0; }
                 }
                 @keyframes fade-slide-up {
-                    0% {
-                        opacity: 0;
-                        transform: translateY(30px);
-                    }
-                    100% {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
+                    0% { opacity: 0; transform: translateY(20px); }
+                    100% { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes separator-expand {
+                    0% { width: 0; opacity: 0; }
+                    100% { width: 3rem; opacity: 1; }
                 }
             `}} />
+
+            {/* NUCLEUS / typewriter text */}
             <div
                 id="typing"
-                // style={{ fontFamily: isNucleus ? 'var(--font-playfair), serif' : undefined }}
-                className={`mx-auto w-full max-w-[85vw] sm:max-w-md px-2 sm:px-4 text-center text-neutral-700 dark:text-neutral-300 tracking-tight origin-center md:leading-normal max-md:leading-[1.35] ${isNucleus ? "transition-none text-4xl sm:text-3xl font-bold leading-none" : "transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] font-inherit text-lg sm:text-xl font-bold"}`}
+                className={`mx-auto w-full max-w-[90vw] sm:max-w-2xl px-2 sm:px-4 text-center origin-center md:leading-normal max-md:leading-[1.35] ${
+                    isNucleus
+                        ? "transition-none text-5xl sm:text-7xl lg:text-8xl font-extralight leading-none tracking-[0.28em] text-gray-900 dark:text-white"
+                        : "transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] font-inherit text-lg sm:text-xl font-light tracking-tight text-neutral-600 dark:text-neutral-400"
+                }`}
             >
                 <span
                     id="text"
-                    className={isNucleus ? "transition-none text-neutral-700 dark:text-neutral-300" : "transition-all duration-1000 "}
+                    className={isNucleus ? "transition-none" : "transition-all duration-1000"}
+                    style={isNucleus ? { textShadow: "0 0 40px rgba(79,124,255,0.15), 0 0 80px rgba(79,124,255,0.05)" } : undefined}
                     dangerouslySetInnerHTML={{ __html: text }}
                 ></span>
                 {!showCaption && (
-                    <span 
-                        style={{ animation: 'typewriter-blink 0.8s linear infinite' }}
-                        className="inline-block  w-0.75 h-[1.1em] ml-1 align-middle bg-current opacity-80"
+                    <span
+                        style={{ animation: 'typewriter-blink 0.9s ease-in-out infinite' }}
+                        className="inline-block w-[2px] h-[0.85em] ml-1.5 align-middle bg-[rgba(79,124,255,0.5)]"
                     ></span>
                 )}
             </div>
-            
+
             {showCaption && (
-                <div 
+                <div
                     key="caption"
-                    style={{ animation: 'fade-slide-up 1.2s ease-out 0.1s both' }}
-                    className="mt-2 sm:mt-2 "
+                    className="mt-5 sm:mt-6 flex flex-col items-center gap-4"
                 >
+                    {/* Thin separator line */}
+                    <div
+                        style={{ animation: 'separator-expand 1.5s cubic-bezier(0.16,1,0.3,1) 0.3s both' }}
+                        className="h-px bg-[rgba(79,124,255,0.2)]"
+                    />
+
+                    {/* Subtitle */}
                     <span
-                        className="text-base sm:text-xl text-gray-400 dark:text-gray-400 font-medium tracking-wide"
+                        style={{ animation: 'fade-slide-up 1.5s cubic-bezier(0.16,1,0.3,1) 0.6s both' }}
+                        className="text-[11px] sm:text-sm lg:text-base text-gray-400 dark:text-[rgba(79,124,255,0.55)] font-light tracking-[0.4em] uppercase"
                     >
                         General Intelligence
                     </span>

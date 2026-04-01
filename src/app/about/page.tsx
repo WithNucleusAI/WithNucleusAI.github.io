@@ -27,21 +27,21 @@ export default function About() {
         </div>
 
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-          <div>
+          <div className="glass-panel rounded-2xl p-6 transition-all duration-300 hover:border-[rgba(79,124,255,0.2)] hover:shadow-[0_0_25px_rgba(79,124,255,0.1)]">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Research</h3>
             <p className="text-gray-600 dark:text-gray-400">
               Cutting-edge AI research focused on general intelligence and autonomous systems.
             </p>
           </div>
 
-          <div>
+          <div className="glass-panel rounded-2xl p-6 transition-all duration-300 hover:border-[rgba(79,124,255,0.2)] hover:shadow-[0_0_25px_rgba(79,124,255,0.1)]">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Development</h3>
             <p className="text-gray-600 dark:text-gray-400">
               Building scalable, production-ready AI systems and applications.
             </p>
           </div>
 
-          <div>
+          <div className="glass-panel rounded-2xl p-6 transition-all duration-300 hover:border-[rgba(79,124,255,0.2)] hover:shadow-[0_0_25px_rgba(79,124,255,0.1)]">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Collaboration</h3>
             <p className="text-gray-600 dark:text-gray-400">
               Working with the global AI community to advance the field together.

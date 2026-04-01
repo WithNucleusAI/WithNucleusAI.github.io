@@ -15,7 +15,7 @@ interface EfficiencyEntry {
 }
 
 const modelColors: Record<string, { dark: string; light: string }> = {
-  nucleus:      { dark: "#3B9EFF", light: "#0066DC" },
+  nucleus:      { dark: "#4F7CFF", light: "#0066DC" },
   "qwen-img":   { dark: "#34EAD0", light: "#0A7D6E" },
   cogview4:     { dark: "#FF9F43", light: "#C56A00" },
   "flux-dev":   { dark: "#FF85C8", light: "#B91C5C" },
@@ -99,7 +99,7 @@ export function EfficiencyChart() {
 
   const secondEntry = restData[0];
   const multiplier = (nucleusEntry.efficiency / secondEntry.efficiency).toFixed(1);
-  const nucleusColor = isDark ? "#3B9EFF" : "#0066DC";
+  const nucleusColor = isDark ? "#4F7CFF" : "#0066DC";
 
   // Median efficiency for context line
   const efficiencies = data.map(d => d.efficiency);
@@ -160,7 +160,7 @@ export function EfficiencyChart() {
             border: `1px solid ${isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.04)"}`,
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={isDark ? "#3B9EFF" : "#0066DC"} strokeWidth="2" strokeLinecap="round" opacity={0.5}>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={isDark ? "#4F7CFF" : "#0066DC"} strokeWidth="2" strokeLinecap="round" opacity={0.5}>
                 <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
               </svg>
               <span style={{ fontSize: 11, color: t.chartSub, fontWeight: 600 }}>Higher = more efficient</span>
@@ -265,7 +265,7 @@ export function EfficiencyChart() {
                   letterSpacing: "-0.04em", lineHeight: 1,
                   ...mono,
                   backgroundImage: isDark
-                    ? "linear-gradient(135deg, #3B9EFF 0%, #818cf8 55%, #c084fc 100%)"
+                    ? "linear-gradient(135deg, #4F7CFF 0%, #818cf8 55%, #c084fc 100%)"
                     : "linear-gradient(135deg, #0066DC 0%, #4F46E5 55%, #7C3AED 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
@@ -319,7 +319,7 @@ export function EfficiencyChart() {
                 style={{
                   height: "100%", borderRadius: 100,
                   background: isDark
-                    ? "linear-gradient(90deg, #3B9EFF 0%, #818cf8 40%, #c084fc 100%)"
+                    ? "linear-gradient(90deg, #4F7CFF 0%, #818cf8 40%, #c084fc 100%)"
                     : "linear-gradient(90deg, #0066DC 0%, #4F46E5 40%, #7C3AED 100%)",
                   opacity: isDark ? 0.95 : 0.92,
                 }}
@@ -517,7 +517,7 @@ export function EfficiencyChart() {
                 fontSize: 17, fontWeight: 800, letterSpacing: "-0.04em",
                 ...mono,
                   backgroundImage: isDark
-                  ? "linear-gradient(135deg, #3B9EFF, #818cf8)"
+                  ? "linear-gradient(135deg, #4F7CFF, #818cf8)"
                   : "linear-gradient(135deg, #0066DC, #4F46E5)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",

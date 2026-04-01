@@ -15,10 +15,10 @@ export default async function BlogPage() {
                 {posts.map((post) => (
                     <div key={post.slug} className="mb-10 sm:mb-12 pb-10 sm:pb-12 border-b border-[#f0f0f0] dark:border-gray-800">
                         <Link href={`/blog/${post.slug}`} className="group no-underline text-inherit block hover:no-underline">
-                            <h2 className="text-[1.4rem] sm:text-[1.8rem] font-semibold tracking-tight m-0 mb-2 transition-colors duration-200 text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400">{post.title}</h2>
+                            <h2 className="text-[1.4rem] sm:text-[1.8rem] font-semibold tracking-tight m-0 mb-2 transition-colors duration-200 text-gray-900 dark:text-gray-100 group-hover:text-[var(--accent)]">{post.title}</h2>
                             <p className="text-[#888] dark:text-gray-500 text-xs sm:text-sm mb-4 block">{post.date}</p>
                             <p className="leading-relaxed text-[#444] dark:text-gray-400 mb-6 text-[0.98rem] sm:text-[1.05rem]">{post.excerpt}</p>
-                            <span className="inline-block font-semibold text-black dark:text-white border-b border-black dark:border-white pb-0.5 transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:border-blue-600 dark:group-hover:border-blue-400">
+                            <span className="inline-block font-semibold text-black dark:text-white border-b border-black dark:border-white pb-0.5 transition-colors duration-200 group-hover:text-[var(--accent)] group-hover:border-[var(--accent)]">
                                 Read more →
                             </span>
                         </Link>

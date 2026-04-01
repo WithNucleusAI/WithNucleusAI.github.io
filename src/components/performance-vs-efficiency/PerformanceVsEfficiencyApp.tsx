@@ -43,7 +43,7 @@ const models: Model[] = [
 /* ─────────────────── Palette ──────────────────── */
 
 const familyConfig: Record<string, { color: string; light: string }> = {
-  Nucleus: { color: "#3B9EFF", light: "#0066DC" },
+  Nucleus: { color: "#4F7CFF", light: "#0066DC" },
   Qwen: { color: "#34EAD0", light: "#0A7D6E" },
   Seedream: { color: "#FFD04A", light: "#B45309" },
   GPT: { color: "#FF7A90", light: "#C01040" },
@@ -235,7 +235,7 @@ function MicroStat({ label, value, color, highlight }: { label: string; value: s
         margin: 0, marginTop: 2, fontSize: 15, fontWeight: 600, letterSpacing: "-0.03em",
         ...mono,
         color: highlight
-          ? (isDark ? "#3B9EFF" : "#0066DC")
+          ? (isDark ? "#4F7CFF" : "#0066DC")
           : color || t.tooltipValue,
       }}>{value}</p>
     </div>
@@ -503,7 +503,7 @@ function AppInner({ disableAmbientBackground }: { disableAmbientBackground?: boo
   }
 
   return (
-    <div className={`size-full flex flex-col items-center overflow-y-auto overflow-x-hidden [scroll-behavior:smooth] antialiased ${mob ? "bg-white dark:bg-black" : "bg-transparent"}`}>
+    <div className={`size-full flex flex-col items-center overflow-y-auto overflow-x-hidden [scroll-behavior:smooth] antialiased ${mob ? "bg-white dark:bg-[#030308]" : "bg-transparent"}`}>
       {!disableAmbientBackground && !mob && (
         <>
           {/* Ambient blooms — asymmetric for organic feel */}
@@ -537,10 +537,10 @@ function AppInner({ disableAmbientBackground }: { disableAmbientBackground?: boo
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               {/* Pill badge with subtle shimmer */}
-              <div className="relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-[#0066DC]/10  px-4 py-[5px] pl-[10px] md:backdrop-blur-[12px] dark:border-[#3B9EFF]/10">
+              <div className="relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-[#0066DC]/10  px-4 py-[5px] pl-[10px] md:backdrop-blur-[12px] dark:border-[#4F7CFF]/10">
                 {/* Shimmer */}
                 <div className="absolute left-[-100%] top-0 h-full w-[200%] animate-[shimmer_4s_ease-in-out_infinite] bg-[linear-gradient(90deg,transparent_40%,rgba(0,102,220,0.06)_50%,transparent_60%)] dark:bg-[linear-gradient(90deg,transparent_40%,rgba(59,158,255,0.08)_50%,transparent_60%)]" />
-                <span className="h-1.5 w-1.5 animate-[pulse_2.5s_ease-in-out_infinite] rounded-full bg-[#0066DC] shadow-[0_0_10px_rgba(0,102,220,0.5)] dark:bg-[#3B9EFF] dark:shadow-[0_0_12px_rgba(59,158,255,0.7)]" />
+                <span className="h-1.5 w-1.5 animate-[pulse_2.5s_ease-in-out_infinite] rounded-full bg-[#0066DC] shadow-[0_0_10px_rgba(0,102,220,0.5)] dark:bg-[#4F7CFF] dark:shadow-[0_0_12px_rgba(59,158,255,0.7)]" />
                 <span className="relative text-[11px] font-medium tracking-[0.02em] text-[#0057C8] dark:text-[#76BBFF]">Benchmark Analysis</span>
               </div>
 
@@ -551,10 +551,10 @@ function AppInner({ disableAmbientBackground }: { disableAmbientBackground?: boo
                 <span className={`${mob ? "text-4xl" : "text-[60px]"} inline font-bold`}>
                   Nucleus
                 </span>
-                <span className={`${mob ? "text-4xl ml-[6px]" : "text-[60px] ml-[10px]"} inline bg-[linear-gradient(135deg,#0055CC_0%,#4F46E5_40%,#7C3AED_80%,#9333EA_100%)] bg-clip-text font-bold text-transparent dark:bg-[linear-gradient(135deg,#3B9EFF_0%,#818cf8_40%,#c084fc_80%,#f0abfc_100%)]`}>
+                <span className={`${mob ? "text-4xl ml-[6px]" : "text-[60px] ml-[10px]"} inline bg-[linear-gradient(135deg,#0055CC_0%,#4F46E5_40%,#7C3AED_80%,#9333EA_100%)] bg-clip-text font-bold text-transparent dark:bg-[linear-gradient(135deg,#4F7CFF_0%,#818cf8_40%,#c084fc_80%,#f0abfc_100%)]`}>
                   Image
                 </span>
-                <span className={`relative inline-block align-super ${mob ? "top-[-6px] ml-2 rounded-[5px] px-2 py-[3px] text-[11px]" : "top-[-12px] ml-[14px] rounded-[7px] px-3 py-1 text-base"} border border-[#0066DC]/25 bg-[#0066DC]/[0.06] font-semibold uppercase tracking-[0.15em] text-[#0057C8] md:backdrop-blur-[8px] dark:border-[#3B9EFF]/30 dark:bg-[#3B9EFF]/[0.1] dark:text-[#82C4FF]`}>
+                <span className={`relative inline-block align-super ${mob ? "top-[-6px] ml-2 rounded-[5px] px-2 py-[3px] text-[11px]" : "top-[-12px] ml-[14px] rounded-[7px] px-3 py-1 text-base"} border border-[#0066DC]/25 bg-[#0066DC]/[0.06] font-semibold uppercase tracking-[0.15em] text-[#0057C8] md:backdrop-blur-[8px] dark:border-[#4F7CFF]/30 dark:bg-[#4F7CFF]/[0.1] dark:text-[#82C4FF]`}>
                   MoE
                 </span>
               </h1>
@@ -766,11 +766,11 @@ function AppInner({ disableAmbientBackground }: { disableAmbientBackground?: boo
         >
           <div className="mb-8 h-px bg-[linear-gradient(90deg,transparent,rgba(0,102,220,0.06)_20%,rgba(147,51,234,0.05)_50%,rgba(5,150,105,0.04)_80%,transparent)] dark:bg-[linear-gradient(90deg,transparent,rgba(59,158,255,0.04)_20%,rgba(192,132,252,0.035)_50%,rgba(52,211,153,0.03)_80%,transparent)]" />
           <div className="mb-[14px] inline-flex items-center gap-2">
-            <div className="h-[5px] w-[5px] rounded-full bg-[#0066DC] opacity-30 dark:bg-[#3B9EFF]" />
+            <div className="h-[5px] w-[5px] rounded-full bg-[#0066DC] opacity-30 dark:bg-[#4F7CFF]" />
             <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#0066DC]/65 dark:text-[#7EC0FF]">
               Nucleus-Image
             </span>
-            <div className="h-[5px] w-[5px] rounded-full bg-[#0066DC] opacity-30 dark:bg-[#3B9EFF]" />
+            <div className="h-[5px] w-[5px] rounded-full bg-[#0066DC] opacity-30 dark:bg-[#4F7CFF]" />
           </div>
           <p className="m-0 text-[11px] leading-[1.5] tracking-[-0.005em] text-black/52 dark:text-white/52">
             Performance scores are approximate from publicly available benchmarks.

@@ -19,7 +19,7 @@ interface DpgModel {
 }
 
 const models: DpgModel[] = [
-  { id: "nucleus", name: "Nucleus-Image", global: 85.10, entity: 93.08, attribute: 92.20, relation: 93.56, other: 93.62, overall: 88.79, color: "#3B9EFF", lightColor: "#0066DC" },
+  { id: "nucleus", name: "Nucleus-Image", global: 85.10, entity: 93.08, attribute: 92.20, relation: 93.56, other: 93.62, overall: 88.79, color: "#4F7CFF", lightColor: "#0066DC" },
   { id: "qwen-img", name: "Qwen-Image", global: 91.32, entity: 91.56, attribute: 92.02, relation: 94.31, other: 92.73, overall: 88.32, color: "#34EAD0", lightColor: "#0A7D6E" },
   { id: "seedream", name: "Seedream 3.0", global: 94.31, entity: 92.65, attribute: 91.36, relation: 92.78, other: 88.24, overall: 88.27, color: "#FFD04A", lightColor: "#B45309" },
   { id: "cogview4", name: "CogView 4", global: 85.13, entity: 83.85, attribute: 90.35, relation: 91.17, other: 91.14, overall: 87.29, color: "#FF9F43", lightColor: "#C56A00" },
@@ -85,7 +85,7 @@ function CategoryBar({ cat, nucleusVal, bestVal, bestModel, index, isDark, mob }
   mob?: boolean;
 }) {
   const isLeader = bestModel.id === "nucleus";
-  const nucleusColor = isDark ? "#3B9EFF" : "#0066DC";
+  const nucleusColor = isDark ? "#4F7CFF" : "#0066DC";
   const onBarText = isDark ? "rgba(245,250,255,0.98)" : "rgba(255,255,255,0.98)";
   const barMax = 100;
   const nPct = nucleusVal != null ? ((nucleusVal - 70) / (barMax - 70)) * 100 : 0;
@@ -182,7 +182,7 @@ export function DpgBench() {
   const mob = useIsMobile();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
-  const nucleusColor = isDark ? "#3B9EFF" : "#0066DC";
+  const nucleusColor = isDark ? "#4F7CFF" : "#0066DC";
   const nucleusRank = sorted.findIndex(m => m.id === "nucleus") + 1;
   const lead = nucleusEntry.overall - sorted[1].overall;
 
@@ -337,7 +337,7 @@ export function DpgBench() {
                   letterSpacing: "-0.04em", lineHeight: 1,
                   ...mono,
                   backgroundImage: isDark
-                    ? "linear-gradient(135deg, #3B9EFF 0%, #818cf8 55%, #c084fc 100%)"
+                    ? "linear-gradient(135deg, #4F7CFF 0%, #818cf8 55%, #c084fc 100%)"
                     : "linear-gradient(135deg, #0066DC 0%, #4F46E5 55%, #7C3AED 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
@@ -505,7 +505,7 @@ export function DpgBench() {
                       height: "100%", borderRadius: 100,
                       background: isNucleus
                         ? (isDark
-                          ? "linear-gradient(90deg, #3B9EFF 0%, #818cf8 50%, #c084fc 100%)"
+                          ? "linear-gradient(90deg, #4F7CFF 0%, #818cf8 50%, #c084fc 100%)"
                           : "linear-gradient(90deg, #0066DC 0%, #4F46E5 50%, #7C3AED 100%)")
                         : `linear-gradient(90deg, ${color}, ${color}CC)`,
                       opacity: isNucleus

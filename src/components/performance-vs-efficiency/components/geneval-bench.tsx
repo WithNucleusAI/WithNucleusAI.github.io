@@ -20,7 +20,7 @@ interface GenEvalModel {
 }
 
 const models: GenEvalModel[] = [
-  { id: "nucleus", name: "Nucleus-Image", singleObj: 0.99, twoObj: 0.95, counting: 0.78, colors: 0.92, position: 0.85, attrBinding: 0.71, overall: 0.87, color: "#3B9EFF", lightColor: "#0066DC" },
+  { id: "nucleus", name: "Nucleus-Image", singleObj: 0.99, twoObj: 0.95, counting: 0.78, colors: 0.92, position: 0.85, attrBinding: 0.71, overall: 0.87, color: "#4F7CFF", lightColor: "#0066DC" },
   { id: "qwen-img", name: "Qwen-Image", singleObj: 0.99, twoObj: 0.92, counting: 0.89, colors: 0.88, position: 0.76, attrBinding: 0.77, overall: 0.87, color: "#34EAD0", lightColor: "#0A7D6E" },
   { id: "cogview4", name: "CogView 4", singleObj: 0.99, twoObj: 0.86, counting: 0.66, colors: 0.79, position: 0.48, attrBinding: 0.58, overall: 0.87, color: "#FF9F43", lightColor: "#C56A00" },
   { id: "seedream", name: "Seedream 3.0", singleObj: 0.99, twoObj: 0.96, counting: 0.91, colors: 0.93, position: 0.47, attrBinding: 0.80, overall: 0.84, color: "#FFD04A", lightColor: "#B45309" },
@@ -61,7 +61,7 @@ const mono: React.CSSProperties = {
 /* ── Nucleus category performance mini-bars ── */
 
 function NucleusCategoryGrid({ isDark, mob }: { isDark: boolean; mob: boolean }) {
-  const nucleusColor = isDark ? "#3B9EFF" : "#0066DC";
+  const nucleusColor = isDark ? "#4F7CFF" : "#0066DC";
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: mob ? "repeat(2, 1fr)" : "repeat(3, 1fr)", gap: 8 }}>
@@ -157,7 +157,7 @@ export function GenEvalBench() {
   const mob = useIsMobile();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
-  const nucleusColor = isDark ? "#3B9EFF" : "#0066DC";
+  const nucleusColor = isDark ? "#4F7CFF" : "#0066DC";
 
   // Nucleus is tied #1 with CogView4 and Qwen-Image at 0.87
   const tiedModels = sorted.filter((m) => m.overall === nucleusEntry.overall && m.id !== "nucleus");
@@ -315,7 +315,7 @@ export function GenEvalBench() {
                   letterSpacing: "-0.04em", lineHeight: 1,
                   ...mono,
                   backgroundImage: isDark
-                    ? "linear-gradient(135deg, #3B9EFF 0%, #818cf8 55%, #c084fc 100%)"
+                    ? "linear-gradient(135deg, #4F7CFF 0%, #818cf8 55%, #c084fc 100%)"
                     : "linear-gradient(135deg, #0066DC 0%, #4F46E5 55%, #7C3AED 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
@@ -476,7 +476,7 @@ export function GenEvalBench() {
                       height: "100%", borderRadius: 100,
                       background: isNucleus
                         ? (isDark
-                          ? "linear-gradient(90deg, #3B9EFF 0%, #818cf8 50%, #c084fc 100%)"
+                          ? "linear-gradient(90deg, #4F7CFF 0%, #818cf8 50%, #c084fc 100%)"
                           : "linear-gradient(90deg, #0066DC 0%, #4F46E5 50%, #7C3AED 100%)")
                         : `linear-gradient(90deg, ${color}, ${color}CC)`,
                       opacity: isNucleus

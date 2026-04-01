@@ -112,12 +112,12 @@ export default function EscherBackground() {
         const image = new window.Image();
         image.src = "/images/hands2.webp";
 
-        const gap = isMobile ? 7.2 : 16.0;
-        const baseRadius = isMobile ? 1.8 : 6.0;
+        const gap = isMobile ? 7.2 : 13.0;
+        const baseRadius = isMobile ? 1.8 : 4.2;
         const MOBILE_IMAGE_ZOOM = 1.5; // ← increase to zoom in on the image on mobile (e.g. 1.2 = 20% zoom)
-        const DESKTOP_IMAGE_ZOOM = 1.1; // ← increase to zoom in on desktop
-        const IMAGE_ROTATION_DEG = -30.0; // ← angle in degrees to rotate the underlying image clockwise
-        const WAVE_INTENSITY = 0.50; // ← adjust wave strength (e.g. 0.8 is strong, 0.3 is minimalist/subtle)
+        const DESKTOP_IMAGE_ZOOM = 1.35; // ← increase to zoom in on desktop
+        const IMAGE_ROTATION_DEG = -25.0; // ← angle in degrees to rotate the underlying image clockwise
+        const WAVE_INTENSITY = 0.30; // ← adjust wave strength (e.g. 0.8 is strong, 0.3 is minimalist/subtle)
         const WAVE_START_RADIUS_X = 350.0; // ← horizontal radius of the ellipse where waves start
         const WAVE_START_RADIUS_Y = 250.0; // ← vertical radius of the ellipse where waves start
         const HOVER_INTENSITY = 0.75; // ← adjust hover max strength
@@ -165,7 +165,7 @@ export default function EscherBackground() {
             }
         `;
 
-        // On mobile: mediump precision (huge GPU win) + cheap tent shimmer instead of exp()
+        // Creative neural field shader — Escher hands emerge from a blue particle nebula
         const fsSource = `
             precision ${floatPrecision} float;
             uniform sampler2D u_image;
@@ -182,80 +182,84 @@ export default function EscherBackground() {
             ${!isMobile ? `
             uniform vec2 u_mouse;
             uniform float u_hoverActive;
+            uniform vec2 u_parallax;
             ` : ''}
+
+            float hash(vec2 p) {
+                return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+            }
 
             void main() {
                 vec2 pos = vec2(gl_FragCoord.x, u_resolution.y - gl_FragCoord.y);
-                vec2 cellCenter = floor(pos / u_gap + 0.5) * u_gap;
+                vec2 cellIndex = floor(pos / u_gap + 0.5);
+                vec2 cellCenter = cellIndex * u_gap;
+                float depth = hash(cellIndex);
+
+                // ── Gentle organic drift ──
+                float driftAmp = 0.6;
+                vec2 drift = vec2(
+                    sin(cellIndex.x * 0.37 + cellIndex.y * 0.71 + u_globalTime * 0.00010) * driftAmp,
+                    cos(cellIndex.y * 0.43 + cellIndex.x * 0.59 + u_globalTime * 0.00008) * driftAmp
+                );
+
+                ${!isMobile ? `
+                vec2 parallaxShift = u_parallax * depth * 3.5;
+                cellCenter += drift + parallaxShift;
+                ` : `
+                cellCenter += drift;
+                `}
+
                 float dist = distance(pos, cellCenter);
 
-                // Continuous water ripples from center
-                vec2 screenCenter = vec2(u_resolution.x * 0.5, u_resolution.y * 0.5 - u_scrollY);
-                vec2 diff = pos - screenCenter;
-                float distFromCenter = length(diff);
-                
-                // Elliptical distance for wave masking and generation
+                // ── Vignette: dots shrink at screen edges, focus eye on center ──
+                vec2 screenCenter = vec2(u_resolution.x * 0.5, u_resolution.y * 0.5);
+                float distToScreenCenter = length(pos - screenCenter);
+                float maxDiag = length(u_resolution) * 0.55;
+                float vignette = 1.0 - smoothstep(maxDiag * 0.3, maxDiag, distToScreenCenter);
+
+                // ── Breathing pulse: very slow, gentle size oscillation ──
+                float breathe = sin(u_globalTime * 0.0004) * 0.5 + 0.5; // 0→1 slow
+                float breatheAmount = mix(0.97, 1.03, breathe); // ±3% size
+
+                // ── Soft ripple waves from center ──
+                vec2 waveCenter = vec2(u_resolution.x * 0.5, u_resolution.y * 0.5 - u_scrollY);
+                vec2 waveDiff = pos - waveCenter;
+                float waveDistFromCenter = length(waveDiff);
+
                 float ellipseRatioY = ${WAVE_START_RADIUS_X.toFixed(1)} / ${WAVE_START_RADIUS_Y.toFixed(1)};
-                vec2 ellipticalDiff = vec2(diff.x, diff.y * ellipseRatioY);
+                vec2 ellipticalDiff = vec2(waveDiff.x, waveDiff.y * ellipseRatioY);
                 float ellipticalDist = length(ellipticalDiff);
-                
-                // Base frequency and speed (lower freq = wider ripples, lower speed = slower)
-                float baseFreq = 0.009; 
-                float waveSpeed = 0.0015;
-                
-                // Exponential falloff for frequency so waves "stretch out" at the edges
-                float freqDecay = exp(-distFromCenter * 0.001); 
+
+                float baseFreq = 0.008;
+                float waveSpeed = 0.0012;
+                float freqDecay = exp(-waveDistFromCenter * 0.0012);
                 float effectiveFreq = baseFreq * mix(0.4, 1.0, freqDecay);
-                
-                // Sine wave based on distance and time
-                // Add a start radius so the wave effect only applies outside of it
+
                 float waveDist = max(0.0, ellipticalDist - ${WAVE_START_RADIUS_X.toFixed(1)});
                 float wave = sin(waveDist * effectiveFreq - u_globalTime * waveSpeed);
-                // Ramp up the wave strength over a very long smooth distance (150px) to hide the visible start boundary
-                float waveMask = smoothstep(0.0, 150.0 * max(1.0, ellipseRatioY), ellipticalDist - ${WAVE_START_RADIUS_X.toFixed(1)});
-                
-                // Remap [-1, 1] to [0, 1] and make the peaks smoother (2.2) instead of sharp (3.0) for a minimal look
-                float shimmer = pow((wave + 1.0) * 0.5, 2.2) * waveMask;
-                
-                // Fade out waves exponentially as they go away from center
-                float waveFalloff = exp(-distFromCenter * 0.00025);
-                
-                // Smoothly fade to exactly 0 towards the far edges of the screen to avoid abrupt endings
-                float maxScreenRadius = max(u_resolution.x, u_resolution.y) * 0.7;
-                float edgeFade = smoothstep(maxScreenRadius, maxScreenRadius * 0.4, distFromCenter);
-                
+                float waveMask = smoothstep(0.0, 180.0, ellipticalDist - ${WAVE_START_RADIUS_X.toFixed(1)});
+                float shimmer = pow((wave + 1.0) * 0.5, 2.5) * waveMask;
+                float waveFalloff = exp(-waveDistFromCenter * 0.0003);
+                float maxScreenRadius = max(u_resolution.x, u_resolution.y) * 0.65;
+                float edgeFade = smoothstep(maxScreenRadius, maxScreenRadius * 0.35, waveDistFromCenter);
                 shimmer *= waveFalloff * edgeFade * u_waveStrength;
-                
+
                 ${isMobile ? `
-                float magEffect = 0.0;
-                vec2 uvOffset = vec2(0.0);
+                float illumination = 0.0;
                 ` : `
-                // Magnifying glass effect
+                // ── Illumination hover: cursor reveals a warm glow ──
                 float distToMouse = distance(pos, u_mouse);
-                float glassRadius = 250.0;
-                float magEffect = 0.0;
-                vec2 uvOffset = vec2(0.0);
-                
-                if (u_hoverActive > 0.0 && distToMouse < glassRadius && u_mouse.x >= 0.0) {
-                    float normDist = distToMouse / glassRadius;
-                    float lensShape = 1.0 - pow(normDist, 2.0); // Parabolic lens
-                    magEffect = lensShape * u_hoverActive;
-                    vec2 centerVector = cellCenter - u_mouse;
-                    uvOffset = -centerVector * (magEffect * 0.5); // Zoom distortion
+                float glowRadius = 200.0;
+                float illumination = 0.0;
+                if (u_hoverActive > 0.0 && u_mouse.x >= 0.0) {
+                    float normDist = distToMouse / glowRadius;
+                    illumination = (1.0 - smoothstep(0.0, 1.0, normDist)) * u_hoverActive * 0.4;
                 }
                 `}
 
-                // Max possible radius used for early exit cull padding to save performance
-                float maxPossibleRadius = u_baseRadius * (1.0 + shimmer * ${WAVE_INTENSITY.toFixed(2)} + magEffect * ${HOVER_INTENSITY.toFixed(2)});
-
-                if (dist > maxPossibleRadius + 0.5) {
-                    gl_FragColor = vec4(0.0);
-                    return;
-                }
-
+                // ── Image sampling ──
                 float imgAspect = u_imageResolution.x / u_imageResolution.y;
                 float canvasAspect = u_resolution.x / u_resolution.y;
-
                 float drawWidth;
                 float drawHeight;
 
@@ -278,49 +282,73 @@ export default function EscherBackground() {
                 }
 
                 float offsetX = (u_resolution.x - drawWidth) * 0.5;
-                float offsetY = (u_resolution.y - drawHeight) * 0.5 - (u_resolution.y * 0.03); // Move up by 5vh
+                float offsetY = (u_resolution.y - drawHeight) * 0.5 - (u_resolution.y * 0.03);
 
-                // Sample UV directly from cellCenter + uvOffset
-                float u = (cellCenter.x + uvOffset.x - offsetX) / drawWidth;
-                float v = (cellCenter.y + uvOffset.y - offsetY + u_scrollY) / drawHeight;
-                vec2 uv = vec2(u, v);
+                float uCoord = (cellCenter.x - offsetX) / drawWidth;
+                float vCoord = (cellCenter.y - offsetY + u_scrollY) / drawHeight;
+                vec2 uv = vec2(uCoord, vCoord);
 
-                // Rotate UV space counter-clockwise by the user-defined angle to rotate the image clockwise
-                float angle = ${(IMAGE_ROTATION_DEG * Math.PI) / 180}; // degrees to radians from config
+                float angle = ${(IMAGE_ROTATION_DEG * Math.PI) / 180};
                 float cosA = cos(angle);
                 float sinA = sin(angle);
                 uv -= vec2(0.5, 0.5);
                 uv = vec2(uv.x * cosA - uv.y * sinA, uv.x * sinA + uv.y * cosA);
                 uv += vec2(0.5, 0.5);
 
-                float brightness;
                 float sampledBrightness = 255.0;
-                if (u_imageFade > 0.001 && uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0) {
+                bool inImage = u_imageFade > 0.001 && uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0;
+                if (inImage) {
                     vec4 color = texture2D(u_image, uv);
                     sampledBrightness = dot(color.rgb, vec3(0.333333)) * 255.0;
                 }
-                // When u_imageFade -> 0, treat the image as pure white (but keep waves).
-                brightness = mix(255.0, sampledBrightness, clamp(u_imageFade, 0.0, 1.0));
+                float brightness = mix(255.0, sampledBrightness, clamp(u_imageFade, 0.0, 1.0));
 
+                // ── S-curve contrast: dramatic separation for crisp hands ──
                 float rawSizeFactor = (255.0 - brightness) / 255.0;
-                
-                // Base size for the dot (0.15 min keeps background dots alive)
-                float baseSize = max(0.15, rawSizeFactor) * u_baseRadius;
-                
-                // Apply hover effect exactly like the original formulation
-                float hoverBonus = baseSize * (magEffect * ${HOVER_INTENSITY.toFixed(2)});
-                
-                // Make wave effects heavily independent of the image brightness!
-                float effectScale = mix(0.65, 1.0, rawSizeFactor); 
-                float waveBonus = u_baseRadius * (shimmer * ${WAVE_INTENSITY.toFixed(2)}) * effectScale;
+                float contrastFactor = smoothstep(0.08, 0.65, rawSizeFactor); // S-curve
+                // Blend: use S-curve for image region, linear for background
+                float inImageBlend = inImage ? 1.0 : 0.0;
+                float sizeFactor = mix(rawSizeFactor, contrastFactor, inImageBlend * u_imageFade);
 
-                float dotSize = baseSize + waveBonus + hoverBonus;
+                // ── Dot sizing with breathing and vignette ──
+                float baseSize = max(0.04, sizeFactor) * u_baseRadius * breatheAmount;
+                float waveBonus = u_baseRadius * (shimmer * ${WAVE_INTENSITY.toFixed(2)}) * mix(0.5, 1.0, sizeFactor);
+                float dotSize = (baseSize + waveBonus) * vignette;
 
-                // Always draw dots, but smaller ones for bright areas
-                if (dotSize > 0.1) {
+                // Illumination boost: dots near cursor grow slightly
+                dotSize *= (1.0 + illumination * 0.3);
+
+                float maxPossibleRadius = dotSize + 1.0;
+                if (dist > maxPossibleRadius + 0.5) {
+                    gl_FragColor = vec4(0.0);
+                    return;
+                }
+
+                // ── Coloring: blue neural field fading to pure black at the drawing ──
+                // Background dots (bright areas / outside image) get subtle blue tint
+                // Drawing dots (dark areas) stay pure black for maximum legibility
+                float blueTint = (1.0 - sizeFactor) * 0.6; // more blue where dots are small (light areas)
+                blueTint *= (1.0 - vignette * 0.3); // slightly more blue at edges
+
+                // Accent blue color: rgb(79, 124, 255) = (0.31, 0.49, 1.0)
+                vec3 dotColor = mix(
+                    vec3(0.0, 0.0, 0.0),           // pure black for drawing
+                    vec3(0.22, 0.38, 0.85),          // deep blue for neural field
+                    blueTint * 0.35                  // very subtle blend
+                );
+
+                // Illumination adds warm blue glow near cursor
+                dotColor = mix(dotColor, vec3(0.31, 0.49, 1.0), illumination * 0.5);
+
+                // Depth-based opacity (very subtle)
+                float depthOpacity = mix(0.85, 1.0, depth);
+
+                // ── Draw the dot ──
+                if (dotSize > 0.08) {
                     float alpha = 1.0 - smoothstep(dotSize - 0.5, dotSize + 0.5, dist);
                     if (alpha > 0.0) {
-                        gl_FragColor = vec4(0.0, 0.0, 0.0, alpha * 0.85);
+                        float finalAlpha = alpha * 0.92 * depthOpacity * max(vignette, 0.05);
+                        gl_FragColor = vec4(dotColor, finalAlpha);
                         return;
                     }
                 }
@@ -381,6 +409,7 @@ export default function EscherBackground() {
         const uWaveStrength = gl.getUniformLocation(program, "u_waveStrength");
         const uMouse = gl.getUniformLocation(program, "u_mouse");
         const uHoverActive = gl.getUniformLocation(program, "u_hoverActive");
+        const uParallax = gl.getUniformLocation(program, "u_parallax");
 
         gl.uniform1f(uGap, gap);
         gl.uniform1f(uBaseRadius, baseRadius);
@@ -438,6 +467,8 @@ export default function EscherBackground() {
         let currentHover = 0;
         let mouseX = -1000;
         let mouseY = -1000;
+        let parallaxX = 0;
+        let parallaxY = 0;
         const readScrollY = () => (window.scrollY || window.pageYOffset || 0) * dpr;
         let currentScrollY = disableScrollLinkedShaderOnIPhone ? 0 : readScrollY();
         let lastRenderedCSSScrollY = disableScrollLinkedShaderOnIPhone ? 0 : (window.scrollY || 0);
@@ -455,6 +486,9 @@ export default function EscherBackground() {
             mouseX = (e.clientX - rect.left) * dpr;
             mouseY = (e.clientY - rect.top) * dpr;
             targetHover = 1;
+            // Parallax: normalized mouse position centered at 0,0
+            parallaxX = (e.clientX / window.innerWidth - 0.5) * 2.0;
+            parallaxY = (e.clientY / window.innerHeight - 0.5) * 2.0;
         };
 
         const handleMouseLeave = () => {
@@ -517,6 +551,7 @@ export default function EscherBackground() {
                 if (Math.abs(targetHover - currentHover) < 0.001) currentHover = targetHover;
                 if (uHoverActive) gl.uniform1f(uHoverActive, currentHover);
                 if (uMouse) gl.uniform2f(uMouse, mouseX, mouseY);
+                if (uParallax) gl.uniform2f(uParallax, parallaxX, parallaxY);
             }
 
             gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -608,7 +643,7 @@ export default function EscherBackground() {
             <div className="w-full h-full dark:opacity-[0.45]">
                 <canvas
                     ref={canvasRef}
-                    className="block w-full h-full dark:invert dark:contrast-100 contrast-125 mix-blend-multiply dark:mix-blend-screen"
+                    className="block w-full h-full dark:invert dark:contrast-100 contrast-[1.35] mix-blend-multiply dark:mix-blend-screen"
                     style={{ opacity: 0, willChange: 'opacity, transform', transform: 'translateZ(0)' }}
                 />
             </div>

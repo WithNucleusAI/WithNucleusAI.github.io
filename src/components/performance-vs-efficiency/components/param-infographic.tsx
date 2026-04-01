@@ -13,7 +13,7 @@ interface ModelEntry {
 }
 
 const top5: ModelEntry[] = [
-  { name: "Nucleus-Image", activeParams: 2.0, totalParams: 17, score: 0.76, family: "Nucleus", color: "#3B9EFF", lightColor: "#0066DC" },
+  { name: "Nucleus-Image", activeParams: 2.0, totalParams: 17, score: 0.76, family: "Nucleus", color: "#4F7CFF", lightColor: "#0066DC" },
   { name: "Qwen-Image", activeParams: 20, totalParams: 20, score: 0.765, family: "Qwen", color: "#34EAD0", lightColor: "#0A7D6E" },
   { name: "CogView 4", activeParams: 6.0, totalParams: 6, score: 0.72, family: "CogView", color: "#FF9F43", lightColor: "#C56A00" },
   { name: "HiDream-1-Full", activeParams: 13.2, totalParams: 17, score: 0.72, family: "HiDream", color: "#A78BFA", lightColor: "#7C3AED" },
@@ -462,7 +462,7 @@ export function ParamInfographic() {
         >
           <svg
             width="18" height="18" viewBox="0 0 24 24" fill="none"
-            stroke={isDark ? "#3B9EFF" : "#0066DC"}
+            stroke={isDark ? "#4F7CFF" : "#0066DC"}
             strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
             opacity={0.75}
           >
@@ -480,7 +480,7 @@ export function ParamInfographic() {
             }}
           >
             Nucleus achieves{" "}
-            <span style={{ color: isDark ? "#3B9EFF" : "#0066DC", fontWeight: 600 }}>
+            <span style={{ color: isDark ? "#4F7CFF" : "#0066DC", fontWeight: 600 }}>
               leading performance
             </span>
             {" "}with only 2B active parameters
