@@ -258,7 +258,7 @@ export default function IntroOverlay() {
 
                 {/* NUCLEUS */}
                 <h1
-                    className="text-5xl sm:text-7xl lg:text-8xl font-extralight tracking-[0.28em] text-white"
+                    className="text-4xl sm:text-7xl lg:text-8xl font-extralight tracking-[0.18em] sm:tracking-[0.28em] text-white"
                     style={{
                         fontFamily: "var(--font-base)",
                         textShadow: "0 0 40px rgba(79,124,255,0.2), 0 0 80px rgba(79,124,255,0.08)",
@@ -268,10 +268,10 @@ export default function IntroOverlay() {
                 </h1>
 
                 {/* Separator + Subtitle */}
-                <div className="mt-5 sm:mt-6 flex flex-col items-center gap-4">
-                    <div className="w-12 h-px bg-[rgba(79,124,255,0.15)]" />
+                <div className="mt-3 sm:mt-6 flex flex-col items-center gap-3 sm:gap-4">
+                    <div className="w-10 sm:w-12 h-px bg-[rgba(79,124,255,0.15)]" />
                     <p
-                        className="text-[11px] sm:text-sm lg:text-base font-light tracking-[0.4em] uppercase text-[rgba(79,124,255,0.55)]"
+                        className="text-[9px] sm:text-sm lg:text-base font-light tracking-[0.3em] sm:tracking-[0.4em] uppercase text-[rgba(79,124,255,0.55)]"
                         style={{ fontFamily: "var(--font-base)" }}
                     >
                         General Intelligence
@@ -279,7 +279,7 @@ export default function IntroOverlay() {
                 </div>
 
                 {/* Bottom equation */}
-                <div className="mt-8 text-[rgba(79,124,255,0.18)] text-[9px] sm:text-[10px] tracking-[0.25em] font-light">
+                <div className="mt-5 sm:mt-8 text-[rgba(79,124,255,0.18)] text-[8px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.25em] font-light">
                     ∇ · Φ = ρ
                 </div>
             </div>

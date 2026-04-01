@@ -92,7 +92,7 @@ export default function ImagePageClient() {
       fontSize: number; isAccent: boolean;
     }
 
-    const colCount = isMobile ? 35 : 80
+    const colCount = isMobile ? 25 : 80
     const columns: RainCol[] = []
 
     for (let i = 0; i < colCount; i++) {
@@ -122,7 +122,7 @@ export default function ImagePageClient() {
     resize()
 
     let animId = 0
-    const FRAME_INTERVAL = isMobile ? 1000 / 24 : 1000 / 30
+    const FRAME_INTERVAL = 1000 / 30 // 30fps everywhere
     let lastFrameTime = 0
 
     const render = (now: number) => {

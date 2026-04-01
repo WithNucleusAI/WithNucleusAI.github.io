@@ -156,7 +156,7 @@ export default function SubtleParticles() {
         const isMobile = window.matchMedia("(max-width: 768px)").matches;
         const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        const FRAME_INTERVAL = isMobile ? 1000 / 24 : 1000 / 30; // 30fps desktop, 24fps mobile — plenty for slow animations
+        const FRAME_INTERVAL = 1000 / 30; // 30fps everywhere
         let lastFrameTime = 0;
         let mouseX = 0.5, mouseY = 0.5;
         const handleMouseMove = (e: MouseEvent) => { if (!isMobile) { mouseX = e.clientX / window.innerWidth; mouseY = e.clientY / window.innerHeight; } };
@@ -223,7 +223,7 @@ export default function SubtleParticles() {
 
         // ── Fibonacci spiral — AI symbols and keywords ──
         interface SpiralChar { index: number; baseAngle: number; baseRadius: number; char: string; fontSize: number; baseOpacity: number; phase: number; isAccent: boolean; isWord: boolean; }
-        const spiralCount = isMobile ? 100 : 220;
+        const spiralCount = isMobile ? 60 : 220; // 60 on mobile — reduce GPU load
         const spiralChars: SpiralChar[] = [];
         for (let i = 0; i < spiralCount; i++) {
             const goldenAngle = i * TAU / (PHI * PHI);

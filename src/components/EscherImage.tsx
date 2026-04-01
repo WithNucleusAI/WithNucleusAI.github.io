@@ -99,9 +99,12 @@ export default function EscherImage() {
             const isSmallScreen = window.matchMedia("(max-width: 1280px)").matches;
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-            // Size the canvas — larger on small screens to compensate for reduced visibility
-            const sizeMultiplier = isMobile ? 1.3 : isSmallScreen ? 1.2 : 1.1;
-            const targetW = Math.min(window.innerHeight * sizeMultiplier, window.innerWidth * 1.1);
+            // Size the canvas — much larger on mobile to fill the screen
+            const targetW = isMobile
+                ? Math.max(window.innerWidth * 1.4, window.innerHeight * 1.2)
+                : isSmallScreen
+                    ? Math.min(window.innerHeight * 1.2, window.innerWidth * 1.15)
+                    : Math.min(window.innerHeight * 1.1, window.innerWidth);
             const aspect = img.width / img.height;
             const cw = Math.floor(targetW * dpr);
             const ch = Math.floor((targetW / aspect) * dpr);
@@ -185,10 +188,11 @@ export default function EscherImage() {
         const fillB = isDark ? 180 : 120;
 
         // Stronger edges and fill on smaller screens
+        const isMobileCanvas = cw < 900 * (window.devicePixelRatio || 1);
         const isSmall = cw < 1200 * (window.devicePixelRatio || 1);
-        const threshold = isSmall ? 0.06 : 0.08;
-        const edgeAlpha = isDark ? (isSmall ? 0.90 : 0.70) : 0.5;
-        const fillAlpha = isDark ? (isSmall ? 0.12 : 0.06) : 0.04;
+        const threshold = isMobileCanvas ? 0.05 : isSmall ? 0.06 : 0.08;
+        const edgeAlpha = isDark ? (isMobileCanvas ? 1.0 : isSmall ? 0.90 : 0.70) : 0.5;
+        const fillAlpha = isDark ? (isMobileCanvas ? 0.18 : isSmall ? 0.12 : 0.06) : 0.04;
 
         for (let i = 0; i < cw * ch; i++) {
             const edge = edges[i];
@@ -226,8 +230,9 @@ export default function EscherImage() {
 
         let animId = 0;
         // Cache viewport check — only changes on resize, not per frame
+        let isMobileViewport = window.innerWidth < 768;
         let isSmallViewport = window.innerWidth < 1280;
-        const onResizeViewport = () => { isSmallViewport = window.innerWidth < 1280; };
+        const onResizeViewport = () => { isMobileViewport = window.innerWidth < 768; isSmallViewport = window.innerWidth < 1280; };
         window.addEventListener("resize", onResizeViewport);
 
         // Throttle to 30fps — breathing animation doesn't need 60fps
@@ -248,7 +253,7 @@ export default function EscherImage() {
 
             const musicMod = audio.isPlaying ? audio.bass * 0.25 : 0;
 
-            const baseOpacity = isSmallViewport ? 0.50 : 0.35;
+            const baseOpacity = isMobileViewport ? 0.65 : isSmallViewport ? 0.50 : 0.35;
             const opacity = baseOpacity + breathCombined * 0.20 + (audio.isPlaying ? audio.amplitude * 0.08 : 0);
             const scale = 0.99 + breathCombined * 0.03 + musicMod * 0.008;
 
@@ -318,8 +323,12 @@ export default function EscherImage() {
                 style={{
                     opacity: 0.10,
                     transform: "rotate(-20deg) translateY(-2%)",
-                    maskImage: "radial-gradient(ellipse 72% 68% at 50% 48%, black 25%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.12) 75%, transparent 92%)",
-                    WebkitMaskImage: "radial-gradient(ellipse 72% 68% at 50% 48%, black 25%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.12) 75%, transparent 92%)",
+                    maskImage: typeof window !== "undefined" && window.innerWidth < 768
+                        ? "radial-gradient(ellipse 95% 85% at 50% 48%, black 20%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 80%, transparent 100%)"
+                        : "radial-gradient(ellipse 72% 68% at 50% 48%, black 25%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.12) 75%, transparent 92%)",
+                    WebkitMaskImage: typeof window !== "undefined" && window.innerWidth < 768
+                        ? "radial-gradient(ellipse 95% 85% at 50% 48%, black 20%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 80%, transparent 100%)"
+                        : "radial-gradient(ellipse 72% 68% at 50% 48%, black 25%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.12) 75%, transparent 92%)",
                     willChange: "transform, opacity",
                 }}
             />

@@ -4,8 +4,8 @@ import Image from "next/image";
 export default function Footer() {
     return (
         <footer data-site-footer className="w-full bg-white dark:bg-[#030308] mt-auto border-t border-gray-100 dark:border-[rgba(79,124,255,0.04)]">
-            <div className="max-w-4xl mx-auto px-4 py-10 sm:py-14">
-                <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+            <div className="max-w-4xl mx-auto px-4 py-6 sm:py-14">
+                <div className="flex flex-col md:flex-row justify-between items-center gap-5 sm:gap-8">
                     {/* Left — nav links */}
                     <div className="flex gap-8">
                         <Link

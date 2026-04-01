@@ -15,7 +15,7 @@ export default function BlogSection({ posts }: BlogSectionProps) {
     return (
         <section
             id="blog-section"
-            className="relative min-h-screen w-full flex flex-col justify-center py-16 sm:py-28"
+            className="relative min-h-[70vh] sm:min-h-screen w-full flex flex-col justify-center py-10 sm:py-28"
         >
             {/* Section glow */}
             <div className="absolute inset-0 flex items-start justify-center pointer-events-none" aria-hidden="true">
@@ -25,13 +25,13 @@ export default function BlogSection({ posts }: BlogSectionProps) {
 
             <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
                 {/* Section header — matching the refined theme */}
-                <div className="mb-14 sm:mb-20 flex flex-col items-start">
+                <div className="mb-8 sm:mb-20 flex flex-col items-start">
                     {/* Equation label */}
                     <div className="mb-4 text-[9px] sm:text-[10px] tracking-[0.35em] text-[rgba(79,124,255,0.25)] dark:text-[rgba(79,124,255,0.3)] font-light" aria-hidden="true">
                         ∇ × knowledge
                     </div>
 
-                    <h2 className="text-2xl sm:text-3xl font-extralight tracking-[0.08em] text-gray-900 dark:text-white"
+                    <h2 className="text-xl sm:text-3xl font-extralight tracking-[0.06em] sm:tracking-[0.08em] text-gray-900 dark:text-white"
                         style={{ textShadow: "0 0 30px rgba(79,124,255,0.08)" }}
                     >
                         Engineering Intelligence

@@ -78,15 +78,21 @@ export function initAudioReactive(): void {
  * Called every frame by visual components. Auto-connects if not yet connected.
  */
 let resumeAttempted = false;
+// On mobile, skip frequency analysis to reduce CPU load — just return zeros
+const isMobileDevice = typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
+let frameSkip = 0;
 
 export function getAudioState() {
     if (!connected) connectToAudio();
-    // Only attempt resume once — not every frame
     if (!resumeAttempted && audioCtx && audioCtx.state === "suspended") {
         resumeAttempted = true;
         audioCtx.resume().catch(() => {});
     }
-    update();
+    // On mobile, only analyze every 3rd frame to reduce CPU
+    frameSkip++;
+    if (!isMobileDevice || frameSkip % 3 === 0) {
+        update();
+    }
 
     return {
         amplitude: smoothedAmplitude,

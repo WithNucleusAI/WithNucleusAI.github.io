@@ -40,11 +40,11 @@ export default function MatrixRain({ alwaysVisible = false }: MatrixRainProps) {
         const isMobile = window.matchMedia("(max-width: 768px)").matches;
         const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        const FRAME_INTERVAL = isMobile ? 1000 / 20 : 1000 / 30;
+        const FRAME_INTERVAL = 1000 / 30; // 30fps everywhere — smooth on all devices
         let lastFrameTime = 0;
 
         // Build columns with depth layers
-        const colCount = isMobile ? 35 : 80;
+        const colCount = isMobile ? 25 : 80; // fewer columns on mobile to prevent audio stutter
         const columns: RainColumn[] = [];
 
         for (let i = 0; i < colCount; i++) {

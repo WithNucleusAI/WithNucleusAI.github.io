@@ -22,7 +22,7 @@ export default function MiniBlogCard({ post, VisualComponent, horizontal = false
     return (
         <Link href={`/blog/${post.slug}`} className="group block h-full w-full">
             <div
-                className={`flex ${horizontal ? 'flex-col sm:flex-row gap-4 sm:gap-8 sm:items-center' : 'flex-col'} h-full overflow-hidden transition-all duration-500 rounded-2xl p-5 sm:p-7 glass-panel hover:border-[rgba(79,124,255,0.15)] hover:shadow-[0_0_40px_rgba(79,124,255,0.06)]`}
+                className={`flex ${horizontal ? 'flex-col sm:flex-row gap-3 sm:gap-8 sm:items-center' : 'flex-col'} h-full overflow-hidden transition-all duration-500 rounded-xl sm:rounded-2xl p-4 sm:p-7 glass-panel hover:border-[rgba(79,124,255,0.15)] hover:shadow-[0_0_40px_rgba(79,124,255,0.06)]`}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
@@ -47,12 +47,12 @@ export default function MiniBlogCard({ post, VisualComponent, horizontal = false
                         </span>
                     </div>
 
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-light text-gray-900 dark:text-[rgba(255,255,255,0.85)] leading-tight mb-3 group-hover:text-[var(--accent)] transition-colors duration-300 tracking-wide line-clamp-2">
+                    <h3 className="text-base sm:text-xl md:text-2xl font-light text-gray-900 dark:text-[rgba(255,255,255,0.85)] leading-snug sm:leading-tight mb-2 sm:mb-3 group-hover:text-[var(--accent)] transition-colors duration-300 tracking-normal sm:tracking-wide line-clamp-2">
                         {post.title}
                     </h3>
 
                     {horizontal && (
-                        <p className="text-sm text-gray-500 dark:text-[rgba(255,255,255,0.35)] line-clamp-3 mb-5 font-light leading-relaxed">
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-[rgba(255,255,255,0.35)] line-clamp-2 sm:line-clamp-3 mb-3 sm:mb-5 font-light leading-relaxed">
                             {post.excerpt}
                         </p>
                     )}
