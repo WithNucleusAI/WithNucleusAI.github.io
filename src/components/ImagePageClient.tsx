@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import PerformanceVsEfficiencyApp from '@/components/performance-vs-efficiency/PerformanceVsEfficiencyApp'
-// import ArchitectureDiagram from '@/components/ArchitectureDiagram'
+import { ArchitectureFlowchart } from '@/components/performance-vs-efficiency/components/architecture-flowchart'
 
 const EASE_OUT = [0.25, 0.46, 0.45, 0.94] as const
 
@@ -406,6 +406,13 @@ export default function ImagePageClient() {
           </div>
         ))}
       </div>
+
+      {/* ═══════════════════ ARCHITECTURE FLOWCHART ═══════════════════ */}
+      <section className="relative z-10 py-8 sm:py-12">
+        <div className="max-w-5xl mx-auto px-4 sm:px-8">
+          <ArchitectureFlowchart />
+        </div>
+      </section>
 
       {/* ── Divider ── */}
       <div className="w-full flex flex-col items-center py-10 relative z-10" aria-hidden="true">
