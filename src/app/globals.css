@@ -16,6 +16,21 @@
   --accent-glow: rgba(79, 124, 255, 0.3);
   --accent-soft: rgba(79, 124, 255, 0.15);
   --accent-muted: rgba(79, 124, 255, 0.08);
+
+  /* ── 5-level accent opacity system ── */
+  --a1: rgba(79, 124, 255, 0.06);   /* very subtle: bg glows, faint borders */
+  --a2: rgba(79, 124, 255, 0.12);   /* subtle: dividers, separator lines */
+  --a3: rgba(79, 124, 255, 0.25);   /* medium: equation text, labels */
+  --a4: rgba(79, 124, 255, 0.45);   /* strong: interactive, badges */
+  --a5: rgba(79, 124, 255, 0.65);   /* emphasis: subtitle, active elements */
+
+  /* ── Text opacity system ── */
+  --t1: rgba(255, 255, 255, 0.20);  /* whisper: decoration equations */
+  --t2: rgba(255, 255, 255, 0.35);  /* muted: secondary labels */
+  --t3: rgba(255, 255, 255, 0.55);  /* body: mission text, descriptions */
+  --t4: rgba(255, 255, 255, 0.80);  /* strong: card titles */
+  --t5: rgba(255, 255, 255, 0.95);  /* primary: headings */
+
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(0, 0, 0, 0.06);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);

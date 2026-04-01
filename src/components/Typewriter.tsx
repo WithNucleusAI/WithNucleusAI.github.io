@@ -190,9 +190,10 @@ export default function Typewriter() {
                 id="typing"
                 className={`mx-auto w-full max-w-[92vw] sm:max-w-2xl px-1 sm:px-4 text-center origin-center md:leading-normal max-md:leading-[1.35] ${
                     isNucleus
-                        ? "transition-none text-4xl sm:text-7xl lg:text-8xl font-extralight leading-none tracking-[0.20em] sm:tracking-[0.28em] text-gray-900 dark:text-white"
-                        : "transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] font-inherit text-base sm:text-xl font-light tracking-tight text-neutral-600 dark:text-neutral-400"
+                        ? "transition-none text-[2.5rem] sm:text-7xl lg:text-8xl font-extralight leading-none tracking-[0.18em] sm:tracking-[0.28em]"
+                        : "transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] font-inherit text-base sm:text-xl font-light tracking-tight"
                 }`}
+                style={isNucleus ? { color: 'var(--t5)' } : { color: 'var(--t2)' }}
             >
                 <span
                     id="text"
@@ -211,7 +212,7 @@ export default function Typewriter() {
             {showCaption && (
                 <div
                     key="caption"
-                    className="mt-3 sm:mt-6 flex flex-col items-center gap-3 sm:gap-4"
+                    className="mt-3 sm:mt-5 flex flex-col items-center gap-2 sm:gap-3"
                 >
                     {/* Thin separator line */}
                     <div
@@ -221,8 +222,8 @@ export default function Typewriter() {
 
                     {/* Subtitle */}
                     <span
-                        style={{ animation: 'fade-slide-up 1.5s cubic-bezier(0.16,1,0.3,1) 0.6s both' }}
-                        className="text-[9px] sm:text-sm lg:text-base text-gray-400 dark:text-[rgba(79,124,255,0.55)] font-light tracking-[0.3em] sm:tracking-[0.4em] uppercase"
+                        style={{ animation: 'fade-slide-up 1.5s cubic-bezier(0.16,1,0.3,1) 0.6s both', color: 'var(--a5)' }}
+                        className="text-[9px] sm:text-sm lg:text-base font-light tracking-[0.3em] sm:tracking-[0.4em] uppercase"
                     >
                         General Intelligence
                     </span>

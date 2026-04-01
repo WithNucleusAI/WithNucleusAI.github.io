@@ -99,11 +99,11 @@ export default function EscherImage() {
             const isSmallScreen = window.matchMedia("(max-width: 1280px)").matches;
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-            // Size the canvas — much larger on mobile to fill the screen
+            // Size canvas to fit viewport — contained, not overflowing
             const targetW = isMobile
-                ? Math.max(window.innerWidth * 1.4, window.innerHeight * 1.2)
+                ? window.innerWidth * 0.95  // fit within phone width
                 : isSmallScreen
-                    ? Math.min(window.innerHeight * 1.2, window.innerWidth * 1.15)
+                    ? Math.min(window.innerHeight * 1.1, window.innerWidth)
                     : Math.min(window.innerHeight * 1.1, window.innerWidth);
             const aspect = img.width / img.height;
             const cw = Math.floor(targetW * dpr);
@@ -259,7 +259,8 @@ export default function EscherImage() {
 
             const tx = Math.sin(t * 0.25) * 1.0;
             const ty = breathCombined * -1.5;
-            const rot = -20 + Math.sin(t * 0.15) * 0.3;
+            const baseRot = isMobileViewport ? -12 : -20;
+            const rot = baseRot + Math.sin(t * 0.15) * 0.3;
 
             canvas.style.opacity = String(opacity);
             canvas.style.transform = `rotate(${rot}deg) translateX(${tx}px) translateY(calc(-2% + ${ty}px)) scale(${scale})`;
@@ -296,10 +297,10 @@ export default function EscherImage() {
             {/* Outer glow — static, GPU-composited */}
             {isDark && (
                 <div className="absolute" style={{
-                    width: "min(120vh, 110vw)", height: "min(100vh, 90vw)",
+                    width: "min(90vh, 85vw)", height: "min(80vh, 75vw)",
                     borderRadius: "50%",
                     background: "radial-gradient(ellipse, rgba(79,124,255,0.04) 0%, rgba(30,50,140,0.02) 50%, transparent 80%)",
-                    filter: "blur(80px)", transform: "rotate(-20deg) translateY(-2%) translateZ(0)",
+                    filter: "blur(60px)", transform: "translateZ(0)",
                     contain: "strict",
                 }} />
             )}
@@ -307,7 +308,7 @@ export default function EscherImage() {
             {/* Inner glow */}
             {isDark && (
                 <div className="absolute" style={{
-                    width: "min(70vh, 60vw)", height: "min(60vh, 50vw)",
+                    width: "min(55vh, 50vw)", height: "min(50vh, 45vw)",
                     borderRadius: "50%",
                     background: "radial-gradient(ellipse, rgba(79,124,255,0.10) 0%, rgba(50,80,200,0.05) 40%, transparent 70%)",
                     filter: "blur(50px)", transform: "rotate(-20deg) translateY(-2%) translateZ(0)",
@@ -322,25 +323,22 @@ export default function EscherImage() {
                 aria-hidden="true"
                 style={{
                     opacity: 0.10,
-                    transform: "rotate(-20deg) translateY(-2%)",
-                    maskImage: typeof window !== "undefined" && window.innerWidth < 768
-                        ? "radial-gradient(ellipse 95% 85% at 50% 48%, black 20%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 80%, transparent 100%)"
-                        : "radial-gradient(ellipse 72% 68% at 50% 48%, black 25%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.12) 75%, transparent 92%)",
-                    WebkitMaskImage: typeof window !== "undefined" && window.innerWidth < 768
-                        ? "radial-gradient(ellipse 95% 85% at 50% 48%, black 20%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 80%, transparent 100%)"
-                        : "radial-gradient(ellipse 72% 68% at 50% 48%, black 25%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.12) 75%, transparent 92%)",
+                    transform: typeof window !== "undefined" && window.innerWidth < 768
+                        ? "rotate(-12deg) translateY(-2%)"
+                        : "rotate(-20deg) translateY(-2%)",
+                    maskImage: "radial-gradient(ellipse 80% 75% at 50% 48%, black 20%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.15) 78%, transparent 95%)",
+                    WebkitMaskImage: "radial-gradient(ellipse 80% 75% at 50% 48%, black 20%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.15) 78%, transparent 95%)",
                     willChange: "transform, opacity",
                 }}
             />
 
             {/* Edge ring */}
             {isDark && (
-                <div className="absolute" style={{
-                    width: "min(85vh, 78vw)", height: "min(72vh, 65vw)",
+                <div className="absolute hidden sm:block" style={{
+                    width: "min(70vh, 65vw)", height: "min(60vh, 55vw)",
                     borderRadius: "50%",
                     border: "1px solid rgba(79,124,255,0.04)",
-                    boxShadow: "0 0 80px rgba(79,124,255,0.03), inset 0 0 80px rgba(79,124,255,0.02)",
-                    transform: "rotate(-20deg) translateY(-2%)",
+                    boxShadow: "0 0 60px rgba(79,124,255,0.03), inset 0 0 60px rgba(79,124,255,0.02)",
                 }} />
             )}
 

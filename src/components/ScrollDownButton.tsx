@@ -27,11 +27,11 @@ export default function ScrollDownButton() {
     };
 
     return (
-        <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-20 transition-all duration-300 ${visible ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
+        <div className={`fixed bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-20 transition-all duration-300 ${visible ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
             <button className="btn btn--circle" onClick={handleClick} aria-label="Scroll down">
                 <div className="btn__content">
                     <svg
-                        className="h-5 w-5 md:h-6 md:w-6"
+                        className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"

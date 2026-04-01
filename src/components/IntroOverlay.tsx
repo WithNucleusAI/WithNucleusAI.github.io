@@ -227,10 +227,10 @@ export default function IntroOverlay() {
                 style={{ opacity: 0.9 }}
             />
 
-            {/* Radial glow behind center content */}
+            {/* Radial glow */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div
-                    className="w-[500px] h-[400px] sm:w-[700px] sm:h-[500px] rounded-full blur-[120px] -translate-y-[8%]"
+                    className="w-[250px] h-[200px] sm:w-[700px] sm:h-[500px] rounded-full blur-[80px] sm:blur-[120px] -translate-y-[8%]"
                     style={{
                         background: "radial-gradient(ellipse, rgba(79,124,255,0.08) 0%, rgba(30,50,120,0.04) 40%, transparent 70%)",
                     }}
@@ -238,13 +238,13 @@ export default function IntroOverlay() {
             </div>
 
             {/* Logo */}
-            <div className="absolute top-8 left-1/2 -translate-x-1/2 z-10">
+            <div className="absolute top-6 sm:top-8 left-1/2 -translate-x-1/2 z-10">
                 <Image
                     src="/logo.webp"
                     alt="Nucleus Logo"
                     width={80}
                     height={80}
-                    className="w-12 h-12 sm:w-16 sm:h-16 invert-0 object-contain opacity-50"
+                    className="w-10 h-10 sm:w-16 sm:h-16 invert-0 object-contain opacity-50"
                     style={{ filter: "drop-shadow(0 0 10px rgba(79,124,255,0.25))" }}
                 />
             </div>
@@ -252,14 +252,15 @@ export default function IntroOverlay() {
             {/* Center content */}
             <div className="relative z-10 flex flex-col items-center -translate-y-[8%]">
                 {/* Equation above title */}
-                <div className="mb-8 text-[rgba(79,124,255,0.3)] text-[10px] sm:text-xs tracking-[0.35em] font-light">
+                <div className="mb-6 sm:mb-8 text-[8px] sm:text-[11px] tracking-[0.3em] sm:tracking-[0.35em] font-light" style={{ color: 'var(--a3)' }}>
                     ∫ f(x) dx → ∞
                 </div>
 
                 {/* NUCLEUS */}
                 <h1
-                    className="text-4xl sm:text-7xl lg:text-8xl font-extralight tracking-[0.18em] sm:tracking-[0.28em] text-white"
+                    className="text-[2.5rem] sm:text-7xl lg:text-8xl font-extralight tracking-[0.18em] sm:tracking-[0.28em]"
                     style={{
+                        color: 'var(--t5)',
                         fontFamily: "var(--font-base)",
                         textShadow: "0 0 40px rgba(79,124,255,0.2), 0 0 80px rgba(79,124,255,0.08)",
                     }}
@@ -271,15 +272,15 @@ export default function IntroOverlay() {
                 <div className="mt-3 sm:mt-6 flex flex-col items-center gap-3 sm:gap-4">
                     <div className="w-10 sm:w-12 h-px bg-[rgba(79,124,255,0.15)]" />
                     <p
-                        className="text-[9px] sm:text-sm lg:text-base font-light tracking-[0.3em] sm:tracking-[0.4em] uppercase text-[rgba(79,124,255,0.55)]"
-                        style={{ fontFamily: "var(--font-base)" }}
+                        className="text-[9px] sm:text-sm lg:text-base font-light tracking-[0.3em] sm:tracking-[0.4em] uppercase"
+                        style={{ color: 'var(--a5)', fontFamily: "var(--font-base)" }}
                     >
                         General Intelligence
                     </p>
                 </div>
 
                 {/* Bottom equation */}
-                <div className="mt-5 sm:mt-8 text-[rgba(79,124,255,0.18)] text-[8px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.25em] font-light">
+                <div className="mt-4 sm:mt-8 text-[7px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.25em] font-light" style={{ color: 'var(--t1)' }}>
                     ∇ · Φ = ρ
                 </div>
             </div>
@@ -288,19 +289,18 @@ export default function IntroOverlay() {
             <button
                 type="button"
                 onClick={handleDiscoverClick}
-                className="fixed bottom-[18vh] left-1/2 -translate-x-1/2 z-[101] cursor-pointer group"
+                className="fixed bottom-[16vh] sm:bottom-[18vh] left-1/2 -translate-x-1/2 z-[101] cursor-pointer group"
             >
-                <div className="relative px-10 py-3.5 rounded-full border border-[rgba(79,124,255,0.3)] bg-[rgba(79,124,255,0.04)] backdrop-blur-sm transition-all duration-500 group-hover:border-[rgba(79,124,255,0.6)] group-hover:bg-[rgba(79,124,255,0.08)] group-hover:shadow-[0_0_40px_rgba(79,124,255,0.15)]">
-                    <span className="text-sm sm:text-base tracking-[0.25em] font-light text-[rgba(255,255,255,0.6)] group-hover:text-[rgba(79,124,255,0.9)] transition-colors duration-500">
+                <div className="relative px-7 py-3 sm:px-10 sm:py-3.5 rounded-full border border-[rgba(79,124,255,0.3)] bg-[rgba(79,124,255,0.04)] backdrop-blur-sm transition-all duration-500 group-hover:border-[rgba(79,124,255,0.6)] group-hover:bg-[rgba(79,124,255,0.08)] group-hover:shadow-[0_0_40px_rgba(79,124,255,0.15)]">
+                    <span className="text-xs sm:text-base tracking-[0.2em] sm:tracking-[0.25em] font-light" style={{ color: 'var(--t3)' }}>
                         DISCOVER
                     </span>
                 </div>
-                {/* Subtle pulse ring */}
                 <div className="absolute inset-0 rounded-full border border-[rgba(79,124,255,0.15)] animate-[intro-pulse_3s_ease-in-out_infinite]" />
             </button>
 
             {/* Bottom equation */}
-            <div className="fixed bottom-[10vh] left-1/2 -translate-x-1/2 z-10 text-[rgba(255,255,255,0.12)] text-[10px] sm:text-xs tracking-[0.2em] font-light">
+            <div className="fixed bottom-[8vh] sm:bottom-[10vh] left-1/2 -translate-x-1/2 z-10 text-[8px] sm:text-xs tracking-[0.15em] sm:tracking-[0.2em] font-light" style={{ color: 'var(--t1)' }}>
                 θ ← θ − α · ∇ℒ(θ)
             </div>
 
