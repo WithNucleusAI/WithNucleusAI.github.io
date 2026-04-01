@@ -44,7 +44,7 @@ export default function MatrixRain({ alwaysVisible = false }: MatrixRainProps) {
         let lastFrameTime = 0;
 
         // Build columns with depth layers
-        const colCount = isMobile ? 22 : 50;
+        const colCount = isMobile ? 35 : 80;
         const columns: RainColumn[] = [];
 
         for (let i = 0; i < colCount; i++) {
@@ -52,7 +52,7 @@ export default function MatrixRain({ alwaysVisible = false }: MatrixRainProps) {
             const baseFontSize = isMobile ? 8 : 10;
             const fontSize = baseFontSize + depth * (isMobile ? 5 : 7); // near = bigger
 
-            const charCount = Math.floor(3 + Math.random() * 5 + depth * 3); // near = longer trails
+            const charCount = Math.floor(5 + Math.random() * 7 + depth * 5); // near = longer trails
             const chars: string[] = [];
             for (let c = 0; c < charCount; c++) {
                 chars.push(
@@ -68,7 +68,7 @@ export default function MatrixRain({ alwaysVisible = false }: MatrixRainProps) {
                 speed: 0.5 + depth * 1.0, // near = faster
                 depth,
                 fontSize,
-                isAccent: Math.random() < 0.22,
+                isAccent: Math.random() < 0.32,
                 phase: Math.random() * 1000,
             });
         }
@@ -118,7 +118,7 @@ export default function MatrixRain({ alwaysVisible = false }: MatrixRainProps) {
             // Rain intensity: either always visible or scroll-based fade-in
             const rainIntensity = alwaysVisible
                 ? 1
-                : Math.min(1, Math.max(0, (scrollProgress - 0.5) * 2));
+                : Math.min(1, 0.5 + Math.max(0, scrollProgress) * 0.5);
             if (rainIntensity < 0.01) { return; }
 
             // Scroll-reactive spotlight: chars near viewport center glow brighter
@@ -177,12 +177,12 @@ export default function MatrixRain({ alwaysVisible = false }: MatrixRainProps) {
 
                     // Combine
                     let opacity = trailFade * depthOpacity * edgeFade * rainIntensity * twinkle;
-                    opacity = (opacity * 0.14 + spotlightBoost * 0.06);
+                    opacity = (opacity * 0.28 + spotlightBoost * 0.12);
 
                     // Head char gets extra brightness
                     if (isHead) opacity *= 1.8;
 
-                    opacity = Math.min(0.35, opacity);
+                    opacity = Math.min(0.6, opacity);
                     if (opacity < 0.006) continue;
 
                     // ── Color ──
@@ -200,7 +200,7 @@ export default function MatrixRain({ alwaysVisible = false }: MatrixRainProps) {
                 }
 
                 // Living data: occasionally swap a char
-                if (Math.random() < 0.004) {
+                if (Math.random() < 0.008) {
                     const idx = Math.floor(Math.random() * col.chars.length);
                     col.chars[idx] = Math.random() < 0.18
                         ? EXPRESSIONS[Math.floor(Math.random() * EXPRESSIONS.length)]
