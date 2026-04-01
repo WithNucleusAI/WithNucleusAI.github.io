@@ -124,77 +124,69 @@ export default function MatrixRain({ alwaysVisible = false }: MatrixRainProps) {
             // Scroll-reactive spotlight: chars near viewport center glow brighter
             const viewportCenterY = h * 0.45;
 
+            // Pre-compute per-column static values and cache font strings
+            const edgeTopInv = 1 / (h * 0.15);
+            const edgeBottomStart = h - h * 0.15;
+            const hInv = 1 / h;
+            let lastFontSize = -1;
+
             for (const col of columns) {
                 const fSize = col.fontSize * dpr;
-                ctx.font = `300 ${fSize}px ui-monospace, SFMono-Regular, Menlo, monospace`;
                 const lineH = fSize * 1.7;
 
-                // Parallax: deeper columns scroll slower relative to viewport
-                const parallaxFactor = 0.3 + col.depth * 0.7; // 0.3 (far) to 1.0 (near)
-                const parallaxOffset = smoothScrollY * (1 - parallaxFactor) * dpr;
+                // Only change font when size differs from previous column
+                if (fSize !== lastFontSize) {
+                    ctx.font = `300 ${fSize}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+                    lastFontSize = fSize;
+                }
 
-                // Column X position
+                const parallaxOffset = smoothScrollY * (1 - (0.3 + col.depth * 0.7)) * dpr;
                 const colX = col.x * w;
-
-                // Fall animation — continuous loop
-                const fallSpeed = col.speed * 18 * dpr; // px per second
+                const fallSpeed = col.speed * 18 * dpr;
                 const totalTrailH = col.chars.length * lineH;
                 const cycleH = h + totalTrailH * 2;
                 const baseOffset = ((time + col.phase) * fallSpeed) % cycleH;
+                const depthOpacity = 0.3 + col.depth * 0.7;
+                const charCountM1 = col.chars.length - 1 || 1;
+                const twinkleBase = time * 1.8 + col.phase * 3;
+
+                // Pre-select color RGB for this column (no template literals in inner loop)
+                const headR = col.isAccent ? 110 : isDark ? 200 : 20;
+                const headG = col.isAccent ? 165 : isDark ? 215 : 30;
+                const headB = col.isAccent ? 255 : isDark ? 235 : 50;
+                const bodyR = col.isAccent ? 79 : isDark ? 110 : 20;
+                const bodyG = col.isAccent ? 124 : isDark ? 130 : 30;
+                const bodyB = col.isAccent ? 255 : isDark ? 155 : 50;
 
                 for (let ci = 0; ci < col.chars.length; ci++) {
-                    // Y position: falling + parallax offset
                     let charY = baseOffset + ci * lineH - totalTrailH - parallaxOffset;
-
-                    // Wrap to keep on screen
                     charY = ((charY % cycleH) + cycleH) % cycleH - totalTrailH;
 
-                    // Skip if off screen
                     if (charY < -lineH * 2 || charY > h + lineH) continue;
 
-                    // ── Opacity layers ──
+                    const isHead = ci === charCountM1;
+                    const trailFade = 0.1 + (ci / charCountM1) * 0.9;
 
-                    // 1. Trail fade: head brightest, tail dimmest
-                    const isHead = ci === col.chars.length - 1;
-                    const trailPos = ci / (col.chars.length - 1 || 1);
-                    const trailFade = 0.1 + trailPos * 0.9;
+                    const distFromCenter = Math.abs(charY - viewportCenterY) * hInv;
+                    const spotlightBoost = Math.max(0, (1 - distFromCenter * 1.2)) * 0.4;
 
-                    // 2. Depth opacity: near columns more visible
-                    const depthOpacity = 0.3 + col.depth * 0.7;
-
-                    // 3. Scroll-reactive spotlight: brighter near viewport center
-                    const distFromCenter = Math.abs(charY - viewportCenterY) / h;
-                    const spotlight = 1 - distFromCenter * 1.2;
-                    const spotlightBoost = Math.max(0, spotlight) * 0.4;
-
-                    // 4. Edge fade (top and bottom of viewport)
-                    const edgeFadeTop = Math.min(1, charY / (h * 0.15));
-                    const edgeFadeBottom = Math.min(1, (h - charY) / (h * 0.15));
+                    const edgeFadeTop = Math.min(1, charY * edgeTopInv);
+                    const edgeFadeBottom = Math.min(1, (h - charY) * edgeTopInv);
                     const edgeFade = Math.max(0, Math.min(edgeFadeTop, edgeFadeBottom));
 
-                    // 5. Twinkle: occasional bright flash
-                    const twinkle = Math.sin(time * 1.8 + ci * 7.3 + col.phase * 3) > 0.94 ? 1.5 : 1;
+                    const twinkle = Math.sin(twinkleBase + ci * 7.3) > 0.94 ? 1.5 : 1;
 
-                    // Combine
                     let opacity = trailFade * depthOpacity * edgeFade * rainIntensity * twinkle;
                     opacity = (opacity * 0.28 + spotlightBoost * 0.12);
-
-                    // Head char gets extra brightness
                     if (isHead) opacity *= 1.8;
-
                     opacity = Math.min(0.6, opacity);
                     if (opacity < 0.006) continue;
 
-                    // ── Color ──
-                    if (col.isAccent) {
-                        const blue = isHead ? "110, 165, 255" : "79, 124, 255";
-                        ctx.fillStyle = `rgba(${blue}, ${opacity})`;
-                    } else if (isDark) {
-                        const gray = isHead ? "200, 215, 235" : "110, 130, 155";
-                        ctx.fillStyle = `rgba(${gray}, ${opacity})`;
-                    } else {
-                        ctx.fillStyle = `rgba(20, 30, 50, ${opacity * 0.5})`;
-                    }
+                    const r = isHead ? headR : bodyR;
+                    const g = isHead ? headG : bodyG;
+                    const b = isHead ? headB : bodyB;
+                    const a = isDark ? opacity : opacity * 0.5;
+                    ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
 
                     ctx.fillText(col.chars[ci], colX, charY);
                 }

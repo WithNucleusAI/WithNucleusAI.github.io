@@ -96,10 +96,12 @@ export default function EscherImage() {
 
         img.onload = () => {
             const isMobile = window.matchMedia("(max-width: 768px)").matches;
+            const isSmallScreen = window.matchMedia("(max-width: 1280px)").matches;
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-            // Size the canvas to fit viewport
-            const targetW = Math.min(window.innerHeight * 1.1, window.innerWidth);
+            // Size the canvas — larger on small screens to compensate for reduced visibility
+            const sizeMultiplier = isMobile ? 1.3 : isSmallScreen ? 1.2 : 1.1;
+            const targetW = Math.min(window.innerHeight * sizeMultiplier, window.innerWidth * 1.1);
             const aspect = img.width / img.height;
             const cw = Math.floor(targetW * dpr);
             const ch = Math.floor((targetW / aspect) * dpr);
@@ -182,8 +184,11 @@ export default function EscherImage() {
         const fillG = isDark ? 70 : 40;
         const fillB = isDark ? 180 : 120;
 
-        // Edge threshold — controls how much detail shows
-        const threshold = 0.08;
+        // Stronger edges and fill on smaller screens
+        const isSmall = cw < 1200 * (window.devicePixelRatio || 1);
+        const threshold = isSmall ? 0.06 : 0.08;
+        const edgeAlpha = isDark ? (isSmall ? 0.90 : 0.70) : 0.5;
+        const fillAlpha = isDark ? (isSmall ? 0.12 : 0.06) : 0.04;
 
         for (let i = 0; i < cw * ch; i++) {
             const edge = edges[i];
@@ -191,17 +196,15 @@ export default function EscherImage() {
             const idx = i * 4;
 
             if (edge > threshold) {
-                // Edge line — strong blue, opacity based on edge strength
                 const strength = Math.min(1, (edge - threshold) / (0.5 - threshold));
-                const alpha = strength * (isDark ? 0.7 : 0.5);
+                const alpha = strength * edgeAlpha;
                 out[idx] = lineR;
                 out[idx + 1] = lineG;
                 out[idx + 2] = lineB;
                 out[idx + 3] = Math.floor(alpha * 255);
             } else if (brightness < 0.6) {
-                // Dark region fill — very faint blue wash for body
                 const darkness = (0.6 - brightness) / 0.6;
-                const alpha = darkness * (isDark ? 0.06 : 0.04);
+                const alpha = darkness * fillAlpha;
                 out[idx] = fillR;
                 out[idx + 1] = fillG;
                 out[idx + 2] = fillB;
@@ -222,11 +225,21 @@ export default function EscherImage() {
         if (!ctx) return;
 
         let animId = 0;
+        // Cache viewport check — only changes on resize, not per frame
+        let isSmallViewport = window.innerWidth < 1280;
+        const onResizeViewport = () => { isSmallViewport = window.innerWidth < 1280; };
+        window.addEventListener("resize", onResizeViewport);
+
+        // Throttle to 30fps — breathing animation doesn't need 60fps
+        const FRAME_MS = 1000 / 30;
+        let lastFrame = 0;
 
         const animate = (now: number) => {
             animId = requestAnimationFrame(animate);
-            const t = now * 0.001;
+            if (now - lastFrame < FRAME_MS) return;
+            lastFrame = now;
 
+            const t = now * 0.001;
             const audio = getAudioState();
 
             const breath1 = Math.sin(t * 0.65) * 0.5 + 0.5;
@@ -235,7 +248,8 @@ export default function EscherImage() {
 
             const musicMod = audio.isPlaying ? audio.bass * 0.25 : 0;
 
-            const opacity = 0.35 + breathCombined * 0.20 + (audio.isPlaying ? audio.amplitude * 0.08 : 0);
+            const baseOpacity = isSmallViewport ? 0.50 : 0.35;
+            const opacity = baseOpacity + breathCombined * 0.20 + (audio.isPlaying ? audio.amplitude * 0.08 : 0);
             const scale = 0.99 + breathCombined * 0.03 + musicMod * 0.008;
 
             const tx = Math.sin(t * 0.25) * 1.0;
@@ -247,7 +261,10 @@ export default function EscherImage() {
         };
 
         animId = requestAnimationFrame(animate);
-        return () => cancelAnimationFrame(animId);
+        return () => {
+            cancelAnimationFrame(animId);
+            window.removeEventListener("resize", onResizeViewport);
+        };
     }, [mounted]);
 
     // Re-render blueprint when theme changes
@@ -271,13 +288,14 @@ export default function EscherImage() {
         >
           <div ref={blurWrapRef} className="absolute inset-0 flex items-center justify-center">
 
-            {/* Outer glow */}
+            {/* Outer glow — static, GPU-composited */}
             {isDark && (
                 <div className="absolute" style={{
                     width: "min(120vh, 110vw)", height: "min(100vh, 90vw)",
                     borderRadius: "50%",
                     background: "radial-gradient(ellipse, rgba(79,124,255,0.04) 0%, rgba(30,50,140,0.02) 50%, transparent 80%)",
-                    filter: "blur(80px)", transform: "rotate(-20deg) translateY(-2%)",
+                    filter: "blur(80px)", transform: "rotate(-20deg) translateY(-2%) translateZ(0)",
+                    contain: "strict",
                 }} />
             )}
 
@@ -287,7 +305,8 @@ export default function EscherImage() {
                     width: "min(70vh, 60vw)", height: "min(60vh, 50vw)",
                     borderRadius: "50%",
                     background: "radial-gradient(ellipse, rgba(79,124,255,0.10) 0%, rgba(50,80,200,0.05) 40%, transparent 70%)",
-                    filter: "blur(50px)", transform: "rotate(-20deg) translateY(-2%)",
+                    filter: "blur(50px)", transform: "rotate(-20deg) translateY(-2%) translateZ(0)",
+                    contain: "strict",
                 }} />
             )}
 

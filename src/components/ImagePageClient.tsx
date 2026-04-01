@@ -92,12 +92,12 @@ export default function ImagePageClient() {
       fontSize: number; isAccent: boolean;
     }
 
-    const colCount = isMobile ? 25 : 55
+    const colCount = isMobile ? 35 : 80
     const columns: RainCol[] = []
 
     for (let i = 0; i < colCount; i++) {
-      const fontSize = (isMobile ? 10 : 13) + Math.random() * (isMobile ? 4 : 6)
-      const charCount = Math.floor(Math.random() * 7) + 3
+      const fontSize = (isMobile ? 8 : 10) + Math.random() * (isMobile ? 5 : 7)
+      const charCount = Math.floor(5 + Math.random() * 7 + Math.random() * 5)
       const chars: string[] = []
       for (let c = 0; c < charCount; c++) {
         chars.push(Math.random() < 0.18
@@ -105,10 +105,10 @@ export default function ImagePageClient() {
           : RAIN_CHARS[Math.floor(Math.random() * RAIN_CHARS.length)])
       }
       columns.push({
-        x: i / colCount + (Math.random() * 0.5 / colCount),
-        chars, speed: 0.012 + Math.random() * 0.020,
+        x: i / colCount + (Math.random() - 0.5) * (0.8 / colCount),
+        chars, speed: 0.008 + Math.random() * 0.016,
         offset: Math.random() * 3, fontSize,
-        isAccent: Math.random() < 0.25,
+        isAccent: Math.random() < 0.32,
       })
     }
 
@@ -139,47 +139,50 @@ export default function ImagePageClient() {
       ctx.textAlign = 'center'
       ctx.textBaseline = 'top'
 
+      const edgeInv = 1 / (h * 0.12)
+      let lastImgFont = -1
+
       for (const col of columns) {
         const colX = col.x * w
         const fSize = col.fontSize * dpr
-        ctx.font = `300 ${fSize}px ui-monospace, SFMono-Regular, Menlo, monospace`
         const lineH = fSize * 1.6
 
+        if (fSize !== lastImgFont) {
+          ctx.font = `300 ${fSize}px ui-monospace, SFMono-Regular, Menlo, monospace`
+          lastImgFont = fSize
+        }
+
         const scrollOffset = ((time * col.speed * h * 0.4) + col.offset * h) % (h * 1.2)
+        const charLen = col.chars.length
+        const charLenM1 = charLen - 1
+        const twinkleBase = time * 2 + col.x * 113
 
-        for (let ci = 0; ci < col.chars.length; ci++) {
+        const headR = col.isAccent ? 110 : isDark ? 190 : 0
+        const headG = col.isAccent ? 165 : isDark ? 210 : 0
+        const headB = col.isAccent ? 255 : isDark ? 230 : 0
+        const bodyR = col.isAccent ? 79 : isDark ? 130 : 0
+        const bodyG = col.isAccent ? 124 : isDark ? 150 : 0
+        const bodyB = col.isAccent ? 255 : isDark ? 175 : 0
+
+        for (let ci = 0; ci < charLen; ci++) {
           const charY = (scrollOffset + ci * lineH) % (h + lineH * 2) - lineH
-
           if (charY < -lineH || charY > h + lineH) continue
 
-          const isHead = ci === col.chars.length - 1
-          const trailFade = isHead ? 1 : 0.15 + (ci / col.chars.length) * 0.5
-
-          // Edge fade
-          const edgeFadeTop = Math.min(1, charY / (h * 0.12))
-          const edgeFadeBottom = Math.min(1, (h - charY) / (h * 0.12))
-          const edgeFade = Math.max(0, Math.min(edgeFadeTop, edgeFadeBottom))
-
-          const twinkle = Math.sin(time * 2 + ci * 7.3 + col.x * 113) > 0.93 ? 1.5 : 1
+          const isHead = ci === charLenM1
+          const trailFade = isHead ? 1 : 0.15 + (ci / charLen) * 0.5
+          const edgeFade = Math.max(0, Math.min(Math.min(1, charY * edgeInv), Math.min(1, (h - charY) * edgeInv)))
+          const twinkle = Math.sin(twinkleBase + ci * 7.3) > 0.93 ? 1.5 : 1
 
           let opacity = trailFade * edgeFade * twinkle
-          opacity = Math.min(0.5, opacity * 0.25)
+          opacity = Math.min(0.6, opacity * 0.28)
           if (isHead) opacity *= 1.8
-
           if (opacity < 0.008) continue
 
-          if (col.isAccent) {
-            ctx.fillStyle = isHead
-              ? `rgba(110, 165, 255, ${opacity * 1.5})`
-              : `rgba(79, 124, 255, ${opacity})`
-          } else if (isDark) {
-            ctx.fillStyle = isHead
-              ? `rgba(190, 210, 230, ${opacity * 1.3})`
-              : `rgba(130, 150, 175, ${opacity})`
-          } else {
-            ctx.fillStyle = `rgba(0, 0, 0, ${opacity * 0.4})`
-          }
-
+          const r = isHead ? headR : bodyR
+          const g = isHead ? headG : bodyG
+          const b = isHead ? headB : bodyB
+          const a = col.isAccent ? (isHead ? opacity * 1.5 : opacity) : (isDark ? (isHead ? opacity * 1.3 : opacity) : opacity * 0.4)
+          ctx.fillStyle = `rgba(${r},${g},${b},${a})`
           ctx.fillText(col.chars[ci], colX, charY)
         }
 
@@ -401,7 +404,7 @@ export default function ImagePageClient() {
             opacity: img.opa,
           }}>
             <div className="w-full h-full rounded-xl overflow-hidden border border-[rgba(79,124,255,0.07)] shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
-              <img src={img.src} alt="" className="w-full h-full object-cover" draggable={false} loading="lazy" />
+              <img src={img.src} alt="" className="w-full h-full object-cover" draggable={false} loading="lazy" decoding="async" />
             </div>
           </div>
         ))}
@@ -468,7 +471,7 @@ export default function ImagePageClient() {
                 viewport={{ once: true, margin: '-5%' }}
                 transition={{ duration: 0.7, ease: EASE_OUT, delay: (imgIdx * 0.05) + (colIdx * 0.02) }}
               >
-                <img src={src} alt="" className="w-full h-auto object-cover" draggable={false} loading="lazy" />
+                <img src={src} alt="" className="w-full h-auto object-cover" draggable={false} loading="lazy" decoding="async" />
               </motion.div>
             ))
           )}

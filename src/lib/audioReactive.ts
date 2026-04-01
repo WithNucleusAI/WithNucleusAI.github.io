@@ -77,10 +77,13 @@ export function initAudioReactive(): void {
 /**
  * Called every frame by visual components. Auto-connects if not yet connected.
  */
+let resumeAttempted = false;
+
 export function getAudioState() {
     if (!connected) connectToAudio();
-    // Always try to resume — covers the case where context was created before user gesture
-    if (audioCtx && audioCtx.state === "suspended") {
+    // Only attempt resume once — not every frame
+    if (!resumeAttempted && audioCtx && audioCtx.state === "suspended") {
+        resumeAttempted = true;
         audioCtx.resume().catch(() => {});
     }
     update();

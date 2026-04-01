@@ -156,7 +156,7 @@ export default function SubtleParticles() {
         const isMobile = window.matchMedia("(max-width: 768px)").matches;
         const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        const FRAME_INTERVAL = isMobile ? 1000 / 30 : 0;
+        const FRAME_INTERVAL = isMobile ? 1000 / 24 : 1000 / 30; // 30fps desktop, 24fps mobile — plenty for slow animations
         let lastFrameTime = 0;
         let mouseX = 0.5, mouseY = 0.5;
         const handleMouseMove = (e: MouseEvent) => { if (!isMobile) { mouseX = e.clientX / window.innerWidth; mouseY = e.clientY / window.innerHeight; } };
@@ -420,24 +420,38 @@ export default function SubtleParticles() {
                 }
             }
 
-            // ── Layer 4: Fibonacci spiral ──
+            // ── Layer 4: Fibonacci spiral (font-batched) ──
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
+            const timeRot = time * 0.015;
+            const timeSinBase = time * 0.08;
+            const timeWaveBase = time * 0.5;
+            let lastSpiralFont = "";
+
             for (const sc of spiralChars) {
-                const wavePhase = time * 0.5 - sc.baseRadius * 0.008 + sc.phase * 0.3;
+                const wavePhase = timeWaveBase - sc.baseRadius * 0.008 + sc.phase * 0.3;
                 const wave = Math.sin(wavePhase) * 0.4 + Math.sin(wavePhase * 0.6 + 1.2) * 0.2;
-                const angle = sc.baseAngle + time * 0.015 + Math.sin(time * 0.08 + sc.index * 0.02) * 0.06;
-                const r = sc.baseRadius * (1 + wave * 0.08 + spiralPulse) * dpr;
-                let x = cx + Math.cos(angle) * r + mx * (1 - Math.min(1, sc.baseRadius / 500)) * 15 * dpr;
-                let y = cy + Math.sin(angle) * r + my * (1 - Math.min(1, sc.baseRadius / 500)) * 15 * dpr;
                 const opacityWave = 0.5 + wave * 0.5;
                 const opacity = sc.baseOpacity * (0.3 + opacityWave * 0.7) + brightnessBoost;
                 if (opacity < 0.01) continue;
-                ctx.font = `${sc.isWord ? "500" : "normal"} ${sc.fontSize * dpr}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+
+                const angle = sc.baseAngle + timeRot + Math.sin(timeSinBase + sc.index * 0.02) * 0.06;
+                const r = sc.baseRadius * (1 + wave * 0.08 + spiralPulse) * dpr;
+                const depthFactor = (1 - Math.min(1, sc.baseRadius * 0.002)) * 15 * dpr;
+                const x = cx + Math.cos(angle) * r + mx * depthFactor;
+                const y = cy + Math.sin(angle) * r + my * depthFactor;
+
+                // Only change font when it actually differs
+                const fontKey = `${sc.isWord ? "5" : "n"}${Math.round(sc.fontSize * dpr)}`;
+                if (fontKey !== lastSpiralFont) {
+                    ctx.font = `${sc.isWord ? "500" : "normal"} ${sc.fontSize * dpr}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+                    lastSpiralFont = fontKey;
+                }
+
                 if (sc.isAccent) {
                     const b = 0.6 + opacityWave * 0.4;
                     ctx.fillStyle = isDark
-                        ? `rgba(${Math.round(60+40*b)},${Math.round(100+55*b)},255,${opacity})`
+                        ? `rgba(${60+Math.round(40*b)},${100+Math.round(55*b)},255,${opacity})`
                         : `rgba(40,80,200,${opacity*0.8})`;
                 } else {
                     ctx.fillStyle = isDark

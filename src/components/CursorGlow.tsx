@@ -7,6 +7,7 @@ export default function CursorGlow() {
     const glowRef = useRef<HTMLDivElement>(null);
     const posRef = useRef({ x: -100, y: -100 });
     const visibleRef = useRef(false);
+    const needsUpdateRef = useRef(false);
     const [isFinePointer, setIsFinePointer] = useState(false);
     const [mounted, setMounted] = useState(false);
     const { resolvedTheme } = useTheme();
@@ -21,41 +22,47 @@ export default function CursorGlow() {
         const glow = glowRef.current;
         if (!glow) return;
 
+        // Single persistent RAF loop — no thrashing
         let rafId = 0;
+        let running = true;
 
-        const updatePosition = () => {
-            if (glow) glow.style.transform = `translate(${posRef.current.x - 15}px, ${posRef.current.y - 15}px)`;
+        const loop = () => {
+            if (!running) return;
+            rafId = requestAnimationFrame(loop);
+            if (needsUpdateRef.current) {
+                needsUpdateRef.current = false;
+                glow.style.transform = `translate(${posRef.current.x - 15}px, ${posRef.current.y - 15}px)`;
+            }
         };
+        rafId = requestAnimationFrame(loop);
 
         const handleMouseMove = (e: MouseEvent) => {
             posRef.current.x = e.clientX;
             posRef.current.y = e.clientY;
+            needsUpdateRef.current = true;
             if (!visibleRef.current) {
                 visibleRef.current = true;
-                if (glow) glow.style.opacity = "1";
+                glow.style.opacity = "1";
             }
-            cancelAnimationFrame(rafId);
-            rafId = requestAnimationFrame(updatePosition);
         };
 
-        const handleMouseLeave = () => { visibleRef.current = false; if (glow) glow.style.opacity = "0"; };
-        const handleMouseEnter = () => { visibleRef.current = true; if (glow) glow.style.opacity = "1"; };
+        const handleMouseLeave = () => { visibleRef.current = false; glow.style.opacity = "0"; };
+        const handleMouseEnter = () => { visibleRef.current = true; glow.style.opacity = "1"; };
 
         window.addEventListener("mousemove", handleMouseMove, { passive: true });
         document.addEventListener("mouseleave", handleMouseLeave);
         document.addEventListener("mouseenter", handleMouseEnter);
 
         return () => {
+            running = false;
+            cancelAnimationFrame(rafId);
             window.removeEventListener("mousemove", handleMouseMove);
             document.removeEventListener("mouseleave", handleMouseLeave);
             document.removeEventListener("mouseenter", handleMouseEnter);
-            cancelAnimationFrame(rafId);
         };
     }, [isFinePointer]);
 
-    // Don't render anything until mounted — prevents hydration mismatch
-    if (!mounted) return null;
-    if (!isFinePointer) return null;
+    if (!mounted || !isFinePointer) return null;
 
     const isDark = resolvedTheme === "dark";
 
