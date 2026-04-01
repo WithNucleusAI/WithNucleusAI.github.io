@@ -253,8 +253,10 @@ export default function EscherImage() {
 
             const musicMod = audio.isPlaying ? audio.bass * 0.25 : 0;
 
-            const baseOpacity = isMobileViewport ? 0.65 : isSmallViewport ? 0.50 : 0.35;
-            const opacity = baseOpacity + breathCombined * 0.20 + (audio.isPlaying ? audio.amplitude * 0.08 : 0);
+            // Fixed opacity — never dims after appearing
+            const fixedOpacity = isMobileViewport ? 0.65 : isSmallViewport ? 0.50 : 0.40;
+
+            // Breathing only through scale — no opacity change
             const scale = 0.99 + breathCombined * 0.03 + musicMod * 0.008;
 
             const tx = Math.sin(t * 0.25) * 1.0;
@@ -262,7 +264,7 @@ export default function EscherImage() {
             const baseRot = isMobileViewport ? -12 : -20;
             const rot = baseRot + Math.sin(t * 0.15) * 0.3;
 
-            canvas.style.opacity = String(opacity);
+            canvas.style.opacity = String(fixedOpacity);
             canvas.style.transform = `rotate(${rot}deg) translateX(${tx}px) translateY(calc(-2% + ${ty}px)) scale(${scale})`;
         };
 
