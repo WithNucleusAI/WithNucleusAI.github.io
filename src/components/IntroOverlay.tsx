@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
+import Image from "next/image";
 
 interface ExtendedWindow extends Window {
     __globalIntroPlayed?: boolean;
@@ -23,61 +24,9 @@ export function getIntroPlayed(): boolean {
     return globalIntroPlayed;
 }
 
-// Happy Mac pixel art — 24x24 grid, 1 = white pixel, 0 = transparent
-const HAPPY_MAC: number[][] = [
-    [0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0],
-    [0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0],
-    [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
-    [0,0,0,1,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,1,0,0,0],
-    [0,0,0,1,0,0,1,0,1,0,0,0,0,0,1,0,1,0,0,0,1,0,0,0],
-    [0,0,0,1,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,1,0,0,0],
-    [0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,0,0,0],
-    [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
-    [0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0],
-    [0,0,0,1,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,1,0,0,0],
-    [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
-    [0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0],
-    [0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0],
-    [0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
-    [0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
-    [0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
-    [0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
-    [0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
-    [0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
-    [0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
-    [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
-    [0,0,0,0,1,1,1,0,0,1,0,0,0,0,1,0,0,1,1,1,0,0,0,0],
-    [0,0,0,0,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1,0,0,0,0],
-];
-
-function HappyMacIcon({ size = 6 }: { size?: number }) {
-    return (
-        <div
-            className="inline-grid"
-            style={{
-                gridTemplateColumns: `repeat(24, ${size}px)`,
-                gridTemplateRows: `repeat(24, ${size}px)`,
-            }}
-            aria-hidden="true"
-        >
-            {HAPPY_MAC.flat().map((pixel, i) => (
-                <div
-                    key={i}
-                    style={{
-                        width: size,
-                        height: size,
-                        backgroundColor: pixel ? '#ffffff' : 'transparent',
-                    }}
-                />
-            ))}
-        </div>
-    );
-}
-
 export default function IntroOverlay() {
     const [hasMounted, setHasMounted] = useState(false);
-    const [step, setStep] = useState<"black" | "icon" | "loading" | "fading" | "done">("black");
+    const [step, setStep] = useState<"black" | "logo" | "loading" | "fading" | "done">("black");
     const [loadProgress, setLoadProgress] = useState(0);
     const loadIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -89,33 +38,32 @@ export default function IntroOverlay() {
         return () => clearTimeout(t);
     }, []);
 
-    // Boot sequence timing
     useEffect(() => {
         if (!hasMounted || step === "done") return;
 
         if (step === "black") {
-            const t = setTimeout(() => setStep("icon"), 300);
+            const t = setTimeout(() => setStep("logo"), 200);
             return () => clearTimeout(t);
         }
 
-        if (step === "icon") {
-            const t = setTimeout(() => setStep("loading"), 1500);
+        if (step === "logo") {
+            const t = setTimeout(() => setStep("loading"), 1200);
             return () => clearTimeout(t);
         }
 
         if (step === "loading") {
             let progress = 0;
             loadIntervalRef.current = setInterval(() => {
-                progress += Math.random() * 15 + 5;
+                progress += Math.random() * 18 + 6;
                 if (progress >= 100) {
                     progress = 100;
                     setLoadProgress(100);
                     if (loadIntervalRef.current) clearInterval(loadIntervalRef.current);
-                    setTimeout(() => finishIntro(), 200);
+                    setTimeout(() => finishIntro(), 150);
                 } else {
                     setLoadProgress(progress);
                 }
-            }, 80);
+            }, 60);
             return () => {
                 if (loadIntervalRef.current) clearInterval(loadIntervalRef.current);
             };
@@ -127,7 +75,7 @@ export default function IntroOverlay() {
         setTimeout(() => {
             setStep("done");
             setIntroPlayed();
-        }, 800);
+        }, 600);
     }, []);
 
     if (!hasMounted) {
@@ -140,35 +88,40 @@ export default function IntroOverlay() {
 
     return (
         <div
-            className={`fixed inset-0 z-[60] flex flex-col items-center justify-center bg-black transition-opacity duration-800
+            className={`fixed inset-0 z-[60] flex flex-col items-center justify-center bg-black transition-opacity duration-600
             ${step === "fading" ? "opacity-0 pointer-events-none" : "opacity-100"}`}
         >
-            {/* Happy Mac icon + text */}
-            {(step === "icon" || step === "loading" || step === "fading") && (
-                <div className="flex flex-col items-center gap-6 sm:gap-8">
-                    <div className="animate-[fadeIn_0.3s_ease-in_forwards]">
-                        <HappyMacIcon size={window.innerWidth < 640 ? 4 : 6} />
+            {(step === "logo" || step === "loading" || step === "fading") && (
+                <div className="flex flex-col items-center">
+                    {/* Nucleus logo — large, centered, brand-first */}
+                    <div className="animate-[fadeIn_0.4s_ease-in_forwards] mb-8 sm:mb-10">
+                        <Image
+                            src="/logo.webp"
+                            alt="Nucleus"
+                            width={120}
+                            height={120}
+                            className="w-16 h-16 sm:w-24 sm:h-24 invert-0"
+                            priority
+                        />
                     </div>
 
-                    <h1
-                        className="text-2xl sm:text-4xl font-bold tracking-[0.3em] sm:tracking-[0.4em] text-white animate-[fadeIn_0.5s_ease-in_0.2s_both]"
-                        style={{ fontFamily: "var(--font-base)" }}
-                    >
+                    <h1 className="text-lg sm:text-2xl font-semibold tracking-[0.25em] text-white/90 animate-[fadeIn_0.4s_ease-in_0.15s_both]">
                         NUCLEUS
                     </h1>
 
-                    <span className="text-[10px] sm:text-xs tracking-[0.3em] text-white/50 uppercase animate-[fadeIn_0.5s_ease-in_0.4s_both]">
+                    <span className="mt-2 text-[9px] sm:text-[10px] tracking-[0.2em] text-white/25 animate-[fadeIn_0.4s_ease-in_0.3s_both]">
                         General Intelligence
                     </span>
                 </div>
             )}
 
-            {/* Loading bar */}
+            {/* Loading bar — thin, refined */}
             {(step === "loading" || step === "fading") && (
-                <div className="absolute bottom-[20vh] sm:bottom-[22vh] left-1/2 -translate-x-1/2 w-48 sm:w-64">
-                    <div className="w-full h-3 sm:h-4 border border-white/60">
+                <div className="absolute bottom-[22vh] sm:bottom-[24vh] left-1/2 -translate-x-1/2 flex flex-col items-center gap-3">
+                    <span className="text-[8px] tracking-[0.3em] text-white/20 uppercase">Loading</span>
+                    <div className="w-36 sm:w-48 h-[2px] bg-white/8 overflow-hidden">
                         <div
-                            className="h-full bg-white transition-[width] duration-100 ease-linear"
+                            className="h-full bg-white/50 transition-[width] duration-75 ease-linear"
                             style={{ width: `${loadProgress}%` }}
                         />
                     </div>

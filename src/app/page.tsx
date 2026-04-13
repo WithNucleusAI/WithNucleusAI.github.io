@@ -28,10 +28,13 @@ export default async function Home() {
       </div>
 
       {/* Mission */}
-      <section id="intro-section" className="min-h-[50vh] sm:min-h-[65vh] flex flex-col justify-center items-center px-6 sm:px-12 max-w-2xl mx-auto py-12 sm:py-24 text-center z-10 relative">
-        <h2 className="text-base sm:text-2xl lg:text-3xl leading-[1.8] sm:leading-[1.7] font-light tracking-wide text-black/70 dark:text-white/70">
-          We design systems that shape tomorrow. Exploring the frontiers of software, artificial intelligence, and resilient architectures to build the foundations of modern engineering.
-        </h2>
+      <section id="intro-section" className="min-h-[45vh] sm:min-h-[60vh] flex flex-col justify-center items-center px-6 sm:px-12 max-w-2xl mx-auto py-12 sm:py-24 text-center z-10 relative">
+        <div className="w-full border-t border-black/6 dark:border-white/6 pt-6 sm:pt-8">
+          <p className="text-[9px] sm:text-[10px] tracking-[0.25em] uppercase text-black/25 dark:text-white/25 mb-5 sm:mb-7">About</p>
+          <h2 className="text-sm sm:text-xl lg:text-2xl leading-[1.8] sm:leading-[1.75] font-light text-black/60 dark:text-white/60">
+            We design systems that shape tomorrow. Exploring the frontiers of software, artificial intelligence, and resilient architectures to build the foundations of modern engineering.
+          </h2>
+        </div>
       </section>
 
       {/* Divider */}

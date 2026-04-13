@@ -22,6 +22,7 @@ export default function Typewriter() {
     const [isNucleus, setIsNucleus] = useState(() => getIntroPlayed());
     const [showCaption, setShowCaption] = useState(() => getIntroPlayed());
 
+    const [currentPhrase, setCurrentPhrase] = useState(0);
     const phraseIdx = useRef(0);
     const charIdx = useRef(0);
     const typing = useRef(true);
@@ -42,6 +43,7 @@ export default function Typewriter() {
             const isFinal = pi === phrases.length - 1;
 
             setIsNucleus(isFinal);
+            setCurrentPhrase(pi);
 
             if (typing.current) {
                 // Typing forward
@@ -135,35 +137,42 @@ export default function Typewriter() {
     }, []);
 
     return (
-        <div className="w-full flex flex-col items-center -translate-y-10 mt-14">
+        <div className="w-full flex flex-col items-center -translate-y-10 mt-14 relative">
             <style dangerouslySetInnerHTML={{ __html: `
-                @keyframes block-blink {
+                @keyframes cursor-blink {
                     0%, 100% { opacity: 1; }
                     50% { opacity: 0; }
                 }
                 @keyframes caption-in {
-                    0% { opacity: 0; transform: translateY(12px); }
+                    0% { opacity: 0; transform: translateY(8px); }
                     100% { opacity: 1; transform: translateY(0); }
                 }
                 @keyframes line-expand {
                     0% { width: 0; opacity: 0; }
-                    100% { width: 3rem; opacity: 1; }
+                    100% { width: 2.5rem; opacity: 1; }
                 }
             `}} />
+
+            {/* Phrase counter — editorial detail */}
+            {!showCaption && (
+                <div className="absolute -top-8 sm:-top-10 right-4 sm:right-0 text-[9px] tracking-[0.15em] text-black/15 dark:text-white/15 font-mono tabular-nums">
+                    {String(currentPhrase + 1).padStart(2, '0')}/{String(phrases.length).padStart(2, '0')}
+                </div>
+            )}
 
             <div
                 id="typing"
                 className={`mx-auto w-full max-w-[92vw] sm:max-w-2xl px-1 sm:px-4 text-center ${
                     isNucleus
                         ? "text-[2.5rem] sm:text-7xl lg:text-8xl font-bold leading-none tracking-[0.22em] sm:tracking-[0.35em] text-black dark:text-white"
-                        : "text-base sm:text-xl font-light tracking-tight text-black/60 dark:text-white/60 leading-relaxed"
+                        : "text-[15px] sm:text-xl font-light tracking-tight text-black/55 dark:text-white/55 leading-relaxed"
                 }`}
             >
                 <span dangerouslySetInnerHTML={{ __html: text }} />
                 {!showCaption && (
                     <span
-                        style={{ animation: 'block-blink 1s step-end infinite' }}
-                        className="inline-block w-[2px] h-[0.85em] ml-1 align-middle bg-black/50 dark:bg-white/50"
+                        style={{ animation: 'cursor-blink 1s steps(1) infinite' }}
+                        className="inline-block w-[2px] h-[0.85em] ml-1 align-middle bg-black/40 dark:bg-white/40"
                     />
                 )}
             </div>
@@ -171,12 +180,12 @@ export default function Typewriter() {
             {showCaption && (
                 <div className="mt-4 sm:mt-6 flex flex-col items-center gap-2 sm:gap-3">
                     <div
-                        style={{ animation: 'line-expand 1.2s cubic-bezier(0.16,1,0.3,1) 0.3s both' }}
-                        className="h-px bg-black/20 dark:bg-white/20"
+                        style={{ animation: 'line-expand 1s cubic-bezier(0.16,1,0.3,1) 0.3s both' }}
+                        className="h-px bg-black/15 dark:bg-white/15"
                     />
                     <span
-                        style={{ animation: 'caption-in 1.2s cubic-bezier(0.16,1,0.3,1) 0.6s both' }}
-                        className="text-[9px] sm:text-sm lg:text-base font-light tracking-[0.3em] sm:tracking-[0.4em] uppercase text-black/50 dark:text-white/50"
+                        style={{ animation: 'caption-in 1s cubic-bezier(0.16,1,0.3,1) 0.5s both' }}
+                        className="text-[9px] sm:text-sm font-light tracking-[0.3em] sm:tracking-[0.35em] uppercase text-black/40 dark:text-white/40"
                     >
                         General Intelligence
                     </span>
