@@ -2,44 +2,25 @@
 @custom-variant dark (&:where(.dark, .dark *));
 @custom-variant pointer-fine (@media (pointer: fine));
 
+/* ============================================
+   MacPaint Design System — Pure 1-bit B&W
+   ============================================ */
+
 @theme {
-  --color-accent: #4F7CFF;
-  --color-accent-glow: rgba(79, 124, 255, 0.3);
-  --color-accent-soft: rgba(79, 124, 255, 0.15);
-  --color-accent-muted: rgba(79, 124, 255, 0.08);
+  --color-fg: #ffffff;
+  --color-bg: #000000;
 }
 
 :root {
   font-family: var(--font-base), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  --accent: #4F7CFF;
-  --accent-rgb: 79, 124, 255;
-  --accent-glow: rgba(79, 124, 255, 0.3);
-  --accent-soft: rgba(79, 124, 255, 0.15);
-  --accent-muted: rgba(79, 124, 255, 0.08);
 
-  /* ── 5-level accent opacity system ── */
-  --a1: rgba(79, 124, 255, 0.06);   /* very subtle: bg glows, faint borders */
-  --a2: rgba(79, 124, 255, 0.12);   /* subtle: dividers, separator lines */
-  --a3: rgba(79, 124, 255, 0.25);   /* medium: equation text, labels */
-  --a4: rgba(79, 124, 255, 0.45);   /* strong: interactive, badges */
-  --a5: rgba(79, 124, 255, 0.65);   /* emphasis: subtitle, active elements */
-
-  /* ── Text opacity system ── */
-  --t1: rgba(255, 255, 255, 0.20);  /* whisper: decoration equations */
-  --t2: rgba(255, 255, 255, 0.35);  /* muted: secondary labels */
-  --t3: rgba(255, 255, 255, 0.55);  /* body: mission text, descriptions */
-  --t4: rgba(255, 255, 255, 0.80);  /* strong: card titles */
-  --t5: rgba(255, 255, 255, 0.95);  /* primary: headings */
-
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(0, 0, 0, 0.06);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --fg: #000000;
+  --bg: #ffffff;
 }
 
 .dark {
-  --glass-bg: rgba(8, 8, 16, 0.7);
-  --glass-border: rgba(79, 124, 255, 0.06);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --fg: #ffffff;
+  --bg: #000000;
 }
 
 html {
@@ -48,224 +29,260 @@ html {
 
 body {
   font-family: var(--font-base), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  /* Disable text selection */
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  position: relative;
 }
 
-code,
-pre,
-kbd,
-samp {
+code, pre, kbd, samp {
   font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
+/* ============================================
+   1-Bit Button System
+   ============================================ */
 
-
-.btn {
-  position: relative;
-  display: inline-block;
-  overflow: hidden;
+.mac-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--fg);
+  background: transparent;
+  color: var(--fg);
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.9);
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-  /* Disable text selection */
+  transition: background 0.15s, color 0.15s;
   -webkit-user-select: none;
   user-select: none;
 }
 
-@media (min-width: 768px) {
-  .btn {
-    backdrop-filter: blur(20px);
-  }
+.mac-btn:hover {
+  background: var(--fg);
+  color: var(--bg);
 }
 
-.dark .btn {
-  background: rgba(0, 0, 0, 0.9);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.05);
-}
-
-.btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-}
-
-.dark .btn:hover {
-  border-color: var(--accent-glow);
-  box-shadow: 0 0 20px var(--accent-soft), 0 8px 30px rgba(255, 255, 255, 0.05);
-}
-
-/* Text/Icon Label inside the button */
-.btn__content {
-  position: relative;
-  z-index: 3;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #111; /* Dark initially for light mode */
-  transition: color 0.3s ease-in-out;
-  /* font-weight: bold; */
-  letter-spacing: 0.05em;
-}
-
-.dark .btn__content {
-  color: #fff; /* White for dark mode */
-}
-
-/* The Hover Interaction - Changes Text Color */
-.btn:hover .btn__content {
-  color: #fff; /* White on hover for light mode */
-}
-
-.dark .btn:hover .btn__content {
-  color: #000; /* Black on hover for dark mode */
-}
-
-/* * THE FILL CIRCLE (The background that scales up)
-     */
-.btn__fill-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.btn__fill-circle {
-  transform-origin: 50% 50%;
-  transform: scale(0); /* Start hidden/tiny */
-  transition: transform 0.3s ease-in-out;
-  fill: #111; /* Dark fill for light mode */
-}
-
-.dark .btn__fill-circle {
-  fill: var(--accent); /* Accent blue fill for dark mode */
-}
-
-/* Scale up on hover */
-.btn:hover .btn__fill-circle {
-  transform: scale(1); /* Scale to fit within container */
-}
-
-/* * THE BORDER SVG (The lines that draw themselves)
-     */
-.btn__border-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.btn__border-path {
-  fill: none;
-  stroke: #111; /* Dark stroke for light mode */
-  stroke-width: 1; /* Slight thickness */
-  stroke-linecap: round;
-  transition: stroke-dashoffset 0.3s ease-in-out;
-}
-
-.dark .btn__border-path {
-  stroke: var(--accent); /* Accent blue stroke for dark mode */
-}
-
-/* -----------------------------------------------------------
-       SPECIFIC: CIRCULAR BUTTON 
-       ----------------------------------------------------------- */
-.btn--circle {
+.mac-btn--circle {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
 }
 
 @media (min-width: 768px) {
-  .btn--circle {
+  .mac-btn--circle {
     width: 3rem;
     height: 3rem;
   }
 }
 
-/* Circumference Calculation for radius 29 (60px viewbox - 1px stroke padding):
-       C = 2 * pi * 29 ≈ 182.2
-       Half Circle ≈ 91.1 
-    */
-.btn--circle .btn__border-path {
-  stroke-dasharray: 91.1 91.1;
+.mac-btn--pill {
+  padding: 0.5rem 1.5rem;
+  border-radius: 0;
 }
 
-/* Initial State: Lines pushed away */
-.btn--circle .btn__border-path--left {
-  stroke-dashoffset: -91.1;
-}
-.btn--circle .btn__border-path--right {
-  stroke-dashoffset: 91.1;
+/* ============================================
+   Dither Pattern Utilities
+   ============================================ */
+
+.dither-light {
+  background-image: url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='0' y='0' width='2' height='2' fill='%23ffffff' fill-opacity='0.06'/%3E%3Crect x='2' y='2' width='2' height='2' fill='%23ffffff' fill-opacity='0.06'/%3E%3C/svg%3E");
 }
 
-/* Hover State: Draw lines to 0 (center) */
-.btn--circle:hover .btn__border-path--left,
-.btn--circle:hover .btn__border-path--right {
-  stroke-dashoffset: 0;
-}
-/* -----------------------------------------------------------
-       SPECIFIC: ORIGINAL PILL BUTTON (For Comparison)
-       ----------------------------------------------------------- */
-.btn--pill {
-  width: 10vw;
-  height: 5vw;
-  border-radius: 1.5vw;
+.dither-medium {
+  background-image: url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='0' y='0' width='2' height='2' fill='%23ffffff' fill-opacity='0.12'/%3E%3Crect x='2' y='2' width='2' height='2' fill='%23ffffff' fill-opacity='0.12'/%3E%3C/svg%3E");
 }
 
-.btn--pill .btn__border-path {
-  stroke-dasharray: 62 62; /* From original code */
+.dither-heavy {
+  background-image: url("data:image/svg+xml,%3Csvg width='2' height='2' viewBox='0 0 2 2' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='0' y='0' width='1' height='1' fill='%23ffffff' fill-opacity='0.25'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23ffffff' fill-opacity='0.25'/%3E%3C/svg%3E");
 }
 
-.btn--pill .btn__border-path--left {
-  stroke-dashoffset: -62;
-}
-.btn--pill .btn__border-path--right {
-  stroke-dashoffset: 62;
+/* ============================================
+   Mac Window Chrome — Classic System 1 Style
+   ============================================ */
+
+.mac-window {
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  position: relative;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
 }
 
-.btn--pill:hover .btn__border-path--left,
-.btn--pill:hover .btn__border-path--right {
-  stroke-dashoffset: 0;
-}
-/* -----------------------------------------------------------
-   SPECIFIC: PLAYGROUND BUTTON (190px x 50px)
-   ----------------------------------------------------------- */
-.btn--playground {
-  width: 190px;
-  height: 50px;
-  border-radius: 25px;
+.dark .mac-window {
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 2px 2px 0 rgba(255,255,255,0.05);
 }
 
-.btn--playground .btn__border-path {
-  stroke-dasharray: 216 216;
+.mac-window__titlebar {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 8px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+  position: relative;
+  /* Classic Mac striped title bar */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.06) 2px,
+    rgba(0, 0, 0, 0.06) 4px
+  );
 }
 
-.btn--playground .btn__border-path--left {
-  stroke-dashoffset: -216;
+.dark .mac-window__titlebar {
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(255, 255, 255, 0.06) 2px,
+    rgba(255, 255, 255, 0.06) 4px
+  );
 }
 
-.btn--playground .btn__border-path--right {
-  stroke-dashoffset: 216;
+.mac-window__dots {
+  display: flex;
+  gap: 0;
+  position: absolute;
+  left: 8px;
 }
 
-.btn--playground:hover .btn__border-path--left,
-.btn--playground:hover .btn__border-path--right {
-  stroke-dashoffset: 0;
+.mac-window__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 0;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  background: var(--bg);
 }
 
-/* KaTeX responsive equations */
+.dark .mac-window__dot {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Only show one dot — the close box like original Mac */
+.mac-window__dot:nth-child(2),
+.mac-window__dot:nth-child(3) {
+  display: none;
+}
+
+.mac-window__title {
+  width: 100%;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: rgba(0, 0, 0, 0.7);
+  font-weight: 700;
+}
+
+.dark .mac-window__title {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.mac-window__body {
+  padding: 16px;
+}
+
+@media (min-width: 640px) {
+  .mac-window__body {
+    padding: 20px;
+  }
+}
+
+/* ============================================
+   Classic Mac Button (System 1 rounded rect)
+   ============================================ */
+
+/* ============================================
+   Dithered Dividers
+   ============================================ */
+
+.dither-divider {
+  height: 4px;
+  width: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='0' y='0' width='2' height='2' fill='%23000000' fill-opacity='0.12'/%3E%3Crect x='2' y='2' width='2' height='2' fill='%23000000' fill-opacity='0.12'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+.dark .dither-divider {
+  background-image: url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='0' y='0' width='2' height='2' fill='%23ffffff' fill-opacity='0.15'/%3E%3Crect x='2' y='2' width='2' height='2' fill='%23ffffff' fill-opacity='0.15'/%3E%3C/svg%3E");
+}
+
+.dither-divider--thin {
+  height: 2px;
+}
+
+/* ============================================
+   Pixel Bounce Animation
+   ============================================ */
+
+@keyframes pixel-bounce {
+  0%, 100% { transform: translate(-50%, 0); }
+  25% { transform: translate(-50%, -4px); }
+  50% { transform: translate(-50%, 0); }
+  75% { transform: translate(-50%, -2px); }
+}
+
+/* ============================================
+   Cursor
+   ============================================ */
+
+.cursor {
+  border-right: 3px solid var(--fg);
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  from, to { border-color: transparent; }
+  50% { border-color: var(--fg); }
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+
+.fadeInAnimation {
+  animation: fadeIn 2s ease-in forwards;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.page-transition {
+  animation: pageTransition 0.5s ease-in-out;
+}
+
+@keyframes pageTransition {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* ============================================
+   Hide Scrollbar
+   ============================================ */
+
+::-webkit-scrollbar {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
+  background: transparent !important;
+}
+
+* {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
+}
+
+/* ============================================
+   KaTeX
+   ============================================ */
+
 .katex-display {
   max-width: 100%;
   overflow-x: auto;
@@ -290,118 +307,10 @@ samp {
   }
 }
 
-
-/* Legacy Animations & Styles */
-#email, #caption {
-  font-family: inherit;
-}
-
-#email {
-  position: fixed;
-  bottom: 30px;
-  font-size: 1.3rem;
-  font-weight: 100;
-  opacity: 0;
-  color: rgb(10, 10, 10);
-}
-
-.dark #email {
-  color: #9ca3af; /* gray-400 */
-}
-
-#caption {
-  opacity: 0;
-}
-
-.fadeInAnimation {
-  animation: fadeIn 2s ease-in forwards;
-}
-
-.dropDownAnimation {
-  animation: dropDown 0.5s ease-in forwards;
-}
-
-@keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
-}
-
-@keyframes dropDown {
-  0% { 
-      transform: translateY(-25px);
-      opacity: 0;
-  }
-  100% { 
-      transform: translateY(0);
-      opacity: 1;
-  }
-}
-
-.cursor {
-  border-right: 3px solid rgb(10, 10, 10);
-  animation: blink 1s step-end infinite;
-}
-
-.dark .cursor {
-  border-right: 3px solid rgb(243, 244, 246);
-  animation: blink-dark 1s step-end infinite;
-}
-
-@keyframes blink {
-  from, to { border-color: transparent; }
-  50% { border-color: rgb(10, 10, 10); }
-}
-
-@keyframes blink-dark {
-  from, to { border-color: transparent; }
-  50% { border-color: rgb(243, 244, 246); }
-}
-
-/* Media queries for responsive adjustments - EXACTLY matching legacy */
-@media (max-width: 600px) {
-  #email {
-      font-size: 0.875rem;
-  }
-}
-
-/* Hide scrollbar globally for aesthetics */
-::-webkit-scrollbar {
-  display: none !important;
-  width: 0px !important;
-  height: 0px !important;
-  background: transparent !important;
-}
-
-* {
-  -ms-overflow-style: none !important;
-  scrollbar-width: none !important;
-}
-
-html::-webkit-scrollbar, body::-webkit-scrollbar {
-  display: none !important;
-  width: 0px !important;
-  height: 0px !important;
-}
-
-/* Page transition styles */
-.page-transition {
-  animation: pageTransition 0.5s ease-in-out;
-}
-
-@keyframes pageTransition {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
 /* ============================================
-   Table of Contents - Desktop Sidebar
+   Table of Contents — Desktop Sidebar
    ============================================ */
 
-/* Main container that holds both dashes and overlay */
 .toc-container {
   position: relative;
   display: flex;
@@ -409,9 +318,6 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
   justify-content: flex-end;
 }
 
-/* Enlarged hover area removed */
-
-/* Dashes navigation - always visible */
 .toc-dashes {
   position: relative;
   z-index: 10;
@@ -426,7 +332,6 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
   gap: 0.625rem;
   max-height: 80vh;
   overflow-y: auto;
-  /* Hide scrollbar for dashes */
   scrollbar-width: none;
   -ms-overflow-style: none;
   overscroll-behavior: contain;
@@ -452,14 +357,10 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
 
 .toc-dash {
   height: 4px;
-  background-color: black;
-  border-radius: 9999px;
-  opacity: 0.4;
+  background-color: var(--fg);
+  border-radius: 0;
+  opacity: 0.3;
   transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.dark .toc-dash {
-  background-color: white;
 }
 
 .toc-dash.w-8 {
@@ -476,10 +377,9 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
 }
 
 .toc-dash-link:hover .toc-dash {
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
-/* Text overlay - slides in from right, covering over the dashes, vertically centered */
 .toc-text-overlay {
   position: absolute;
   top: 0;
@@ -502,16 +402,8 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
 }
 
 .toc-text-overlay-content {
-  background: #ffffff; /* Solid background to hide dashes completely */
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 1rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-
-.dark .toc-text-overlay-content {
-  background: #1f1d1d; /* gray-900 */
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  background: var(--bg);
+  border: 1px solid var(--fg);
 }
 
 .toc-text-list {
@@ -537,19 +429,15 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
 .toc-text-link {
   display: block;
   font-size: 0.9rem;
-  color: black;
+  color: var(--fg);
   text-decoration: none;
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 240px;
-  opacity: 0.4; /* Match dashes non-active state */
+  opacity: 0.4;
   transition: all 0.2s ease;
-}
-
-.dark .toc-text-link {
-  color: #f3f4f6; /* gray-100 */
 }
 
 .toc-text-link:hover {
@@ -558,14 +446,13 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
 
 .toc-text-link.active {
   font-weight: 600;
-  opacity: 1; /* Match dashes active state */
+  opacity: 1;
 }
 
 /* ============================================
-   Table of Contents - Mobile Overlay (from ContentsButton)
+   Table of Contents — Mobile Overlay
    ============================================ */
 
-/* Mobile floating button */
 .contents-button {
   position: fixed;
   bottom: 20px;
@@ -587,45 +474,26 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.85);
-  color: white;
+  background: var(--fg);
+  color: var(--bg);
   border: none;
   font-size: 1.25rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
 }
 
-.dark .contents-button button {
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-@media (min-width: 768px) {
-  .dark .contents-button button {
-    backdrop-filter: blur(10px);
-  }
-}
-
 .contents-button button:hover {
-  background: rgba(0, 0, 0, 0.95);
-  transform: scale(1.05);
+  opacity: 0.8;
 }
 
-.dark .contents-button button:hover {
-  background: rgba(255, 255, 255, 0.25);
-}
-
-/* Mobile overlay */
 .toc-overlay {
   position: fixed;
   inset: 0;
   z-index: 999;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg);
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
@@ -635,43 +503,20 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
   padding: 2rem;
 }
 
-@media (min-width: 768px) {
-  .toc-overlay {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-  }
-}
-
-.dark .toc-overlay {
-  background: rgba(0, 0, 0, 0.95);
-}
-
-@media (min-width: 768px) {
-  .dark .toc-overlay {
-    background: rgba(0, 0, 0, 0.8);
-  }
-}
-
 .toc-overlay.open {
   opacity: 1;
   visibility: visible;
 }
 
 .toc-overlay-content {
-  background: white;
-  border-radius: 1.5rem;
+  background: var(--bg);
+  border: 1px solid var(--fg);
+  border-radius: 0;
   padding: 2rem;
   max-width: 90vw;
   max-height: 80vh;
   overflow-y: auto;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   position: relative;
-}
-
-.dark .toc-overlay-content {
-  background: #111827; /* gray-900 */
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .toc-overlay-close {
@@ -680,31 +525,23 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
   right: 1rem;
   width: 36px;
   height: 36px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.05);
-  border: none;
+  border-radius: 0;
+  background: transparent;
+  border: 1px solid var(--fg);
+  color: var(--fg);
   font-size: 1rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.dark .toc-overlay-close {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  transition: all 0.15s ease;
 }
 
 .toc-overlay-close:hover {
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--fg);
+  color: var(--bg);
 }
 
-.dark .toc-overlay-close:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* Hide mobile button on desktop */
 @media (min-width: 1024px) {
   .contents-button,
   .toc-overlay {
@@ -712,7 +549,6 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
   }
 }
 
-/* Hide desktop TOC on mobile */
 @media (max-width: 1023px) {
   .toc-container {
     display: none;
@@ -720,24 +556,9 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
 }
 
 /* ============================================
-   Glass Panel Utility
+   Link Underline (simple)
    ============================================ */
-.glass-panel {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
-}
 
-@media (min-width: 768px) {
-  .glass-panel {
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-  }
-}
-
-/* ============================================
-   Link Underline Animation (center → outward)
-   ============================================ */
 .link-underline {
   position: relative;
 }
@@ -748,19 +569,12 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
   bottom: -2px;
   left: 50%;
   width: 0;
-  height: 1.5px;
-  background: var(--accent);
+  height: 1px;
+  background: var(--fg);
   transition: width 0.3s ease, left 0.3s ease;
 }
 
 .link-underline:hover::after {
   width: 100%;
   left: 0;
-}
-
-/* ============================================
-   Accent Glow Utility
-   ============================================ */
-.accent-glow {
-  box-shadow: 0 0 20px var(--accent-glow), 0 0 60px var(--accent-soft);
 }

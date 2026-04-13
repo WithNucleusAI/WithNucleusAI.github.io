@@ -49,10 +49,10 @@ function CodeBlock({ children, ...rest }: ComponentProps<'pre'>) {
     };
 
     return (
-        <div className="relative group my-6 rounded-lg overflow-hidden border border-gray-100 dark:border-neutral-700">
+        <div className="relative group my-6 overflow-hidden border border-black/20 dark:border-white/20">
             <button
                 onClick={handleCopy}
-                className="absolute right-3 top-3 p-2 text-gray-400 hover:text-gray-700 dark:text-neutral-400 dark:hover:text-neutral-200 bg-white dark:bg-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-700 border border-gray-200 dark:border-neutral-600 rounded-md transition-all duration-200 z-10 shadow-sm"
+                className="absolute right-3 top-3 p-2 text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white bg-white dark:bg-black border border-black/20 dark:border-white/20 transition-all duration-200 z-10"
                 aria-label={copied ? 'Copied' : 'Copy code'}
                 title={copied ? 'Copied' : 'Copy code'}
             >
@@ -146,13 +146,13 @@ export default function BlogContent({ content }: BlogContentProps) {
                     style={isDark ? vscDarkPlus : prism}
                     language={language}
                     PreTag="div"
-                    customStyle={{ margin: 0, padding: '1.25rem', paddingRight: '3.5rem', backgroundColor: isDark ? '#1e1e1e' : '#f5f7f9' }}
+                    customStyle={{ margin: 0, padding: '1.25rem', paddingRight: '3.5rem', backgroundColor: isDark ? '#0a0a0a' : '#f5f7f9' }}
                     {...props}
                 >
                     {String(children).replace(/\n$/, '')}
                 </SyntaxHighlighter>
             ) : (
-                <code className={`${className || ''} px-1.5 py-0.5 rounded bg-gray-100 dark:bg-neutral-800 dark:text-neutral-200 text-[0.9em]`} {...props}>
+                <code className={`${className || ''} px-1.5 py-0.5 bg-black/5 dark:bg-white/10 text-black dark:text-white text-[0.9em]`} {...props}>
                     {children}
                 </code>
             );

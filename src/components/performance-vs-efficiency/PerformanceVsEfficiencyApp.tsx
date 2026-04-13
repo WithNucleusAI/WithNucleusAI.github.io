@@ -757,28 +757,7 @@ function AppInner({ disableAmbientBackground }: { disableAmbientBackground?: boo
         {/* GenEval Bench */}
         <GenEvalBench />
 
-        {/* Footer */}
-        <motion.footer
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7, duration: 0.6 }}
-          className="mt-[72px] pb-10 text-center"
-        >
-          <div className="mb-8 h-px bg-[linear-gradient(90deg,transparent,rgba(0,102,220,0.06)_20%,rgba(147,51,234,0.05)_50%,rgba(5,150,105,0.04)_80%,transparent)] dark:bg-[linear-gradient(90deg,transparent,rgba(59,158,255,0.04)_20%,rgba(192,132,252,0.035)_50%,rgba(52,211,153,0.03)_80%,transparent)]" />
-          <div className="mb-[14px] inline-flex items-center gap-2">
-            <div className="h-[5px] w-[5px] rounded-full bg-[#0066DC] opacity-30 dark:bg-[#4F7CFF]" />
-            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#0066DC]/65 dark:text-[#7EC0FF]">
-              Nucleus-Image
-            </span>
-            <div className="h-[5px] w-[5px] rounded-full bg-[#0066DC] opacity-30 dark:bg-[#4F7CFF]" />
-          </div>
-          <p className="m-0 text-[11px] leading-[1.5] tracking-[-0.005em] text-black/52 dark:text-white/52">
-            Performance scores are approximate from publicly available benchmarks.
-          </p>
-          <p style={{ ...mono }} className="m-0 mt-2 text-[10px] tracking-[0.02em] text-black/48 dark:text-white/48">
-            Data compiled March 2026
-          </p>
-        </motion.footer>
+        {/* Footer removed — disclaimer moved to page level */}
       </div>
 
       {/* Global keyframes */}

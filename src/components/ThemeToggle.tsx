@@ -23,7 +23,7 @@ export default function ThemeToggle() {
         setMounted(true);
         const handleIntroDone = () => setIsVisible(true);
         window.addEventListener('intro-done', handleIntroDone);
-        
+
         if (pathname === '/') {
             setIsVisible(getIntroPlayed());
         } else {
@@ -39,26 +39,24 @@ export default function ThemeToggle() {
 
     const currentTheme = theme === "system" ? systemTheme : theme;
 
+    // Hide on image page — forced dark only
+    if (pathname === '/image') return null;
+
     return (
         <div
             className={`fixed left-7.5 max-md:left-3.75 z-50 transition-all duration-1000 ${isVisible ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}
             style={{ bottom: `${bottomOffset}px` }}
         >
-            <button className="btn btn--circle" onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")} aria-label="Toggle theme">
-                <div className="btn__content">
-                    {currentTheme === "dark" ? (
-                        <Sun className="h-5 w-5 md:h-6 md:w-6" />
-                    ) : (
-                        <Moon className="h-5 w-5 md:h-6 md:w-6" />
-                    )}
-                </div>
-                <svg className="btn__fill-layer" viewBox="0 0 60 60">
-                    <circle className="btn__fill-circle" fill="#FFFFFF" cx="30" cy="30" r="29" />
-                </svg>
-                <svg className="btn__border-layer" viewBox="0 0 60 60">
-                    <path className="btn__border-path btn__border-path--left" d="M30,59 A29,29 0 0,1 30,1" />
-                    <path className="btn__border-path btn__border-path--right" d="M30,59 A29,29 0 0,0 30,1" />
-                </svg>
+            <button
+                className="mac-btn mac-btn--circle"
+                onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")}
+                aria-label="Toggle theme"
+            >
+                {currentTheme === "dark" ? (
+                    <Sun className="h-5 w-5 md:h-6 md:w-6" />
+                ) : (
+                    <Moon className="h-5 w-5 md:h-6 md:w-6" />
+                )}
             </button>
         </div>
     );

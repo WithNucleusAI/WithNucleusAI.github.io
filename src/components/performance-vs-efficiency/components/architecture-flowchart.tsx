@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { useTheme } from "./theme-context";
 import { useIsMobile } from "./use-mobile";
@@ -22,19 +23,23 @@ import { useIsMobile } from "./use-mobile";
    ═══════════════════════════════════════════════════════════ */
 
 export function ArchitectureFlowchart() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const { t, theme } = useTheme();
   const isDark = theme === "dark";
   const mob = useIsMobile();
   const u = isDark ? "d" : "l";
 
+  if (!mounted) return <div style={{ minHeight: 400 }} />;
+
   /* ═══════════ COLOUR SYSTEM ═══════════ */
   const C = {
-    txt:      isDark ? "#C8CCD4" : "#1C2028",
-    txtHi:    isDark ? "#EEF0F4" : "#0C0E12",
-    txtSoft:  isDark ? "rgba(255,255,255,.32)" : "rgba(0,0,0,.30)",
-    txtMuted: isDark ? "rgba(255,255,255,.18)" : "rgba(0,0,0,.16)",
-    line:     isDark ? "rgba(255,255,255,.09)" : "rgba(0,0,0,.12)",
-    lineHi:   isDark ? "rgba(255,255,255,.20)" : "rgba(0,0,0,.30)",
+    txt:      isDark ? "#D8DCE8" : "#1C2028",
+    txtHi:    isDark ? "#F4F6FC" : "#0C0E12",
+    txtSoft:  isDark ? "rgba(255,255,255,.50)" : "rgba(0,0,0,.30)",
+    txtMuted: isDark ? "rgba(255,255,255,.30)" : "rgba(0,0,0,.16)",
+    line:     isDark ? "rgba(255,255,255,.15)" : "rgba(0,0,0,.12)",
+    lineHi:   isDark ? "rgba(255,255,255,.35)" : "rgba(0,0,0,.30)",
     skipLine: isDark ? "rgba(255,183,77,.12)"  : "rgba(180,100,0,.12)",
     skipHi:   isDark ? "rgba(255,183,77,.28)"  : "rgba(180,100,0,.28)",
     dash:     isDark ? "rgba(92,179,255,.20)"  : "rgba(0,113,227,.18)",
@@ -44,17 +49,17 @@ export function ArchitectureFlowchart() {
     indigo:   isDark ? "#818CF8"  : "#6366F1",
     teal:     isDark ? "#2DD4BF"  : "#0D9488",
 
-    n:  { f0: isDark ? "rgba(255,255,255,.012)" : "rgba(255,255,255,.68)",
-          f1: isDark ? "rgba(255,255,255,.048)" : "rgba(255,255,255,.92)",
-          s:  isDark ? "rgba(255,255,255,.055)" : "rgba(0,0,0,.07)",
-          hi: isDark ? "rgba(255,255,255,.07)"  : "rgba(255,255,255,.80)",
-          sh: isDark ? "rgba(0,0,0,.10)"        : "rgba(0,0,0,.02)",
+    n:  { f0: isDark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.68)",
+          f1: isDark ? "rgba(255,255,255,.08)" : "rgba(255,255,255,.92)",
+          s:  isDark ? "rgba(255,255,255,.12)" : "rgba(0,0,0,.07)",
+          hi: isDark ? "rgba(255,255,255,.14)"  : "rgba(255,255,255,.80)",
+          sh: isDark ? "rgba(0,0,0,.15)"        : "rgba(0,0,0,.02)",
           bar: "transparent" },
-    d:  { f0: isDark ? "rgba(32,34,58,.75)"    : "rgba(26,28,46,.86)",
-          f1: isDark ? "rgba(50,54,86,.82)"    : "rgba(42,46,74,.94)",
-          s:  isDark ? "rgba(129,140,248,.18)" : "rgba(99,102,241,.22)",
-          hi: isDark ? "rgba(129,140,248,.12)" : "rgba(255,255,255,.05)",
-          sh: isDark ? "rgba(0,0,0,.18)"       : "rgba(0,0,0,.04)",
+    d:  { f0: isDark ? "rgba(40,42,70,.85)"    : "rgba(26,28,46,.86)",
+          f1: isDark ? "rgba(60,64,100,.90)"   : "rgba(42,46,74,.94)",
+          s:  isDark ? "rgba(129,140,248,.30)" : "rgba(99,102,241,.22)",
+          hi: isDark ? "rgba(129,140,248,.20)" : "rgba(255,255,255,.05)",
+          sh: isDark ? "rgba(0,0,0,.25)"       : "rgba(0,0,0,.04)",
           bar: isDark ? "#818CF8"              : "#6366F1" },
     a:  { f0: isDark ? "rgba(59,130,246,.02)"  : "rgba(0,113,227,.008)",
           f1: isDark ? "rgba(59,130,246,.07)"  : "rgba(0,113,227,.035)",
@@ -355,10 +360,10 @@ export function ArchitectureFlowchart() {
       transition={{ delay: 0.4, duration: 0.8, ease: [0.22, 0.61, 0.36, 1] }}
       style={{
         borderRadius: mob ? 18 : 24,
-        background: t.panelBg,
-        backdropFilter: "blur(24px) saturate(1.3)",
-        WebkitBackdropFilter: "blur(24px) saturate(1.3)",
-        border: `1px solid ${t.panelBorder}`,
+        background: isDark ? "rgba(8,8,20,0.85)" : "rgba(255,255,255,0.90)",
+        backdropFilter: "blur(24px) saturate(1.4)",
+        WebkitBackdropFilter: "blur(24px) saturate(1.4)",
+        border: isDark ? "1px solid rgba(100,160,255,0.15)" : `1px solid ${t.panelBorder}`,
         boxShadow: t.panelShadow,
         overflow: "hidden",
         position: "relative" as const,
@@ -392,7 +397,7 @@ export function ArchitectureFlowchart() {
 
         {/* ══════════════════ SVG ══════════════════ */}
         <div style={{ overflowX: "auto", margin: mob ? "0 -8px" : 0, padding: mob ? "0 8px 8px" : 0 }}>
-          <svg viewBox="0 0 940 900"
+          <svg viewBox="0 0 480 900"
             style={{ width: "100%", minWidth: mob ? 700 : undefined, maxWidth: 940, display: "block" }}>
 
             <defs>
@@ -735,68 +740,6 @@ export function ArchitectureFlowchart() {
               );
             })()}
 
-            {/* Expert inputs */}
-            {Nd(eXcx, EI, 56, 30, "x", "default", 11)}
-            {Nd(eUcx, EI, 136, 30, "Unmodulated x", "default", 9.5)}
-            {Nd(eTcx, EI, 92, 30, "Timestep", "default", 10)}
-
-            {Ar(eXcx, EI - 15, eScx, EX + BH / 2)}
-
-            {Ln(eUcx, EI - 15, eUcx, EI - 34)}
-            {Ln(eTcx, EI - 15, eTcx, EI - 34)}
-            {Ln(eUcx, EI - 34, eTcx, EI - 34)}
-            {Ar((eUcx + eTcx) / 2, EI - 34, eRcx, RO + BH / 2)}
-
-            {Nd(eRcx, RO, 108, BH, "Router", "default", 11, { icon: "R" })}
-
-            {Ln(eRcx, RO - BH / 2, eRcx, RO - BH / 2 - 26)}
-            {Ar(eRcx, RO - BH / 2 - 26, e1cx, EX + BH / 2)}
-            {Ar(eRcx, RO - BH / 2 - 26, e64cx, EX + BH / 2)}
-
-            {Nd(eScx, EX, 118, BH, "Shared Expert", "moe", 10)}
-            {Nd(e1cx, EX, 84, BH, "Expert 1", "default", 10)}
-            {Nd(e64cx, EX, 84, BH, "Expert 64", "default", 10)}
-
-            {/* ellipsis dots */}
-            <g>
-              {[0, 10, 20].map(dx => (
-                <circle key={dx} cx={(e1cx + e64cx) / 2 - 10 + dx} cy={EX} r={1.5}
-                  fill={C.txtMuted} />
-              ))}
-            </g>
-
-            {/* Expert group bracket with label */}
-            {(() => {
-              const bx = e1cx - 47, by = EX - BH / 2 - 8;
-              const bw = e64cx - e1cx + 94, bh = BH + 16;
-              return (
-                <g>
-                  <rect x={bx} y={by} width={bw} height={bh} rx={8}
-                    fill={isDark ? "rgba(255,255,255,.006)" : "rgba(0,0,0,.006)"}
-                    stroke={isDark ? "rgba(255,255,255,.07)" : "rgba(0,0,0,.09)"}
-                    strokeWidth={0.7} />
-                  {/* label badge */}
-                  <g>
-                    <rect x={bx + bw / 2 - 36} y={by - 7} width={72} height={14} rx={7}
-                      fill={isDark ? "rgba(255,255,255,.015)" : "rgba(0,0,0,.015)"}
-                      stroke={isDark ? "rgba(255,255,255,.04)" : "rgba(0,0,0,.05)"}
-                      strokeWidth={0.4} />
-                    <text x={bx + bw / 2} y={by} textAnchor="middle" dominantBaseline="central"
-                      fill={C.txtSoft} fontSize={7} fontFamily="'JetBrains Mono',monospace"
-                      fontWeight={600} letterSpacing="0.05em">
-                      64 ROUTED
-                    </text>
-                  </g>
-                </g>
-              );
-            })()}
-
-            {Ar(eScx, EX - BH / 2, ePcx - 7, EP + PR)}
-            {Ar(e1cx, EX - BH / 2, ePcx, EP + PR)}
-            {Ar(e64cx, EX - BH / 2, ePcx + 7, EP + PR)}
-
-            {Pl(ePcx, EP)}
-            {Ar(ePcx, EP - PR, ePcx, ED.y + 20)}
 
           </svg>
         </div>
@@ -806,32 +749,31 @@ export function ArchitectureFlowchart() {
         <div style={{
           display: "flex",
           gap: mob ? 10 : 16,
-          marginTop: mob ? 16 : 28,
+          marginTop: mob ? 16 : 20,
           flexWrap: "wrap",
-          justifyContent: mob ? "center" : "flex-end",
-          paddingRight: mob ? 0 : 8,
+          justifyContent: "center",
         }}>
           {/* Architecture Note card */}
           <div style={{
             padding: 0, borderRadius: 16, overflow: "hidden",
-            background: isDark ? "rgba(255,255,255,.012)" : "rgba(0,0,0,.012)",
-            backdropFilter: "blur(16px) saturate(1.2)",
-            WebkitBackdropFilter: "blur(16px) saturate(1.2)",
-            border: `1px solid ${isDark ? "rgba(255,255,255,.035)" : "rgba(0,0,0,.055)"}`,
-            maxWidth: 270, flex: "0 0 auto",
+            background: isDark ? "rgba(15,15,35,.9)" : "rgba(0,0,0,.012)",
+            backdropFilter: "blur(16px) saturate(1.3)",
+            WebkitBackdropFilter: "blur(16px) saturate(1.3)",
+            border: `1px solid ${isDark ? "rgba(100,160,255,.12)" : "rgba(0,0,0,.055)"}`,
+            flex: "1 1 220px", maxWidth: 320, minWidth: 200,
           }}>
             {/* accent bar top */}
             <div style={{
               height: 2, background: isDark
-                ? "linear-gradient(90deg, transparent, rgba(255,183,77,.3) 30%, rgba(255,183,77,.3) 70%, transparent)"
-                : "linear-gradient(90deg, transparent, rgba(180,100,0,.2) 30%, rgba(180,100,0,.2) 70%, transparent)",
+                ? "linear-gradient(90deg, transparent, rgba(255,183,77,.6) 30%, rgba(255,183,77,.6) 70%, transparent)"
+                : "linear-gradient(90deg, transparent, rgba(180,100,0,.3) 30%, rgba(180,100,0,.3) 70%, transparent)",
             }} />
             <div style={{ padding: "14px 18px 16px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 10 }}>
                 <div style={{
                   width: 18, height: 18, borderRadius: 6,
-                  background: isDark ? "rgba(255,183,77,.06)" : "rgba(180,100,0,.04)",
-                  border: `1px solid ${isDark ? "rgba(255,183,77,.1)" : "rgba(180,100,0,.08)"}`,
+                  background: isDark ? "rgba(255,183,77,.12)" : "rgba(180,100,0,.06)",
+                  border: `1px solid ${isDark ? "rgba(255,183,77,.25)" : "rgba(180,100,0,.12)"}`,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 9, color: C.org, fontFamily: "'JetBrains Mono',monospace", fontWeight: 700,
                 }}>!</div>
@@ -859,24 +801,24 @@ export function ArchitectureFlowchart() {
           {/* Model Specifications card */}
           <div style={{
             padding: 0, borderRadius: 16, overflow: "hidden",
-            background: isDark ? "rgba(255,255,255,.012)" : "rgba(0,0,0,.012)",
-            backdropFilter: "blur(16px) saturate(1.2)",
-            WebkitBackdropFilter: "blur(16px) saturate(1.2)",
-            border: `1px solid ${isDark ? "rgba(255,255,255,.035)" : "rgba(0,0,0,.055)"}`,
-            maxWidth: 290, flex: "0 0 auto",
+            background: isDark ? "rgba(15,15,35,.9)" : "rgba(0,0,0,.012)",
+            backdropFilter: "blur(16px) saturate(1.3)",
+            WebkitBackdropFilter: "blur(16px) saturate(1.3)",
+            border: `1px solid ${isDark ? "rgba(100,160,255,.12)" : "rgba(0,0,0,.055)"}`,
+            flex: "1 1 220px", maxWidth: 320, minWidth: 200,
           }}>
             {/* accent bar top */}
             <div style={{
               height: 2, background: isDark
-                ? "linear-gradient(90deg, transparent, rgba(45,212,191,.3) 30%, rgba(45,212,191,.3) 70%, transparent)"
-                : "linear-gradient(90deg, transparent, rgba(13,148,136,.2) 30%, rgba(13,148,136,.2) 70%, transparent)",
+                ? "linear-gradient(90deg, transparent, rgba(45,212,191,.6) 30%, rgba(45,212,191,.6) 70%, transparent)"
+                : "linear-gradient(90deg, transparent, rgba(13,148,136,.3) 30%, rgba(13,148,136,.3) 70%, transparent)",
             }} />
             <div style={{ padding: "14px 20px 16px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 12 }}>
                 <div style={{
                   width: 18, height: 18, borderRadius: 6,
-                  background: isDark ? "rgba(45,212,191,.06)" : "rgba(13,148,136,.04)",
-                  border: `1px solid ${isDark ? "rgba(45,212,191,.1)" : "rgba(13,148,136,.08)"}`,
+                  background: isDark ? "rgba(45,212,191,.12)" : "rgba(13,148,136,.06)",
+                  border: `1px solid ${isDark ? "rgba(45,212,191,.25)" : "rgba(13,148,136,.12)"}`,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 8, color: C.teal, fontFamily: "'JetBrains Mono',monospace", fontWeight: 700,
                 }}>≡</div>
@@ -890,8 +832,8 @@ export function ArchitectureFlowchart() {
               {[
                 ["Total Parameters", "17B"],
                 ["Active Parameters", "2B"],
-                ["Experts", "64"],
-                ["Shared Experts", "1"],
+                ["Transformer Blocks", "32"],
+                ["Attention", "GQA"],
               ].map(([k, v], i) => (
                 <div key={i} style={{
                   display: "flex", justifyContent: "space-between", alignItems: "center",
@@ -911,8 +853,8 @@ export function ArchitectureFlowchart() {
               {/* capacity factor sub-card */}
               <div style={{
                 marginTop: 10, padding: "10px 12px", borderRadius: 10,
-                background: isDark ? "rgba(255,255,255,.01)" : "rgba(0,0,0,.01)",
-                border: `1px solid ${isDark ? "rgba(255,255,255,.022)" : "rgba(0,0,0,.03)"}`,
+                background: isDark ? "rgba(255,255,255,.03)" : "rgba(0,0,0,.02)",
+                border: `1px solid ${isDark ? "rgba(100,160,255,.08)" : "rgba(0,0,0,.04)"}`,
               }}>
                 <div style={{
                   fontSize: 8.5, fontWeight: 620, color: C.txtSoft, marginBottom: 6,

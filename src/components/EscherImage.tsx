@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import { getIntroPlayed } from "./IntroOverlay";
-import { getAudioState } from "@/lib/audioReactive";
 
 export default function EscherImage() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -177,22 +176,22 @@ export default function EscherImage() {
         const imageData = ctx.createImageData(cw, ch);
         const out = imageData.data;
 
-        // Blueprint colors
-        const lineR = isDark ? 79 : 30;
-        const lineG = isDark ? 124 : 60;
-        const lineB = isDark ? 255 : 180;
+        // Blueprint colors — maximum vivid neon blue
+        const lineR = isDark ? 130 : 20;
+        const lineG = isDark ? 190 : 50;
+        const lineB = isDark ? 255 : 220;
 
-        // Faint fill for darker regions (gives the drawing some body, not just edges)
-        const fillR = isDark ? 40 : 20;
-        const fillG = isDark ? 70 : 40;
+        // Fill for darker regions — vivid blue body
+        const fillR = isDark ? 70 : 15;
+        const fillG = isDark ? 120 : 35;
         const fillB = isDark ? 180 : 120;
 
         // Stronger edges and fill on smaller screens
         const isMobileCanvas = cw < 900 * (window.devicePixelRatio || 1);
         const isSmall = cw < 1200 * (window.devicePixelRatio || 1);
-        const threshold = isMobileCanvas ? 0.05 : isSmall ? 0.06 : 0.08;
-        const edgeAlpha = isDark ? (isMobileCanvas ? 1.0 : isSmall ? 0.90 : 0.70) : 0.5;
-        const fillAlpha = isDark ? (isMobileCanvas ? 0.18 : isSmall ? 0.12 : 0.06) : 0.04;
+        const threshold = isMobileCanvas ? 0.03 : isSmall ? 0.04 : 0.05;
+        const edgeAlpha = 1.0;
+        const fillAlpha = isDark ? (isMobileCanvas ? 0.35 : 0.25) : 0.10;
 
         for (let i = 0; i < cw * ch; i++) {
             const edge = edges[i];
@@ -245,19 +244,15 @@ export default function EscherImage() {
             lastFrame = now;
 
             const t = now * 0.001;
-            const audio = getAudioState();
-
             const breath1 = Math.sin(t * 0.65) * 0.5 + 0.5;
             const breath2 = Math.sin(t * 0.38 + 0.5) * 0.5 + 0.5;
             const breathCombined = breath1 * 0.6 + breath2 * 0.4;
 
-            const musicMod = audio.isPlaying ? audio.bass * 0.25 : 0;
-
             // Fixed opacity — never dims after appearing
-            const fixedOpacity = isMobileViewport ? 0.65 : isSmallViewport ? 0.50 : 0.40;
+            const fixedOpacity = isMobileViewport ? 1.0 : isSmallViewport ? 0.90 : 0.80;
 
             // Breathing only through scale — no opacity change
-            const scale = 0.99 + breathCombined * 0.03 + musicMod * 0.008;
+            const scale = 0.99 + breathCombined * 0.03;
 
             const tx = Math.sin(t * 0.25) * 1.0;
             const ty = breathCombined * -1.5;
@@ -325,11 +320,9 @@ export default function EscherImage() {
                 aria-hidden="true"
                 style={{
                     opacity: 0.10,
-                    transform: typeof window !== "undefined" && window.innerWidth < 768
-                        ? "rotate(-12deg) translateY(-2%)"
-                        : "rotate(-20deg) translateY(-2%)",
-                    maskImage: "radial-gradient(ellipse 80% 75% at 50% 48%, black 20%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.15) 78%, transparent 95%)",
-                    WebkitMaskImage: "radial-gradient(ellipse 80% 75% at 50% 48%, black 20%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.15) 78%, transparent 95%)",
+                    transform: "rotate(-20deg) translateY(-2%)",
+                    maskImage: "radial-gradient(ellipse 90% 85% at 50% 48%, black 35%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.2) 82%, transparent 98%)",
+                    WebkitMaskImage: "radial-gradient(ellipse 90% 85% at 50% 48%, black 35%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.2) 82%, transparent 98%)",
                     willChange: "transform, opacity",
                 }}
             />
