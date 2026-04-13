@@ -34,45 +34,45 @@ export function ArchitectureFlowchart() {
 
   /* ═══════════ COLOUR SYSTEM ═══════════ */
   const C = {
-    txt:      isDark ? "#D8DCE8" : "#1C2028",
-    txtHi:    isDark ? "#F4F6FC" : "#0C0E12",
-    txtSoft:  isDark ? "rgba(255,255,255,.50)" : "rgba(0,0,0,.30)",
-    txtMuted: isDark ? "rgba(255,255,255,.30)" : "rgba(0,0,0,.16)",
-    line:     isDark ? "rgba(255,255,255,.15)" : "rgba(0,0,0,.12)",
-    lineHi:   isDark ? "rgba(255,255,255,.35)" : "rgba(0,0,0,.30)",
-    skipLine: isDark ? "rgba(255,183,77,.12)"  : "rgba(180,100,0,.12)",
-    skipHi:   isDark ? "rgba(255,183,77,.28)"  : "rgba(180,100,0,.28)",
-    dash:     isDark ? "rgba(92,179,255,.20)"  : "rgba(0,113,227,.18)",
-    blu:      isDark ? "#5CB3FF"  : "#0071E3",
-    org:      isDark ? "#FFB45E"  : "#BF5A00",
-    grn:      isDark ? "#6EE7B7"  : "#15803D",
-    indigo:   isDark ? "#818CF8"  : "#6366F1",
-    teal:     isDark ? "#2DD4BF"  : "#0D9488",
+    txt:      isDark ? "#E8ECF4" : "#1C2028",
+    txtHi:    isDark ? "#FFFFFF" : "#0C0E12",
+    txtSoft:  isDark ? "rgba(255,255,255,.70)" : "rgba(0,0,0,.30)",
+    txtMuted: isDark ? "rgba(255,255,255,.45)" : "rgba(0,0,0,.16)",
+    line:     isDark ? "rgba(255,255,255,.25)" : "rgba(0,0,0,.12)",
+    lineHi:   isDark ? "rgba(255,255,255,.50)" : "rgba(0,0,0,.30)",
+    skipLine: isDark ? "rgba(255,183,77,.25)"  : "rgba(180,100,0,.12)",
+    skipHi:   isDark ? "rgba(255,183,77,.45)"  : "rgba(180,100,0,.28)",
+    dash:     isDark ? "rgba(92,179,255,.35)"  : "rgba(0,113,227,.18)",
+    blu:      isDark ? "#7CC4FF"  : "#0071E3",
+    org:      isDark ? "#FFC87A"  : "#BF5A00",
+    grn:      isDark ? "#86EFAC"  : "#15803D",
+    indigo:   isDark ? "#A5B4FC"  : "#6366F1",
+    teal:     isDark ? "#5EEAD4"  : "#0D9488",
 
-    n:  { f0: isDark ? "rgba(255,255,255,.03)" : "rgba(255,255,255,.68)",
-          f1: isDark ? "rgba(255,255,255,.08)" : "rgba(255,255,255,.92)",
-          s:  isDark ? "rgba(255,255,255,.12)" : "rgba(0,0,0,.07)",
-          hi: isDark ? "rgba(255,255,255,.14)"  : "rgba(255,255,255,.80)",
-          sh: isDark ? "rgba(0,0,0,.15)"        : "rgba(0,0,0,.02)",
+    n:  { f0: isDark ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.68)",
+          f1: isDark ? "rgba(255,255,255,.12)" : "rgba(255,255,255,.92)",
+          s:  isDark ? "rgba(255,255,255,.20)" : "rgba(0,0,0,.07)",
+          hi: isDark ? "rgba(255,255,255,.22)"  : "rgba(255,255,255,.80)",
+          sh: isDark ? "rgba(0,0,0,.20)"        : "rgba(0,0,0,.02)",
           bar: "transparent" },
-    d:  { f0: isDark ? "rgba(40,42,70,.85)"    : "rgba(26,28,46,.86)",
-          f1: isDark ? "rgba(60,64,100,.90)"   : "rgba(42,46,74,.94)",
-          s:  isDark ? "rgba(129,140,248,.30)" : "rgba(99,102,241,.22)",
-          hi: isDark ? "rgba(129,140,248,.20)" : "rgba(255,255,255,.05)",
-          sh: isDark ? "rgba(0,0,0,.25)"       : "rgba(0,0,0,.04)",
-          bar: isDark ? "#818CF8"              : "#6366F1" },
-    a:  { f0: isDark ? "rgba(59,130,246,.02)"  : "rgba(0,113,227,.008)",
-          f1: isDark ? "rgba(59,130,246,.07)"  : "rgba(0,113,227,.035)",
-          s:  isDark ? "rgba(59,130,246,.13)"  : "rgba(0,113,227,.12)",
-          hi: isDark ? "rgba(92,179,255,.09)"  : "rgba(0,113,227,.05)",
-          sh: isDark ? "rgba(0,0,0,.08)"       : "rgba(0,0,0,.015)",
-          bar: isDark ? "#5CB3FF"              : "#0071E3" },
-    m:  { f0: isDark ? "rgba(45,212,191,.015)" : "rgba(13,148,136,.008)",
-          f1: isDark ? "rgba(45,212,191,.07)"  : "rgba(13,148,136,.04)",
-          s:  isDark ? "rgba(45,212,191,.13)"  : "rgba(13,148,136,.14)",
-          hi: isDark ? "rgba(45,212,191,.09)"  : "rgba(13,148,136,.05)",
-          sh: isDark ? "rgba(0,0,0,.08)"       : "rgba(0,0,0,.015)",
-          bar: isDark ? "#2DD4BF"              : "#0D9488" },
+    d:  { f0: isDark ? "rgba(50,52,85,.90)"    : "rgba(26,28,46,.86)",
+          f1: isDark ? "rgba(70,74,115,.95)"   : "rgba(42,46,74,.94)",
+          s:  isDark ? "rgba(129,140,248,.45)" : "rgba(99,102,241,.22)",
+          hi: isDark ? "rgba(129,140,248,.30)" : "rgba(255,255,255,.05)",
+          sh: isDark ? "rgba(0,0,0,.30)"       : "rgba(0,0,0,.04)",
+          bar: isDark ? "#A5B4FC"              : "#6366F1" },
+    a:  { f0: isDark ? "rgba(59,130,246,.06)"  : "rgba(0,113,227,.008)",
+          f1: isDark ? "rgba(59,130,246,.14)"  : "rgba(0,113,227,.035)",
+          s:  isDark ? "rgba(59,130,246,.25)"  : "rgba(0,113,227,.12)",
+          hi: isDark ? "rgba(92,179,255,.18)"  : "rgba(0,113,227,.05)",
+          sh: isDark ? "rgba(0,0,0,.12)"       : "rgba(0,0,0,.015)",
+          bar: isDark ? "#7CC4FF"              : "#0071E3" },
+    m:  { f0: isDark ? "rgba(45,212,191,.05)" : "rgba(13,148,136,.008)",
+          f1: isDark ? "rgba(45,212,191,.14)"  : "rgba(13,148,136,.04)",
+          s:  isDark ? "rgba(45,212,191,.25)"  : "rgba(13,148,136,.14)",
+          hi: isDark ? "rgba(45,212,191,.18)"  : "rgba(13,148,136,.05)",
+          sh: isDark ? "rgba(0,0,0,.12)"       : "rgba(0,0,0,.015)",
+          bar: isDark ? "#5EEAD4"              : "#0D9488" },
 
     p:  { f0: isDark ? "rgba(255,255,255,.012)" : "rgba(255,255,255,.66)",
           f1: isDark ? "rgba(255,255,255,.055)" : "rgba(255,255,255,.90)",
@@ -178,27 +178,10 @@ export function ArchitectureFlowchart() {
             x2={cx + w / 2 - rx - 3} y2={cy + h / 2 - 0.5}
             stroke={p.sh} strokeWidth={0.4} strokeLinecap="round" />
 
-          {/* ⑨ type icon badge */}
-          {icon && (() => {
-            const ix = cx - w / 2 + (isSpecial ? 14 : 10);
-            const col = v === "dark" ? C.indigo : v === "moe" ? C.teal : v === "accent" ? C.blu : C.txtSoft;
-            return (
-              <g>
-                <circle cx={ix} cy={cy + (sub ? -2 : 0)} r={6}
-                  fill={isDark ? "rgba(255,255,255,.02)" : "rgba(0,0,0,.02)"}
-                  stroke={col + (isDark ? "22" : "18")} strokeWidth={0.5} />
-                <text x={ix} y={cy + (sub ? -1.5 : 0.5)} textAnchor="middle" dominantBaseline="central"
-                  fill={col} fontSize={7} fontFamily="'JetBrains Mono',monospace" fontWeight={700}>
-                  {icon}
-                </text>
-              </g>
-            );
-          })()}
-
           {/* ⑩ label(s) */}
           {lines.map((l, i) => {
             const yOff = sub ? -4 : 0;
-            const xOff = icon ? 6 : (isSpecial && p.bar !== "transparent" ? 4 : 0);
+            const xOff = (isSpecial && p.bar !== "transparent" ? 4 : 0);
             return (
               <text key={i} x={cx + xOff}
                 y={cy + (i - (lines.length - 1) / 2) * (isHero ? 15 : 14) + yOff + 0.5}
@@ -360,10 +343,10 @@ export function ArchitectureFlowchart() {
       transition={{ delay: 0.4, duration: 0.8, ease: [0.22, 0.61, 0.36, 1] }}
       style={{
         borderRadius: mob ? 18 : 24,
-        background: isDark ? "rgba(8,8,20,0.85)" : "rgba(255,255,255,0.90)",
+        background: isDark ? "rgba(12,12,30,0.92)" : "rgba(255,255,255,0.90)",
         backdropFilter: "blur(24px) saturate(1.4)",
         WebkitBackdropFilter: "blur(24px) saturate(1.4)",
-        border: isDark ? "1px solid rgba(100,160,255,0.15)" : `1px solid ${t.panelBorder}`,
+        border: isDark ? "1px solid rgba(120,170,255,0.20)" : `1px solid ${t.panelBorder}`,
         boxShadow: t.panelShadow,
         overflow: "hidden",
         position: "relative" as const,
@@ -756,10 +739,10 @@ export function ArchitectureFlowchart() {
           {/* Architecture Note card */}
           <div style={{
             padding: 0, borderRadius: 16, overflow: "hidden",
-            background: isDark ? "rgba(15,15,35,.9)" : "rgba(0,0,0,.012)",
+            background: isDark ? "rgba(18,18,45,.95)" : "rgba(0,0,0,.012)",
             backdropFilter: "blur(16px) saturate(1.3)",
             WebkitBackdropFilter: "blur(16px) saturate(1.3)",
-            border: `1px solid ${isDark ? "rgba(100,160,255,.12)" : "rgba(0,0,0,.055)"}`,
+            border: `1px solid ${isDark ? "rgba(120,170,255,.18)" : "rgba(0,0,0,.055)"}`,
             flex: "1 1 220px", maxWidth: 320, minWidth: 200,
           }}>
             {/* accent bar top */}
@@ -801,10 +784,10 @@ export function ArchitectureFlowchart() {
           {/* Model Specifications card */}
           <div style={{
             padding: 0, borderRadius: 16, overflow: "hidden",
-            background: isDark ? "rgba(15,15,35,.9)" : "rgba(0,0,0,.012)",
+            background: isDark ? "rgba(18,18,45,.95)" : "rgba(0,0,0,.012)",
             backdropFilter: "blur(16px) saturate(1.3)",
             WebkitBackdropFilter: "blur(16px) saturate(1.3)",
-            border: `1px solid ${isDark ? "rgba(100,160,255,.12)" : "rgba(0,0,0,.055)"}`,
+            border: `1px solid ${isDark ? "rgba(120,170,255,.18)" : "rgba(0,0,0,.055)"}`,
             flex: "1 1 220px", maxWidth: 320, minWidth: 200,
           }}>
             {/* accent bar top */}

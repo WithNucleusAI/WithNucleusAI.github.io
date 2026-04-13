@@ -54,17 +54,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${plexMono.variable} ${inconsolata.variable} text-black dark:text-white bg-white dark:bg-black flex flex-col items-center text-center min-h-screen m-0 p-0 overflow-x-hidden`}>
+      <body className={`${plexMono.variable} ${inconsolata.variable} text-white bg-black flex flex-col items-center text-center min-h-screen m-0 p-0 overflow-x-hidden`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
+          forcedTheme="dark"
           disableTransitionOnChange
         >
           <TopNav />
           <main className="flex-1 flex flex-col w-full sm:pt-28">{children}</main>
           <Footer />
           <ScrollToTop />
-          <ThemeToggle />
         </ThemeProvider>
       </body>
     </html>

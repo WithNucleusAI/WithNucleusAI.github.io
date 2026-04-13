@@ -164,8 +164,8 @@ export default function Typewriter() {
                 id="typing"
                 className={`mx-auto w-full max-w-[92vw] sm:max-w-2xl px-1 sm:px-4 text-center ${
                     isNucleus
-                        ? "text-[2.5rem] sm:text-7xl lg:text-8xl font-bold leading-none tracking-[0.22em] sm:tracking-[0.35em] text-black dark:text-white"
-                        : "text-[15px] sm:text-xl font-light tracking-tight text-black/55 dark:text-white/55 leading-relaxed"
+                        ? "text-[2.5rem] sm:text-7xl lg:text-8xl font-bold leading-none tracking-[0.22em] sm:tracking-[0.35em] text-black dark:text-white [text-shadow:0_0_30px_rgba(0,0,0,1),0_0_60px_rgba(0,0,0,0.8)]"
+                        : "text-[15px] sm:text-xl font-normal tracking-tight text-black/90 dark:text-white/90 leading-relaxed [text-shadow:0_0_20px_rgba(0,0,0,1),0_0_40px_rgba(0,0,0,0.9),0_0_80px_rgba(0,0,0,0.7)]"
                 }`}
             >
                 <span dangerouslySetInnerHTML={{ __html: text }} />
@@ -185,7 +185,7 @@ export default function Typewriter() {
                     />
                     <span
                         style={{ animation: 'caption-in 1s cubic-bezier(0.16,1,0.3,1) 0.5s both' }}
-                        className="text-[9px] sm:text-sm font-light tracking-[0.3em] sm:tracking-[0.35em] uppercase text-black/40 dark:text-white/40"
+                        className="text-[9px] sm:text-sm font-light tracking-[0.3em] sm:tracking-[0.35em] uppercase text-black/60 dark:text-white/70 [text-shadow:0_0_15px_rgba(0,0,0,1),0_0_30px_rgba(0,0,0,0.8)]"
                     >
                         General Intelligence
                     </span>

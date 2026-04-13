@@ -1,87 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useTheme } from "next-themes";
-import { getIntroPlayed } from "./IntroOverlay";
 
 export default function EscherImage() {
-    const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [isIntroDone, setIsIntroDone] = useState(() => getIntroPlayed());
     const [mounted, setMounted] = useState(false);
-    const fadeAppliedRef = useRef(false);
-    const { resolvedTheme } = useTheme();
-    const themeRef = useRef(resolvedTheme);
+    const animRef = useRef(0);
+    const edgeDataRef = useRef<{ edges: Float32Array; cw: number; ch: number } | null>(null);
 
     useEffect(() => setMounted(true), []);
-    useEffect(() => { themeRef.current = resolvedTheme; }, [resolvedTheme]);
 
-    useEffect(() => {
-        if (!isIntroDone) {
-            const handle = () => setIsIntroDone(true);
-            window.addEventListener("intro-done", handle, { once: true });
-            return () => window.removeEventListener("intro-done", handle);
-        }
-    }, [isIntroDone]);
-
-    // Cinematic entrance
-    const blurWrapRef = useRef<HTMLDivElement>(null);
-    const introAlreadyPlayed = useRef(getIntroPlayed()).current;
-
-    useEffect(() => {
-        if (!isIntroDone || !containerRef.current || fadeAppliedRef.current) return;
-        fadeAppliedRef.current = true;
-        const el = containerRef.current;
-        const blurWrap = blurWrapRef.current;
-
-        if (introAlreadyPlayed) {
-            el.style.opacity = "1";
-            el.style.transform = "scale(1)";
-            if (blurWrap) blurWrap.style.filter = "blur(0px)";
-            return;
-        }
-
-        el.style.transform = "scale(0.90)";
-        if (blurWrap) blurWrap.style.filter = "blur(12px)";
-
-        const timer = setTimeout(() => {
-            el.style.transition = "opacity 5s cubic-bezier(0.16, 1, 0.3, 1), transform 7s cubic-bezier(0.16, 1, 0.3, 1)";
-            el.style.opacity = "1";
-            el.style.transform = "scale(1)";
-
-            setTimeout(() => {
-                if (blurWrap) {
-                    blurWrap.style.transition = "filter 4s cubic-bezier(0.16, 1, 0.3, 1)";
-                    blurWrap.style.filter = "blur(0px)";
-                    setTimeout(() => { blurWrap.style.transition = ""; }, 4100);
-                }
-            }, 800);
-
-            setTimeout(() => { el.style.transition = ""; }, 7100);
-        }, 1800);
-
-        return () => clearTimeout(timer);
-    }, [isIntroDone]);
-
-    // Scroll fade
-    useEffect(() => {
-        if (!containerRef.current) return;
-        const el = containerRef.current;
-        const onScroll = () => {
-            const y = window.scrollY || 0;
-            const vh = window.innerHeight || 1;
-            const start = vh * 0.1;
-            const end = vh * 1.2;
-            let fade = 1;
-            if (y > start) fade = Math.max(0, 1 - (y - start) / (end - start));
-            if (fadeAppliedRef.current) el.style.opacity = String(fade);
-        };
-        window.addEventListener("scroll", onScroll, { passive: true });
-        onScroll();
-        return () => window.removeEventListener("scroll", onScroll);
-    }, []);
-
-    // ── Blueprint edge detection + rendering ──
     useEffect(() => {
         if (!mounted) return;
         const canvas = canvasRef.current;
@@ -95,15 +23,9 @@ export default function EscherImage() {
 
         img.onload = () => {
             const isMobile = window.matchMedia("(max-width: 768px)").matches;
-            const isSmallScreen = window.matchMedia("(max-width: 1280px)").matches;
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-            // Size canvas to fit viewport — contained, not overflowing
-            const targetW = isMobile
-                ? window.innerWidth * 0.95  // fit within phone width
-                : isSmallScreen
-                    ? Math.min(window.innerHeight * 1.1, window.innerWidth)
-                    : Math.min(window.innerHeight * 1.1, window.innerWidth);
+            const targetW = isMobile ? window.innerWidth * 0.92 : Math.min(700, window.innerWidth * 0.55);
             const aspect = img.width / img.height;
             const cw = Math.floor(targetW * dpr);
             const ch = Math.floor((targetW / aspect) * dpr);
@@ -113,231 +35,118 @@ export default function EscherImage() {
             canvas.style.width = `${targetW}px`;
             canvas.style.height = `${targetW / aspect}px`;
 
-            // Draw the image to extract pixel data
             ctx.drawImage(img, 0, 0, cw, ch);
             const imageData = ctx.getImageData(0, 0, cw, ch);
             const pixels = imageData.data;
 
-            // Convert to grayscale luminance array
+            // Grayscale
             const gray = new Float32Array(cw * ch);
             for (let i = 0; i < cw * ch; i++) {
                 const idx = i * 4;
                 gray[i] = (pixels[idx] * 0.299 + pixels[idx + 1] * 0.587 + pixels[idx + 2] * 0.114) / 255;
             }
 
-            // Sobel edge detection
+            // Sobel
             const edges = new Float32Array(cw * ch);
             for (let y = 1; y < ch - 1; y++) {
                 for (let x = 1; x < cw - 1; x++) {
                     const idx = y * cw + x;
-                    // Sobel X
                     const gx =
-                        -gray[(y - 1) * cw + (x - 1)] + gray[(y - 1) * cw + (x + 1)]
-                        - 2 * gray[y * cw + (x - 1)] + 2 * gray[y * cw + (x + 1)]
-                        - gray[(y + 1) * cw + (x - 1)] + gray[(y + 1) * cw + (x + 1)];
-                    // Sobel Y
+                        -gray[(y-1)*cw+(x-1)] + gray[(y-1)*cw+(x+1)]
+                        -2*gray[y*cw+(x-1)] + 2*gray[y*cw+(x+1)]
+                        -gray[(y+1)*cw+(x-1)] + gray[(y+1)*cw+(x+1)];
                     const gy =
-                        -gray[(y - 1) * cw + (x - 1)] - 2 * gray[(y - 1) * cw + x] - gray[(y - 1) * cw + (x + 1)]
-                        + gray[(y + 1) * cw + (x - 1)] + 2 * gray[(y + 1) * cw + x] + gray[(y + 1) * cw + (x + 1)];
-
+                        -gray[(y-1)*cw+(x-1)] -2*gray[(y-1)*cw+x] -gray[(y-1)*cw+(x+1)]
+                        +gray[(y+1)*cw+(x-1)] +2*gray[(y+1)*cw+x] +gray[(y+1)*cw+(x+1)];
                     edges[idx] = Math.sqrt(gx * gx + gy * gy);
                 }
             }
 
-            // Normalize edges
+            // Normalize
             let maxEdge = 0;
-            for (let i = 0; i < edges.length; i++) {
-                if (edges[i] > maxEdge) maxEdge = edges[i];
-            }
-            if (maxEdge > 0) {
-                for (let i = 0; i < edges.length; i++) edges[i] /= maxEdge;
-            }
+            for (let i = 0; i < edges.length; i++) if (edges[i] > maxEdge) maxEdge = edges[i];
+            if (maxEdge > 0) for (let i = 0; i < edges.length; i++) edges[i] /= maxEdge;
 
-            // Store edge data for animation
-            edgeDataRef.current = { edges, width: cw, height: ch, gray };
+            edgeDataRef.current = { edges, cw, ch };
 
-            // Initial render
-            renderBlueprint(ctx, cw, ch, 0);
+            // Start animation loop
+            const FRAME_MS = 1000 / 24;
+            let lastFrame = 0;
+
+            const animate = (now: number) => {
+                animRef.current = requestAnimationFrame(animate);
+                if (now - lastFrame < FRAME_MS) return;
+                lastFrame = now;
+
+                const t = now * 0.001;
+                const data = edgeDataRef.current;
+                if (!data) return;
+
+                ctx.clearRect(0, 0, cw, ch);
+                const outData = ctx.createImageData(cw, ch);
+                const out = outData.data;
+
+                // Animated pulse — edges glow brighter and dimmer in a slow wave
+                const pulse = 0.85 + Math.sin(t * 0.6) * 0.15; // 0.7 to 1.0 — subtle
+                const threshold = 0.22;
+
+                // Animated draw-on: sweep line reveals edges from left to right over time
+                // After full reveal, just show everything with pulse
+                const revealDuration = 4; // seconds for full reveal
+                const revealProgress = Math.min(1, t / revealDuration);
+                const revealX = revealProgress * cw;
+
+                for (let y = 0; y < ch; y++) {
+                    for (let x = 0; x < cw; x++) {
+                        const i = y * cw + x;
+                        const edge = data.edges[i];
+
+                        if (edge > threshold) {
+                            // Distance from reveal line — creates a soft glow at the drawing edge
+                            let drawAlpha = 1;
+                            if (revealProgress < 1) {
+                                if (x > revealX) continue; // not yet revealed
+                                const distFromEdge = revealX - x;
+                                // Bright glow near the "pen tip"
+                                const tipGlow = distFromEdge < 30 ? 1 + (1 - distFromEdge / 30) * 2 : 1;
+                                drawAlpha = tipGlow;
+                            }
+
+                            const strength = Math.min(1, (edge - threshold) / (0.45 - threshold));
+                            const alpha = Math.min(1, strength * 1.8 * pulse * drawAlpha);
+
+                            const idx = i * 4;
+                            // Brighter near tip during reveal, normal after
+                            const tipBoost = (revealProgress < 1 && (revealX - x) < 20) ? 1.5 : 1;
+                            out[idx] = Math.min(255, Math.floor(130 * tipBoost));
+                            out[idx + 1] = Math.min(255, Math.floor(190 * tipBoost));
+                            out[idx + 2] = 255;
+                            out[idx + 3] = Math.floor(alpha * 255);
+                        }
+                    }
+                }
+
+                ctx.putImageData(outData, 0, 0);
+            };
+
+            animRef.current = requestAnimationFrame(animate);
         };
+
+        return () => cancelAnimationFrame(animRef.current);
     }, [mounted]);
-
-    const edgeDataRef = useRef<{ edges: Float32Array; width: number; height: number; gray: Float32Array } | null>(null);
-
-    // Render the blueprint with breathing animation
-    const renderBlueprint = (ctx: CanvasRenderingContext2D, cw: number, ch: number, time: number) => {
-        const data = edgeDataRef.current;
-        if (!data) return;
-
-        const isDark = themeRef.current === "dark";
-        const { edges, gray } = data;
-
-        ctx.clearRect(0, 0, cw, ch);
-
-        const imageData = ctx.createImageData(cw, ch);
-        const out = imageData.data;
-
-        // Blueprint colors — maximum vivid neon blue
-        const lineR = isDark ? 130 : 20;
-        const lineG = isDark ? 190 : 50;
-        const lineB = isDark ? 255 : 220;
-
-        // Fill for darker regions — vivid blue body
-        const fillR = isDark ? 70 : 15;
-        const fillG = isDark ? 120 : 35;
-        const fillB = isDark ? 180 : 120;
-
-        // Stronger edges and fill on smaller screens
-        const isMobileCanvas = cw < 900 * (window.devicePixelRatio || 1);
-        const isSmall = cw < 1200 * (window.devicePixelRatio || 1);
-        const threshold = isMobileCanvas ? 0.03 : isSmall ? 0.04 : 0.05;
-        const edgeAlpha = 1.0;
-        const fillAlpha = isDark ? (isMobileCanvas ? 0.35 : 0.25) : 0.10;
-
-        for (let i = 0; i < cw * ch; i++) {
-            const edge = edges[i];
-            const brightness = gray[i];
-            const idx = i * 4;
-
-            if (edge > threshold) {
-                const strength = Math.min(1, (edge - threshold) / (0.5 - threshold));
-                const alpha = strength * edgeAlpha;
-                out[idx] = lineR;
-                out[idx + 1] = lineG;
-                out[idx + 2] = lineB;
-                out[idx + 3] = Math.floor(alpha * 255);
-            } else if (brightness < 0.6) {
-                const darkness = (0.6 - brightness) / 0.6;
-                const alpha = darkness * fillAlpha;
-                out[idx] = fillR;
-                out[idx + 1] = fillG;
-                out[idx + 2] = fillB;
-                out[idx + 3] = Math.floor(alpha * 255);
-            }
-        }
-
-        ctx.putImageData(imageData, 0, 0);
-    };
-
-    // Breathing animation — drives canvas opacity + transform
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas || !mounted) return;
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-        const ctx = canvas.getContext("2d", { willReadFrequently: true });
-        if (!ctx) return;
-
-        let animId = 0;
-        // Cache viewport check — only changes on resize, not per frame
-        let isMobileViewport = window.innerWidth < 768;
-        let isSmallViewport = window.innerWidth < 1280;
-        const onResizeViewport = () => { isMobileViewport = window.innerWidth < 768; isSmallViewport = window.innerWidth < 1280; };
-        window.addEventListener("resize", onResizeViewport);
-
-        // Throttle to 30fps — breathing animation doesn't need 60fps
-        const FRAME_MS = 1000 / 30;
-        let lastFrame = 0;
-
-        const animate = (now: number) => {
-            animId = requestAnimationFrame(animate);
-            if (now - lastFrame < FRAME_MS) return;
-            lastFrame = now;
-
-            const t = now * 0.001;
-            const breath1 = Math.sin(t * 0.65) * 0.5 + 0.5;
-            const breath2 = Math.sin(t * 0.38 + 0.5) * 0.5 + 0.5;
-            const breathCombined = breath1 * 0.6 + breath2 * 0.4;
-
-            // Fixed opacity — never dims after appearing
-            const fixedOpacity = isMobileViewport ? 1.0 : isSmallViewport ? 0.90 : 0.80;
-
-            // Breathing only through scale — no opacity change
-            const scale = 0.99 + breathCombined * 0.03;
-
-            const tx = Math.sin(t * 0.25) * 1.0;
-            const ty = breathCombined * -1.5;
-            const baseRot = isMobileViewport ? -12 : -20;
-            const rot = baseRot + Math.sin(t * 0.15) * 0.3;
-
-            canvas.style.opacity = String(fixedOpacity);
-            canvas.style.transform = `rotate(${rot}deg) translateX(${tx}px) translateY(calc(-2% + ${ty}px)) scale(${scale})`;
-        };
-
-        animId = requestAnimationFrame(animate);
-        return () => {
-            cancelAnimationFrame(animId);
-            window.removeEventListener("resize", onResizeViewport);
-        };
-    }, [mounted]);
-
-    // Re-render blueprint when theme changes
-    useEffect(() => {
-        if (!mounted || !edgeDataRef.current) return;
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const ctx = canvas.getContext("2d", { willReadFrequently: true });
-        if (!ctx) return;
-        const data = edgeDataRef.current;
-        renderBlueprint(ctx, data.width, data.height, 0);
-    }, [mounted, resolvedTheme]);
-
-    const isDark = mounted && resolvedTheme === "dark";
 
     return (
-        <div
-            ref={containerRef}
-            className="fixed inset-0 -z-20 pointer-events-none flex items-center justify-center overflow-hidden"
-            style={{ opacity: 0 }}
-        >
-          <div ref={blurWrapRef} className="absolute inset-0 flex items-center justify-center">
-
-            {/* Outer glow — static, GPU-composited */}
-            {isDark && (
-                <div className="absolute" style={{
-                    width: "min(90vh, 85vw)", height: "min(80vh, 75vw)",
-                    borderRadius: "50%",
-                    background: "radial-gradient(ellipse, rgba(79,124,255,0.04) 0%, rgba(30,50,140,0.02) 50%, transparent 80%)",
-                    filter: "blur(60px)", transform: "translateZ(0)",
-                    contain: "strict",
-                }} />
-            )}
-
-            {/* Inner glow */}
-            {isDark && (
-                <div className="absolute" style={{
-                    width: "min(55vh, 50vw)", height: "min(50vh, 45vw)",
-                    borderRadius: "50%",
-                    background: "radial-gradient(ellipse, rgba(79,124,255,0.10) 0%, rgba(50,80,200,0.05) 40%, transparent 70%)",
-                    filter: "blur(50px)", transform: "rotate(-20deg) translateY(-2%) translateZ(0)",
-                    contain: "strict",
-                }} />
-            )}
-
-            {/* Blueprint canvas */}
+        <div className="flex justify-center items-center">
             <canvas
                 ref={canvasRef}
                 className="select-none"
                 aria-hidden="true"
                 style={{
-                    opacity: 0.10,
-                    transform: "rotate(-20deg) translateY(-2%)",
-                    maskImage: "radial-gradient(ellipse 90% 85% at 50% 48%, black 35%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.2) 82%, transparent 98%)",
-                    WebkitMaskImage: "radial-gradient(ellipse 90% 85% at 50% 48%, black 35%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.2) 82%, transparent 98%)",
-                    willChange: "transform, opacity",
+                    opacity: 0.9,
+                    maskImage: "radial-gradient(ellipse 85% 80% at 50% 48%, black 25%, rgba(0,0,0,0.5) 55%, transparent 85%)",
+                    WebkitMaskImage: "radial-gradient(ellipse 85% 80% at 50% 48%, black 25%, rgba(0,0,0,0.5) 55%, transparent 85%)",
                 }}
             />
-
-            {/* Edge ring */}
-            {isDark && (
-                <div className="absolute hidden sm:block" style={{
-                    width: "min(70vh, 65vw)", height: "min(60vh, 55vw)",
-                    borderRadius: "50%",
-                    border: "1px solid rgba(79,124,255,0.04)",
-                    boxShadow: "0 0 60px rgba(79,124,255,0.03), inset 0 0 60px rgba(79,124,255,0.02)",
-                }} />
-            )}
-
-          </div>
         </div>
     );
 }
