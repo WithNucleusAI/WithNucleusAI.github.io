@@ -10,7 +10,7 @@ import { useFooterAwareBottomOffset } from "@/lib/useFooterAwareBottom";
 export default function ThemeToggle() {
     const { theme, setTheme, systemTheme } = useTheme();
     const [mounted, setMounted] = React.useState(false);
-    const bottomOffset = useFooterAwareBottomOffset(30, 10);
+    const bottomOffset = useFooterAwareBottomOffset(24, 10);
     const pathname = usePathname();
     const [isVisible, setIsVisible] = React.useState(() => {
         if (typeof window !== "undefined") {
@@ -33,31 +33,23 @@ export default function ThemeToggle() {
         return () => window.removeEventListener('intro-done', handleIntroDone);
     }, [pathname]);
 
-    if (!mounted) {
-        return null;
-    }
+    if (!mounted) return null;
+    if (pathname === '/image') return null;
 
     const currentTheme = theme === "system" ? systemTheme : theme;
 
-    // Hide on image page — forced dark only
-    if (pathname === '/image') return null;
-
     return (
-        <div
-            className={`fixed left-7.5 max-md:left-3.75 z-50 transition-all duration-1000 ${isVisible ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}
+        <button
+            onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")}
+            aria-label="Toggle theme"
+            className={`fixed left-5 sm:left-7 z-50 text-black/25 dark:text-white/25 hover:text-black dark:hover:text-white transition-all duration-300 cursor-pointer ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             style={{ bottom: `${bottomOffset}px` }}
         >
-            <button
-                className="mac-btn mac-btn--circle"
-                onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")}
-                aria-label="Toggle theme"
-            >
-                {currentTheme === "dark" ? (
-                    <Sun className="h-5 w-5 md:h-6 md:w-6" />
-                ) : (
-                    <Moon className="h-5 w-5 md:h-6 md:w-6" />
-                )}
-            </button>
-        </div>
+            {currentTheme === "dark" ? (
+                <Sun className="w-4 h-4" />
+            ) : (
+                <Moon className="w-4 h-4" />
+            )}
+        </button>
     );
 }

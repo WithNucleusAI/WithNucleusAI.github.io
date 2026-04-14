@@ -4,6 +4,7 @@ import BlogSection from "@/components/BlogSection";
 import { getPosts } from "@/lib/posts";
 import EscherImage from "@/components/EscherImage";
 import Typewriter from "@/components/Typewriter";
+import Image from "next/image";
 
 export default async function Home() {
   const posts = await getPosts();
@@ -13,43 +14,44 @@ export default async function Home() {
     <main className="w-full relative">
       <IntroOverlay />
 
-      {/* Hero — clean, no illustration behind text */}
-      <section className="h-svh sm:-mt-28 relative flex flex-col justify-center items-center w-full overflow-hidden">
-        <div className="relative w-full flex flex-col items-center">
-          <Typewriter />
+      {/* Hero */}
+      <section className="h-svh sm:-mt-28 relative flex flex-col justify-center items-center w-full">
+        {/* Logo — prominent brand mark */}
+        <div className="mb-8 sm:mb-10">
+          <Image
+            src="/logo.webp"
+            alt="Nucleus"
+            width={80}
+            height={80}
+            className="w-12 h-12 sm:w-16 sm:h-16 invert dark:invert-0 opacity-80"
+            priority
+          />
         </div>
+        <Typewriter />
         <ScrollDownButton />
       </section>
 
-      {/* Hands illustration — standalone section */}
-      <section className="relative w-full flex justify-center items-center py-12 sm:py-20 overflow-hidden">
+      {/* Hands illustration */}
+      <section className="relative w-full flex justify-center items-center pt-0 pb-4 sm:pb-8 -mt-8 sm:-mt-12 overflow-hidden">
         <EscherImage />
       </section>
 
-      {/* Divider */}
-      <div className="relative w-full flex justify-center py-4 sm:py-6" aria-hidden="true">
-        <div className="w-px h-10 sm:h-14 bg-white/6" />
-      </div>
-
-      {/* Mission */}
-      <section id="intro-section" className="min-h-[45vh] sm:min-h-[60vh] flex flex-col justify-center items-center px-6 sm:px-12 max-w-2xl mx-auto py-12 sm:py-24 text-center z-10 relative">
-        <div className="w-full border-t border-white/6 pt-6 sm:pt-8">
-          <p className="text-[9px] sm:text-[10px] tracking-[0.25em] uppercase text-white/25 mb-5 sm:mb-7">About</p>
-          <h2 className="text-sm sm:text-xl lg:text-2xl leading-[1.8] sm:leading-[1.75] font-light text-white/60">
-            We design systems that shape tomorrow. Exploring the frontiers of software, artificial intelligence, and resilient architectures to build the foundations of modern engineering.
-          </h2>
-        </div>
+      {/* About */}
+      <section id="intro-section" className="flex flex-col justify-center items-center px-6 sm:px-12 max-w-2xl mx-auto py-10 sm:py-16 text-center">
+        <p className="text-[9px] sm:text-[10px] tracking-[0.25em] uppercase text-black/20 dark:text-white/20 mb-4 sm:mb-6">About</p>
+        <h2 className="text-sm sm:text-lg lg:text-xl leading-[1.8] sm:leading-[1.8] font-light text-black/50 dark:text-white/50">
+          We design systems that shape tomorrow. Exploring the frontiers of software, artificial intelligence, and resilient architectures to build the foundations of modern engineering.
+        </h2>
       </section>
 
       {/* Divider */}
-      <div className="relative w-full flex justify-center py-4 sm:py-8" aria-hidden="true">
-        <div className="w-12 sm:w-16 h-px bg-white/6" />
+      <div className="relative w-full flex justify-center py-6 sm:py-10" aria-hidden="true">
+        <div className="w-10 sm:w-14 h-px bg-black/5 dark:bg-white/5" />
       </div>
 
       <BlogSection posts={recentPosts} />
 
-      {/* Pre-footer spacer */}
-      <div className="py-8 sm:py-14" />
+      <div className="py-6 sm:py-10" />
     </main>
   );
 }

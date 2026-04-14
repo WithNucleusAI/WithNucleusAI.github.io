@@ -13,7 +13,7 @@ export default function BlogSection({ posts }: BlogSectionProps) {
     return (
         <section
             id="blog-section"
-            className="relative w-full flex flex-col justify-center py-8 sm:py-20"
+            className="relative w-full flex flex-col justify-center py-4 sm:py-12"
         >
             <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 relative z-10">
                 <p className="text-[10px] sm:text-xs tracking-[0.2em] uppercase font-medium text-black/30 dark:text-white/30 mb-6 sm:mb-10">

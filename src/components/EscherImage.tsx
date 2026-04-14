@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "next-themes";
 
 export default function EscherImage() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [mounted, setMounted] = useState(false);
     const animRef = useRef(0);
     const edgeDataRef = useRef<{ edges: Float32Array; cw: number; ch: number } | null>(null);
+    const { resolvedTheme } = useTheme();
+    const themeRef = useRef(resolvedTheme);
+    useEffect(() => { themeRef.current = resolvedTheme; }, [resolvedTheme]);
 
     useEffect(() => setMounted(true), []);
 
@@ -25,7 +29,7 @@ export default function EscherImage() {
             const isMobile = window.matchMedia("(max-width: 768px)").matches;
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-            const targetW = isMobile ? window.innerWidth * 0.92 : Math.min(700, window.innerWidth * 0.55);
+            const targetW = isMobile ? window.innerWidth * 0.95 : Math.min(850, window.innerWidth * 0.65);
             const aspect = img.width / img.height;
             const cw = Math.floor(targetW * dpr);
             const ch = Math.floor((targetW / aspect) * dpr);
@@ -86,8 +90,8 @@ export default function EscherImage() {
                 const outData = ctx.createImageData(cw, ch);
                 const out = outData.data;
 
-                // Animated pulse — edges glow brighter and dimmer in a slow wave
-                const pulse = 0.85 + Math.sin(t * 0.6) * 0.15; // 0.7 to 1.0 — subtle
+                const isDark = themeRef.current === "dark";
+                const pulse = 0.85 + Math.sin(t * 0.6) * 0.15;
                 const threshold = 0.22;
 
                 // Animated draw-on: sweep line reveals edges from left to right over time
@@ -118,9 +122,9 @@ export default function EscherImage() {
                             const idx = i * 4;
                             // Brighter near tip during reveal, normal after
                             const tipBoost = (revealProgress < 1 && (revealX - x) < 20) ? 1.5 : 1;
-                            out[idx] = Math.min(255, Math.floor(130 * tipBoost));
-                            out[idx + 1] = Math.min(255, Math.floor(190 * tipBoost));
-                            out[idx + 2] = 255;
+                            out[idx] = isDark ? Math.min(255, Math.floor(130 * tipBoost)) : Math.min(255, Math.floor(30 * tipBoost));
+                            out[idx + 1] = isDark ? Math.min(255, Math.floor(190 * tipBoost)) : Math.min(255, Math.floor(60 * tipBoost));
+                            out[idx + 2] = isDark ? 255 : Math.min(255, Math.floor(160 * tipBoost));
                             out[idx + 3] = Math.floor(alpha * 255);
                         }
                     }

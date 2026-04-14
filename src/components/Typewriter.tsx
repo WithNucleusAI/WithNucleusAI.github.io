@@ -137,7 +137,7 @@ export default function Typewriter() {
     }, []);
 
     return (
-        <div className="w-full flex flex-col items-center -translate-y-10 mt-14 relative">
+        <div className="w-full flex flex-col items-center relative">
             <style dangerouslySetInnerHTML={{ __html: `
                 @keyframes cursor-blink {
                     0%, 100% { opacity: 1; }
@@ -164,8 +164,8 @@ export default function Typewriter() {
                 id="typing"
                 className={`mx-auto w-full max-w-[92vw] sm:max-w-2xl px-1 sm:px-4 text-center ${
                     isNucleus
-                        ? "text-[2.5rem] sm:text-7xl lg:text-8xl font-bold leading-none tracking-[0.22em] sm:tracking-[0.35em] text-black dark:text-white [text-shadow:0_0_30px_rgba(0,0,0,1),0_0_60px_rgba(0,0,0,0.8)]"
-                        : "text-[15px] sm:text-xl font-normal tracking-tight text-black/90 dark:text-white/90 leading-relaxed [text-shadow:0_0_20px_rgba(0,0,0,1),0_0_40px_rgba(0,0,0,0.9),0_0_80px_rgba(0,0,0,0.7)]"
+                        ? "text-3xl sm:text-6xl lg:text-7xl font-bold leading-none tracking-[0.18em] sm:tracking-[0.25em] text-black dark:text-white"
+                        : "text-[14px] sm:text-lg font-normal tracking-tight text-black/65 dark:text-white/75 leading-relaxed"
                 }`}
             >
                 <span dangerouslySetInnerHTML={{ __html: text }} />
@@ -178,14 +178,14 @@ export default function Typewriter() {
             </div>
 
             {showCaption && (
-                <div className="mt-4 sm:mt-6 flex flex-col items-center gap-2 sm:gap-3">
+                <div className="mt-3 sm:mt-5 flex flex-col items-center gap-2 sm:gap-2.5">
                     <div
                         style={{ animation: 'line-expand 1s cubic-bezier(0.16,1,0.3,1) 0.3s both' }}
-                        className="h-px bg-black/15 dark:bg-white/15"
+                        className="h-px bg-black/10 dark:bg-white/10"
                     />
                     <span
                         style={{ animation: 'caption-in 1s cubic-bezier(0.16,1,0.3,1) 0.5s both' }}
-                        className="text-[9px] sm:text-sm font-light tracking-[0.3em] sm:tracking-[0.35em] uppercase text-black/60 dark:text-white/70 [text-shadow:0_0_15px_rgba(0,0,0,1),0_0_30px_rgba(0,0,0,0.8)]"
+                        className="text-[8px] sm:text-xs font-light tracking-[0.25em] sm:tracking-[0.3em] uppercase text-black/35 dark:text-white/40"
                     >
                         General Intelligence
                     </span>
