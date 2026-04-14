@@ -13,26 +13,25 @@ export default function BlogSection({ posts }: BlogSectionProps) {
     return (
         <section
             id="blog-section"
-            className="relative w-full flex flex-col justify-center py-4 sm:py-12"
+            className="relative w-full py-4 sm:py-10"
         >
-            <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 relative z-10">
-                <p className="text-[10px] sm:text-xs tracking-[0.2em] uppercase font-medium text-black/30 dark:text-white/30 mb-6 sm:mb-10">
-                    Recent
-                </p>
-
-                <div className="flex flex-col gap-0">
-                    {posts.map((post, i) => (
-                        <MiniBlogCard key={post.slug} post={post} index={i} />
-                    ))}
-                </div>
-
-                <div className="mt-6 sm:mt-10 flex justify-end">
+            <div className="w-full max-w-2xl mx-auto px-5 sm:px-6">
+                <div className="flex items-center justify-between mb-6 sm:mb-8">
+                    <span className="text-[8px] sm:text-[9px] tracking-[0.3em] uppercase text-black/20 dark:text-white/15 border border-black/8 dark:border-white/6 px-3 py-1">
+                        Recent
+                    </span>
                     <Link
                         href="/blog"
-                        className="text-[10px] sm:text-xs tracking-[0.15em] text-black/35 dark:text-white/35 transition-colors duration-300 hover:text-black dark:hover:text-white"
+                        className="text-[10px] sm:text-[11px] tracking-[0.08em] text-black/30 dark:text-white/25 transition-colors duration-200 hover:text-black dark:hover:text-white"
                     >
                         View all &rarr;
                     </Link>
+                </div>
+
+                <div className="flex flex-col">
+                    {posts.map((post, i) => (
+                        <MiniBlogCard key={post.slug} post={post} index={i} />
+                    ))}
                 </div>
             </div>
         </section>

@@ -12,26 +12,25 @@ interface MiniBlogCardProps {
 export default function MiniBlogCard({ post, index = 0 }: MiniBlogCardProps) {
     return (
         <Link href={`/blog/${post.slug}`} className="group block w-full">
-            <div className="py-5 sm:py-6 border-b border-black/6 dark:border-white/6 transition-colors hover:border-black/15 dark:hover:border-white/15">
-                <div className="flex items-baseline gap-3 sm:gap-5 mb-1.5 sm:mb-2">
-                    {/* Index number — editorial */}
-                    <span className="text-[10px] sm:text-[11px] font-mono tabular-nums text-black/15 dark:text-white/15 shrink-0 w-5">
+            <div className="py-4 sm:py-5 border-b border-black/[0.04] dark:border-white/[0.04] group-hover:border-black/10 dark:group-hover:border-white/8 transition-colors">
+                <div className="flex items-start gap-4 sm:gap-5">
+                    <span className="text-[9px] sm:text-[10px] font-mono tabular-nums text-black/12 dark:text-white/10 pt-0.5 shrink-0">
                         {String(index + 1).padStart(2, '0')}
                     </span>
-                    <span className="text-[10px] sm:text-[11px] tracking-[0.06em] text-black/25 dark:text-white/25 font-mono shrink-0 tabular-nums">
-                        {post.date}
-                    </span>
-                    <h3 className="text-sm sm:text-base font-medium text-black/75 dark:text-white/75 group-hover:text-black dark:group-hover:text-white transition-colors line-clamp-1 flex-1">
-                        {post.title}
-                    </h3>
-                    {/* Hover arrow */}
-                    <span className="text-black/0 dark:text-white/0 group-hover:text-black/30 dark:group-hover:text-white/30 transition-all duration-200 text-xs shrink-0 translate-x-[-4px] group-hover:translate-x-0">
+                    <div className="flex-1 min-w-0">
+                        <h3 className="text-[13px] sm:text-[15px] font-medium text-black/70 dark:text-white/70 group-hover:text-black dark:group-hover:text-white transition-colors leading-snug mb-1 sm:mb-1.5">
+                            {post.title}
+                        </h3>
+                        <div className="flex items-center gap-3">
+                            <span className="text-[9px] sm:text-[10px] tracking-[0.04em] text-black/20 dark:text-white/15 font-mono tabular-nums">
+                                {post.date}
+                            </span>
+                        </div>
+                    </div>
+                    <span className="text-[10px] text-black/0 dark:text-white/0 group-hover:text-black/25 dark:group-hover:text-white/20 transition-all duration-200 pt-0.5 shrink-0">
                         &rarr;
                     </span>
                 </div>
-                <p className="text-[11px] sm:text-xs line-clamp-2 font-light leading-relaxed text-black/30 dark:text-white/30 pl-8 sm:pl-[116px]">
-                    {post.excerpt}
-                </p>
             </div>
         </Link>
     );

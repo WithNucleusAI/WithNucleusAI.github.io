@@ -28,33 +28,47 @@ export default function TopNav() {
     return () => window.removeEventListener('intro-done', handleIntroDone);
   }, [pathname, introDone]);
 
+  const navItems = [
+    { href: '/', label: 'Home' },
+    { href: '/blog', label: 'Blog' },
+    { href: '/image', label: 'Image' },
+  ];
+
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-black/90 backdrop-blur-sm border-b border-black/6 dark:border-white/6 transition-all duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
     >
-      <div className="flex items-center justify-between px-5 py-2.5 sm:px-8 sm:py-3 max-w-5xl mx-auto">
-        <Link href="/" className="flex items-center gap-3 sm:gap-4 no-underline transition-opacity duration-300 hover:opacity-60">
-          <Image src="/logo.webp" alt="Nucleus AI" width={40} height={40}
-            className="invert dark:invert-0 w-6 h-6 sm:w-7 sm:h-7"
-          />
-          <span className="text-sm sm:text-base font-semibold text-black dark:text-white tracking-[0.06em]">Nucleus</span>
-        </Link>
+      {/* Mac-style menu bar — flat, full-width, no blur, just a solid bar */}
+      <div className="bg-black/[0.03] dark:bg-white/[0.03] border-b border-black/[0.08] dark:border-white/[0.06]">
+        <div className="flex items-center justify-between px-4 py-[7px] sm:px-6 sm:py-[9px]">
+          {/* Logo mark */}
+          <Link href="/" className="flex items-center gap-2 no-underline transition-opacity duration-200 hover:opacity-60">
+            <Image src="/logo.webp" alt="Nucleus" width={40} height={40}
+              className="invert dark:invert-0 w-[18px] h-[18px] sm:w-5 sm:h-5"
+            />
+            <span className="text-[13px] sm:text-sm font-semibold text-black dark:text-white tracking-[0.04em]">Nucleus</span>
+          </Link>
 
-        <nav className="flex items-center gap-5 sm:gap-7">
-          {[
-            { href: '/', label: 'Home' },
-            { href: '/blog', label: 'Blog' },
-            { href: '/image', label: 'Image' },
-          ].filter(item => item.href !== pathname).map(item => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-[11px] sm:text-xs tracking-[0.04em] text-black/35 dark:text-white/35 transition-colors duration-200 hover:text-black dark:hover:text-white"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+          {/* Menu items — Mac-style: inline, compact, monospace */}
+          <nav className="flex items-center">
+            {navItems.map((item, i) => {
+              const isActive = item.href === pathname;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`text-[11px] sm:text-[12px] px-2.5 sm:px-3 py-1 transition-colors duration-150 ${
+                    isActive
+                      ? "text-black dark:text-white font-medium"
+                      : "text-black/40 dark:text-white/35 hover:text-black/80 dark:hover:text-white/80"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
       </div>
     </header>
   );
