@@ -164,7 +164,7 @@ export default function Typewriter() {
                 id="typing"
                 className={`mx-auto w-full max-w-[92vw] sm:max-w-2xl px-1 sm:px-4 text-center ${
                     isNucleus
-                        ? "text-3xl sm:text-6xl lg:text-7xl font-bold leading-none tracking-[0.18em] sm:tracking-[0.25em] text-black dark:text-white"
+                        ? "text-3xl sm:text-6xl lg:text-7xl font-medium leading-none tracking-[0.2em] sm:tracking-[0.3em] text-black dark:text-white"
                         : "text-[14px] sm:text-lg font-normal tracking-tight text-black/65 dark:text-white/75 leading-relaxed"
                 }`}
             >
