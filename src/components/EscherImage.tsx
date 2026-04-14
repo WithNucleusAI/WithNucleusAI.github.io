@@ -94,9 +94,10 @@ export default function EscherImage() {
             const outData = ctx.createImageData(cw, ch);
             const out = outData.data;
 
-            const lineR = isDark ? 130 : 30;
-            const lineG = isDark ? 190 : 60;
-            const lineB = isDark ? 255 : 160;
+            // Warm amber — antique technical drawing feel
+            const lineR = isDark ? 220 : 80;
+            const lineG = isDark ? 180 : 55;
+            const lineB = isDark ? 120 : 20;
             const threshold = 0.22;
 
             for (let i = 0; i < cw * ch; i++) {
