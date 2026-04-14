@@ -61,14 +61,14 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
     }
 
     return (
-        <div className="max-w-[1200px] mx-auto py-10 px-4 sm:py-16 sm:px-8 text-left w-full box-border select-text">
-            <Link href="/blog" className="inline-flex items-center mb-6 sm:mb-8 no-underline text-black/40 dark:text-white/40 text-[0.8rem] sm:text-[0.85rem] font-medium transition-colors duration-200 hover:text-black dark:hover:text-white">
-                &larr; Back to Blogs
+        <div className="max-w-[1000px] mx-auto py-10 px-5 sm:py-16 sm:px-8 text-left w-full box-border select-text">
+            <Link href="/blog" className="inline-flex items-center mb-8 sm:mb-12 no-underline text-black/30 dark:text-white/25 text-[11px] sm:text-xs tracking-[0.04em] transition-colors duration-200 hover:text-black dark:hover:text-white">
+                &larr; Back
             </Link>
 
-            <header className="mb-10 sm:mb-16 text-center flex flex-col items-center max-w-[1000px] mx-auto">
-                <h1 className="mb-4 text-[2.2rem] sm:text-[3.5rem] leading-tight tracking-tight font-bold text-black dark:text-white">{post.title}</h1>
-                <p className="text-sm sm:text-base text-black/40 dark:text-white/40">{post.date}</p>
+            <header className="mb-10 sm:mb-16 text-center flex flex-col items-center max-w-[800px] mx-auto">
+                <h1 className="mb-3 text-2xl sm:text-4xl leading-tight tracking-tight font-bold text-black dark:text-white">{post.title}</h1>
+                <p className="text-xs sm:text-sm text-black/30 dark:text-white/25 font-mono tabular-nums">{post.date}</p>
             </header>
 
             <CollapsibleToc content={post.content}>

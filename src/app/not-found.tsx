@@ -3,21 +3,18 @@ import Link from "next/link";
 export default function NotFound() {
   return (
     <main className="w-full relative flex-1 flex flex-col items-center justify-center min-h-[70vh]">
-      <div className="z-10 relative flex flex-col items-center justify-center text-center px-6 mt-[-10vh]">
-        <h1 className="text-8xl sm:text-9xl font-bold tracking-tighter text-black dark:text-white">
+      <div className="flex flex-col items-center justify-center text-center px-6 -mt-16">
+        <h1 className="text-6xl sm:text-8xl font-bold tracking-tighter text-black dark:text-white">
           404
         </h1>
-        <h2 className="text-2xl sm:text-4xl font-medium mt-4 text-black dark:text-white">
-          Page Not Found
-        </h2>
-        <p className="mt-6 text-lg sm:text-xl text-black/50 dark:text-white/50 max-w-md">
-          The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
+        <p className="mt-4 text-sm sm:text-base text-black/40 dark:text-white/35 max-w-sm leading-relaxed">
+          The page you are looking for doesn&apos;t exist.
         </p>
         <Link
           href="/"
-          className="mt-10 px-8 py-3 bg-black dark:bg-white text-white dark:text-black font-medium hover:opacity-80 transition-opacity duration-200"
+          className="mt-8 text-[11px] sm:text-xs tracking-[0.1em] text-black/40 dark:text-white/35 hover:text-black dark:hover:text-white transition-colors"
         >
-          Return Home
+          &larr; Home
         </Link>
       </div>
     </main>
