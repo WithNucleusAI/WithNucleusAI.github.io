@@ -78,7 +78,7 @@ type Aggregates = {
     topBrowsers: Array<{ key: string; count: number }>;
     topOses: Array<{ key: string; count: number }>;
     topReferrers: Array<{ key: string; count: number }>;
-    avgTimePerPage: Array<{ path: string; avg: number; n: number }>;
+    perPage: Array<{ path: string; views: number; durationSamples: number; avg: number }>;
     recent: Array<{
         path: string;
         country: string;
@@ -256,10 +256,22 @@ function aggregate(docs: VisitDoc[], range: RangeInfo): Aggregates {
         views: timelineMap.get(k) ?? 0,
     }));
 
-    const avgTimePerPage = [...pageDurations.entries()]
-        .map(([path, { total, n }]) => ({ path, avg: total / n, n }))
-        .sort((a, b) => b.n - a.n)
-        .slice(0, 15);
+    // Per-page stats: views + (duration sample size + avg time). Views come
+    // from the full `pages` map so a page shows up even if no visit ever
+    // reported a non-zero duration yet. Duration info is only filled when
+    // at least one sample exists.
+    const perPage: Array<{ path: string; views: number; durationSamples: number; avg: number }> =
+        [...pages.entries()]
+            .map(([path, views]) => {
+                const d = pageDurations.get(path);
+                return {
+                    path,
+                    views,
+                    durationSamples: d?.n ?? 0,
+                    avg: d && d.n > 0 ? d.total / d.n : 0,
+                };
+            })
+            .sort((a, b) => b.views - a.views);
 
     return {
         timeline,
@@ -277,7 +289,7 @@ function aggregate(docs: VisitDoc[], range: RangeInfo): Aggregates {
         topBrowsers: topN(browsers, 8),
         topOses: topN(oses, 8),
         topReferrers: topN(referrers, 10),
-        avgTimePerPage,
+        perPage,
         recent: [], // filled separately
     };
 }
@@ -379,6 +391,74 @@ function BarList({
                 </ul>
             )}
         </div>
+    );
+}
+
+/**
+ * Featured pages block — large cards for the pages we most care about
+ * (home and image model). Each card shows views, how many of those views
+ * recorded a dwell time, and the mean dwell time. If a page hasn't been
+ * visited in the current window, the card still renders to make that
+ * legible, rather than silently disappearing.
+ */
+const FEATURED = [
+    { path: "/", label: "Home" },
+    { path: "/image", label: "Image model" },
+];
+
+function FeaturedPages({
+    perPage,
+}: {
+    perPage: Array<{ path: string; views: number; durationSamples: number; avg: number }>;
+}) {
+    const byPath = new Map(perPage.map((p) => [p.path, p]));
+    return (
+        <section className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+            {FEATURED.map(({ path, label }) => {
+                const row = byPath.get(path);
+                const views = row?.views ?? 0;
+                const samples = row?.durationSamples ?? 0;
+                const avg = samples > 0 ? Math.round(row!.avg) : 0;
+                return (
+                    <div
+                        key={path}
+                        className="border border-black/20 dark:border-white/20 p-5 text-left"
+                    >
+                        <div className="flex items-baseline justify-between">
+                            <div className="text-xs uppercase opacity-60 tracking-wider">
+                                {label}
+                            </div>
+                            <div className="text-xs font-[var(--font-code)] opacity-50">
+                                {path}
+                            </div>
+                        </div>
+                        <div className="mt-3 grid grid-cols-2 gap-4">
+                            <div>
+                                <div className="text-[10px] uppercase opacity-50 tracking-wider">
+                                    Views
+                                </div>
+                                <div className="text-2xl font-bold mt-0.5 font-[var(--font-base)]">
+                                    {views.toLocaleString()}
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-[10px] uppercase opacity-50 tracking-wider">
+                                    Avg view time
+                                </div>
+                                <div className="text-2xl font-bold mt-0.5 font-[var(--font-base)]">
+                                    {samples > 0 ? formatDuration(avg) : "—"}
+                                </div>
+                                {samples > 0 && (
+                                    <div className="text-[10px] opacity-50 mt-0.5">
+                                        from {samples} sample{samples === 1 ? "" : "s"}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                );
+            })}
+        </section>
     );
 }
 
@@ -675,28 +755,36 @@ export default function DashboardClient() {
                 <BarList title="Operating systems" rows={data.topOses} />
             </section>
 
+            <FeaturedPages perPage={data.perPage} />
+
             <section className="border border-black/20 dark:border-white/20 p-5 mb-6">
                 <h3 className="text-sm uppercase tracking-wider opacity-70 mb-3">
-                    Average time on page (top 15 by volume)
+                    All pages · views & average time
                 </h3>
-                {data.avgTimePerPage.length === 0 ? (
-                    <p className="text-xs opacity-50">No duration data yet</p>
+                {data.perPage.length === 0 ? (
+                    <p className="text-xs opacity-50">No page data yet</p>
                 ) : (
                     <table className="w-full text-xs font-[var(--font-code)]">
                         <thead>
                             <tr className="opacity-60 text-left">
                                 <th className="py-1.5 pr-2">Path</th>
                                 <th className="py-1.5 pr-2 text-right">Views</th>
+                                <th className="py-1.5 pr-2 text-right">With dwell data</th>
                                 <th className="py-1.5 pr-2 text-right">Avg time</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {data.avgTimePerPage.map((r) => (
+                            {data.perPage.map((r) => (
                                 <tr key={r.path} className="border-t border-black/10 dark:border-white/10">
                                     <td className="py-1.5 pr-2 truncate max-w-xs">{r.path}</td>
-                                    <td className="py-1.5 pr-2 text-right tabular-nums">{r.n}</td>
+                                    <td className="py-1.5 pr-2 text-right tabular-nums">{r.views}</td>
+                                    <td className="py-1.5 pr-2 text-right tabular-nums opacity-60">
+                                        {r.durationSamples}
+                                    </td>
                                     <td className="py-1.5 pr-2 text-right tabular-nums">
-                                        {formatDuration(Math.round(r.avg))}
+                                        {r.durationSamples > 0
+                                            ? formatDuration(Math.round(r.avg))
+                                            : "—"}
                                     </td>
                                 </tr>
                             ))}
