@@ -9,20 +9,19 @@ const phrases = [
     "NUCLEUS"
 ];
 
-const typingSpeed = 55;
-const deletingSpeed = 18;
-const nucleusTypingSpeed = 160;
-const delayAfterTyping = 3200;
-const delayAfterDeleting = 800;
-const commaDelay = 1200;
-const periodDelay = 1000;
+const typingSpeed = 45;
+const deletingSpeed = 16;
+const nucleusTypingSpeed = 140;
+const delayAfterTyping = 3000;
+const delayAfterDeleting = 600;
+const commaDelay = 1000;
+const periodDelay = 800;
 
 export default function Typewriter() {
     const [text, setText] = useState("");
     const [isNucleus, setIsNucleus] = useState(() => getIntroPlayed());
     const [showCaption, setShowCaption] = useState(() => getIntroPlayed());
 
-    const [currentPhrase, setCurrentPhrase] = useState(0);
     const phraseIdx = useRef(0);
     const charIdx = useRef(0);
     const typing = useRef(true);
@@ -43,15 +42,12 @@ export default function Typewriter() {
             const isFinal = pi === phrases.length - 1;
 
             setIsNucleus(isFinal);
-            setCurrentPhrase(pi);
 
             if (typing.current) {
-                // Typing forward
                 let ci = charIdx.current;
                 let ch = phrase.charAt(ci);
                 ci++;
 
-                // Skip HTML tags instantly
                 if (ch === '<') {
                     while (ci < phrase.length && phrase.charAt(ci - 1) !== '>') ci++;
                 }
@@ -61,7 +57,6 @@ export default function Typewriter() {
 
                 if (ci < phrase.length) {
                     const nextCh = phrase.charAt(ci);
-                    // Pause at commas and periods (but not at end of string)
                     if (nextCh === ',' && ci < phrase.length - 1) {
                         setText(phrase.substring(0, ci + 1));
                         charIdx.current = ci + 1;
@@ -75,25 +70,22 @@ export default function Typewriter() {
                         return;
                     }
                     const speed = isFinal
-                        ? nucleusTypingSpeed + (Math.random() * 60 - 30)
+                        ? nucleusTypingSpeed + (Math.random() * 50 - 25)
                         : typingSpeed + (Math.random() * 20 - 10);
                     timer.current = setTimeout(tick, speed);
                 } else {
-                    // Done typing this phrase
                     if (isFinal) {
                         setIsNucleus(true);
                         setShowCaption(true);
-                        return; // Stop
+                        return;
                     }
                     typing.current = false;
                     timer.current = setTimeout(tick, delayAfterTyping);
                 }
             } else {
-                // Deleting backward
                 let ci = charIdx.current;
 
                 if (ci > 0) {
-                    // Skip back over HTML tags
                     if (phrase.charAt(ci - 1) === '>') {
                         while (ci > 0 && phrase.charAt(ci - 1) !== '<') ci--;
                         ci--;
@@ -102,10 +94,9 @@ export default function Typewriter() {
                     setText(phrase.substring(0, ci));
                     charIdx.current = ci;
 
-                    const speed = pi === phrases.length - 2 ? 35 : deletingSpeed;
+                    const speed = pi === phrases.length - 2 ? 30 : deletingSpeed;
                     timer.current = setTimeout(tick, speed);
                 } else {
-                    // Done deleting — move to next phrase
                     typing.current = true;
                     phraseIdx.current = pi + 1;
                     charIdx.current = 0;
@@ -114,7 +105,6 @@ export default function Typewriter() {
             }
         };
 
-        // Wait for intro to finish before starting
         const start = () => {
             if (timer.current) clearTimeout(timer.current);
             timer.current = setTimeout(tick, typingSpeed);
@@ -137,14 +127,14 @@ export default function Typewriter() {
     }, []);
 
     return (
-        <div className="w-full flex flex-col items-center relative">
+        <div className="w-full flex flex-col items-center px-6 sm:px-8">
             <style dangerouslySetInnerHTML={{ __html: `
                 @keyframes cursor-blink {
                     0%, 100% { opacity: 1; }
                     50% { opacity: 0; }
                 }
                 @keyframes caption-in {
-                    0% { opacity: 0; transform: translateY(8px); }
+                    0% { opacity: 0; transform: translateY(6px); }
                     100% { opacity: 1; transform: translateY(0); }
                 }
                 @keyframes line-expand {
@@ -153,39 +143,35 @@ export default function Typewriter() {
                 }
             `}} />
 
-            {/* Phrase counter — editorial detail */}
-            {!showCaption && (
-                <div className="absolute -top-8 sm:-top-10 right-4 sm:right-0 text-[9px] tracking-[0.15em] text-black/15 dark:text-white/15 font-mono tabular-nums">
-                    {String(currentPhrase + 1).padStart(2, '0')}/{String(phrases.length).padStart(2, '0')}
-                </div>
-            )}
-
             <div
-                id="typing"
-                className={`mx-auto w-full max-w-[92vw] sm:max-w-2xl px-1 sm:px-4 text-center ${
+                className={`mx-auto w-full text-center ${
                     isNucleus
-                        ? "text-3xl sm:text-6xl lg:text-7xl font-medium leading-none tracking-[0.2em] sm:tracking-[0.3em] text-black dark:text-white"
-                        : "text-[14px] sm:text-lg font-normal tracking-tight text-black/65 dark:text-white/75 leading-relaxed"
+                        ? "max-w-3xl text-3xl sm:text-6xl lg:text-7xl font-medium leading-none tracking-[0.2em] sm:tracking-[0.3em] text-black dark:text-white"
+                        : "max-w-lg text-[14px] sm:text-[16px] font-light text-black/55 dark:text-white/55 leading-[1.8]"
                 }`}
             >
                 <span dangerouslySetInnerHTML={{ __html: text }} />
                 {!showCaption && (
                     <span
-                        style={{ animation: 'cursor-blink 1s steps(1) infinite' }}
-                        className="inline-block w-[2px] h-[0.85em] ml-1 align-middle bg-black/40 dark:bg-white/40"
+                        style={{ animation: 'cursor-blink 0.8s steps(1) infinite' }}
+                        className={`inline-block align-middle ml-[2px] ${
+                            isNucleus
+                                ? "w-[3px] h-[0.8em] bg-black/30 dark:bg-white/30"
+                                : "w-[6px] h-[16px] sm:h-[18px] bg-black/25 dark:bg-white/25"
+                        }`}
                     />
                 )}
             </div>
 
             {showCaption && (
-                <div className="mt-3 sm:mt-5 flex flex-col items-center gap-2 sm:gap-2.5">
+                <div className="mt-4 sm:mt-6 flex flex-col items-center gap-2 sm:gap-2.5">
                     <div
                         style={{ animation: 'line-expand 1s cubic-bezier(0.16,1,0.3,1) 0.3s both' }}
-                        className="h-px bg-black/10 dark:bg-white/10"
+                        className="h-px bg-black/8 dark:bg-white/8"
                     />
                     <span
                         style={{ animation: 'caption-in 1s cubic-bezier(0.16,1,0.3,1) 0.5s both' }}
-                        className="text-[8px] sm:text-xs font-light tracking-[0.25em] sm:tracking-[0.3em] uppercase text-black/35 dark:text-white/40"
+                        className="text-[8px] sm:text-xs font-light tracking-[0.25em] sm:tracking-[0.3em] uppercase text-black/30 dark:text-white/35"
                     >
                         General Intelligence
                     </span>
