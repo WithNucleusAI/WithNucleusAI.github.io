@@ -46,19 +46,38 @@ export default async function Home() {
       </section>
 
       {/* ═══ About ═══ */}
-      <section id="intro-section" className="px-5 sm:px-12 max-w-xl mx-auto py-10 sm:py-24 text-center">
+      <section id="intro-section" className="px-6 sm:px-12 max-w-xl mx-auto py-14 sm:py-28 text-center">
+
         <ScrollReveal>
-          <div className="inline-block mb-6 sm:mb-8">
-            <span className="text-[8px] sm:text-[9px] tracking-[0.3em] uppercase text-black/20 dark:text-white/15 border border-black/8 dark:border-white/6 px-3 py-1">
-              About
-            </span>
+          <p className="text-[13px] sm:text-[15px] leading-[2] font-light text-black/40 dark:text-white/35 mb-5 sm:mb-6">
+            Systems with very simple rules can produce unexpectedly complex behavior when scaled.
+          </p>
+          <div className="space-y-1 sm:space-y-1.5 mb-5 sm:mb-6">
+            <p className="text-[11px] sm:text-[13px] text-black/50 dark:text-white/40">Ants — individually dumb, colony = intelligent</p>
+            <p className="text-[11px] sm:text-[13px] text-black/50 dark:text-white/40">Neurons — individually simple, brain = consciousness</p>
+            <p className="text-[11px] sm:text-[13px] text-black/50 dark:text-white/40">Transformers — simple next-token prediction = intelligence-like behavior</p>
           </div>
+          <p className="text-[13px] sm:text-[15px] font-medium text-black/65 dark:text-white/55 mb-10 sm:mb-14">This is the idea of emergence.</p>
         </ScrollReveal>
+
         <ScrollReveal delay={100}>
-          <p className="text-[13px] sm:text-base lg:text-lg leading-[1.9] sm:leading-[1.85] font-light text-black/45 dark:text-white/45">
-            We design systems that shape tomorrow. Exploring the frontiers of software, artificial intelligence, and resilient architectures to build the foundations of modern engineering.
+          <p className="text-[13px] sm:text-[15px] leading-[2] font-light text-black/40 dark:text-white/35 mb-10 sm:mb-14">
+            Ada Lovelace saw that a simple computational substrate could represent <span className="font-medium text-[rgb(220,180,120)] dark:text-[rgb(220,180,120)]">logic</span> and all forms of <span className="font-medium text-[rgb(140,170,200)] dark:text-[rgb(150,180,210)]">memory</span>. Turing and his peers saw that logic itself could construct an <span className="font-medium text-[rgb(140,170,200)] dark:text-[rgb(150,180,210)]">initial state of mind</span> — and a reward-driven process that enables <span className="font-medium text-[rgb(220,180,120)] dark:text-[rgb(220,180,120)]">learning</span>.
           </p>
         </ScrollReveal>
+
+        <ScrollReveal delay={200}>
+          <p className="text-[13px] sm:text-[15px] leading-[2] font-light text-black/40 dark:text-white/35 mb-5 sm:mb-6">
+            The next step function in general intelligence will not come from a fictional design yet to be found.
+          </p>
+          <p className="text-[14px] sm:text-[17px] leading-[1.8] font-medium text-black/75 dark:text-white/65 mb-5 sm:mb-6">
+            It will come from a better arrangement of the building blocks already at hand.
+          </p>
+          <p className="text-[12px] sm:text-[14px] leading-[2] font-light text-black/35 dark:text-white/30">
+            We are engineering a core commodity that scales beautifully on its own — where and how it fits in the world are fundamental parts of its design.
+          </p>
+        </ScrollReveal>
+
       </section>
 
 
