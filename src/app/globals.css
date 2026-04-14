@@ -36,10 +36,23 @@ body {
   position: relative;
 }
 
-/* Crosshair cursor on desktop */
+/* Retro Mac cursors */
 @media (pointer: fine) {
-  body { cursor: crosshair; }
-  a, button, [role="button"] { cursor: pointer; }
+  /* Default — classic Mac arrow (pixel-art style) */
+  body {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='20' viewBox='0 0 14 20' shape-rendering='crispEdges'%3E%3Cpath d='M1 1v14l3.5-3.5L8 18l2-1-3.5-6.5H12z' fill='%23000' stroke='%23fff' stroke-width='1.2'/%3E%3C/svg%3E") 1 1, auto;
+  }
+  .dark body, body:where(.dark) {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='20' viewBox='0 0 14 20' shape-rendering='crispEdges'%3E%3Cpath d='M1 1v14l3.5-3.5L8 18l2-1-3.5-6.5H12z' fill='%23fff' stroke='%23000' stroke-width='1.2'/%3E%3C/svg%3E") 1 1, auto;
+  }
+
+  /* Pointer — retro Mac pointing hand */
+  a, button, [role="button"], [onclick], .cursor-pointer {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='20' viewBox='0 0 17 20' shape-rendering='crispEdges'%3E%3Cpath d='M5 7V2.5a1.5 1.5 0 013 0V7m0 0V4.5a1.5 1.5 0 013 0V7m0 0V5.5a1.5 1.5 0 013 0V12a5 5 0 01-5 5H7.5A4.5 4.5 0 013 12.5V9.5a1.5 1.5 0 013 0V7' fill='%23000' stroke='%23fff' stroke-width='1'/%3E%3C/svg%3E") 6 1, pointer;
+  }
+  .dark a, .dark button, .dark [role="button"], .dark [onclick], .dark .cursor-pointer {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='20' viewBox='0 0 17 20' shape-rendering='crispEdges'%3E%3Cpath d='M5 7V2.5a1.5 1.5 0 013 0V7m0 0V4.5a1.5 1.5 0 013 0V7m0 0V5.5a1.5 1.5 0 013 0V12a5 5 0 01-5 5H7.5A4.5 4.5 0 013 12.5V9.5a1.5 1.5 0 013 0V7' fill='%23fff' stroke='%23000' stroke-width='1'/%3E%3C/svg%3E") 6 1, pointer;
+  }
 }
 
 /* Film grain overlay */

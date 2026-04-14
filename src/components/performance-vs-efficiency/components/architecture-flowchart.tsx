@@ -379,9 +379,9 @@ export function ArchitectureFlowchart() {
 
 
         {/* ══════════════════ SVG ══════════════════ */}
-        <div style={{ overflowX: "auto", margin: mob ? "0 -8px" : 0, padding: mob ? "0 8px 8px" : 0 }}>
+        <div style={{ overflowX: mob ? "scroll" : "visible", margin: mob ? "0 -4px" : 0, padding: mob ? "0 4px 8px" : 0, WebkitOverflowScrolling: "touch" }}>
           <svg viewBox="0 0 480 900"
-            style={{ width: "100%", minWidth: mob ? 700 : undefined, maxWidth: 940, display: "block" }}>
+            style={{ width: "100%", minWidth: mob ? 420 : undefined, maxWidth: 940, display: "block" }}>
 
             <defs>
               {/* ── CSS animations ── */}

@@ -131,7 +131,7 @@ export default function ImagePageClient() {
       {/* Hero */}
       <section className="min-h-screen flex flex-col items-center justify-center px-6 relative z-10">
         <motion.h1
-          className="text-5xl sm:text-7xl lg:text-8xl font-bold tracking-[0.20em] text-center text-white"
+          className="text-3xl sm:text-7xl lg:text-8xl font-bold tracking-[0.15em] sm:tracking-[0.20em] text-center text-white"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, ease: EASE_OUT }}
@@ -162,7 +162,7 @@ export default function ImagePageClient() {
             Leading Performance
           </span>
 
-          <div className="flex items-center gap-8 sm:gap-12">
+          <div className="flex items-center gap-5 sm:gap-12">
             <div className="flex flex-col items-center">
               <span className="text-xl sm:text-3xl font-bold tracking-[0.08em] text-white">2B</span>
               <span className="text-[8px] sm:text-[9px] tracking-[0.25em] uppercase text-white/30 font-light mt-1">active params</span>
@@ -177,6 +177,30 @@ export default function ImagePageClient() {
               <span className="text-xl sm:text-3xl font-bold tracking-[0.08em] text-white">64</span>
               <span className="text-[8px] sm:text-[9px] tracking-[0.25em] uppercase text-white/30 font-light mt-1">experts</span>
             </div>
+          </div>
+          {/* CTA buttons */}
+          <div className="flex items-center gap-3 sm:gap-4 mt-2">
+            <a
+              href="https://huggingface.co/NucleusAI/NucleusMoE-Image"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-white text-black text-[10px] sm:text-xs tracking-[0.1em] font-semibold uppercase hover:bg-white/90 transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Download Model
+            </a>
+            <a
+              href="https://huggingface.co/blog/NucleusAI/nucleus-image"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 border border-white/25 text-white/70 text-[10px] sm:text-xs tracking-[0.1em] font-medium uppercase hover:border-white/50 hover:text-white transition-all"
+            >
+              Read Blog &rarr;
+            </a>
           </div>
         </motion.div>
       </section>
@@ -221,8 +245,8 @@ export default function ImagePageClient() {
       </div>
 
       {/* Architecture Flowchart — compact */}
-      <section className="relative z-10 py-6 sm:py-10">
-        <div className="max-w-2xl mx-auto px-4 sm:px-8">
+      <section className="relative z-10 py-6 sm:py-10 overflow-hidden">
+        <div className="max-w-2xl mx-auto px-2 sm:px-8">
           <ArchitectureFlowchart />
         </div>
       </section>
