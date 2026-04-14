@@ -108,7 +108,7 @@ export default function EscherImage() {
                     out[idx] = lineR;
                     out[idx + 1] = lineG;
                     out[idx + 2] = lineB;
-                    out[idx + 3] = Math.floor(Math.min(1, strength * 1.8) * 255);
+                    out[idx + 3] = Math.floor(Math.min(1, strength * (isMobile ? 2.2 : 1.8)) * 255);
                 }
             }
 
