@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import { IBM_Plex_Mono, Inconsolata } from "next/font/google";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -6,6 +7,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import ThemeToggle from "@/components/ThemeToggle";
 import TopNav from "@/components/TopNav";
 import Footer from "@/components/Footer";
+import AnalyticsTracker from "@/components/AnalyticsTracker";
 
 const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -65,6 +67,9 @@ export default function RootLayout({
           <Footer />
           <ScrollToTop />
           <ThemeToggle />
+          <Suspense fallback={null}>
+            <AnalyticsTracker />
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>

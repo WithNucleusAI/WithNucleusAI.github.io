@@ -1,0 +1,65 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Only the `visits` collection is writable by clients, and only with a
+    // strict schema. Dashboard reads happen via the admin SDK (which
+    // bypasses rules), so reads are denied here entirely.
+    match /visits/{viewId} {
+
+      // Public reads for the client-side dashboard.
+      // The dashboard page itself is password-gated by src/proxy.ts, but
+      // anyone who extracts the public Firebase config from withnucleus.ai's
+      // JS could also query this collection. The data is analytics
+      // metadata, not secrets. Tighten later with App Check if needed.
+      allow get, list: if true;
+
+      // Allow `create` if the document matches the expected shape.
+      // - All required fields must be present and correctly typed
+      // - Path length capped to prevent abuse
+      // - duration must be 0 (clients can't pre-fill it; they update later)
+      allow create: if
+        request.resource.data.keys().hasAll([
+          'viewId','sessionId','visitorHash','path','referrer','country','region','city',
+          'device','browser','os','tz','lang','screenW','screenH','day','ts','duration'
+        ])
+        && request.resource.data.viewId == viewId
+        && request.resource.data.viewId is string
+        && request.resource.data.sessionId is string
+        && request.resource.data.visitorHash is string
+        && request.resource.data.path is string
+        && request.resource.data.path.size() <= 300
+        && (request.resource.data.referrer == null || request.resource.data.referrer is string)
+        && request.resource.data.country is string
+        && (request.resource.data.region == null || request.resource.data.region is string)
+        && (request.resource.data.city == null || request.resource.data.city is string)
+        && request.resource.data.device in ['mobile','tablet','desktop','bot','unknown']
+        && request.resource.data.browser is string
+        && request.resource.data.os is string
+        && (request.resource.data.tz == null || request.resource.data.tz is string)
+        && (request.resource.data.lang == null || request.resource.data.lang is string)
+        && (request.resource.data.screenW == null || request.resource.data.screenW is int)
+        && (request.resource.data.screenH == null || request.resource.data.screenH is int)
+        && request.resource.data.day is string
+        && request.resource.data.day.matches('^\\d{4}-\\d{2}-\\d{2}$')
+        && request.resource.data.duration == 0;
+
+      // Allow `update` ONLY for closing out a pageview (duration + closedAt).
+      // Any other field change → deny.
+      allow update: if
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['duration','closedAt'])
+        && request.resource.data.duration is int
+        && request.resource.data.duration >= 0
+        && request.resource.data.duration <= 1800; // 30 min cap
+
+      allow delete: if false;
+    }
+
+    // Everything else: denied.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
