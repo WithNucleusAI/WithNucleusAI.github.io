@@ -74,7 +74,7 @@ export default async function Home() {
             It will come from a better arrangement of the building blocks already at hand.
           </p>
           <p className="text-[12px] sm:text-base leading-[1.8] sm:leading-[1.9] font-light text-black/60 dark:text-white/50">
-            We are engineering a core commodity that scales beautifully on its own — where and how it fits in the world are fundamental parts of its design.
+            We are engineering a core commodity that scales beautifully on its own — where and how it fits in the world are fundamental factors of its design.
           </p>
         </ScrollReveal>
 

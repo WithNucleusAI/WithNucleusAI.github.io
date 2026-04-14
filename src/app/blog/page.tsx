@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { getPosts } from "@/lib/posts";
 
 export const dynamic = 'force-static';
@@ -14,28 +13,20 @@ export default async function BlogPage() {
             </h1>
             <div>
                 {posts.map((post, i) => (
-                    <div key={post.slug} className="mb-0">
-                        <Link href={`/blog/${post.slug}`} className="group no-underline text-inherit block hover:no-underline">
-                            <div className="py-5 sm:py-6 border-b border-black/[0.04] dark:border-white/[0.04] group-hover:border-black/10 dark:group-hover:border-white/8 transition-all duration-300 group-hover:pl-2 sm:group-hover:pl-3">
-                                <div className="flex items-baseline gap-3 sm:gap-5 mb-1.5 sm:mb-2">
-                                    <span className="text-[10px] sm:text-[11px] font-mono tabular-nums text-black/25 dark:text-white/20 shrink-0 w-5">
-                                        {String(i + 1).padStart(2, '0')}
-                                    </span>
-                                    <h2 className="text-[14px] sm:text-base font-medium text-black/75 dark:text-white/70 group-hover:text-black dark:group-hover:text-white transition-colors leading-snug">
-                                        {post.title}
-                                    </h2>
-                                </div>
-                                <div className="flex items-baseline gap-3 sm:gap-5">
-                                    <span className="w-5 shrink-0" />
-                                    <p className="text-[11px] sm:text-xs text-black/40 dark:text-white/35 font-mono tabular-nums">
-                                        {post.date}
-                                    </p>
-                                </div>
-                                <p className="mt-2 text-[12px] sm:text-[13px] line-clamp-2 font-light leading-relaxed text-black/50 dark:text-white/45 pl-8 sm:pl-[40px]">
-                                    {post.excerpt}
-                                </p>
+                    <div key={post.slug} className="py-5 sm:py-6 border-b border-black/[0.06] dark:border-white/[0.06]">
+                        <div className="flex items-start gap-3 sm:gap-5">
+                            <span className="text-[10px] sm:text-[11px] font-mono tabular-nums text-black/25 dark:text-white/20 pt-0.5 shrink-0 w-5">
+                                {String(i + 1).padStart(2, '0')}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                                <h2 className="text-[14px] sm:text-base font-medium text-black/75 dark:text-white/70 leading-snug mb-1.5">
+                                    {post.title}
+                                </h2>
+                                <span className="text-[10px] sm:text-[11px] tracking-[0.1em] uppercase text-black/30 dark:text-white/25">
+                                    Coming Soon
+                                </span>
                             </div>
-                        </Link>
+                        </div>
                     </div>
                 ))}
             </div>

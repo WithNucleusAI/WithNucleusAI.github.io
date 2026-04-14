@@ -3,7 +3,6 @@
 import React from 'react';
 import MiniBlogCard from "@/components/MiniBlogCard";
 import { Post } from "@/lib/posts";
-import Link from "next/link";
 import ScrollReveal from "@/components/ScrollReveal";
 
 interface BlogSectionProps {
@@ -20,14 +19,8 @@ export default function BlogSection({ posts }: BlogSectionProps) {
                 <ScrollReveal>
                     <div className="flex items-center justify-between mb-8 sm:mb-10">
                         <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-black/35 dark:text-white/30 border border-black/10 dark:border-white/8 px-3 py-1">
-                            Recent
+                            Upcoming
                         </span>
-                        <Link
-                            href="/blog"
-                            className="text-[11px] sm:text-[12px] tracking-[0.06em] text-black/40 dark:text-white/35 transition-colors duration-200 hover:text-black dark:hover:text-white"
-                        >
-                            View all &rarr;
-                        </Link>
                     </div>
                 </ScrollReveal>
 
