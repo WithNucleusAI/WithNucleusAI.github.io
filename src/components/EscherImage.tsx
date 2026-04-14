@@ -44,7 +44,7 @@ export default function EscherImage() {
 
         img.onload = () => {
             const isMobile = window.matchMedia("(max-width: 768px)").matches;
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const dpr = Math.min(window.devicePixelRatio || 1, 3); // Allow 3x for mobile retina
 
             const targetW = isMobile ? window.innerWidth * 0.95 : Math.min(850, window.innerWidth * 0.65);
             const aspect = img.width / img.height;
@@ -98,7 +98,7 @@ export default function EscherImage() {
             const lineR = isDark ? 220 : 80;
             const lineG = isDark ? 180 : 55;
             const lineB = isDark ? 120 : 20;
-            const threshold = 0.22;
+            const threshold = isMobile ? 0.18 : 0.22;
 
             for (let i = 0; i < cw * ch; i++) {
                 const edge = edges[i];
