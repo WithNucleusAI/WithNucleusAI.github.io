@@ -19,12 +19,12 @@ export default function BlogSection({ posts }: BlogSectionProps) {
             <div className="w-full max-w-2xl mx-auto px-5 sm:px-6">
                 <ScrollReveal>
                     <div className="flex items-center justify-between mb-8 sm:mb-10">
-                        <span className="text-[8px] sm:text-[9px] tracking-[0.3em] uppercase text-black/20 dark:text-white/15 border border-black/8 dark:border-white/6 px-3 py-1">
+                        <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-black/35 dark:text-white/30 border border-black/10 dark:border-white/8 px-3 py-1">
                             Recent
                         </span>
                         <Link
                             href="/blog"
-                            className="text-[10px] sm:text-[11px] tracking-[0.08em] text-black/25 dark:text-white/20 transition-colors duration-200 hover:text-black dark:hover:text-white"
+                            className="text-[11px] sm:text-[12px] tracking-[0.06em] text-black/40 dark:text-white/35 transition-colors duration-200 hover:text-black dark:hover:text-white"
                         >
                             View all &rarr;
                         </Link>

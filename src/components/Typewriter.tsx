@@ -147,7 +147,7 @@ export default function Typewriter() {
                 className={`mx-auto w-full text-center ${
                     isNucleus
                         ? "max-w-3xl text-3xl sm:text-6xl lg:text-7xl font-medium leading-none tracking-[0.2em] sm:tracking-[0.3em] text-black dark:text-white"
-                        : "max-w-lg text-[14px] sm:text-[16px] font-light text-black/55 dark:text-white/55 leading-[1.8]"
+                        : "max-w-md text-[16px] sm:text-[16px] font-light text-black/70 dark:text-white/65 leading-[1.8]"
                 }`}
             >
                 <span dangerouslySetInnerHTML={{ __html: text }} />
