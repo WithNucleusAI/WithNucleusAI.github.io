@@ -62,13 +62,14 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
 
     return (
         <div className="max-w-[1000px] mx-auto py-10 px-5 sm:py-16 sm:px-8 text-left w-full box-border select-text">
-            <Link href="/blog" className="inline-flex items-center mb-8 sm:mb-12 no-underline text-black/30 dark:text-white/25 text-[11px] sm:text-xs tracking-[0.04em] transition-colors duration-200 hover:text-black dark:hover:text-white">
+            <Link href="/blog" className="pill-btn pill-btn--sm mb-8 sm:mb-12 no-underline">
                 &larr; Back
             </Link>
 
             <header className="mb-10 sm:mb-16 text-center flex flex-col items-center max-w-[800px] mx-auto">
-                <h1 className="mb-3 text-2xl sm:text-4xl leading-tight tracking-tight font-bold text-black dark:text-white">{post.title}</h1>
-                <p className="text-xs sm:text-sm text-black/30 dark:text-white/25 font-mono tabular-nums">{post.date}</p>
+                <span className="eyebrow text-surface-50 mb-4">The Journal</span>
+                <h1 className="mb-3 text-3xl sm:text-5xl leading-[1.05] tracking-[-0.02em] font-semibold text-white">{post.title}</h1>
+                <p className="text-xs sm:text-sm text-surface-50 font-mono tabular-nums">{post.date}</p>
             </header>
 
             <CollapsibleToc content={post.content}>

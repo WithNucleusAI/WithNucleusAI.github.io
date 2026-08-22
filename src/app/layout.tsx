@@ -1,17 +1,16 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import "./globals.css";
-import { IBM_Plex_Mono, Inconsolata } from "next/font/google";
+import { Inter_Tight, Inconsolata } from "next/font/google";
 import ScrollToTop from "@/components/ScrollToTop";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import ThemeToggle from "@/components/ThemeToggle";
 import TopNav from "@/components/TopNav";
 import Footer from "@/components/Footer";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
 
-const plexMono = IBM_Plex_Mono({
+const interTight = Inter_Tight({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
   variable: "--font-base",
 });
 
@@ -22,10 +21,7 @@ const inconsolata = Inconsolata({
 });
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
-  ],
+  themeColor: "#0e100f",
 };
 
 export const metadata: Metadata = {
@@ -56,17 +52,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${plexMono.variable} ${inconsolata.variable} text-black dark:text-white bg-white dark:bg-black flex flex-col items-center text-center min-h-screen m-0 p-0 overflow-x-hidden`}>
+      <body className={`${interTight.variable} ${inconsolata.variable} text-white bg-black flex flex-col items-center text-center min-h-screen m-0 p-0 overflow-x-hidden`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
+          forcedTheme="dark"
           disableTransitionOnChange
         >
           <TopNav />
           <main className="flex-1 flex flex-col w-full sm:pt-28">{children}</main>
           <Footer />
           <ScrollToTop />
-          <ThemeToggle />
           <Suspense fallback={null}>
             <AnalyticsTracker />
           </Suspense>

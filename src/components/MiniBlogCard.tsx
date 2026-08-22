@@ -10,16 +10,16 @@ interface MiniBlogCardProps {
 
 export default function MiniBlogCard({ post, index = 0 }: MiniBlogCardProps) {
     return (
-        <div className="py-5 sm:py-6 border-b border-black/[0.06] dark:border-white/[0.06]">
+        <div className="py-5 sm:py-6 border-b border-surface-25">
             <div className="flex items-start gap-3 sm:gap-5">
-                <span className="text-[10px] sm:text-[11px] font-mono tabular-nums text-black/25 dark:text-white/20 pt-0.5 shrink-0">
+                <span className="text-[12px] sm:text-[13px] font-mono tabular-nums text-pink/70 pt-1 shrink-0">
                     {String(index + 1).padStart(2, '0')}
                 </span>
                 <div className="flex-1 min-w-0">
-                    <h3 className="text-[14px] sm:text-[15px] font-medium text-black/75 dark:text-white/70 leading-snug mb-1.5">
+                    <h3 className="text-[16px] sm:text-[19px] font-medium text-white leading-snug mb-1.5 tracking-[-0.011em]">
                         {post.title}
                     </h3>
-                    <span className="text-[10px] sm:text-[11px] tracking-[0.1em] uppercase text-black/30 dark:text-white/25">
+                    <span className="text-[13px] sm:text-[14px] text-surface-50">
                         Coming Soon
                     </span>
                 </div>
