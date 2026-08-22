@@ -1,0 +1,1000 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tell — Every company has a story</title>
+<meta name="description" content="Tell is a web design and branding firm. Every company has a story — we design how yours is told.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ============================================
+     Tokens — void / ash / frost / graphite / crimson
+     ============================================ */
+  :root {
+    --void: #000000;
+    --ash: #cccccc;
+    --frost: #ffffff;
+    --graphite: #4c4c4c;
+    --crimson: #fc1c46;
+
+    --font-sui: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --page-max: 1400px;
+    --margin-x: clamp(24px, 9vw, 126px);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--void);
+    color: var(--ash);
+    font-family: var(--font-sui);
+    font-size: 15px;
+    line-height: 1.15;
+    overflow-x: hidden;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  ::selection { background: var(--crimson); color: var(--frost); }
+
+  .page {
+    max-width: var(--page-max);
+    margin: 0 auto;
+    padding: 0 var(--margin-x);
+  }
+
+  /* ============================================
+     Type roles
+     ============================================ */
+  .display {
+    font-size: clamp(52px, 12.5vw, 186px);
+    font-weight: 700;
+    line-height: 0.96;
+    letter-spacing: -0.009em;
+    text-transform: uppercase;
+    color: var(--frost);
+  }
+  .heading-lg {
+    font-size: clamp(40px, 6.5vw, 91px);
+    font-weight: 700;
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--frost);
+  }
+  .lead {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.25;
+    color: var(--ash);
+  }
+  .eyebrow {
+    font-size: 15px;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: var(--graphite);
+  }
+  .meta {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--graphite);
+  }
+
+  /* ============================================
+     Buttons — one crimson pill, ghost everything else
+     ============================================ */
+  .pill-crimson {
+    display: inline-flex;
+    align-items: center;
+    background: var(--crimson);
+    color: var(--frost);
+    border: none;
+    border-radius: 9999px;
+    padding: 0 30px;
+    font-family: var(--font-sui);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 2.6;
+    text-transform: uppercase;
+    letter-spacing: -0.009em;
+    cursor: pointer;
+    will-change: transform;
+  }
+
+  .ghost {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    color: var(--frost);
+    font-family: var(--font-sui);
+    font-size: 15px;
+    font-weight: 400;
+    cursor: pointer;
+    position: relative;
+  }
+  .ghost::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    height: 1px;
+    width: 100%;
+    background: var(--frost);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .35s cubic-bezier(.22,1,.36,1);
+  }
+  .ghost:hover::after { transform: scaleX(1); }
+
+  /* ============================================
+     Header
+     ============================================ */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 50;
+    background: var(--void);
+  }
+  .header-row {
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--frost);
+    font-size: 17px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .brand__mark { width: 15px; height: 15px; }
+  .tagline { font-size: 14px; color: var(--ash); }
+  @media (max-width: 900px) { .tagline { display: none; } }
+  .header-actions { display: flex; align-items: center; gap: 22px; }
+
+  .burger {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 14px;
+    width: 26px;
+    padding: 0;
+  }
+  .burger span {
+    display: block;
+    height: 1px;
+    width: 100%;
+    background: var(--frost);
+    transition: transform .35s cubic-bezier(.22,1,.36,1);
+  }
+  .burger:hover span:first-child { transform: translateY(2px); }
+  .burger:hover span:last-child { transform: translateY(-2px); }
+
+  /* ============================================
+     Full-screen menu
+     ============================================ */
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: var(--void);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 var(--margin-x);
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .45s ease, visibility 0s linear .45s;
+  }
+  .menu.open { visibility: visible; opacity: 1; transition: opacity .45s ease; }
+  .menu__close {
+    position: absolute;
+    top: 29px;
+    right: var(--margin-x);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 26px;
+    height: 26px;
+  }
+  .menu__close span {
+    position: absolute;
+    top: 50%; left: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--frost);
+  }
+  .menu__close span:first-child { transform: rotate(45deg); }
+  .menu__close span:last-child { transform: rotate(-45deg); }
+  .menu__link {
+    display: flex;
+    align-items: baseline;
+    gap: 22px;
+    font-size: clamp(40px, 6.5vw, 91px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--frost);
+    opacity: 0;
+    transform: translateY(36px);
+    transition: opacity .6s cubic-bezier(.22,1,.36,1), transform .6s cubic-bezier(.22,1,.36,1), color .25s ease;
+  }
+  .menu.open .menu__link { opacity: 1; transform: none; }
+  .menu.open .menu__link:nth-child(2) { transition-delay: .08s; }
+  .menu.open .menu__link:nth-child(3) { transition-delay: .16s; }
+  .menu.open .menu__link:nth-child(4) { transition-delay: .24s; }
+  .menu__link:hover { color: var(--graphite); }
+  .menu__link .meta { font-size: 14px; }
+
+  /* ============================================
+     The thought bubble — fixed layer, travels between
+     data-bubble anchors as the page scrolls
+     ============================================ */
+  .bubble {
+    position: fixed;
+    top: 0; left: 0;
+    width: 680px;
+    height: 680px;
+    z-index: 5;
+    pointer-events: none;
+    will-change: transform;
+  }
+  .bubble svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .bubble__media {
+    position: absolute;
+    inset: 0;
+    clip-path: url(#cloudClip);
+  }
+  .bubble__media video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.04);
+    opacity: 0;
+    transition: opacity .8s ease;
+  }
+  .bubble__media video.on { opacity: 1; }
+  .bubble__outline {
+    fill: none;
+    stroke: var(--frost);
+    stroke-width: 1.6;
+    vector-effect: non-scaling-stroke;
+  }
+  /* Comic trail dots — lag behind the bubble as it travels */
+  .tdot {
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 5;
+    pointer-events: none;
+    border: 1.4px solid var(--frost);
+    border-radius: 58% 42% 55% 45% / 48% 55% 45% 52%;
+    background: var(--void);
+    will-change: transform;
+  }
+  .tdot--1 { width: 44px; height: 40px; }
+  .tdot--2 { width: 24px; height: 22px; }
+  .tdot--3 { width: 12px; height: 11px; }
+
+  /* Invisible waypoint anchors inside sections */
+  [data-bubble] {
+    position: absolute;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  /* ============================================
+     Hero
+     ============================================ */
+  .hero {
+    position: relative;
+    padding-top: 180px;
+    padding-bottom: clamp(86px, 10vw, 108px);
+    min-height: 94vh;
+  }
+  .hero .display { position: relative; z-index: 6; }
+  .hero__lead {
+    max-width: 400px;
+    margin-top: 43px;
+    position: relative;
+    z-index: 6;
+  }
+  .hero__lead em { font-style: normal; color: var(--frost); }
+  .hero__scroll {
+    margin-top: 65px;
+    display: inline-block;
+    font-size: 14px;
+    color: var(--graphite);
+    animation: scroll-pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes scroll-pulse {
+    0%, 100% { opacity: .5; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(6px); }
+  }
+
+  /* ============================================
+     Marquee — outlined runaway line
+     ============================================ */
+  .marquee {
+    overflow: hidden;
+    padding: clamp(43px, 6vw, 86px) 0 0;
+    white-space: nowrap;
+  }
+  .marquee__track {
+    display: inline-block;
+    animation: marquee 26s linear infinite;
+  }
+  .marquee__track span {
+    font-size: clamp(40px, 6.5vw, 91px);
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--graphite);
+    padding-right: 22px;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ============================================
+     Sections
+     ============================================ */
+  section { padding: clamp(86px, 10vw, 108px) 0 0; position: relative; }
+  .section-head { margin-bottom: 65px; position: relative; z-index: 6; }
+  .section-head .eyebrow { display: block; margin-bottom: 22px; }
+
+  /* Work — stacked story rows */
+  .work-item {
+    display: block;
+    padding: 29px 0;
+    max-width: 60%;
+    position: relative;
+    z-index: 6;
+    transition: transform .4s cubic-bezier(.22,1,.36,1);
+  }
+  @media (max-width: 820px) { .work-item { max-width: 100%; } }
+  .work-item:hover { transform: translateX(22px); }
+  .work-item__row { display: flex; align-items: baseline; gap: 22px; }
+  .work-item__index { font-size: 14px; color: var(--graphite); min-width: 30px; }
+  .work-item__name {
+    font-size: clamp(27px, 3.4vw, 48px);
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--frost);
+    transition: color .25s ease;
+  }
+  .work-item:hover .work-item__name { color: var(--ash); }
+  .work-item__desc {
+    font-size: 14px;
+    line-height: 1.25;
+    color: var(--ash);
+    margin-top: 7px;
+    margin-left: 52px;
+  }
+
+  /* Capabilities */
+  .cap-list { display: flex; flex-direction: column; gap: 9px; position: relative; z-index: 6; max-width: 60%; }
+  @media (max-width: 820px) { .cap-list { max-width: 100%; } }
+  .cap {
+    font-size: 27px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--ash);
+    display: flex;
+    align-items: baseline;
+    gap: 22px;
+  }
+  .cap .meta { min-width: 30px; }
+
+  /* Statement — words light up as you scroll through */
+  .statement {
+    font-size: clamp(27px, 4.6vw, 72px);
+    font-weight: 400;
+    line-height: 1.1;
+    max-width: 1100px;
+    position: relative;
+    z-index: 6;
+  }
+  .statement .w { color: var(--graphite); transition: color .3s ease; }
+  .statement .w.lit { color: var(--frost); }
+
+  /* Chapters — the process */
+  .chapters {
+    display: flex;
+    flex-direction: column;
+    gap: 43px;
+    position: relative;
+    z-index: 6;
+  }
+  .chapter { display: flex; align-items: baseline; gap: 29px; }
+  .chapter__num { font-size: 14px; color: var(--graphite); min-width: 30px; }
+  .chapter__name {
+    font-size: clamp(27px, 3vw, 44px);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    color: var(--frost);
+    min-width: clamp(120px, 16vw, 220px);
+  }
+  .chapter__desc { font-size: 17px; line-height: 1.25; color: var(--ash); max-width: 420px; }
+
+  /* ============================================
+     Contact
+     ============================================ */
+  .contact-form {
+    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+    margin-top: 65px;
+    position: relative;
+    z-index: 6;
+  }
+  .field {
+    background: transparent;
+    color: var(--frost);
+    font-family: var(--font-sui);
+    font-size: 17px;
+    line-height: 1.2;
+    border: none;
+    border-bottom: 1px solid var(--frost);
+    border-radius: 0;
+    padding: 7.2px 21.6px 7.2px 0;
+    outline: none;
+  }
+  .field::placeholder { color: var(--graphite); }
+  .field:focus { border-bottom-color: var(--crimson); }
+  textarea.field { resize: vertical; min-height: 86px; }
+
+  /* ============================================
+     Footer
+     ============================================ */
+  footer { padding: clamp(86px, 10vw, 108px) 0 43px; }
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 22px;
+    font-size: 14px;
+    color: var(--graphite);
+  }
+  .footer-row a { color: var(--graphite); transition: color .25s ease; }
+  .footer-row a:hover { color: var(--ash); }
+
+  /* ============================================
+     Motion — load sequence + scroll reveals
+     ============================================ */
+  header { animation: fade-in .8s ease both; }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+  .hero .display .line {
+    display: block;
+    overflow: hidden;
+    padding: .1em .05em .14em;
+    margin: -.1em -.05em -.14em;
+  }
+  .js .hero .display .line > span {
+    display: inline-block;
+    transform: translateY(112%);
+    transition: transform 1s cubic-bezier(.16,1,.3,1);
+    transition-delay: var(--d, 0s);
+  }
+  .hero.in .display .line > span { transform: none; }
+
+  .js .hero__lead, .js .hero__scroll {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity .8s ease .75s, transform .8s cubic-bezier(.22,1,.36,1) .75s;
+  }
+  .js .hero__scroll { transition-delay: .95s; }
+  .hero.in .hero__lead, .hero.in .hero__scroll { opacity: 1; transform: none; }
+  .hero.in .hero__scroll { animation-delay: 2s; }
+
+  .js .bubble, .js .tdot {
+    opacity: 0;
+    transition: opacity 1.2s ease .5s;
+  }
+  .js .bubble.in, .js .tdot.in { opacity: 1; }
+
+  .js .reveal {
+    opacity: 0;
+    transform: translateY(36px);
+    transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1);
+  }
+  .js .reveal.in { opacity: 1; transform: none; }
+
+  .js [data-stagger] > * {
+    opacity: 0;
+    transform: translateY(29px);
+    transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1);
+    transition-delay: var(--d, 0s);
+  }
+  .js [data-stagger].in > * { opacity: 1; transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    header, .hero__scroll, .marquee__track { animation: none; }
+    .js .hero .display .line > span,
+    .js .hero__lead, .js .hero__scroll,
+    .js .bubble, .js .tdot,
+    .js .reveal,
+    .js [data-stagger] > *,
+    .menu__link {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    .statement .w { color: var(--frost); }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Header — brand left, tagline center, CTA + burger right -->
+  <header>
+    <div class="page header-row">
+      <a class="brand" href="#">
+        <svg class="brand__mark" viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M10 1.5c4.7 0 8.5 2.9 8.5 6.6 0 3.6-3.8 6.5-8.5 6.5-.8 0-1.6-.1-2.3-.3L4 17l.9-3.6C2.9 12.2 1.5 10.3 1.5 8.1c0-3.7 3.8-6.6 8.5-6.6z" fill="#fc1c46"/>
+        </svg>
+        Tell
+      </a>
+      <span class="tagline">Every company has a story</span>
+      <div class="header-actions">
+        <a class="pill-crimson" id="magneticCta" href="#contact">Tell us yours</a>
+        <button class="burger" aria-label="Open menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Full-screen menu -->
+  <nav class="menu" aria-hidden="true">
+    <button class="menu__close" aria-label="Close menu"><span></span><span></span></button>
+    <a class="menu__link" href="#work"><span class="meta">01</span>Stories</a>
+    <a class="menu__link" href="#capabilities"><span class="meta">02</span>Studio</a>
+    <a class="menu__link" href="#contact"><span class="meta">03</span>Contact</a>
+  </nav>
+
+  <!-- The travelling thought bubble -->
+  <div class="bubble" aria-hidden="true">
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+      <defs>
+        <clipPath id="cloudClip" clipPathUnits="objectBoundingBox">
+          <path id="cloudClipPath" d=""></path>
+        </clipPath>
+      </defs>
+      <path id="cloudOutline" class="bubble__outline" d=""></path>
+    </svg>
+    <div class="bubble__media">
+      <video id="vidA" muted loop playsinline preload="auto"></video>
+      <video id="vidB" muted loop playsinline preload="auto"></video>
+    </div>
+  </div>
+  <div class="tdot tdot--1" aria-hidden="true"></div>
+  <div class="tdot tdot--2" aria-hidden="true"></div>
+  <div class="tdot tdot--3" aria-hidden="true"></div>
+
+  <!-- Hero -->
+  <section class="hero page">
+    <h1 class="display">
+      <span class="line"><span>Every</span></span>
+      <span class="line"><span>company</span></span>
+      <span class="line"><span>has a story</span></span>
+    </h1>
+
+    <p class="hero__lead lead">
+      — <em>we design how yours is told.</em> Brand identity, digital
+      experiences, and motion for companies with something to say.
+    </p>
+
+    <span class="hero__scroll">(Scroll)</span>
+
+    <div data-bubble data-size="600" data-clip="0" style="right: -3%; top: 90px; width: 600px; height: 600px;"></div>
+  </section>
+
+  <!-- Marquee -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <span>Every story worth telling —</span><span>Every story worth telling —</span><span>Every story worth telling —</span><span>Every story worth telling —</span>
+    </div>
+  </div>
+
+  <!-- Work -->
+  <section id="work" class="page">
+    <div class="section-head reveal">
+      <span class="eyebrow">Selected Work</span>
+      <h2 class="heading-lg">Stories<br>We've Told</h2>
+    </div>
+    <div data-stagger>
+      <a class="work-item" href="#">
+        <div class="work-item__row">
+          <span class="work-item__index">01</span>
+          <span class="work-item__name">Harbor &amp; Pine</span>
+        </div>
+        <p class="work-item__desc">A century-old furniture maker, retold for direct-to-consumer</p>
+      </a>
+      <a class="work-item" href="#">
+        <div class="work-item__row">
+          <span class="work-item__index">02</span>
+          <span class="work-item__name">Lumen Health</span>
+        </div>
+        <p class="work-item__desc">A telehealth platform given a human voice</p>
+      </a>
+      <a class="work-item" href="#">
+        <div class="work-item__row">
+          <span class="work-item__index">03</span>
+          <span class="work-item__name">Fieldnote</span>
+        </div>
+        <p class="work-item__desc">A farm-to-table startup with a story worth planting</p>
+      </a>
+      <a class="work-item" href="#">
+        <div class="work-item__row">
+          <span class="work-item__index">04</span>
+          <span class="work-item__name">Arclight</span>
+        </div>
+        <p class="work-item__desc">A security firm recast as the calm inside the storm</p>
+      </a>
+      <a class="work-item" href="#">
+        <div class="work-item__row">
+          <span class="work-item__index">05</span>
+          <span class="work-item__name">Nomad Rail</span>
+        </div>
+        <p class="work-item__desc">Rail travel, sold as the slow adventure it is</p>
+      </a>
+    </div>
+    <div data-bubble data-size="340" data-clip="1" style="right: 4%; top: 46%; width: 340px; height: 340px;"></div>
+  </section>
+
+  <!-- Capabilities -->
+  <section id="capabilities" class="page">
+    <div class="section-head reveal">
+      <span class="eyebrow">Capabilities</span>
+      <h2 class="heading-lg">How We<br>Tell It</h2>
+    </div>
+    <div class="cap-list" data-stagger>
+      <div class="cap"><span class="meta">A</span>Narrative strategy &amp; positioning</div>
+      <div class="cap"><span class="meta">B</span>Brand identity &amp; systems</div>
+      <div class="cap"><span class="meta">C</span>Web design &amp; engineering</div>
+      <div class="cap"><span class="meta">D</span>Motion, film &amp; illustration</div>
+    </div>
+    <div data-bubble data-size="400" data-clip="1" style="right: 8%; top: 30%; width: 400px; height: 400px;"></div>
+  </section>
+
+  <!-- Statement — lights up word by word as you scroll -->
+  <section class="page">
+    <p class="statement" id="statement">
+      A brand is not what you say about yourself. It is the story
+      people retell. We find yours, give it a voice, and make it
+      worth retelling.
+    </p>
+    <div data-bubble data-size="220" data-clip="0" style="left: 2%; top: 60%; width: 220px; height: 220px;"></div>
+  </section>
+
+  <!-- Chapters -->
+  <section class="page">
+    <div class="section-head reveal">
+      <span class="eyebrow">The Process</span>
+      <h2 class="heading-lg">Three<br>Chapters</h2>
+    </div>
+    <div class="chapters" data-stagger>
+      <div class="chapter">
+        <span class="chapter__num">01</span>
+        <span class="chapter__name">Listen</span>
+        <p class="chapter__desc">We find the story you already are — founders, customers, archives, ambition.</p>
+      </div>
+      <div class="chapter">
+        <span class="chapter__num">02</span>
+        <span class="chapter__name">Shape</span>
+        <p class="chapter__desc">We give it form: a voice, an identity, a design system that can carry it.</p>
+      </div>
+      <div class="chapter">
+        <span class="chapter__num">03</span>
+        <span class="chapter__name">Tell</span>
+        <p class="chapter__desc">We build the stages where it's told — web, film, motion, and every touchpoint after.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="page">
+    <div class="section-head reveal">
+      <span class="eyebrow">Contact</span>
+      <h2 class="heading-lg">Tell Us<br>Yours</h2>
+    </div>
+    <form class="contact-form reveal" action="#" method="post">
+      <input class="field" type="text" name="name" placeholder="Your name" autocomplete="name">
+      <input class="field" type="email" name="email" placeholder="Email address" autocomplete="email">
+      <textarea class="field" name="message" placeholder="Start at the beginning — what's your story?"></textarea>
+      <div>
+        <button class="ghost" type="submit">Send it over</button>
+      </div>
+    </form>
+    <div data-bubble data-size="380" data-clip="2" style="right: 6%; top: 34%; width: 380px; height: 380px;"></div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="page">
+    <div class="footer-row">
+      <span>&copy; 2026 Tell</span>
+      <a href="mailto:hello@tell.studio">hello@tell.studio</a>
+      <span>Every company has a story.</span>
+    </div>
+  </footer>
+
+<script>
+  document.documentElement.classList.add('js');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ================================================
+     Story films inside the bubble
+     ================================================ */
+  // H.264 mp4 where supported (universal), VP9 webm for open-codec browsers
+  const VEXT = document.createElement('video').canPlayType('video/mp4; codecs="avc1.42E01E"') ? 'mp4' : 'webm';
+  const CLIPS = [0, 1, 2].map((i) => `tell/story-${i}.${VEXT}`);
+
+  /* ================================================
+     Load sequence
+     ================================================ */
+  document.querySelectorAll('.hero .display .line > span').forEach((el, i) => {
+    el.style.setProperty('--d', `${i * 110}ms`);
+  });
+  const startHero = () => {
+    document.querySelector('.hero').classList.add('in');
+    document.querySelectorAll('.bubble, .tdot').forEach((el) => el.classList.add('in'));
+  };
+  const heroFallback = setTimeout(startHero, 700);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => { clearTimeout(heroFallback); requestAnimationFrame(startHero); });
+  }
+
+  /* ================================================
+     Scroll reveals
+     ================================================ */
+  document.querySelectorAll('[data-stagger]').forEach((el) => {
+    [...el.children].forEach((child, i) => child.style.setProperty('--d', `${i * 90}ms`));
+  });
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal, [data-stagger]').forEach((el) => io.observe(el));
+
+  /* ================================================
+     Menu
+     ================================================ */
+  const menu = document.querySelector('.menu');
+  const burger = document.querySelector('.burger');
+  const setMenu = (open) => {
+    menu.classList.toggle('open', open);
+    menu.setAttribute('aria-hidden', String(!open));
+    burger.setAttribute('aria-expanded', String(open));
+  };
+  burger.addEventListener('click', () => setMenu(true));
+  menu.querySelector('.menu__close').addEventListener('click', () => setMenu(false));
+  menu.querySelectorAll('.menu__link').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+
+  /* ================================================
+     Magnetic CTA
+     ================================================ */
+  const cta = document.getElementById('magneticCta');
+  if (cta && !reduced && matchMedia('(pointer: fine)').matches) {
+    const strength = 0.35;
+    cta.addEventListener('mousemove', (e) => {
+      const r = cta.getBoundingClientRect();
+      const dx = e.clientX - (r.left + r.width / 2);
+      const dy = e.clientY - (r.top + r.height / 2);
+      cta.style.transform = `translate(${dx * strength}px, ${dy * strength}px)`;
+    });
+    cta.addEventListener('mouseleave', () => { cta.style.transform = ''; });
+  }
+
+  /* ================================================
+     Statement — words light up with scroll progress
+     ================================================ */
+  const statement = document.getElementById('statement');
+  const words = statement.textContent.trim().split(/\s+/);
+  statement.innerHTML = words.map((w) => `<span class="w">${w}</span>`).join(' ');
+  const wEls = [...statement.querySelectorAll('.w')];
+
+  /* ================================================
+     The travelling thought bubble
+     ------------------------------------------------
+     Anchors ([data-bubble]) mark where the bubble
+     should sit for each section. As the viewport
+     centre crosses from one anchor to the next, the
+     bubble glides between them; the trail dots follow
+     with increasing lag, comic-book style. The cloud
+     outline "boils" at 8fps like hand-drawn animation.
+     ================================================ */
+  const bubble = document.querySelector('.bubble');
+  const dots = [...document.querySelectorAll('.tdot')];
+  const outline = document.getElementById('cloudOutline');
+  const clipPathEl = document.getElementById('cloudClipPath');
+  const vids = [document.getElementById('vidA'), document.getElementById('vidB')];
+  const BASE = 680;
+
+  /* --- Boiling comic cloud path --- */
+  const BUMPS = 13;
+  const seeds = Array.from({ length: BUMPS }, () => Math.random() * 100);
+  let jitter = new Array(BUMPS).fill(0);
+  const reseed = () => { jitter = jitter.map(() => (Math.random() - 0.5) * 2.6); };
+  reseed();
+
+  const cloudPath = (unit) => {
+    // Points on an ellipse; each gap between points bows outward — a scallop.
+    const cx = 50, cy = 50, rx = 42.5, ry = 39.5;
+    const pts = [];
+    for (let i = 0; i < BUMPS; i++) {
+      const a = (i / BUMPS) * Math.PI * 2 + seeds[i] * 0.002;
+      const j = reduced ? 0 : jitter[i];
+      pts.push([
+        cx + Math.cos(a) * (rx + j),
+        cy + Math.sin(a) * (ry + j),
+      ]);
+    }
+    const s = unit ? 0.01 : 1; // clipPath uses objectBoundingBox units
+    let d = `M ${pts[0][0] * s} ${pts[0][1] * s}`;
+    for (let i = 0; i < BUMPS; i++) {
+      const [x1, y1] = pts[i];
+      const [x2, y2] = pts[(i + 1) % BUMPS];
+      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+      const ox = mx - 50, oy = my - 50;
+      const olen = Math.hypot(ox, oy) || 1;
+      const push = 7.5;
+      const qx = mx + (ox / olen) * push;
+      const qy = my + (oy / olen) * push;
+      d += ` Q ${qx * s} ${qy * s} ${x2 * s} ${y2 * s}`;
+    }
+    return d + ' Z';
+  };
+
+  const redrawCloud = () => {
+    outline.setAttribute('d', cloudPath(false));
+    clipPathEl.setAttribute('d', cloudPath(true));
+  };
+  redrawCloud();
+  if (!reduced) {
+    setInterval(() => { reseed(); redrawCloud(); }, 130);
+  }
+
+  /* --- Waypoints from anchors --- */
+  let anchors = [];
+  const measure = () => {
+    anchors = [...document.querySelectorAll('[data-bubble]')].map((el) => {
+      const r = el.getBoundingClientRect();
+      return {
+        x: r.left + scrollX + r.width / 2,
+        y: r.top + scrollY + r.height / 2,
+        size: parseFloat(el.dataset.size),
+        clip: parseInt(el.dataset.clip, 10) || 0,
+      };
+    }).sort((a, b) => a.y - b.y);
+  };
+  measure();
+  addEventListener('resize', measure);
+  addEventListener('load', measure);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  const ease = (t) => t * t * (3 - 2 * t);
+
+  const target = () => {
+    const s = scrollY + innerHeight * 0.5;
+    if (!anchors.length) return { x: innerWidth / 2, y: innerHeight / 2, size: 400, clip: 0 };
+    if (s <= anchors[0].y) return { ...anchors[0] };
+    if (s >= anchors[anchors.length - 1].y) return { ...anchors[anchors.length - 1] };
+    let i = 0;
+    while (s > anchors[i + 1].y) i++;
+    const a = anchors[i], b = anchors[i + 1];
+    const t = ease((s - a.y) / (b.y - a.y));
+    return {
+      x: a.x + (b.x - a.x) * t,
+      y: a.y + (b.y - a.y) * t,
+      size: a.size + (b.size - a.size) * t,
+      clip: t < 0.5 ? a.clip : b.clip,
+    };
+  };
+
+  /* --- Video crossfade --- */
+  let activeClip = -1;
+  let front = 0;
+  const setClip = (idx) => {
+    if (idx === activeClip) return;
+    activeClip = idx;
+    const back = 1 - front;
+    const v = vids[back];
+    v.src = CLIPS[idx];
+    const swap = () => {
+      if (!reduced) v.play().catch(() => {});
+      vids[back].classList.add('on');
+      vids[front].classList.remove('on');
+      front = back;
+    };
+    v.readyState >= 2 ? swap() : v.addEventListener('canplay', swap, { once: true });
+  };
+
+  /* --- The glide loop --- */
+  const cur = { x: innerWidth * 0.72, y: innerHeight * 0.45, size: 600 };
+  const dotState = dots.map(() => ({ x: cur.x, y: cur.y }));
+  const DOT_K = [0.055, 0.04, 0.028];
+  const DOT_OFF = [
+    { x: -0.30, y: 0.44, s: 1 },
+    { x: -0.40, y: 0.56, s: 1 },
+    { x: -0.47, y: 0.65, s: 1 },
+  ];
+  let prevX = cur.x;
+  let t0 = 0;
+
+  const frame = (ms) => {
+    requestAnimationFrame(frame);
+    if (!t0) t0 = ms;
+    const t = (ms - t0) / 1000;
+
+    const tg = target();
+    setClip(tg.clip);
+
+    // Ambient float on top of the travel path
+    const swayX = reduced ? 0 : Math.sin(t * 0.7) * 10;
+    const swayY = reduced ? 0 : Math.cos(t * 0.9) * 12;
+
+    const k = reduced ? 1 : 0.075;
+    cur.x += (tg.x - cur.x) * k;
+    cur.y += (tg.y - cur.y) * k;
+    cur.size += (tg.size - cur.size) * k;
+
+    const vx = cur.x - prevX;
+    prevX = cur.x;
+    const rot = reduced ? 0 : Math.max(-6, Math.min(6, vx * 0.35)) + Math.sin(t * 0.5) * 1.5;
+
+    const scale = cur.size / BASE;
+    const sx = cur.x - scrollX;
+    const sy = cur.y - scrollY;
+    bubble.style.transform =
+      `translate3d(${sx - BASE / 2 + swayX}px, ${sy - BASE / 2 + swayY}px, 0) rotate(${rot}deg) scale(${scale})`;
+
+    // Trail dots chase the bubble's lower-left, each lazier than the last
+    dots.forEach((dot, i) => {
+      const off = DOT_OFF[i];
+      const tx = cur.x + off.x * cur.size + swayX * (0.6 - i * 0.15);
+      const ty = cur.y + off.y * cur.size + swayY * (0.6 - i * 0.15);
+      const st = dotState[i];
+      const dk = reduced ? 1 : DOT_K[i];
+      st.x += (tx - st.x) * dk;
+      st.y += (ty - st.y) * dk;
+      const ds = Math.max(0.4, scale);
+      dot.style.transform = `translate3d(${st.x - scrollX}px, ${st.y - scrollY}px, 0) scale(${ds})`;
+    });
+
+    // Statement words light with scroll progress through the block
+    const sr = statement.getBoundingClientRect();
+    const p = Math.max(0, Math.min(1, (innerHeight * 0.8 - sr.top) / (sr.height + innerHeight * 0.4)));
+    const lit = Math.floor(p * wEls.length);
+    wEls.forEach((w, i) => w.classList.toggle('lit', i < lit));
+  };
+  requestAnimationFrame(frame);
+
+  /* --- Kick off first clip --- */
+  setClip(0);
+</script>
+</body>
+</html>
