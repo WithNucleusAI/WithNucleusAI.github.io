@@ -1,0 +1,780 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voidworks — Form out of void</title>
+<meta name="description" content="A design-study recreation of a black-cathedral agency site: monumental type, one crimson signal, an obsidian WebGL sphere.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ============================================
+     Tokens — five colors, one family, one radius
+     ============================================ */
+  :root {
+    --void: #000000;
+    --ash: #cccccc;
+    --frost: #ffffff;
+    --graphite: #4c4c4c;
+    --crimson: #fc1c46;
+
+    --font-sui: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --page-max: 1400px;
+    --margin-x: clamp(24px, 9vw, 126px);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--void);
+    color: var(--ash);
+    font-family: var(--font-sui);
+    font-size: 15px;
+    line-height: 1.15;
+    overflow-x: hidden;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  ::selection { background: var(--crimson); color: var(--frost); }
+
+  .page {
+    max-width: var(--page-max);
+    margin: 0 auto;
+    padding: 0 var(--margin-x);
+  }
+
+  /* ============================================
+     Type roles
+     ============================================ */
+  .display {
+    font-size: clamp(56px, 14vw, 198px);
+    font-weight: 700;
+    line-height: 0.96;
+    letter-spacing: -0.009em;
+    text-transform: uppercase;
+    color: var(--frost);
+  }
+  .heading-lg {
+    font-size: clamp(40px, 6.5vw, 91px);
+    font-weight: 700;
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--frost);
+  }
+  .lead {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--ash);
+  }
+  .eyebrow {
+    font-size: 15px;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: var(--graphite);
+  }
+  .meta {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--graphite);
+  }
+
+  /* ============================================
+     The one filled button — crimson pill
+     ============================================ */
+  .pill-crimson {
+    display: inline-flex;
+    align-items: center;
+    background: var(--crimson);
+    color: var(--frost);
+    border: none;
+    border-radius: 9999px;
+    padding: 0 30px;
+    font-family: var(--font-sui);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 2.6;
+    text-transform: uppercase;
+    letter-spacing: -0.009em;
+    cursor: pointer;
+    transition: transform .25s cubic-bezier(.22,1,.36,1);
+  }
+  .pill-crimson:hover { transform: scale(1.05); }
+
+  /* Ghost text button — transparent, underline on hover */
+  .ghost {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    color: var(--frost);
+    font-family: var(--font-sui);
+    font-size: 15px;
+    font-weight: 400;
+    cursor: pointer;
+    position: relative;
+  }
+  .ghost::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    height: 1px;
+    width: 100%;
+    background: var(--frost);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .35s cubic-bezier(.22,1,.36,1);
+  }
+  .ghost:hover::after { transform: scaleX(1); }
+
+  /* ============================================
+     Header — 72px, three zones, no fill, no rule
+     ============================================ */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 50;
+    background: var(--void);
+  }
+  .header-row {
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--frost);
+    font-size: 15px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .brand__mark {
+    width: 14px;
+    height: 14px;
+    border-radius: 9999px;
+    background: var(--crimson);
+  }
+  .tagline {
+    font-size: 14px;
+    color: var(--ash);
+  }
+  @media (max-width: 860px) { .tagline { display: none; } }
+  .header-actions { display: flex; align-items: center; gap: 22px; }
+
+  .burger {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 14px;
+    width: 26px;
+    padding: 0;
+  }
+  .burger span {
+    display: block;
+    height: 1px;
+    width: 100%;
+    background: var(--frost);
+    transition: transform .35s cubic-bezier(.22,1,.36,1);
+  }
+  .burger:hover span:first-child { transform: translateY(2px); }
+  .burger:hover span:last-child { transform: translateY(-2px); }
+
+  /* ============================================
+     Full-screen menu overlay
+     ============================================ */
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: var(--void);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 var(--margin-x);
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .45s ease, visibility 0s linear .45s;
+  }
+  .menu.open {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity .45s ease;
+  }
+  .menu__close {
+    position: absolute;
+    top: 29px;
+    right: var(--margin-x);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 26px;
+    height: 26px;
+  }
+  .menu__close span {
+    position: absolute;
+    top: 50%; left: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--frost);
+  }
+  .menu__close span:first-child { transform: rotate(45deg); }
+  .menu__close span:last-child { transform: rotate(-45deg); }
+  .menu__link {
+    display: flex;
+    align-items: baseline;
+    gap: 22px;
+    font-size: clamp(40px, 6.5vw, 91px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--frost);
+    opacity: 0;
+    transform: translateY(36px);
+    transition: opacity .6s cubic-bezier(.22,1,.36,1), transform .6s cubic-bezier(.22,1,.36,1), color .25s ease;
+  }
+  .menu.open .menu__link { opacity: 1; transform: none; }
+  .menu.open .menu__link:nth-child(2) { transition-delay: .08s; }
+  .menu.open .menu__link:nth-child(3) { transition-delay: .16s; }
+  .menu.open .menu__link:nth-child(4) { transition-delay: .24s; }
+  .menu__link:hover { color: var(--graphite); }
+  .menu__link .meta { font-size: 14px; }
+
+  /* ============================================
+     Hero — split: monumental type left, sphere overlapping right
+     ============================================ */
+  .hero {
+    position: relative;
+    padding-top: 180px;
+    padding-bottom: clamp(86px, 10vw, 108px);
+    min-height: 92vh;
+  }
+  .hero .display { position: relative; z-index: 1; }
+  .hero__lead {
+    max-width: 380px;
+    margin-top: 43px;
+    position: relative;
+    z-index: 3;
+  }
+  .sphere-wrap {
+    position: absolute;
+    z-index: 2;
+    right: calc(-1 * var(--margin-x) / 2);
+    top: 96px;
+    width: clamp(280px, 46vw, 720px);
+    aspect-ratio: 1;
+    pointer-events: none;
+  }
+  .sphere-wrap canvas { width: 100%; height: 100%; display: block; }
+  /* Fallback when WebGL is unavailable — a dark orb with rim light */
+  .sphere-fallback {
+    width: 100%; height: 100%;
+    border-radius: 9999px;
+    background:
+      radial-gradient(circle at 30% 25%, rgba(80,100,255,.28), transparent 40%),
+      radial-gradient(circle at 75% 75%, rgba(200,130,60,.18), transparent 45%),
+      radial-gradient(circle at 50% 45%, #101014 0%, #000000 72%);
+    display: none;
+  }
+
+  /* ============================================
+     Sections — spacious vertical rhythm
+     ============================================ */
+  section { padding: clamp(86px, 10vw, 108px) 0 0; }
+  .section-head { margin-bottom: 65px; }
+  .section-head .eyebrow { display: block; margin-bottom: 22px; }
+
+  /* Work — stacked near-full-width transparent rows */
+  .work-item {
+    display: block;
+    padding: 29px 0;
+    transition: transform .4s cubic-bezier(.22,1,.36,1);
+  }
+  .work-item:hover { transform: translateX(22px); }
+  .work-item__row {
+    display: flex;
+    align-items: baseline;
+    gap: 22px;
+  }
+  .work-item__index {
+    font-size: 14px;
+    color: var(--graphite);
+    min-width: 30px;
+  }
+  .work-item__name {
+    font-size: clamp(27px, 3.4vw, 48px);
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--frost);
+    transition: color .25s ease;
+  }
+  .work-item:hover .work-item__name { color: var(--ash); }
+  .work-item__desc {
+    font-size: 14px;
+    line-height: 1.15;
+    color: var(--ash);
+    margin-top: 7px;
+    margin-left: 52px;
+  }
+
+  /* Capabilities */
+  .cap-list { display: flex; flex-direction: column; gap: 9px; }
+  .cap {
+    font-size: 27px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--ash);
+    display: flex;
+    align-items: baseline;
+    gap: 22px;
+  }
+  .cap .meta { min-width: 30px; }
+
+  /* Statement */
+  .statement {
+    font-size: clamp(27px, 4.6vw, 72px);
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--graphite);
+    max-width: 1100px;
+  }
+  .statement em {
+    font-style: normal;
+    color: var(--frost);
+  }
+
+  /* ============================================
+     Contact — hairline inputs on the void
+     ============================================ */
+  .contact-form {
+    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+    margin-top: 65px;
+  }
+  .field {
+    background: transparent;
+    color: var(--frost);
+    font-family: var(--font-sui);
+    font-size: 17px;
+    line-height: 1.2;
+    border: none;
+    border-bottom: 1px solid var(--frost);
+    border-radius: 0;
+    padding: 7.2px 21.6px 7.2px 0;
+    outline: none;
+  }
+  .field::placeholder { color: var(--graphite); }
+  .field:focus { border-bottom-color: var(--crimson); }
+  textarea.field { resize: vertical; min-height: 86px; }
+
+  /* ============================================
+     Footer — a single quiet line
+     ============================================ */
+  footer {
+    padding: clamp(86px, 10vw, 108px) 0 43px;
+  }
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 22px;
+    font-size: 14px;
+    color: var(--graphite);
+  }
+  .footer-row a { color: var(--graphite); transition: color .25s ease; }
+  .footer-row a:hover { color: var(--ash); }
+
+  /* ============================================
+     Motion — load sequence and scroll reveals
+     ============================================ */
+  header { animation: fade-in .8s ease both; }
+
+  .hero .display .line {
+    display: block;
+    overflow: hidden;
+    padding-bottom: .06em;
+    margin-bottom: -.06em;
+  }
+  .js .hero .display .line > span {
+    display: inline-block;
+    transform: translateY(110%);
+    transition: transform 1s cubic-bezier(.16,1,.3,1);
+    transition-delay: var(--d, 0s);
+  }
+  .hero.in .display .line > span { transform: none; }
+
+  .js .hero__lead {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity .8s ease .7s, transform .8s cubic-bezier(.22,1,.36,1) .7s;
+  }
+  .hero.in .hero__lead { opacity: 1; transform: none; }
+
+  .js .sphere-wrap {
+    opacity: 0;
+    scale: .8;
+    transition: opacity 1.4s ease .4s, scale 1.6s cubic-bezier(.22,1,.36,1) .4s;
+  }
+  .hero.in .sphere-wrap { opacity: 1; scale: 1; }
+
+  .js .reveal {
+    opacity: 0;
+    transform: translateY(36px);
+    transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1);
+  }
+  .js .reveal.in { opacity: 1; transform: none; }
+
+  .js [data-stagger] > * {
+    opacity: 0;
+    transform: translateY(29px);
+    transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1);
+    transition-delay: var(--d, 0s);
+  }
+  .js [data-stagger].in > * { opacity: 1; transform: none; }
+
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    header { animation: none; }
+    .js .hero .display .line > span,
+    .js .hero__lead,
+    .js .sphere-wrap,
+    .js .reveal,
+    .js [data-stagger] > *,
+    .menu__link {
+      opacity: 1;
+      transform: none;
+      scale: none;
+      transition: none;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Header — logo left, tagline center, CTA + burger right -->
+  <header>
+    <div class="page header-row">
+      <a class="brand" href="#">
+        <span class="brand__mark"></span>
+        Voidworks
+      </a>
+      <span class="tagline">A digital experience studio</span>
+      <div class="header-actions">
+        <a class="pill-crimson" href="#contact">Contact Us</a>
+        <button class="burger" aria-label="Open menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Full-screen menu -->
+  <nav class="menu" aria-hidden="true">
+    <button class="menu__close" aria-label="Close menu"><span></span><span></span></button>
+    <a class="menu__link" href="#work"><span class="meta">01</span>Work</a>
+    <a class="menu__link" href="#capabilities"><span class="meta">02</span>Studio</a>
+    <a class="menu__link" href="#contact"><span class="meta">03</span>Contact</a>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero page">
+    <h1 class="display">
+      <span class="line"><span>Form</span></span>
+      <span class="line"><span>out of</span></span>
+      <span class="line"><span>void</span></span>
+    </h1>
+
+    <div class="sphere-wrap" aria-hidden="true">
+      <canvas id="orb"></canvas>
+      <div class="sphere-fallback"></div>
+    </div>
+
+    <p class="hero__lead lead">
+      We are a studio of designers and engineers shaping digital
+      monuments — sites, products, and experiences carved from
+      type, code, and restraint.
+    </p>
+  </section>
+
+  <!-- Work -->
+  <section id="work" class="page">
+    <div class="section-head reveal">
+      <span class="eyebrow">Selected Work</span>
+      <h2 class="heading-lg">Recent<br>Monuments</h2>
+    </div>
+    <div data-stagger>
+      <a class="work-item" href="#">
+        <div class="work-item__row">
+          <span class="work-item__index">01</span>
+          <span class="work-item__name">Meridian</span>
+        </div>
+        <p class="work-item__desc">Digital flagship for a private bank</p>
+      </a>
+      <a class="work-item" href="#">
+        <div class="work-item__row">
+          <span class="work-item__index">02</span>
+          <span class="work-item__name">Aurora Systems</span>
+        </div>
+        <p class="work-item__desc">Product site and design system</p>
+      </a>
+      <a class="work-item" href="#">
+        <div class="work-item__row">
+          <span class="work-item__index">03</span>
+          <span class="work-item__name">Halcyon</span>
+        </div>
+        <p class="work-item__desc">Brand identity and WebGL experience</p>
+      </a>
+      <a class="work-item" href="#">
+        <div class="work-item__row">
+          <span class="work-item__index">04</span>
+          <span class="work-item__name">Statik</span>
+        </div>
+        <p class="work-item__desc">Commerce replatform, headless build</p>
+      </a>
+      <a class="work-item" href="#">
+        <div class="work-item__row">
+          <span class="work-item__index">05</span>
+          <span class="work-item__name">Orbital</span>
+        </div>
+        <p class="work-item__desc">Launch campaign and interactive film</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- Capabilities -->
+  <section id="capabilities" class="page">
+    <div class="section-head reveal">
+      <span class="eyebrow">Capabilities</span>
+      <h2 class="heading-lg">What<br>We Do</h2>
+    </div>
+    <div class="cap-list" data-stagger>
+      <div class="cap"><span class="meta">A</span>Strategy &amp; positioning</div>
+      <div class="cap"><span class="meta">B</span>Identity &amp; art direction</div>
+      <div class="cap"><span class="meta">C</span>Web engineering</div>
+      <div class="cap"><span class="meta">D</span>Motion &amp; WebGL</div>
+    </div>
+  </section>
+
+  <!-- Statement -->
+  <section class="page">
+    <p class="statement reveal">
+      Everything that can be removed, <em>is removed.</em>
+      What remains is the work — <em>set in type large enough
+      to stand on its own.</em>
+    </p>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="page">
+    <div class="section-head reveal">
+      <span class="eyebrow">Contact</span>
+      <h2 class="heading-lg">Start a<br>Project</h2>
+    </div>
+    <form class="contact-form reveal" action="#" method="post">
+      <input class="field" type="text" name="name" placeholder="Your name" autocomplete="name">
+      <input class="field" type="email" name="email" placeholder="Email address" autocomplete="email">
+      <textarea class="field" name="message" placeholder="Tell us about the project"></textarea>
+      <div>
+        <button class="ghost" type="submit">Send inquiry</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Footer — one quiet line -->
+  <footer class="page">
+    <div class="footer-row">
+      <span>&copy; 2026 Voidworks — a design study</span>
+      <a href="mailto:hello@example.com">hello@example.com</a>
+      <span>+1 000 000 0000</span>
+    </div>
+  </footer>
+
+<script>
+  document.documentElement.classList.add('js');
+
+  /* ---------- Load sequence ---------- */
+  document.querySelectorAll('.hero .display .line > span').forEach((el, i) => {
+    el.style.setProperty('--d', `${i * 110}ms`);
+  });
+  const startHero = () => document.querySelector('.hero').classList.add('in');
+  const heroFallback = setTimeout(startHero, 700);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+      clearTimeout(heroFallback);
+      requestAnimationFrame(startHero);
+    });
+  }
+
+  /* ---------- Scroll reveals ---------- */
+  document.querySelectorAll('[data-stagger]').forEach((el) => {
+    [...el.children].forEach((child, i) => child.style.setProperty('--d', `${i * 90}ms`));
+  });
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal, [data-stagger]').forEach((el) => io.observe(el));
+
+  /* ---------- Menu overlay ---------- */
+  const menu = document.querySelector('.menu');
+  const burger = document.querySelector('.burger');
+  const setMenu = (open) => {
+    menu.classList.toggle('open', open);
+    menu.setAttribute('aria-hidden', String(!open));
+    burger.setAttribute('aria-expanded', String(open));
+  };
+  burger.addEventListener('click', () => setMenu(true));
+  menu.querySelector('.menu__close').addEventListener('click', () => setMenu(false));
+  menu.querySelectorAll('.menu__link').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+
+  /* ---------- Obsidian sphere — raymarched liquid blob ---------- */
+  (() => {
+    const canvas = document.getElementById('orb');
+    const gl = canvas.getContext('webgl', { alpha: true, antialias: true, premultipliedAlpha: true });
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!gl) {
+      canvas.style.display = 'none';
+      document.querySelector('.sphere-fallback').style.display = 'block';
+      return;
+    }
+
+    const vsrc = `
+      attribute vec2 aPos;
+      void main() { gl_Position = vec4(aPos, 0.0, 1.0); }
+    `;
+    const fsrc = `
+      precision highp float;
+      uniform vec2 uRes;
+      uniform float uT;
+
+      // Liquid displacement of a unit sphere
+      float map(vec3 p) {
+        float t = uT * 0.35;
+        float d1 = sin(p.x * 3.0 + t) * sin(p.y * 3.2 - t * 0.7) * sin(p.z * 2.8 + t * 0.5);
+        float d2 = sin(p.x * 7.0 - t * 0.6) * sin(p.y * 6.0 + t * 0.9) * sin(p.z * 5.0 - t * 0.4);
+        return length(p) - 1.0 + d1 * 0.055 + d2 * 0.018;
+      }
+
+      vec3 calcNormal(vec3 p) {
+        vec2 e = vec2(0.0015, 0.0);
+        return normalize(vec3(
+          map(p + e.xyy) - map(p - e.xyy),
+          map(p + e.yxy) - map(p - e.yxy),
+          map(p + e.yyx) - map(p - e.yyx)
+        ));
+      }
+
+      void main() {
+        vec2 uv = (2.0 * gl_FragCoord.xy - uRes) / min(uRes.x, uRes.y);
+        vec3 ro = vec3(0.0, 0.0, 2.7);
+        vec3 rd = normalize(vec3(uv, -2.3));
+
+        float d = 0.0;
+        float hit = -1.0;
+        vec3 p;
+        for (int i = 0; i < 80; i++) {
+          p = ro + rd * d;
+          float m = map(p);
+          if (m < 0.0012) { hit = 1.0; break; }
+          d += m * 0.9;
+          if (d > 5.0) break;
+        }
+
+        if (hit < 0.0) { gl_FragColor = vec4(0.0); return; }
+
+        vec3 n = calcNormal(p);
+        vec3 lightDir = normalize(vec3(0.5, 0.8, 0.6));
+        float fres = pow(1.0 - max(dot(n, -rd), 0.0), 3.0);
+        float diff = max(dot(n, lightDir), 0.0);
+
+        // Rim reflections: blue one flank, amber the other, purple above
+        vec3 rimBlue   = vec3(0.25, 0.38, 1.00);
+        vec3 rimAmber  = vec3(0.75, 0.45, 0.18);
+        vec3 rimPurple = vec3(0.52, 0.24, 0.85);
+        vec3 rim = mix(rimBlue, rimAmber, smoothstep(-0.7, 0.7, n.x));
+        rim = mix(rim, rimPurple, smoothstep(0.1, 0.9, n.y) * 0.55);
+
+        vec3 col = vec3(0.012)               // obsidian base
+                 + vec3(0.035) * diff        // faint key light
+                 + rim * fres * 0.85;        // colored rim
+
+        vec3 h = normalize(lightDir - rd);
+        col += vec3(1.0) * pow(max(dot(n, h), 0.0), 90.0) * 0.18;
+
+        gl_FragColor = vec4(col, 1.0);
+      }
+    `;
+
+    const compile = (type, src) => {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      return s;
+    };
+    const prog = gl.createProgram();
+    gl.attachShader(prog, compile(gl.VERTEX_SHADER, vsrc));
+    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fsrc));
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+      canvas.style.display = 'none';
+      document.querySelector('.sphere-fallback').style.display = 'block';
+      return;
+    }
+    gl.useProgram(prog);
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog, 'aPos');
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+    const uRes = gl.getUniformLocation(prog, 'uRes');
+    const uT = gl.getUniformLocation(prog, 'uT');
+
+    const resize = () => {
+      const dpr = Math.min(devicePixelRatio || 1, 1.5);
+      const size = canvas.clientWidth * dpr;
+      if (canvas.width !== size) {
+        canvas.width = canvas.height = size;
+        gl.viewport(0, 0, size, size);
+      }
+    };
+    resize();
+    addEventListener('resize', resize);
+
+    const draw = (ms) => {
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+      gl.uniform1f(uT, ms / 1000);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    };
+
+    if (reduced) {
+      draw(0);
+    } else {
+      const tick = (ms) => { draw(ms); requestAnimationFrame(tick); };
+      requestAnimationFrame(tick);
+    }
+  })();
+</script>
+</body>
+</html>
