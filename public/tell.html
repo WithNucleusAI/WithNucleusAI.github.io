@@ -184,12 +184,29 @@
     position: absolute;
     z-index: 1;
     pointer-events: none;
-    will-change: transform;
+    will-change: transform, border-radius;
+  }
+  /* Each shape breathes through its own morph cycle at its own tempo —
+     the shapes never hold still, and no two move at the same speed */
+  @keyframes morph-a {
+    0%, 100% { border-radius: 46% 54% 60% 40% / 50% 44% 56% 50%; }
+    33% { border-radius: 62% 38% 40% 60% / 40% 60% 44% 56%; }
+    66% { border-radius: 36% 64% 58% 42% / 62% 36% 64% 38%; }
+  }
+  @keyframes morph-b {
+    0%, 100% { border-radius: 999px 999px 24px 24px; }
+    33% { border-radius: 56% 44% 52% 48% / 56% 46% 54% 44%; }
+    66% { border-radius: 24px 999px 999px 24px; }
+  }
+  @keyframes morph-c {
+    0%, 100% { border-radius: 999px; }
+    50% { border-radius: 44% 56% 50% 50% / 60% 42% 58% 40%; }
   }
   .art--dawn {
     width: clamp(170px, 24vw, 360px);
     aspect-ratio: 1;
     border-radius: 46% 54% 60% 40% / 50% 44% 56% 50%;
+    animation: morph-a 17s ease-in-out infinite;
     background:
       radial-gradient(circle at 30% 25%, rgba(255,255,255,.5), transparent 45%),
       linear-gradient(135deg, var(--hue-pink) 5%, var(--hue-blue) 95%);
@@ -198,6 +215,7 @@
     width: clamp(150px, 18vw, 280px);
     aspect-ratio: 2 / 1;
     border-radius: 999px 999px 24px 24px;
+    animation: morph-b 13s ease-in-out infinite;
     background:
       radial-gradient(circle at 32% 18%, rgba(255,255,255,.45), transparent 48%),
       linear-gradient(120deg, var(--hue-orange) 15%, #ffd28a 100%);
@@ -207,6 +225,7 @@
     aspect-ratio: 5 / 2;
     border-radius: 999px;
     transform: rotate(-18deg);
+    animation: morph-c 21s ease-in-out infinite;
     background:
       radial-gradient(circle at 28% 22%, rgba(255,255,255,.45), transparent 45%),
       linear-gradient(114deg, var(--hue-lilac) 10%, var(--hue-lipstick) 100%);
@@ -216,9 +235,28 @@
     aspect-ratio: 2 / 1;
     border-radius: 999px;
     transform: rotate(-24deg);
+    animation: morph-c 11s ease-in-out infinite reverse;
     background:
       radial-gradient(circle at 30% 25%, rgba(255,255,255,.5), transparent 45%),
       linear-gradient(114deg, var(--hue-green) 15%, var(--hue-lightgreen) 80%);
+  }
+  .art--sea {
+    width: clamp(120px, 14vw, 220px);
+    aspect-ratio: 2 / 1;
+    border-radius: 999px;
+    animation: morph-b 15s ease-in-out infinite reverse;
+    background:
+      radial-gradient(circle at 30% 22%, rgba(255,255,255,.5), transparent 45%),
+      linear-gradient(120deg, var(--hue-blue) 10%, var(--hue-lightgreen) 100%);
+  }
+  .art--sun {
+    width: clamp(80px, 9vw, 140px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    animation: morph-a 9s ease-in-out infinite;
+    background:
+      radial-gradient(circle at 32% 26%, rgba(255,255,255,.55), transparent 48%),
+      linear-gradient(135deg, var(--hue-lipstick) 10%, var(--hue-orange) 100%);
   }
 
   /* ============================================
@@ -229,6 +267,7 @@
     top: 0; left: 0; right: 0;
     z-index: 50;
     background: var(--paper);
+    border-bottom: 1px solid var(--hairline);
     animation: fade-in .8s ease both;
   }
   .header-row {
@@ -503,7 +542,11 @@
     color: var(--ink);
     transition: color .25s ease;
   }
-  .work-item:hover .work-item__name { color: var(--muted); }
+  .work-item:nth-child(1):hover .work-item__name { color: var(--hue-green); }
+  .work-item:nth-child(2):hover .work-item__name { color: var(--hue-orange); }
+  .work-item:nth-child(3):hover .work-item__name { color: var(--hue-lipstick); }
+  .work-item:nth-child(4):hover .work-item__name { color: var(--hue-lilac); }
+  .work-item:nth-child(5):hover .work-item__name { color: var(--hue-blue); }
   .work-item__desc {
     font-size: 14px;
     line-height: 1.25;
@@ -523,7 +566,11 @@
     align-items: baseline;
     gap: 22px;
   }
-  .cap .meta { min-width: 30px; }
+  .cap .meta { min-width: 30px; font-weight: 500; }
+  .cap:nth-child(1) .meta { color: var(--hue-green); }
+  .cap:nth-child(2) .meta { color: var(--hue-orange); }
+  .cap:nth-child(3) .meta { color: var(--hue-lilac); }
+  .cap:nth-child(4) .meta { color: var(--hue-blue); }
 
   .statement {
     font-size: clamp(27px, 4.6vw, 72px);
@@ -678,7 +725,7 @@
   .js [data-stagger].in > * { opacity: 1; transform: none; }
 
   @media (prefers-reduced-motion: reduce) {
-    header, .hero__scroll, .marquee__track { animation: none; }
+    header, .hero__scroll, .marquee__track, .art { animation: none; }
     .js .lines .line > span,
     .js .hero__lead, .js .hero__scroll,
     .js .bubble, .js .tdot, .js .art,
@@ -826,6 +873,7 @@
       <span class="eyebrow reveal">Capabilities</span>
       <h2 class="heading-lg lines">How We<br>Tell It</h2>
     </div>
+    <div class="art art--sea" data-depth=".20" style="left: -2%; top: 62%;" aria-hidden="true"></div>
     <div class="cap-list" data-stagger>
       <div class="cap"><span class="meta">A</span>Narrative strategy &amp; positioning</div>
       <div class="cap"><span class="meta">B</span>Brand identity &amp; systems</div>
@@ -852,6 +900,7 @@
       <span class="eyebrow reveal">The Process</span>
       <h2 class="heading-lg lines">Three<br>Chapters</h2>
     </div>
+    <div class="art art--sun" data-depth=".24" style="right: 6%; top: 12%;" aria-hidden="true"></div>
     <div class="chapters" data-stagger>
       <div class="chapter">
         <span class="chapter__num">01</span>
@@ -1125,7 +1174,7 @@
   /* The glide loop */
   const cur = { x: innerWidth * 0.72, y: innerHeight * 0.45, size: 600 };
   const dotState = dots.map(() => ({ x: cur.x, y: cur.y }));
-  const DOT_K = [0.055, 0.04, 0.028];
+  const DOT_K = [0.10, 0.075, 0.055];
   const DOT_OFF = [
     { x: -0.30, y: 0.44 },
     { x: -0.40, y: 0.56 },
@@ -1134,6 +1183,7 @@
   let prevX = cur.x;
   let prevScroll = scrollY;
   let scrollVel = 0;
+  let artKick = 0;
   let scrubCur = 0;
   let marqueeX = 0;
   let lastMs = 0;
@@ -1190,30 +1240,40 @@
 
     const scale = cur.size / BASE;
     const sx = Math.max(cur.size * 0.3, Math.min(innerWidth - cur.size * 0.3, cur.x - scrollX));
-    const sy = cur.y - scrollY;
+    /* Never let the cloud ride up into the header band */
+    const sy = Math.max(88 + cur.size * 0.5, cur.y - scrollY);
     bubble.style.transform =
       `translate3d(${sx - BASE / 2 + swayX}px, ${sy - BASE / 2 + swayY}px, 0) rotate(${rot}deg) scale(${scale})`;
 
+    /* Dots chase the bubble's on-screen position so they stay attached
+       even when the cloud is held below the header */
     dots.forEach((dot, i) => {
       const off = DOT_OFF[i];
-      const tx = cur.x + off.x * cur.size + swayX * (0.6 - i * 0.15);
-      const ty = cur.y + off.y * cur.size + swayY * (0.6 - i * 0.15);
+      const tx = sx + off.x * cur.size + swayX * (0.6 - i * 0.15);
+      const ty = sy + off.y * cur.size + swayY * (0.6 - i * 0.15);
       const st = dotState[i];
       const dk = reduced ? 1 : DOT_K[i];
       st.x += (tx - st.x) * dk;
       st.y += (ty - st.y) * dk;
       const ds = Math.max(0.4, scale);
-      dot.style.transform = `translate3d(${st.x - scrollX}px, ${st.y - scrollY}px, 0) scale(${ds})`;
+      dot.style.transform = `translate3d(${st.x}px, ${st.y}px, 0) scale(${ds})`;
     });
 
-    /* Colored artifacts drift on parallax */
+    /* Colored artifacts — each with its own drift amplitude and tempo,
+       swelling gently when the scroll moves fast */
+    artKick += (Math.min(1, Math.abs(scrollVel) / 34) - artKick) * 0.06;
     if (!reduced) {
       arts.forEach((a, i) => {
         const rel = (a.y - scrollY) - innerHeight * 0.5;
         const py = -rel * a.depth;
-        const dx = Math.sin(t * 0.4 + i * 2.1) * 8;
-        const dr = Math.sin(t * 0.3 + i * 1.4) * 3;
-        a.el.style.transform = `translate3d(${dx}px, ${py}px, 0) rotate(${a.rot + dr}deg)`;
+        const ampX = 16 + (i % 3) * 14;
+        const spd = 0.28 + (i % 4) * 0.11;
+        const dx = Math.sin(t * spd + i * 2.1) * ampX;
+        const dy = Math.cos(t * spd * 0.8 + i * 1.7) * (10 + (i % 2) * 8);
+        const dr = Math.sin(t * 0.22 + i * 1.4) * (5 + (i % 3) * 3);
+        const sc = 1 + Math.sin(t * spd * 0.6 + i) * 0.04 + artKick * 0.14;
+        a.el.style.transform =
+          `translate3d(${dx}px, ${py + dy}px, 0) rotate(${a.rot + dr}deg) scale(${sc})`;
       });
     }
 
