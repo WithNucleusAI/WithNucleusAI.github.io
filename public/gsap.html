@@ -209,7 +209,7 @@
     pointer-events: none;
     z-index: 1;
     filter: saturate(1.05);
-    animation: blob-drift 14s ease-in-out infinite;
+    animation: blob-drift 9s ease-in-out infinite;
   }
   .blob--splash {
     width: clamp(160px, 24vw, 360px);
@@ -246,7 +246,7 @@
   }
   @keyframes blob-drift {
     0%, 100% { translate: 0 0; rotate: 0deg; }
-    50% { translate: 0 -18px; rotate: 2deg; }
+    50% { translate: 0 -30px; rotate: 4deg; }
   }
 
   /* ============================================
@@ -316,7 +316,7 @@
   .tool__shape {
     width: clamp(220px, 28vw, 420px);
     aspect-ratio: 1;
-    animation: blob-drift 16s ease-in-out infinite;
+    animation: blob-drift 12s ease-in-out infinite;
   }
   .tool__shape--scroll {
     border-radius: 46% 54% 60% 40% / 50% 44% 56% 50%;
@@ -352,7 +352,7 @@
 
   .tool__copy { text-align: left; }
   .tool__copy .eyebrow { display: block; margin-bottom: 20px; color: var(--surface-50); font-size: 16px; }
-  .tool__label { font-size: 19px; font-weight: 400; margin-bottom: 14px; }
+  .tool__label { display: block; font-size: 19px; font-weight: 400; margin-bottom: 14px; }
   .tool__label--scroll { color: var(--pink); }
   .tool__label--svg { color: var(--orangey); }
   .tool__label--text { color: var(--lilac); }
@@ -484,14 +484,95 @@
   }
 
   /* ============================================
-     Reveal on scroll
+     Motion — load sequence
      ============================================ */
-  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1); }
-  .reveal.in { opacity: 1; transform: none; }
+  .banner, .nav { animation: fade-down .7s cubic-bezier(.22,1,.36,1) both; }
+  .nav { animation-delay: .08s; }
+  @keyframes fade-down {
+    from { opacity: 0; transform: translateY(-14px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* Headline letters rise out of a clipped line box.
+     The padding/negative-margin pair leaves room for descenders
+     that lh 0.9 would otherwise clip. */
+  .hero__headline .line {
+    display: block;
+    overflow: hidden;
+    padding: .1em .05em .14em;
+    margin: -.1em -.05em -.14em;
+  }
+  .js .hero__headline .ch {
+    display: inline-block;
+    transform: translateY(120%);
+    transition: transform .9s cubic-bezier(.16,1,.3,1);
+    transition-delay: var(--d, 0s);
+  }
+  .hero--in .hero__headline .ch { transform: none; }
+
+  /* Blobs pop in with overshoot, then keep drifting —
+     entrance uses opacity/scale, drift animates translate/rotate,
+     so the two never fight */
+  .js .blob {
+    opacity: 0;
+    scale: .2;
+    transition: opacity .7s ease, scale 1s cubic-bezier(.34,1.56,.64,1);
+  }
+  .js .blob--dome { transition-delay: .35s; }
+  .js .blob--splash { transition-delay: .5s; }
+  .js .blob--pill { transition-delay: .65s; }
+  .hero--in .blob { opacity: 1; scale: 1; }
+
+  .js .hero__meta > * {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1);
+  }
+  .js .hero__meta > :nth-child(1) { transition-delay: .55s; }
+  .js .hero__meta > :nth-child(2) { transition-delay: .7s; }
+  .js .hero__meta > :nth-child(3) { transition-delay: .85s; }
+  .hero--in .hero__meta > * { opacity: 1; transform: none; }
+
+  /* ============================================
+     Motion — scroll-triggered reveals
+     ============================================ */
+  .js .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1);
+  }
+  .js .reveal-zoom {
+    opacity: 0;
+    scale: .82;
+    transition: opacity .9s ease, scale 1.1s cubic-bezier(.22,1,.36,1);
+  }
+  .js [data-stagger] > * {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1);
+    transition-delay: var(--d, 0s);
+  }
+  .js .reveal.in { opacity: 1; transform: none; }
+  .js .reveal-zoom.in { opacity: 1; scale: 1; }
+  .js [data-stagger].in > * { opacity: 1; transform: none; }
+
+  /* Showcase preview blobs swell on hover */
+  .card__preview::after { transition: scale .5s cubic-bezier(.22,1,.36,1); }
+  .card:hover .card__preview::after { scale: 1.12; }
 
   @media (prefers-reduced-motion: reduce) {
-    .blob, .tool__shape { animation: none; }
-    .reveal { opacity: 1; transform: none; transition: none; }
+    .banner, .nav, .blob, .tool__shape { animation: none; }
+    .js .blob,
+    .js .hero__headline .ch,
+    .js .hero__meta > *,
+    .js .reveal,
+    .js .reveal-zoom,
+    .js [data-stagger] > * {
+      opacity: 1;
+      transform: none;
+      scale: none;
+      transition: none;
+    }
   }
 </style>
 </head>
@@ -529,7 +610,7 @@
     <div class="blob blob--pill" aria-hidden="true"></div>
     <div class="blob blob--dome" aria-hidden="true"></div>
 
-    <h1 class="hero__headline">Animate<br>everything</h1>
+    <h1 class="hero__headline"><span class="line">Animate</span><span class="line">everything</span></h1>
 
     <div class="hero__meta">
       <span class="eyebrow">A wildly robust JavaScript animation library</span>
@@ -567,8 +648,8 @@
       <div class="hairline"></div>
 
       <div class="tool reveal">
-        <div class="tool__art"><div class="tool__shape tool__shape--scroll"></div></div>
-        <div class="tool__copy">
+        <div class="tool__art reveal-zoom"><div class="tool__shape tool__shape--scroll"></div></div>
+        <div class="tool__copy" data-stagger>
           <span class="tool__label tool__label--scroll">Scroll</span>
           <h3 class="tool__title">Scroll-driven storytelling, without the jank.</h3>
           <p class="tool__body">Pin sections, scrub timelines, snap to scenes, and parallax anything. The scroll position becomes your playhead — everything else stays buttery.</p>
@@ -579,8 +660,8 @@
       <div class="hairline"></div>
 
       <div class="tool reveal">
-        <div class="tool__art"><div class="tool__shape tool__shape--svg"></div></div>
-        <div class="tool__copy">
+        <div class="tool__art reveal-zoom"><div class="tool__shape tool__shape--svg"></div></div>
+        <div class="tool__copy" data-stagger>
           <span class="tool__label tool__label--svg">SVG</span>
           <h3 class="tool__title">Draw, morph, and move vectors like clay.</h3>
           <p class="tool__body">Animate strokes as they draw themselves, morph one shape into another, and send elements along any path — resolution-independent and pixel-perfect.</p>
@@ -591,8 +672,8 @@
       <div class="hairline"></div>
 
       <div class="tool reveal">
-        <div class="tool__art"><div class="tool__shape tool__shape--text"></div></div>
-        <div class="tool__copy">
+        <div class="tool__art reveal-zoom"><div class="tool__shape tool__shape--text"></div></div>
+        <div class="tool__copy" data-stagger>
           <span class="tool__label tool__label--text">Text</span>
           <h3 class="tool__title">Split, scramble, and reveal type.</h3>
           <p class="tool__body">Break headlines into characters, words, or lines and choreograph each one. Typewriters, scrambles, staggered reveals — typography that performs.</p>
@@ -603,8 +684,8 @@
       <div class="hairline"></div>
 
       <div class="tool reveal">
-        <div class="tool__art"><div class="tool__shape tool__shape--ui"></div></div>
-        <div class="tool__copy">
+        <div class="tool__art reveal-zoom"><div class="tool__shape tool__shape--ui"></div></div>
+        <div class="tool__copy" data-stagger>
           <span class="tool__label tool__label--ui">UI</span>
           <h3 class="tool__title">Flip between states with silky transitions.</h3>
           <p class="tool__body">Reorder grids, expand cards, swap layouts — record a state, make your change, and let the library animate the difference. Layout thrash, solved.</p>
@@ -624,7 +705,7 @@
         <h2>Showcase</h2>
       </div>
 
-      <div class="showcase-grid reveal">
+      <div class="showcase-grid" data-stagger>
         <div class="card" style="--card-grad: linear-gradient(135deg, var(--pink), var(--blue));">
           <div class="card__preview"></div>
           <h3 class="card__title">Summer Fair</h3>
@@ -709,12 +790,45 @@
   </footer>
 
 <script>
+  // Gate all hidden-until-animated states behind .js so the page
+  // is never blank if scripting is unavailable
+  document.documentElement.classList.add('js');
+
+  // Split the headline into letters for the staggered rise-in
+  let delay = 0;
+  document.querySelectorAll('.hero__headline .line').forEach((line) => {
+    const chars = line.textContent.split('');
+    line.textContent = '';
+    for (const c of chars) {
+      const s = document.createElement('span');
+      s.className = 'ch';
+      s.textContent = c;
+      s.style.setProperty('--d', `${delay}ms`);
+      delay += 26;
+      line.appendChild(s);
+    }
+  });
+
+  // Kick the hero once the webfont is in so letters never swap mid-flight
+  const startHero = () => document.querySelector('.hero').classList.add('hero--in');
+  const heroFallback = setTimeout(startHero, 700);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+      clearTimeout(heroFallback);
+      requestAnimationFrame(startHero);
+    });
+  }
+
+  // Scroll-triggered reveals, with per-child stagger for [data-stagger]
+  document.querySelectorAll('[data-stagger]').forEach((el) => {
+    [...el.children].forEach((child, i) => child.style.setProperty('--d', `${i * 90}ms`));
+  });
   const io = new IntersectionObserver((entries) => {
     for (const e of entries) {
       if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
     }
   }, { threshold: 0.12 });
-  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  document.querySelectorAll('.reveal, .reveal-zoom, [data-stagger]').forEach((el) => io.observe(el));
 </script>
 </body>
 </html>
