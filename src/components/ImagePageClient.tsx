@@ -131,7 +131,7 @@ export default function ImagePageClient() {
       {/* Hero */}
       <section className="min-h-screen flex flex-col items-center justify-center px-6 relative z-10">
         <motion.h1
-          className="text-4xl sm:text-7xl lg:text-8xl font-semibold tracking-[-0.02em] leading-[0.9] text-center text-white"
+          className="text-3xl sm:text-7xl lg:text-8xl font-bold tracking-[0.15em] sm:tracking-[0.20em] text-center text-white"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, ease: EASE_OUT }}
@@ -154,7 +154,7 @@ export default function ImagePageClient() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 1, ease: EASE_OUT }}
         >
-          <span className="px-5 py-2 text-[12px] sm:text-[14px] rounded-full border border-white/40 text-white/70">
+          <span className="px-5 py-2 text-[10px] sm:text-xs tracking-[0.25em] uppercase font-light border border-white/20 text-white/60">
             The 1st Sparse MoE Diffusion Transformer
           </span>
 

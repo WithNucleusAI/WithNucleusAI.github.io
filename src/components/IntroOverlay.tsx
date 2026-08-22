@@ -105,11 +105,11 @@ export default function IntroOverlay() {
                         />
                     </div>
 
-                    <h1 className="text-2xl sm:text-4xl font-semibold tracking-[-0.02em] text-white/90 animate-[fadeIn_0.4s_ease-in_0.15s_both]">
+                    <h1 className="text-lg sm:text-2xl font-semibold tracking-[0.25em] text-white/90 animate-[fadeIn_0.4s_ease-in_0.15s_both]">
                         NUCLEUS
                     </h1>
 
-                    <span className="eyebrow mt-3 text-[12px] sm:text-[13px] text-white/40 animate-[fadeIn_0.4s_ease-in_0.3s_both]">
+                    <span className="mt-2 text-[9px] sm:text-[10px] tracking-[0.2em] text-white/25 animate-[fadeIn_0.4s_ease-in_0.3s_both]">
                         General Intelligence
                     </span>
                 </div>
@@ -118,10 +118,10 @@ export default function IntroOverlay() {
             {/* Loading bar — thin, refined */}
             {(step === "loading" || step === "fading") && (
                 <div className="absolute bottom-[22vh] sm:bottom-[24vh] left-1/2 -translate-x-1/2 flex flex-col items-center gap-3">
-                    <span className="text-[10px] text-white/30">Loading</span>
-                    <div className="w-36 sm:w-48 h-[2px] rounded-full bg-white/10 overflow-hidden">
+                    <span className="text-[8px] tracking-[0.3em] text-white/20 uppercase">Loading</span>
+                    <div className="w-36 sm:w-48 h-[2px] bg-white/8 overflow-hidden">
                         <div
-                            className="h-full bg-shockingly-green/80 transition-[width] duration-75 ease-linear"
+                            className="h-full bg-white/50 transition-[width] duration-75 ease-linear"
                             style={{ width: `${loadProgress}%` }}
                         />
                     </div>

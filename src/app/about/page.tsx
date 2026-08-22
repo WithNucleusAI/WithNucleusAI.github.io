@@ -1,19 +1,12 @@
 export default function About() {
-  const pillars = [
-    { title: "Research", desc: "General intelligence and autonomous systems.", color: "text-shockingly-green" },
-    { title: "Development", desc: "Scalable, production-ready AI systems.", color: "text-blue" },
-    { title: "Collaboration", desc: "Open collaboration with the AI community.", color: "text-lilac" },
-  ];
-
   return (
     <main className="w-full">
       <section className="flex flex-col justify-center items-center px-6 sm:px-12 max-w-2xl mx-auto py-16 sm:py-28 text-center">
-        <span className="eyebrow text-surface-50 mb-4 sm:mb-6">Nucleus AI</span>
-        <h1 className="text-[44px] sm:text-[66px] font-semibold leading-[1] tracking-[-0.02em] mb-10 sm:mb-14 text-white">
+        <h1 className="text-xl sm:text-3xl leading-[1.3] font-bold tracking-[0.04em] mb-8 sm:mb-12 text-black dark:text-white">
           About
         </h1>
 
-        <div className="space-y-5 sm:space-y-7 text-[15px] sm:text-[19px] leading-[1.6] sm:leading-[1.7] text-white/75">
+        <div className="space-y-5 sm:space-y-7 text-[14px] sm:text-base leading-[1.9] font-light text-black/50 dark:text-white/45">
           <p>
             Nucleus AI is dedicated to advancing the field of artificial intelligence through innovative research
             and development. We focus on building the next generation of general intelligence systems that can
@@ -31,24 +24,20 @@ export default function About() {
           </p>
         </div>
 
-        <div className="mt-14 sm:mt-20 w-full">
-          <div className="hairline" />
-          {pillars.map((card) => (
-            <div key={card.title}>
-              <div className="py-7 sm:py-9 flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-8 text-left">
-                <h3 className={`text-[21px] sm:text-[24px] font-semibold tracking-[-0.011em] sm:w-56 shrink-0 ${card.color}`}>{card.title}</h3>
-                <p className="text-[14px] sm:text-[16px] text-surface-50 leading-[1.5]">
-                  {card.desc}
-                </p>
-              </div>
-              <div className="hairline" />
+        <div className="mt-14 sm:mt-20 grid grid-cols-1 md:grid-cols-3 gap-px bg-black/[0.04] dark:bg-white/[0.03] w-full border border-black/[0.06] dark:border-white/[0.04]">
+          {[
+            { title: "Research", desc: "General intelligence and autonomous systems." },
+            { title: "Development", desc: "Scalable, production-ready AI systems." },
+            { title: "Collaboration", desc: "Open collaboration with the AI community." },
+          ].map((card) => (
+            <div key={card.title} className="bg-white dark:bg-black p-5 sm:p-7 text-center">
+              <h3 className="text-[10px] sm:text-xs font-medium tracking-[0.2em] uppercase mb-2 text-black/60 dark:text-white/50">{card.title}</h3>
+              <p className="text-[12px] sm:text-[13px] font-light text-black/35 dark:text-white/30 leading-relaxed">
+                {card.desc}
+              </p>
             </div>
           ))}
         </div>
-
-        <a href="mailto:contact@withnucleus.ai" className="pill-btn mt-12 sm:mt-16">
-          Get in Touch
-        </a>
       </section>
     </main>
   );

@@ -135,9 +135,9 @@ export default function EscherImage() {
             const outData = ctx.createImageData(cw, ch);
             const out = outData.data;
 
-            const lineR = isDark ? 255 : 80;
-            const lineG = isDark ? 252 : 55;
-            const lineB = isDark ? 225 : 20;
+            const lineR = isDark ? 220 : 80;
+            const lineG = isDark ? 180 : 55;
+            const lineB = isDark ? 120 : 20;
 
             // Threshold in squared magnitude space
             const threshNorm = isMobile ? 0.18 : 0.22;

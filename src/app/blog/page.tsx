@@ -8,24 +8,21 @@ export default async function BlogPage() {
 
     return (
         <div className="max-w-2xl mx-auto py-10 px-5 sm:py-20 sm:px-6 text-left w-full box-border select-text">
-            <div className="mb-8 sm:mb-14 pb-6 sm:pb-8 border-b border-surface-25">
-                <span className="eyebrow text-surface-50 block mb-4">The Journal</span>
-                <h1 className="text-[44px] sm:text-[66px] font-semibold leading-[1] tracking-[-0.02em] text-pink">
-                    Blog
-                </h1>
-            </div>
+            <h1 className="text-xl sm:text-3xl mb-8 sm:mb-14 pb-4 sm:pb-6 font-bold tracking-[0.04em] text-black dark:text-white border-b border-black/[0.06] dark:border-white/[0.04]">
+                Blog
+            </h1>
             <div>
                 {posts.map((post, i) => (
-                    <div key={post.slug} className="py-5 sm:py-6 border-b border-surface-25">
+                    <div key={post.slug} className="py-5 sm:py-6 border-b border-black/[0.06] dark:border-white/[0.06]">
                         <div className="flex items-start gap-3 sm:gap-5">
-                            <span className="text-[12px] sm:text-[13px] font-mono tabular-nums text-pink/70 pt-1 shrink-0 w-5">
+                            <span className="text-[10px] sm:text-[11px] font-mono tabular-nums text-black/25 dark:text-white/20 pt-0.5 shrink-0 w-5">
                                 {String(i + 1).padStart(2, '0')}
                             </span>
                             <div className="flex-1 min-w-0">
-                                <h2 className="text-[16px] sm:text-[19px] font-medium text-white leading-snug mb-1.5 tracking-[-0.011em]">
+                                <h2 className="text-[14px] sm:text-base font-medium text-black/75 dark:text-white/70 leading-snug mb-1.5">
                                     {post.title}
                                 </h2>
-                                <span className="text-[13px] sm:text-[14px] text-surface-50">
+                                <span className="text-[10px] sm:text-[11px] tracking-[0.1em] uppercase text-black/30 dark:text-white/25">
                                     Coming Soon
                                 </span>
                             </div>
