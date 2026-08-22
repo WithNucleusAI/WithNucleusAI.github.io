@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tween — Animate everything</title>
+<meta name="description" content="A design-study recreation of a dark-canvas motion-library landing page.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ============================================
+     Tokens
+     ============================================ */
+  :root {
+    --just-black: #0e100f;
+    --surface-cream: #fffce1;
+    --surface-50: #7c7c6f;
+    --surface-25: #42433d;
+    --off-black: #191919;
+    --shockingly-green: #0ae448;
+    --light-green: #abff84;
+    --orangey: #ff8709;
+    --pink: #fec5fb;
+    --lilac: #9d95ff;
+    --blue: #00bae2;
+    --core-green: #dfffd1;
+    --lipstick-pink: #f100cb;
+    --gradient-green: linear-gradient(114.41deg, #0ae448 20.74%, #abff84 65.5%);
+
+    --font-sans: 'Inter Tight', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --page-max: 1280px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--just-black);
+    color: var(--surface-cream);
+    font-family: var(--font-sans);
+    font-size: 19px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    overflow-x: hidden;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; }
+
+  .wrap {
+    max-width: var(--page-max);
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ============================================
+     Buttons — outlined ghost pills only
+     ============================================ */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid var(--surface-cream);
+    border-radius: 100px;
+    background: transparent;
+    color: var(--surface-cream);
+    font-family: var(--font-sans);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    padding: 15px 24px;
+    cursor: pointer;
+    transition: opacity .2s ease;
+  }
+  .pill:hover { opacity: .8; }
+
+  .pill--sm { font-size: 15px; padding: 9px 18px; }
+
+  /* Primary CTA — the single chromatic control: gradient stroke, ghost fill */
+  .pill--gradient {
+    position: relative;
+    border: none;
+    padding: 16.5px 25.5px;
+  }
+  .pill--gradient.pill--sm { padding: 10.5px 19.5px; }
+  .pill--gradient::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 100px;
+    padding: 1.5px;
+    background: var(--gradient-green);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* ============================================
+     Curly-bracket annotation
+     ============================================ */
+  .eyebrow {
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--surface-cream);
+  }
+  .eyebrow::before { content: '{ '; opacity: .55; }
+  .eyebrow::after  { content: ' }'; opacity: .55; }
+
+  .hairline { height: 1px; width: 100%; background: var(--surface-25); }
+
+  /* ============================================
+     Announcement banner
+     ============================================ */
+  .banner {
+    width: 100%;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.4;
+    letter-spacing: -0.14px;
+    padding: 10px 16px;
+  }
+  .banner a { color: var(--shockingly-green); }
+  .banner a:hover { text-decoration: underline; }
+
+  /* ============================================
+     Nav
+     ============================================ */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 0;
+  }
+  .nav__mark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--shockingly-green);
+  }
+  .nav__mark svg { display: block; }
+  .nav__links {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .nav__links a:not(.pill) {
+    font-size: 16px;
+    padding: 10px 12px;
+    color: var(--surface-cream);
+    opacity: .85;
+    transition: opacity .15s ease;
+  }
+  .nav__links a:not(.pill):hover { opacity: 1; }
+  .nav__cta { display: flex; align-items: center; gap: 10px; }
+  @media (max-width: 860px) {
+    .nav__links a:not(.pill) { display: none; }
+  }
+
+  /* ============================================
+     Hero — edge-bleeding display type
+     ============================================ */
+  .hero {
+    position: relative;
+    padding: clamp(64px, 10vw, 140px) 0 clamp(56px, 8vw, 120px);
+  }
+  .hero__headline {
+    font-size: clamp(64px, 15.5vw, 224px);
+    font-weight: 600;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+  .hero__meta {
+    margin-top: clamp(40px, 6vw, 88px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    position: relative;
+    z-index: 2;
+  }
+  .hero__meta .eyebrow { color: var(--surface-50); }
+  .hero__sub {
+    max-width: 560px;
+    text-align: center;
+    font-size: 23px;
+    line-height: 1.38;
+    letter-spacing: -0.23px;
+    color: var(--surface-cream);
+    opacity: .85;
+  }
+
+  /* Decorative organic shapes — lit from within, never shadowed */
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+    filter: saturate(1.05);
+    animation: blob-drift 14s ease-in-out infinite;
+  }
+  .blob--splash {
+    width: clamp(160px, 24vw, 360px);
+    height: clamp(160px, 24vw, 360px);
+    right: clamp(-60px, -4vw, -20px);
+    top: 8%;
+    border-radius: 58% 42% 55% 45% / 48% 55% 45% 52%;
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,.35), transparent 42%),
+      linear-gradient(135deg, var(--pink) 10%, var(--lipstick-pink) 65%, var(--lilac) 100%);
+  }
+  .blob--pill {
+    width: clamp(120px, 18vw, 280px);
+    height: clamp(60px, 9vw, 140px);
+    left: clamp(-40px, -2vw, -10px);
+    bottom: 26%;
+    border-radius: 999px;
+    transform: rotate(-24deg);
+    background:
+      radial-gradient(circle at 30% 25%, rgba(255,255,255,.4), transparent 45%),
+      linear-gradient(114deg, var(--shockingly-green) 15%, var(--light-green) 80%);
+    animation-delay: -5s;
+  }
+  .blob--dome {
+    width: clamp(110px, 15vw, 230px);
+    height: clamp(55px, 7.5vw, 115px);
+    left: 12%;
+    top: 4%;
+    border-radius: 999px 999px 0 0;
+    background:
+      radial-gradient(circle at 35% 20%, rgba(255,255,255,.35), transparent 50%),
+      linear-gradient(120deg, var(--orangey) 20%, #ffc06a 90%);
+    animation-delay: -9s;
+  }
+  @keyframes blob-drift {
+    0%, 100% { translate: 0 0; rotate: 0deg; }
+    50% { translate: 0 -18px; rotate: 2deg; }
+  }
+
+  /* ============================================
+     Sections
+     ============================================ */
+  section { position: relative; }
+  .section-pad { padding: clamp(64px, 9vw, 120px) 0; }
+
+  .why { text-align: center; }
+  .why .eyebrow { display: block; margin-bottom: 32px; color: var(--surface-50); }
+  .why__headline {
+    font-size: clamp(34px, 5.2vw, 66px);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    max-width: 980px;
+    margin: 0 auto;
+  }
+  .why__headline .c-scroll { color: var(--pink); }
+  .why__headline .c-svg { color: var(--orangey); }
+  .why__headline .c-text { color: var(--lilac); }
+  .why__headline .c-ui { color: var(--blue); }
+  .why__headline .c-core { color: var(--shockingly-green); }
+  .why__body {
+    max-width: 640px;
+    margin: 36px auto 0;
+    font-size: 23px;
+    line-height: 1.38;
+    letter-spacing: -0.23px;
+    opacity: .8;
+  }
+
+  /* ============================================
+     Tool feature blocks
+     ============================================ */
+  .tools-head {
+    text-align: center;
+    padding-bottom: clamp(48px, 6vw, 80px);
+  }
+  .tools-head .eyebrow { display: block; margin-bottom: 28px; color: var(--surface-50); }
+  .tools-head h2 {
+    font-size: clamp(40px, 7.8vw, 101px);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.011em;
+  }
+
+  .tool {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(32px, 6vw, 96px);
+    align-items: center;
+    padding: clamp(56px, 7vw, 96px) 0;
+  }
+  .tool:nth-child(even) .tool__art { order: 2; }
+  @media (max-width: 820px) {
+    .tool { grid-template-columns: 1fr; }
+    .tool:nth-child(even) .tool__art { order: 0; }
+  }
+
+  .tool__art {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: clamp(220px, 30vw, 400px);
+  }
+  .tool__shape {
+    width: clamp(220px, 28vw, 420px);
+    aspect-ratio: 1;
+    animation: blob-drift 16s ease-in-out infinite;
+  }
+  .tool__shape--scroll {
+    border-radius: 46% 54% 60% 40% / 50% 44% 56% 50%;
+    background:
+      radial-gradient(circle at 30% 25%, rgba(255,255,255,.45), transparent 45%),
+      linear-gradient(135deg, var(--pink) 5%, var(--blue) 95%);
+  }
+  .tool__shape--svg {
+    aspect-ratio: 2 / 1;
+    align-self: center;
+    border-radius: 999px 999px 24px 24px;
+    background:
+      radial-gradient(circle at 32% 18%, rgba(255,255,255,.4), transparent 48%),
+      linear-gradient(120deg, var(--orangey) 15%, #ffd28a 100%);
+    animation-delay: -4s;
+  }
+  .tool__shape--text {
+    border-radius: 999px;
+    aspect-ratio: 5 / 2;
+    transform: rotate(-18deg);
+    background:
+      radial-gradient(circle at 28% 22%, rgba(255,255,255,.4), transparent 45%),
+      linear-gradient(114deg, var(--lilac) 10%, var(--lipstick-pink) 100%);
+    animation-delay: -8s;
+  }
+  .tool__shape--ui {
+    border-radius: 54% 46% 42% 58% / 46% 56% 44% 54%;
+    background:
+      radial-gradient(circle at 34% 26%, rgba(255,255,255,.45), transparent 45%),
+      linear-gradient(135deg, var(--blue) 10%, var(--core-green) 100%);
+    animation-delay: -12s;
+  }
+
+  .tool__copy { text-align: left; }
+  .tool__copy .eyebrow { display: block; margin-bottom: 20px; color: var(--surface-50); font-size: 16px; }
+  .tool__label { font-size: 19px; font-weight: 400; margin-bottom: 14px; }
+  .tool__label--scroll { color: var(--pink); }
+  .tool__label--svg { color: var(--orangey); }
+  .tool__label--text { color: var(--lilac); }
+  .tool__label--ui { color: var(--blue); }
+  .tool__title {
+    font-size: clamp(30px, 3.4vw, 44px);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin-bottom: 20px;
+  }
+  .tool__body {
+    font-size: 23px;
+    line-height: 1.38;
+    letter-spacing: -0.23px;
+    opacity: .8;
+    margin-bottom: 32px;
+    max-width: 520px;
+  }
+
+  /* ============================================
+     Showcase
+     ============================================ */
+  .showcase-head { text-align: center; padding-bottom: clamp(40px, 5vw, 64px); }
+  .showcase-head .eyebrow { display: block; margin-bottom: 28px; color: var(--surface-50); }
+  .showcase-head h2 {
+    font-size: clamp(40px, 6vw, 76px);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.011em;
+  }
+  .showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 980px) { .showcase-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 620px) { .showcase-grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--off-black);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: left;
+    transition: transform .3s cubic-bezier(.22,1,.36,1);
+  }
+  .card:hover { transform: translateY(-4px); }
+  .card__preview {
+    aspect-ratio: 16 / 9;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    background: var(--just-black);
+    position: relative;
+    overflow: hidden;
+  }
+  .card__preview::after {
+    content: '';
+    position: absolute;
+    width: 55%;
+    aspect-ratio: 1;
+    left: 50%;
+    top: 50%;
+    translate: -50% -38%;
+    border-radius: 52% 48% 56% 44% / 46% 54% 46% 54%;
+    background:
+      radial-gradient(circle at 32% 26%, rgba(255,255,255,.4), transparent 46%),
+      var(--card-grad, linear-gradient(135deg, var(--pink), var(--blue)));
+  }
+  .card__title {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.011em;
+    margin-bottom: 8px;
+  }
+  .card__tag { font-size: 16px; }
+  .card__tag--scroll { color: var(--pink); }
+  .card__tag--svg { color: var(--orangey); }
+  .card__tag--text { color: var(--lilac); }
+  .card__tag--ui { color: var(--blue); }
+  .card__tag--core { color: var(--shockingly-green); }
+  .card__tag--other { color: var(--light-green); }
+
+  .showcase-cta { display: flex; justify-content: center; padding-top: clamp(40px, 5vw, 64px); }
+
+  /* ============================================
+     Footer — one surface step lighter
+     ============================================ */
+  footer {
+    background: var(--off-black);
+    margin-top: clamp(64px, 9vw, 120px);
+  }
+  .footer-inner {
+    padding: clamp(60px, 7vw, 80px) 0;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    text-align: left;
+  }
+  @media (max-width: 820px) { .footer-inner { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .footer-inner { grid-template-columns: 1fr; } }
+
+  .footer-brand .nav__mark { margin-bottom: 18px; }
+  .footer-brand .eyebrow { color: var(--surface-50); font-size: 16px; }
+
+  .footer-col h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 18px;
+  }
+  .footer-col a {
+    display: block;
+    font-size: 16px;
+    color: var(--surface-50);
+    padding: 5px 0;
+    transition: color .15s ease;
+  }
+  .footer-col a:hover { color: var(--surface-cream); }
+
+  .footer-base {
+    padding: 24px 0 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 14px;
+    letter-spacing: -0.14px;
+    color: var(--surface-50);
+  }
+
+  /* ============================================
+     Reveal on scroll
+     ============================================ */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blob, .tool__shape { animation: none; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Announcement banner -->
+  <div class="banner">Tween is now 100% free — core and every plugin. <a href="#">Read&nbsp;the&nbsp;announcement</a></div>
+
+  <!-- Nav -->
+  <header class="wrap">
+    <nav class="nav">
+      <a class="nav__mark" href="#">
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+          <circle cx="13" cy="13" r="11" stroke="#0ae448" stroke-width="2.4"/>
+          <circle cx="19" cy="8" r="4" fill="#0ae448"/>
+        </svg>
+        tween
+      </a>
+      <div class="nav__links">
+        <a href="#tools">Tools</a>
+        <a href="#showcase">Showcase</a>
+        <a href="#">Docs</a>
+        <a href="#">Community</a>
+      </div>
+      <div class="nav__cta">
+        <a class="pill pill--sm" href="#tools">Tools</a>
+        <a class="pill pill--gradient pill--sm" href="#">Get Tween</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="blob blob--splash" aria-hidden="true"></div>
+    <div class="blob blob--pill" aria-hidden="true"></div>
+    <div class="blob blob--dome" aria-hidden="true"></div>
+
+    <h1 class="hero__headline">Animate<br>everything</h1>
+
+    <div class="hero__meta">
+      <span class="eyebrow">A wildly robust JavaScript animation library</span>
+      <p class="hero__sub">Scroll, SVG, text, and UI — one tiny toolkit that moves anything JavaScript can touch, at 60fps, in every browser.</p>
+      <a class="pill" href="#tools">Explore the Tools</a>
+    </div>
+  </section>
+
+  <!-- Why -->
+  <section class="section-pad why reveal">
+    <div class="wrap">
+      <span class="eyebrow">Why Tween</span>
+      <h2 class="why__headline">
+        One consistent API for
+        <span class="c-scroll">scroll</span>,
+        <span class="c-svg">SVG</span>,
+        <span class="c-text">text</span> and
+        <span class="c-ui">UI</span> —
+        built on a <span class="c-core">core</span> that never gets in your way.
+      </h2>
+      <p class="why__body">No dependencies, no jank, no wrestling with the browser. Sequence anything on a timeline and ship motion that feels engineered, not decorated.</p>
+    </div>
+  </section>
+
+  <div class="wrap"><div class="hairline"></div></div>
+
+  <!-- Tools -->
+  <section id="tools" class="section-pad">
+    <div class="wrap">
+      <div class="tools-head reveal">
+        <span class="eyebrow">Tween Tools</span>
+        <h2>Pick your discipline</h2>
+      </div>
+
+      <div class="hairline"></div>
+
+      <div class="tool reveal">
+        <div class="tool__art"><div class="tool__shape tool__shape--scroll"></div></div>
+        <div class="tool__copy">
+          <span class="tool__label tool__label--scroll">Scroll</span>
+          <h3 class="tool__title">Scroll-driven storytelling, without the jank.</h3>
+          <p class="tool__body">Pin sections, scrub timelines, snap to scenes, and parallax anything. The scroll position becomes your playhead — everything else stays buttery.</p>
+          <a class="pill" href="#">Explore Scroll</a>
+        </div>
+      </div>
+
+      <div class="hairline"></div>
+
+      <div class="tool reveal">
+        <div class="tool__art"><div class="tool__shape tool__shape--svg"></div></div>
+        <div class="tool__copy">
+          <span class="tool__label tool__label--svg">SVG</span>
+          <h3 class="tool__title">Draw, morph, and move vectors like clay.</h3>
+          <p class="tool__body">Animate strokes as they draw themselves, morph one shape into another, and send elements along any path — resolution-independent and pixel-perfect.</p>
+          <a class="pill" href="#">Explore SVG</a>
+        </div>
+      </div>
+
+      <div class="hairline"></div>
+
+      <div class="tool reveal">
+        <div class="tool__art"><div class="tool__shape tool__shape--text"></div></div>
+        <div class="tool__copy">
+          <span class="tool__label tool__label--text">Text</span>
+          <h3 class="tool__title">Split, scramble, and reveal type.</h3>
+          <p class="tool__body">Break headlines into characters, words, or lines and choreograph each one. Typewriters, scrambles, staggered reveals — typography that performs.</p>
+          <a class="pill" href="#">Explore Text</a>
+        </div>
+      </div>
+
+      <div class="hairline"></div>
+
+      <div class="tool reveal">
+        <div class="tool__art"><div class="tool__shape tool__shape--ui"></div></div>
+        <div class="tool__copy">
+          <span class="tool__label tool__label--ui">UI</span>
+          <h3 class="tool__title">Flip between states with silky transitions.</h3>
+          <p class="tool__body">Reorder grids, expand cards, swap layouts — record a state, make your change, and let the library animate the difference. Layout thrash, solved.</p>
+          <a class="pill" href="#">Explore UI</a>
+        </div>
+      </div>
+
+      <div class="hairline"></div>
+    </div>
+  </section>
+
+  <!-- Showcase -->
+  <section id="showcase" class="section-pad">
+    <div class="wrap">
+      <div class="showcase-head reveal">
+        <span class="eyebrow">Made with Tween</span>
+        <h2>Showcase</h2>
+      </div>
+
+      <div class="showcase-grid reveal">
+        <div class="card" style="--card-grad: linear-gradient(135deg, var(--pink), var(--blue));">
+          <div class="card__preview"></div>
+          <h3 class="card__title">Summer Fair</h3>
+          <span class="card__tag card__tag--scroll">Scroll</span>
+        </div>
+        <div class="card" style="--card-grad: linear-gradient(135deg, var(--orangey), #ffd28a);">
+          <div class="card__preview"></div>
+          <h3 class="card__title">Orange Crush</h3>
+          <span class="card__tag card__tag--svg">SVG</span>
+        </div>
+        <div class="card" style="--card-grad: linear-gradient(135deg, var(--lilac), var(--lipstick-pink));">
+          <div class="card__preview"></div>
+          <h3 class="card__title">Purple Haze</h3>
+          <span class="card__tag card__tag--text">Text</span>
+        </div>
+        <div class="card" style="--card-grad: linear-gradient(135deg, var(--blue), var(--core-green));">
+          <div class="card__preview"></div>
+          <h3 class="card__title">Skyfall</h3>
+          <span class="card__tag card__tag--ui">UI</span>
+        </div>
+        <div class="card" style="--card-grad: linear-gradient(114deg, var(--shockingly-green), var(--light-green));">
+          <div class="card__preview"></div>
+          <h3 class="card__title">Emerald City</h3>
+          <span class="card__tag card__tag--core">Core</span>
+        </div>
+        <div class="card" style="--card-grad: linear-gradient(135deg, var(--lipstick-pink), var(--orangey));">
+          <div class="card__preview"></div>
+          <h3 class="card__title">Neon Dusk</h3>
+          <span class="card__tag card__tag--other">Community</span>
+        </div>
+      </div>
+
+      <div class="showcase-cta reveal">
+        <a class="pill" href="#">Explore All Showcases</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="hairline"></div>
+    <div class="wrap">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <a class="nav__mark" href="#">
+            <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+              <circle cx="13" cy="13" r="11" stroke="#0ae448" stroke-width="2.4"/>
+              <circle cx="19" cy="8" r="4" fill="#0ae448"/>
+            </svg>
+            tween
+          </a>
+          <span class="eyebrow">Animation for everyone</span>
+        </div>
+        <div class="footer-col">
+          <h3>Tools</h3>
+          <a href="#">Core</a>
+          <a href="#">Scroll</a>
+          <a href="#">SVG</a>
+          <a href="#">Text</a>
+          <a href="#">UI</a>
+        </div>
+        <div class="footer-col">
+          <h3>Resources</h3>
+          <a href="#">Docs</a>
+          <a href="#">Cheat Sheet</a>
+          <a href="#">Starter Templates</a>
+          <a href="#">Changelog</a>
+        </div>
+        <div class="footer-col">
+          <h3>Community</h3>
+          <a href="#">Forum</a>
+          <a href="#">Showcase</a>
+          <a href="#">GitHub</a>
+          <a href="#">X / Twitter</a>
+        </div>
+      </div>
+      <div class="footer-base">
+        <span>&copy; 2026 Tween — a design study.</span>
+        <span>Set in Inter Tight on #0e100f.</span>
+      </div>
+    </div>
+  </footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+</script>
+</body>
+</html>
