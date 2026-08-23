@@ -1406,10 +1406,10 @@
     0%   { transform: scaleY(.75) scaleX(1.05); opacity: .9; }
     100% { transform: scaleY(1.2) scaleX(.85); opacity: 1; }
   }
-  @media (max-width: 700px) { #fleet { display: none; } }
-  /* On phones the travelling cloud can't clear full-width text — the
-     mobile read is clean editorial; the animated layer is a desktop stage */
-  @media (max-width: 700px) { .bubble, .tdot { display: none; } }
+  @media (max-width: 900px) { #fleet { display: none; } }
+  /* On phones and tablets the travelling cloud can't clear the type — the
+     small-screen read is clean editorial; the animated layer is a desktop stage */
+  @media (max-width: 900px) { .bubble, .tdot { display: none; } }
 
   @media (prefers-reduced-motion: reduce) {
     header, .hero__scroll, .marquee__track, .art, .deco svg,
@@ -2291,10 +2291,10 @@
     const heroAnchor = anchors.find((a) => a.hero);
     const l2 = document.querySelector('#heroHeadline .line:nth-child(2) > span');
     if (heroAnchor && l2) {
-      heroAnchor.size = Math.min(heroAnchor.size, innerWidth * 0.42);
+      heroAnchor.size = Math.min(heroAnchor.size, innerWidth * 0.30);
       const wordRight = l2.getBoundingClientRect().right + scrollX;
-      const clear = wordRight + heroAnchor.size / 2 + 34;
-      const cap = innerWidth - heroAnchor.size * 0.32;
+      const clear = wordRight + heroAnchor.size / 2 + 30;
+      const cap = innerWidth - heroAnchor.size * 0.28;
       heroAnchor.x = Math.min(Math.max(heroAnchor.x, clear), cap);
     }
     const sb = document.getElementById('scrubBand');
