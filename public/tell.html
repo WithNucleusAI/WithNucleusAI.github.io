@@ -530,6 +530,8 @@
     left: 0; top: 0;
     height: 300px;
     width: auto;
+    max-width: none;   /* the sandbox injects img{max-width:100%}; our
+                          zero-width fixed host would clamp it to 0 */
     transform: translate(-50%, -54%);
     transform-origin: 50% 62%;
     opacity: 0;
