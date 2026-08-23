@@ -1001,6 +1001,90 @@
     transition: opacity .8s ease !important;
   }
 
+  /* ============================================
+     Scout — the scroll-following squirrel
+     ============================================ */
+  #squirrel {
+    position: fixed;
+    left: 1.6%;
+    bottom: 0;
+    width: clamp(80px, 7vw, 104px);
+    z-index: 44;
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  #squirrel svg { width: 100%; height: auto; overflow: visible; display: block; }
+  #squirrel g { transform-box: fill-box; }
+  #sqRoot   { transform-origin: 50% 92%; }
+  #sqTail   { transform-origin: 82% 86%; }
+  #sqLegB, #sqLegF { transform-origin: 50% 9%; }
+  #sqArmB   { transform-origin: 50% 12%; }
+  #sqArmF   { transform-origin: 50% 8%; }
+  #sqTorso  { transform-origin: 50% 96%; }
+  #sqHead   { transform-origin: 46% 88%; }
+  #sqEyes   { transform-origin: 50% 50%; }
+  /* z z z — only while dozing */
+  .sq-z {
+    position: absolute;
+    left: 72%;
+    top: -6%;
+    width: 60px;
+    height: 60px;
+    opacity: 0;
+    transition: opacity .4s ease;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-weight: 700;
+    color: #9b8f7e;
+  }
+  #squirrel.sleeping .sq-z { opacity: 1; }
+  .sq-z span {
+    position: absolute;
+    left: 0; top: 30px;
+    opacity: 0;
+  }
+  #squirrel.sleeping .sq-z span { animation: sq-zfloat 2.7s ease-in-out infinite; }
+  .sq-z span:nth-child(1) { font-size: 13px; animation-delay: 0s; }
+  .sq-z span:nth-child(2) { font-size: 17px; animation-delay: .9s; }
+  .sq-z span:nth-child(3) { font-size: 22px; animation-delay: 1.8s; }
+  @keyframes sq-zfloat {
+    0%   { opacity: 0; transform: translate(0, 6px) rotate(-6deg) scale(.7); }
+    20%  { opacity: .9; }
+    70%  { opacity: .8; }
+    100% { opacity: 0; transform: translate(26px, -34px) rotate(10deg) scale(1.1); }
+  }
+  @media (max-width: 700px) { #squirrel { display: none; } }
+
+  /* ============================================
+     Sky scene — rocket meets paper plane, they scatter
+     ============================================ */
+  #crashScene {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .25s ease;
+  }
+  #rocket, #plane { position: absolute; top: 0; left: 0; will-change: transform, opacity; }
+  #rocket { width: clamp(38px, 3.6vw, 50px); }
+  #plane  { width: clamp(33px, 3.2vw, 46px); }
+  #rocket svg, #plane svg { width: 100%; height: auto; display: block; overflow: visible; }
+  #rkFlame { transform-box: fill-box; transform-origin: 50% 0%; animation: rk-flame .11s steps(2, jump-none) infinite; }
+  @keyframes rk-flame {
+    0%   { transform: scaleY(.75) scaleX(1.05); opacity: .9; }
+    100% { transform: scaleY(1.2) scaleX(.85); opacity: 1; }
+  }
+  #crashPuff {
+    position: absolute; top: 0; left: 0;
+    width: 130px; height: 130px; margin: -65px 0 0 -65px;
+    border-radius: 50%; opacity: 0;
+    background: radial-gradient(circle, rgba(255,252,242,.95), rgba(255,210,63,.5) 38%, rgba(252,28,70,.18) 60%, transparent 72%);
+    will-change: transform, opacity;
+  }
+  .cdb { position: absolute; top: 0; left: 0; will-change: transform, opacity; }
+  @media (max-width: 700px) { #crashScene { display: none; } }
+
   @media (prefers-reduced-motion: reduce) {
     header, .hero__scroll, .marquee__track, .art, .deco svg,
     .artg svg, .artg .book-page, .artg .drop-body, .artg .droplet,
@@ -1291,7 +1375,7 @@
   </section>
 
   <!-- Chapters -->
-  <section class="page">
+  <section class="page" id="chaptersSection">
     <div class="section-head">
       <span class="eyebrow reveal">The Process</span>
       <h2 class="heading-lg lines">Three<br>Chapters</h2>
@@ -1374,6 +1458,88 @@
     <div class="marquee__track" id="marqueeTrack2">
       <span>Say it once — say it right —</span><span>Say it once — say it right —</span><span>Say it once — say it right —</span><span>Say it once — say it right —</span><span>Say it once — say it right —</span><span>Say it once — say it right —</span>
     </div>
+  </div>
+
+  <!-- A rocket and a paper plane cross the mid-page sky, meet, and scatter
+       — scrubbed to the chapters section's scroll span -->
+  <div id="crashScene" aria-hidden="true">
+    <div id="rocket">
+      <svg viewBox="0 0 60 96" xmlns="http://www.w3.org/2000/svg">
+        <g id="rkFlame">
+          <path d="M22 64 Q30 98 38 64 Q34 80 30 80 Q26 80 22 64 Z" fill="#ff8709"/>
+          <path d="M25 64 Q30 88 35 64 Q32 76 30 76 Q28 76 25 64 Z" fill="#ffd23f"/>
+        </g>
+        <path d="M16 52 C 5 58 3 68 6 74 L 17 66 Z" fill="#fc1c46" stroke="#0e100f" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M44 52 C 55 58 57 68 54 74 L 43 66 Z" fill="#fc1c46" stroke="#0e100f" stroke-width="2.5" stroke-linejoin="round"/>
+        <rect x="16" y="36" width="28" height="32" rx="10" fill="#fffcf2" stroke="#0e100f" stroke-width="2.5"/>
+        <path d="M30 4 C 41 16 44 26 44 40 L 16 40 C 16 26 19 16 30 4 Z" fill="#fc1c46" stroke="#0e100f" stroke-width="2.5" stroke-linejoin="round"/>
+        <circle cx="30" cy="49" r="6.5" fill="#7cc4e0" stroke="#0e100f" stroke-width="2.5"/>
+        <path d="M22 62 h16" stroke="#0e100f" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+      </svg>
+    </div>
+    <div id="plane">
+      <svg viewBox="0 0 66 44" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 9 L62 22 L18 23 Z" fill="#fffcf2"/>
+        <path d="M18 23 L62 22 L6 35 Z" fill="#e3d8bf"/>
+        <path d="M4 9 L62 22 L6 35 L18 23 Z" fill="none" stroke="#0e100f" stroke-width="2.5" stroke-linejoin="round"/>
+        <line x1="18" y1="23" x2="40" y2="21" stroke="#0e100f" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <div id="crashPuff"></div>
+    <div id="crashDebris"></div>
+  </div>
+
+  <!-- Scout — a cute squirrel who tumbles in with the burst and runs the
+       whole scroll journey, sitting and dozing off whenever you pause -->
+  <div id="squirrel" aria-hidden="true">
+    <div class="sq-z" id="sqZ"><span>z</span><span>z</span><span>z</span></div>
+    <svg viewBox="0 0 170 160" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="sqFur" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#c07b3e"/><stop offset="1" stop-color="#a5622e"/>
+        </linearGradient>
+        <linearGradient id="sqTailg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#c98a4b"/><stop offset=".7" stop-color="#a5622e"/><stop offset="1" stop-color="#8a4f22"/>
+        </linearGradient>
+      </defs>
+      <g id="sqRoot">
+        <g id="sqTail">
+          <path d="M60 128 C 20 126 6 96 12 68 C 16 44 34 20 60 18 C 46 30 40 52 46 70 C 52 90 66 104 78 112 C 74 122 68 128 60 128 Z"
+                fill="url(#sqTailg)" stroke="#6e3f1c" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M52 34 C 40 46 36 62 42 78 C 30 62 30 44 42 30 C 46 30 50 32 52 34 Z" fill="#e9c893" opacity=".8"/>
+        </g>
+        <g id="sqLegB"><ellipse cx="70" cy="140" rx="13" ry="8" fill="#8a4f22"/>
+          <rect x="62" y="112" width="15" height="26" rx="7" fill="url(#sqFur)" stroke="#6e3f1c" stroke-width="2.5"/></g>
+        <g id="sqTorso">
+          <ellipse cx="86" cy="104" rx="30" ry="34" fill="url(#sqFur)" stroke="#6e3f1c" stroke-width="3"/>
+          <ellipse cx="92" cy="112" rx="18" ry="23" fill="#f2dcb4"/>
+        </g>
+        <g id="sqLegF"><ellipse cx="100" cy="141" rx="13" ry="8" fill="#a5622e"/>
+          <rect x="93" y="113" width="15" height="27" rx="7" fill="url(#sqFur)" stroke="#6e3f1c" stroke-width="2.5"/></g>
+        <g id="sqArmB"><rect x="74" y="96" width="11" height="24" rx="5.5" fill="#a5622e" stroke="#6e3f1c" stroke-width="2"/></g>
+        <g id="sqHead">
+          <path d="M74 30 C 70 14 80 8 90 16 C 86 22 82 28 82 36 Z" fill="#a5622e" stroke="#6e3f1c" stroke-width="2.5"/>
+          <path d="M112 26 C 116 10 106 6 97 14 C 101 20 104 26 104 34 Z" fill="#c07b3e" stroke="#6e3f1c" stroke-width="2.5"/>
+          <path d="M78 24 C 76 16 82 14 87 18 C 84 21 82 24 82 30 Z" fill="#e7a6ab"/>
+          <path d="M108 20 C 110 12 104 11 100 15 C 102 18 104 21 104 27 Z" fill="#e7a6ab"/>
+          <circle cx="96" cy="54" r="27" fill="url(#sqFur)" stroke="#6e3f1c" stroke-width="3"/>
+          <ellipse cx="106" cy="64" rx="15" ry="12" fill="#f2dcb4"/>
+          <circle cx="82" cy="64" r="7" fill="#f19aa6" opacity=".45"/>
+          <circle cx="118" cy="66" r="6" fill="#f19aa6" opacity=".45"/>
+          <g id="sqEyes">
+            <circle cx="88" cy="50" r="7.5" fill="#241a12"/>
+            <circle cx="110" cy="50" r="8" fill="#241a12"/>
+            <circle cx="90.5" cy="47.5" r="2.4" fill="#fff"/>
+            <circle cx="112.5" cy="47.5" r="2.6" fill="#fff"/>
+          </g>
+          <g id="sqLids"></g>
+          <ellipse cx="116" cy="62" rx="4" ry="3.2" fill="#3a2415"/>
+          <path d="M116 65 C 116 70 112 72 108 70" fill="none" stroke="#6e3f1c" stroke-width="2" stroke-linecap="round"/>
+        </g>
+        <g id="sqArmF"><rect x="100" y="92" width="11" height="26" rx="5.5" fill="#c07b3e" stroke="#6e3f1c" stroke-width="2"/>
+          <ellipse cx="105" cy="118" rx="7" ry="5" fill="#a5622e"/></g>
+      </g>
+    </svg>
   </div>
 
   <!-- Footer -->
@@ -1692,6 +1858,170 @@
   let skewCur = 0;
   const heroLines = [...heroHeadline.querySelectorAll('.line')];
 
+  /* ================================================
+     Scout — the scroll-following squirrel. A procedural
+     bound cycle driven by scroll distance, blended into
+     a sit pose when you pause and a doze when you linger.
+     ================================================ */
+  const sqEl = document.getElementById('squirrel');
+  const sqRootG = document.getElementById('sqRoot');
+  const sqTailG = document.getElementById('sqTail');
+  const sqLegBG = document.getElementById('sqLegB');
+  const sqLegFG = document.getElementById('sqLegF');
+  const sqArmBG = document.getElementById('sqArmB');
+  const sqArmFG = document.getElementById('sqArmF');
+  const sqTorsoG = document.getElementById('sqTorso');
+  const sqHeadG = document.getElementById('sqHead');
+  const sqEyesG = document.getElementById('sqEyes');
+  const sqLerp = (a, b, t) => a + (b - a) * t;
+  const SQTAU = Math.PI * 2;
+  let sqReady = false;
+  let sqPhase = 0, sqRun = 0, sqSit = 0, sqSleep = 0;
+  let sqPrevScroll = scrollY, sqStill = 0, sqTailLag = 0;
+  let sqBlink = 1, sqBlinkT = 0, sqBlinkNext = 2;
+  let sqLean = 0, sqHopBoost = 0, sqStrides = 0, sqNextHop = 4 + Math.floor(Math.random() * 4);
+
+  function updateSquirrel(dt) {
+    if (!sqReady || reduced || !sqRootG) return;
+    const ds = scrollY - sqPrevScroll; sqPrevScroll = scrollY;
+    const ads = Math.abs(ds);
+    const moving = ads > 0.6;
+
+    sqRun += ((moving ? 1 : 0) - sqRun) * (moving ? 0.2 : 0.06);
+    sqStill = moving ? 0 : sqStill + dt;
+    sqSit  += ((sqStill > 0.6 ? 1 : 0) - sqSit) * 0.07;
+    sqSleep += ((sqStill > 3.0 ? 1 : 0) - sqSleep) * 0.028;
+
+    const speed = Math.min(1, Math.abs(scrollVel) / 22);
+    const prevPhase = sqPhase;
+    sqPhase += (ads * 0.016 + sqRun * (2.4 + speed * 3.4) * dt) * (1 - sqSit * 0.9);
+    if (Math.floor(sqPhase) !== Math.floor(prevPhase)) {
+      sqStrides++;
+      if (sqStrides >= sqNextHop && sqRun > 0.55) { sqHopBoost = 1; sqNextHop = sqStrides + 4 + Math.floor(Math.random() * 5); }
+    }
+    sqHopBoost *= (1 - dt * 2.6);
+
+    const ph = sqPhase * SQTAU;
+    const hop = Math.max(0, Math.sin((sqPhase % 1) * Math.PI));
+    const boundY = -(hop * (17 + sqHopBoost * 40)) * sqRun * (1 - sqSit);
+    sqLean += ((speed * 12 * sqRun * (1 - sqSit)) - sqLean) * 0.12;
+
+    const legB = sqLerp(-18 + 34 * Math.sin(ph), 10, sqSit);
+    const legF = sqLerp(18 - 34 * Math.sin(ph), -10, sqSit);
+    const armB = sqLerp(26 * Math.sin(ph) - 4, 34, sqSit);
+    const armF = sqLerp(-26 * Math.sin(ph) - 8, -42, sqSit);
+    const torso = sqLerp(5 * Math.sin(ph + 0.5), -10, sqSit);
+    const headRunSit = sqLerp(-3 * Math.sin(ph) - 2, 5, sqSit);
+    const head = sqLerp(headRunSit, 17, sqSleep);
+    const tailBase = sqLerp(-14 - speed * 16, 26, sqSit);
+    const tailFlow = Math.sin(ph - 0.8) * (6 + speed * 8) * sqRun * (1 - sqSit);
+    sqTailLag += ((-boundY * 0.4) - sqTailLag) * 0.16;
+    const tail = tailBase + tailFlow + sqTailLag;
+
+    sqBlinkT += dt;
+    if (sqBlinkT > sqBlinkNext) {
+      sqBlink = 0;
+      if (sqBlinkT > sqBlinkNext + 0.1) { sqBlink = 1; sqBlinkT = 0; sqBlinkNext = 1.8 + Math.random() * 3.5; }
+    }
+    const eyeScale = sqLerp(sqBlink, 0.05, Math.min(1, sqSleep * 1.5));
+
+    sqRootG.style.transform = `translate(0px, ${boundY.toFixed(2)}px) rotate(${sqLean.toFixed(2)}deg)`;
+    sqLegBG.style.transform = `rotate(${legB.toFixed(2)}deg)`;
+    sqLegFG.style.transform = `rotate(${legF.toFixed(2)}deg)`;
+    sqArmBG.style.transform = `rotate(${armB.toFixed(2)}deg)`;
+    sqArmFG.style.transform = `rotate(${armF.toFixed(2)}deg)`;
+    sqTorsoG.style.transform = `rotate(${torso.toFixed(2)}deg)`;
+    sqHeadG.style.transform = `rotate(${(head * 0.4).toFixed(2)}deg) translateY(${(sqSleep * 3).toFixed(2)}px)`;
+    sqTailG.style.transform = `rotate(${tail.toFixed(2)}deg)`;
+    sqEyesG.style.transform = `scaleY(${eyeScale.toFixed(3)})`;
+
+    const sleeping = sqSleep > 0.5;
+    if (sleeping !== sqEl.classList.contains('sleeping')) sqEl.classList.toggle('sleeping', sleeping);
+  }
+
+  /* Scout tumbles in out of the blast, then lands and takes over */
+  function sqDropIn() {
+    if (!sqEl) return;
+    if (reduced || innerWidth < 700 || !('animate' in Element.prototype)) {
+      sqEl.style.opacity = '1'; sqReady = true; sqPrevScroll = scrollY; return;
+    }
+    sqEl.style.opacity = '1';
+    const from = -(innerHeight * 0.92);
+    sqEl.animate(
+      [
+        { transform: `translateY(${from}px) rotate(-260deg) scale(.7)`, opacity: 0 },
+        { transform: `translateY(${from}px) rotate(-260deg) scale(.7)`, opacity: 1, offset: .06 },
+        { transform: 'translateY(-16px) rotate(10deg) scale(1.04)', offset: .8 },
+        { transform: 'translateY(2px) rotate(-3deg) scale(1)', offset: .92 },
+        { transform: 'translateY(0px) rotate(0deg) scale(1)' },
+      ],
+      { duration: 1150, easing: 'cubic-bezier(.5,0,.35,1)', fill: 'backwards' }
+    );
+    setTimeout(() => { sqReady = true; sqPrevScroll = scrollY; }, 1080);
+  }
+
+  /* ================================================
+     Sky scene — a rocket climbs and a paper plane glides
+     across the mid-page sky; they meet and scatter into
+     paper and sparks. Fully scrubbed to the chapters
+     section, so it plays and rewinds with the scroll.
+     ================================================ */
+  const crashScene = document.getElementById('crashScene');
+  const rocketEl = document.getElementById('rocket');
+  const planeEl = document.getElementById('plane');
+  const crashPuff = document.getElementById('crashPuff');
+  const crashDebrisEl = document.getElementById('crashDebris');
+  const chSec = document.getElementById('chaptersSection');
+  const CDHUES = ['#0ae448', '#ff8709', '#9d95ff', '#00bae2', '#f100cb'];
+  const debrisPieces = [];
+  (function buildDebris() {
+    if (!crashDebrisEl) return;
+    for (let i = 0; i < 15; i++) {
+      const el = document.createElement('div'); el.className = 'cdb';
+      const kind = i % 4; const s = 6 + Math.random() * 12;
+      if (kind === 0) el.style.cssText = `width:${s}px;height:${s * 0.7}px;background:#fffcf2;border:1.5px solid #0e100f;border-radius:2px`;
+      else if (kind === 1) el.style.cssText = `width:${s}px;height:${s}px;background:#fc1c46;border-radius:2px`;
+      else if (kind === 2) { const c = CDHUES[i % CDHUES.length]; el.style.cssText = `width:${s * 0.6}px;height:${s * 0.6}px;background:${c};border-radius:50%`; }
+      else el.style.cssText = `width:${s * 1.6}px;height:${s * 1.6}px;background:rgba(120,116,110,.45);border-radius:50%;filter:blur(2px)`;
+      crashDebrisEl.appendChild(el);
+      const ang = Math.random() * Math.PI * 2;
+      debrisPieces.push({ el, ox: Math.cos(ang), oy: Math.sin(ang), dist: 55 + Math.random() * 175, rot: Math.random() * 540 - 270, fall: 110 + Math.random() * 170 });
+    }
+  })();
+
+  function updateCrash() {
+    if (!crashScene || !chSec || reduced || innerWidth < 700) return;
+    const r = chSec.getBoundingClientRect();
+    const p = clamp01((innerHeight * 0.72 - r.top) / innerHeight);
+    const active = p > 0.002 && p < 0.998;
+    crashScene.style.opacity = active ? '1' : '0';
+    if (!active) return;
+    /* Meeting point sits in the clear upper-left sky, well left of the
+       travelling thought-cloud so nothing is lost against it */
+    const mx = innerWidth * 0.4, my = innerHeight * 0.19;
+    const a = clamp01(p / 0.5), b = clamp01((p - 0.5) / 0.5);
+    const ea = 1 - Math.pow(1 - a, 2.2), eb = 1 - Math.pow(1 - b, 2);
+    const rsx = innerWidth * 0.3, rsy = innerHeight * 1.16;
+    const rx = rsx + (mx - rsx) * ea + Math.sin(a * Math.PI) * innerWidth * 0.02;
+    const ry = rsy + (my - rsy) * ea;
+    rocketEl.style.opacity = p < 0.5 ? 1 : 0;
+    rocketEl.style.transform = `translate(${rx}px,${ry}px) translate(-50%,-50%) rotate(${9 + Math.sin(a * 9) * 3}deg)`;
+    const psx = -innerWidth * 0.2, psy = -innerHeight * 0.02;
+    const px = psx + (mx - psx) * ea, py = psy + (my - psy) * ea;
+    const pang = Math.atan2(my - psy, mx - psx) * 180 / Math.PI;
+    planeEl.style.opacity = p < 0.5 ? 1 : 0;
+    planeEl.style.transform = `translate(${px}px,${py}px) translate(-50%,-50%) rotate(${pang + Math.sin(a * 7) * 4}deg)`;
+    crashPuff.style.left = mx + 'px'; crashPuff.style.top = my + 'px';
+    crashPuff.style.opacity = Math.max(0, 1 - Math.abs(p - 0.5) / 0.13) * 0.95;
+    crashPuff.style.transform = `scale(${0.35 + b * 1.5})`;
+    debrisPieces.forEach((d) => {
+      const dx = d.ox * d.dist * eb;
+      const dy = d.oy * d.dist * eb + b * b * d.fall;
+      d.el.style.transform = `translate(${mx + dx}px,${my + dy}px) translate(-50%,-50%) rotate(${(d.rot * eb).toFixed(1)}deg)`;
+      d.el.style.opacity = b <= 0.001 ? 0 : (1 - b);
+    });
+  }
+
   const frame = (ms) => {
     requestAnimationFrame(frame);
     if (!t0) t0 = ms;
@@ -1842,6 +2172,9 @@
         d.el.style.transform = `translate3d(${d.x}px, ${d.y}px, 0)`;
       });
     }
+
+    updateSquirrel(dt);
+    updateCrash();
   };
   requestAnimationFrame(frame);
 
@@ -2008,6 +2341,8 @@
     bubbleHold = false;
     cur.size = 24;
     startHero();
+    /* Scout tumbles out of the blast a beat later and lands to run */
+    setTimeout(sqDropIn, 260);
   };
 
   /* Arm the artifact flights: held inside the mark through the charge
@@ -2069,7 +2404,7 @@
   const runOverture = () => {
     if (overtureDone) return;
     overtureDone = true;
-    if (reduced || innerWidth < 700 || !('animate' in Element.prototype)) { startHero(); return; }
+    if (reduced || innerWidth < 700 || !('animate' in Element.prototype)) { startHero(); sqDropIn(); return; }
 
     const html = document.documentElement;
     html.classList.add('burst-mode');   /* settles headline lines for measuring */
