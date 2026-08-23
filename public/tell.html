@@ -451,26 +451,60 @@
   }
   .menu__close span:first-child { transform: rotate(45deg); }
   .menu__close span:last-child { transform: rotate(-45deg); }
+  .menu__ghost {
+    position: absolute;
+    left: var(--margin-x); bottom: 4vh;
+    font-size: clamp(180px, 40vw, 560px);
+    font-weight: 700; line-height: .8; letter-spacing: -0.03em;
+    text-transform: uppercase;
+    color: transparent; -webkit-text-stroke: 1px rgba(14,16,15,.06);
+    pointer-events: none; user-select: none;
+    opacity: 0; transform: translateY(40px) scale(.98);
+    transition: opacity .8s ease .1s, transform .9s cubic-bezier(.22,1,.36,1) .1s;
+  }
+  .menu.open .menu__ghost { opacity: 1; transform: none; }
+  .menu__links { display: flex; flex-direction: column; position: relative; z-index: 2; }
+  .menu__links:hover .menu__link:not(:hover) { opacity: .32; }
   .menu__link {
+    --accent: var(--crimson);
     display: flex;
     align-items: baseline;
-    gap: 22px;
-    font-size: clamp(40px, 6.5vw, 91px);
+    gap: 26px;
+    padding: 8px 0;
+    font-size: clamp(40px, 6.5vw, 88px);
     font-weight: 700;
-    line-height: 1.15;
+    line-height: 1.12;
     letter-spacing: -0.02em;
     text-transform: uppercase;
     color: var(--ink);
     opacity: 0;
-    transform: translateY(36px);
-    transition: opacity .6s cubic-bezier(.22,1,.36,1), transform .6s cubic-bezier(.22,1,.36,1), color .25s ease;
+    transform: translateY(40px);
+    transition: opacity .6s cubic-bezier(.22,1,.36,1), transform .6s cubic-bezier(.22,1,.36,1);
   }
   .menu.open .menu__link { opacity: 1; transform: none; }
-  .menu.open .menu__link:nth-child(2) { transition-delay: .08s; }
-  .menu.open .menu__link:nth-child(3) { transition-delay: .16s; }
-  .menu.open .menu__link:nth-child(4) { transition-delay: .24s; }
-  .menu__link:hover { color: var(--muted); }
-  .menu__link .meta { font-size: 14px; }
+  .menu.open .menu__links .menu__link:nth-child(1) { transition-delay: .05s; }
+  .menu.open .menu__links .menu__link:nth-child(2) { transition-delay: .12s; }
+  .menu.open .menu__links .menu__link:nth-child(3) { transition-delay: .19s; }
+  .menu.open .menu__links .menu__link:nth-child(4) { transition-delay: .26s; }
+  .menu__i { font-size: 14px; font-weight: 500; color: var(--accent); align-self: flex-start; padding-top: .5em; font-variant-numeric: tabular-nums; }
+  .menu__name { position: relative; transition: color .25s ease, transform .45s cubic-bezier(.22,1,.36,1); }
+  .menu__link:hover .menu__name { color: var(--accent); transform: translateX(18px); }
+  .menu__arrow {
+    align-self: center; font-size: .5em; color: var(--accent);
+    opacity: 0; transform: translateX(-16px);
+    transition: opacity .3s ease, transform .45s cubic-bezier(.22,1,.36,1);
+  }
+  .menu__link:hover .menu__arrow { opacity: 1; transform: translateX(18px); }
+  .menu__foot {
+    position: absolute; left: var(--margin-x); right: var(--margin-x); bottom: 34px;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+    font-size: 14px; color: var(--muted); z-index: 2;
+    opacity: 0; transform: translateY(16px);
+    transition: opacity .6s ease .34s, transform .6s cubic-bezier(.22,1,.36,1) .34s;
+  }
+  .menu.open .menu__foot { opacity: 1; transform: none; }
+  .menu__foot a { color: var(--muted); transition: color .25s ease; }
+  .menu__foot a:hover { color: var(--crimson); }
 
   /* ============================================
      The thought bubble — inked on paper
@@ -1410,9 +1444,17 @@
   <!-- Full-screen menu -->
   <nav class="menu" aria-hidden="true">
     <button class="menu__close" aria-label="Close menu"><span></span><span></span></button>
-    <a class="menu__link" href="#work"><span class="meta">01</span>Stories</a>
-    <a class="menu__link" href="#capabilities"><span class="meta">02</span>Studio</a>
-    <a class="menu__link" href="#contact"><span class="meta">03</span>Contact</a>
+    <span class="menu__ghost" aria-hidden="true">Tell</span>
+    <div class="menu__links">
+      <a class="menu__link" href="#work" style="--accent: var(--hue-green);"><span class="menu__i">01</span><span class="menu__name">Stories</span><span class="menu__arrow" aria-hidden="true">→</span></a>
+      <a class="menu__link" href="#capabilities" style="--accent: var(--hue-orange);"><span class="menu__i">02</span><span class="menu__name">Studio</span><span class="menu__arrow" aria-hidden="true">→</span></a>
+      <a class="menu__link" href="#chaptersSection" style="--accent: var(--hue-lilac);"><span class="menu__i">03</span><span class="menu__name">Process</span><span class="menu__arrow" aria-hidden="true">→</span></a>
+      <a class="menu__link" href="#contact" style="--accent: var(--hue-blue);"><span class="menu__i">04</span><span class="menu__name">Contact</span><span class="menu__arrow" aria-hidden="true">→</span></a>
+    </div>
+    <div class="menu__foot">
+      <a href="mailto:hello@tell.studio">hello@tell.studio</a>
+      <span>Every company has a story.</span>
+    </div>
   </nav>
 
   <!-- The travelling thought bubble -->
