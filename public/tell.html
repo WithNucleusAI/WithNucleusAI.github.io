@@ -916,11 +916,21 @@
     opacity: 0;
     pointer-events: none;
   }
+  .ov-bloom {
+    position: fixed;
+    z-index: 92;
+    width: 46vmax;
+    height: 46vmax;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(14,16,15,.22), rgba(252,28,70,.10) 42%, rgba(14,16,15,0) 68%);
+    filter: blur(10px);
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
   .ray {
     position: fixed;
     z-index: 93;
-    width: 3px;
-    border-radius: 3px;
+    width: 2px;
     transform-origin: 50% 100%;
     pointer-events: none;
     will-change: transform, opacity;
@@ -1814,13 +1824,13 @@
      blank paper, then detonates. Ink speed-lines fire,
      colour shards blow outward, ink droplets scatter,
      and the whole page — every headline letter, every
-     artifact, the thought-cloud — is thrown out of the
-     blast and slams into place, no two pieces at once.
-     The mark itself rockets up to become the logo.
+     artifact, the thought-cloud — drifts out of the
+     blast and eases into place, no two pieces at once.
+     The mark itself floats up to become the logo.
      ================================================ */
   const HUES = ['#0ae448', '#ff8709', '#fec5fb', '#9d95ff', '#00bae2', '#f100cb', '#fc1c46'];
   let overtureDone = false;
-  const CHARGE = 660;          /* the gathering, before the blast   */
+  const CHARGE = 760;          /* the gathering, before the blast   */
   const cxv0 = () => innerWidth / 2;
   const cyv0 = () => innerHeight / 2;
 
@@ -1842,10 +1852,10 @@
       m.animate(
         [
           { transform: `translate(calc(-50% + ${ox}px), calc(-50% + ${oy}px)) scale(.3)`, opacity: 0 },
-          { transform: `translate(calc(-50% + ${ox * 0.5}px), calc(-50% + ${oy * 0.5}px)) scale(1)`, opacity: .85, offset: .55 },
+          { transform: `translate(calc(-50% + ${ox * 0.5}px), calc(-50% + ${oy * 0.5}px)) scale(.9)`, opacity: .6, offset: .55 },
           { transform: 'translate(-50%, -50%) scale(.2)', opacity: 0 },
         ],
-        { duration: 420 + Math.random() * 200, delay: 70 + Math.random() * 240, easing: 'cubic-bezier(.5,0,.75,0)', fill: 'both' }
+        { duration: 520 + Math.random() * 240, delay: 90 + Math.random() * 280, easing: 'cubic-bezier(.4,0,.5,1)', fill: 'both' }
       );
       setTimeout(() => m.remove(), CHARGE + 200);
     }
@@ -1857,50 +1867,69 @@
     const cxv = cxv0(), cyv = cyv0();
     const reach = Math.max(innerWidth, innerHeight);
 
-    /* A single breath of light — impact, not a colour wash */
+    /* A soft breath of light — a bloom, not a hard flash */
     const flash = document.createElement('div');
     flash.className = 'ov-flash';
     document.body.appendChild(flash);
     flash.animate(
-      [{ opacity: 0 }, { opacity: .78, offset: .12 }, { opacity: 0 }],
-      { duration: 300, easing: 'ease-out', fill: 'forwards' }
+      [{ opacity: 0 }, { opacity: .5, offset: .22 }, { opacity: 0 }],
+      { duration: 460, easing: 'cubic-bezier(.33,0,.3,1)', fill: 'forwards' }
     );
-    setTimeout(() => flash.remove(), 340);
+    setTimeout(() => flash.remove(), 500);
 
-    /* Comic-book speed lines fire out of the mark */
-    const NR = 26;
+    /* Soft ink bloom — the organic body of the blast, spreading and
+       melting away like a drop of ink hitting wet paper */
+    const bloom = document.createElement('div');
+    bloom.className = 'ov-bloom';
+    bloom.style.left = `${cxv}px`;
+    bloom.style.top = `${cyv}px`;
+    document.body.appendChild(bloom);
+    bloom.animate(
+      [
+        { transform: 'translate(-50%,-50%) scale(.08)', opacity: 0 },
+        { transform: 'translate(-50%,-50%) scale(.6)', opacity: .9, offset: .3 },
+        { transform: 'translate(-50%,-50%) scale(1.5)', opacity: 0 },
+      ],
+      { duration: 1000, easing: 'cubic-bezier(.22,.68,.3,1)', fill: 'forwards' }
+    );
+    setTimeout(() => bloom.remove(), 1050);
+
+    /* A few feathered wisps of motion — a whisper of energy radiating
+       out, soft and quick to fade (not hard comic rays) */
+    const NR = 15;
     for (let i = 0; i < NR; i++) {
       const ray = document.createElement('div');
       ray.className = 'ray';
-      const len = reach * (0.42 + Math.random() * 0.28);
-      const ang = (i / NR) * 360 + (Math.random() * 7 - 3.5);
+      const len = reach * (0.3 + Math.random() * 0.22);
+      const ang = (i / NR) * 360 + (Math.random() * 12 - 6);
       ray.style.height = `${len}px`;
-      ray.style.left = `${cxv - 1.5}px`;
+      ray.style.left = `${cxv - 1}px`;
       ray.style.top = `${cyv - len}px`;
-      const crimson = i % 3 === 0;
+      const crimson = i % 4 === 0;
       ray.style.background = crimson
-        ? 'linear-gradient(to top, rgba(252,28,70,.9), rgba(252,28,70,0))'
-        : 'linear-gradient(to top, rgba(14,16,15,.5), rgba(14,16,15,0))';
+        ? 'linear-gradient(to top, rgba(252,28,70,0), rgba(252,28,70,.34) 32%, rgba(252,28,70,0))'
+        : 'linear-gradient(to top, rgba(14,16,15,0), rgba(14,16,15,.2) 34%, rgba(14,16,15,0))';
       document.body.appendChild(ray);
       ray.animate(
         [
-          { transform: `rotate(${ang}deg) scaleY(0)`, opacity: .95 },
-          { transform: `rotate(${ang}deg) scaleY(1)`, opacity: .95, offset: .32 },
-          { transform: `rotate(${ang}deg) scaleY(1.04)`, opacity: 0 },
+          { transform: `rotate(${ang}deg) scaleY(0)`, opacity: 0 },
+          { transform: `rotate(${ang}deg) scaleY(.8)`, opacity: .8, offset: .4 },
+          { transform: `rotate(${ang}deg) scaleY(1.05)`, opacity: 0 },
         ],
-        { duration: 440 + Math.random() * 200, easing: 'cubic-bezier(.1,.75,.2,1)', fill: 'forwards' }
+        { duration: 520 + Math.random() * 260, delay: Math.random() * 90, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'forwards' }
       );
-      setTimeout(() => ray.remove(), 720);
+      setTimeout(() => ray.remove(), 950);
     }
 
-    /* Colour shards — a dense, varied debris field */
-    const NS = 66;
+    /* Colour shards — a soft, varied debris field that drifts out and
+       floats down like confetti settling, not shrapnel */
+    const NS = 54;
     for (let i = 0; i < NS; i++) {
       const p = document.createElement('div');
       p.className = 'shard';
       const hue = HUES[i % HUES.length];
       const shape = SHAPES[i % SHAPES.length];
-      const s = 6 + Math.random() * 20;
+      const s = 6 + Math.random() * 18;
       p.style.width = `${s}px`;
       p.style.height = `${s}px`;
       if (shape === 'circle') { p.style.borderRadius = '50%'; p.style.background = hue; }
@@ -1912,21 +1941,22 @@
       p.style.top = `${cyv}px`;
       document.body.appendChild(p);
       const ang = Math.random() * Math.PI * 2;
-      const dist = 170 + Math.random() * reach * 0.52;
+      const dist = 140 + Math.random() * reach * 0.42;
       const tx = Math.cos(ang) * dist;
-      const ty = Math.sin(ang) * dist * 0.88;
-      const rot = Math.random() * 760 - 380;
-      const fall = 70 + Math.random() * 90;
+      const ty = Math.sin(ang) * dist * 0.82;
+      const rot = Math.random() * 460 - 230;
+      const fall = 90 + Math.random() * 120;
+      const drift = (Math.random() * 40 - 20);
       p.animate(
         [
-          { transform: 'translate(-50%,-50%) scale(.15) rotate(0deg)', opacity: 1 },
-          { transform: `translate(calc(-50% + ${tx * 0.72}px), calc(-50% + ${ty * 0.72}px)) scale(1.05) rotate(${rot * 0.6}deg)`, opacity: 1, offset: .34 },
-          { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(1) rotate(${rot}deg)`, opacity: 1, offset: .62 },
-          { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty + fall}px)) scale(.8) rotate(${rot * 1.25}deg)`, opacity: 0 },
+          { transform: 'translate(-50%,-50%) scale(.4) rotate(0deg)', opacity: 0 },
+          { transform: `translate(calc(-50% + ${tx * 0.5}px), calc(-50% + ${ty * 0.5}px)) scale(1) rotate(${rot * 0.45}deg)`, opacity: 1, offset: .32 },
+          { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(.97) rotate(${rot}deg)`, opacity: 1, offset: .68 },
+          { transform: `translate(calc(-50% + ${tx + drift}px), calc(-50% + ${ty + fall}px)) scale(.82) rotate(${rot * 1.15}deg)`, opacity: 0 },
         ],
-        { duration: 1000 + Math.random() * 620, easing: 'cubic-bezier(.15,.85,.28,1)', fill: 'forwards' }
+        { duration: 1350 + Math.random() * 750, delay: Math.random() * 200, easing: 'cubic-bezier(.22,.66,.3,1)', fill: 'forwards' }
       );
-      setTimeout(() => p.remove(), 1700);
+      setTimeout(() => p.remove(), 2350);
     }
 
     /* Ink droplets — the blast throws wet ink that arcs and falls,
@@ -1942,19 +1972,19 @@
       d.style.top = `${cyv}px`;
       document.body.appendChild(d);
       const ang = Math.random() * Math.PI * 2;
-      const dist = 120 + Math.random() * reach * 0.34;
+      const dist = 100 + Math.random() * reach * 0.28;
       const tx = Math.cos(ang) * dist;
-      const ty = Math.sin(ang) * dist * 0.7 - 40;
-      const rot = Math.random() * 200 - 100;
+      const ty = Math.sin(ang) * dist * 0.62 - 30;
+      const rot = Math.random() * 160 - 80;
       d.animate(
         [
-          { transform: 'translate(-50%,-50%) scale(.2)', opacity: 1 },
+          { transform: 'translate(-50%,-50%) scale(.3)', opacity: 0 },
           { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(1) rotate(${rot}deg)`, opacity: 1, offset: .5 },
-          { transform: `translate(calc(-50% + ${tx * 1.1}px), calc(-50% + ${ty + 160 + Math.random() * 90}px)) scale(.7) rotate(${rot * 1.4}deg)`, opacity: 0 },
+          { transform: `translate(calc(-50% + ${tx * 1.08}px), calc(-50% + ${ty + 180 + Math.random() * 110}px)) scale(.72) rotate(${rot * 1.3}deg)`, opacity: 0 },
         ],
-        { duration: 1150 + Math.random() * 400, easing: 'cubic-bezier(.3,.7,.3,1)', fill: 'forwards' }
+        { duration: 1350 + Math.random() * 450, delay: Math.random() * 160, easing: 'cubic-bezier(.28,.64,.32,1)', fill: 'forwards' }
       );
-      setTimeout(() => d.remove(), 1650);
+      setTimeout(() => d.remove(), 2000);
     }
   };
 
@@ -1981,22 +2011,23 @@
       const r = el.getBoundingClientRect();
       const dx = cxv - (r.left + r.width / 2);
       const dy = cyv - (r.top + r.height / 2);
-      const spin = Math.random() * 200 - 100;
-      const stagger = (Math.hypot(dx, dy) / maxD) * 220;   /* near lands first */
+      const spin = Math.random() * 120 - 60;
+      const stagger = (Math.hypot(dx, dy) / maxD) * 200 + Math.random() * 170;   /* near settles first */
       el.animate(
         [
-          { transform: `translate(${dx}px, ${dy}px) scale(0) rotate(${spin}deg)`, opacity: .9 },
-          { transform: `translate(${dx * 0.1}px, ${dy * 0.1 - 40}px) scale(1.14) rotate(${spin * -0.18}deg)`, opacity: 1, offset: .66 },
+          { transform: `translate(${dx}px, ${dy}px) scale(.15) rotate(${spin}deg)`, opacity: 0 },
+          { transform: `translate(${dx * 0.55}px, ${dy * 0.55}px) scale(.7) rotate(${spin * 0.6}deg)`, opacity: 1, offset: .28 },
+          { transform: `translate(${dx * 0.08}px, ${dy * 0.08 - 16}px) scale(1.05) rotate(${spin * -0.1}deg)`, opacity: 1, offset: .7 },
           { transform: 'none', opacity: 1 },
         ],
-        { duration: 900 + Math.random() * 240, delay: launchDelay + stagger, easing: 'cubic-bezier(.2,.9,.24,1)', fill: 'backwards' }
+        { duration: 1050 + Math.random() * 320, delay: launchDelay + stagger, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' }
       );
     });
   };
 
   /* Arm the headline: every letter is held scaled-to-nothing inside the
-     mark, then blasted to its real place with a springy landing. Letters
-     nearest the centre land first, so the type resolves as a shock-sweep */
+     mark, then drifts out and eases into its real place. Letters nearer
+     the centre settle first, so the type resolves as a soft outward wave */
   const armLetters = (launchDelay) => {
     const cxv = cxv0(), cyv = cyv0();
     const chars = [...heroHeadline.querySelectorAll('.ch')];
@@ -2008,16 +2039,16 @@
     });
     const maxD = Math.max(1, ...measured.map((m) => m.dist));
     measured.forEach((m) => {
-      const spin = Math.random() * 150 - 75;
-      const stagger = (m.dist / maxD) * 260;
+      const spin = Math.random() * 70 - 35;
+      const stagger = (m.dist / maxD) * 200 + Math.random() * 150;
       m.el.animate(
         [
-          { transform: `translate(${m.dx}px, ${m.dy}px) scale(.2) rotate(${spin}deg)`, opacity: 0 },
-          { transform: `translate(${m.dx}px, ${m.dy}px) scale(.2) rotate(${spin}deg)`, opacity: 1, offset: .0001 },
-          { transform: `translate(${m.dx * 0.14}px, ${m.dy * 0.14}px) scale(1.12) rotate(${spin * -0.12}deg)`, opacity: 1, offset: .6 },
+          { transform: `translate(${m.dx}px, ${m.dy}px) scale(.4) rotate(${spin}deg)`, opacity: 0 },
+          { transform: `translate(${m.dx * 0.8}px, ${m.dy * 0.8}px) scale(.56) rotate(${spin * 0.7}deg)`, opacity: 1, offset: .2 },
+          { transform: `translate(${m.dx * 0.1}px, ${m.dy * 0.1}px) scale(1.03) rotate(${spin * -0.06}deg)`, opacity: 1, offset: .7 },
           { transform: 'none', opacity: 1 },
         ],
-        { duration: 720 + Math.random() * 160, delay: launchDelay + stagger, easing: 'cubic-bezier(.18,.92,.26,1)', fill: 'backwards' }
+        { duration: 900 + Math.random() * 260, delay: launchDelay + stagger, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' }
       );
     });
   };
@@ -2049,31 +2080,31 @@
     seed.style.top = `${innerHeight / 2 - 11}px`;
     document.body.appendChild(seed);
 
-    /* Charge: the mark arrives, swells, and coils tight before release */
+    /* Charge: the mark arrives, breathes in, and gathers before release */
     seed.animate(
       [
         { transform: 'scale(0)' },
-        { transform: 'scale(.9)', offset: .3 },
-        { transform: 'scale(1.5)', offset: .68 },
-        { transform: 'scale(.5)' },
+        { transform: 'scale(1)', offset: .4 },
+        { transform: 'scale(1.35)', offset: .74 },
+        { transform: 'scale(.7)' },
       ],
-      { duration: CHARGE, easing: 'cubic-bezier(.36,0,.66,-0.2)', fill: 'forwards' }
+      { duration: CHARGE, easing: 'cubic-bezier(.4,0,.5,1)', fill: 'forwards' }
     );
 
     setTimeout(() => {
       burst();
-      /* The mark rockets up and lands as the logo */
+      /* The mark floats up and settles as the logo */
       const mark = document.querySelector('.brand__mark');
       const mr = mark.getBoundingClientRect();
       const dx = mr.left + mr.width / 2 - innerWidth / 2;
       const dy = mr.top + mr.height / 2 - innerHeight / 2;
       const flight = seed.animate(
         [
-          { transform: 'scale(.5)' },
-          { transform: `translate(${dx * 0.3}px, ${dy * 1.15 - 30}px) scale(1.15)`, offset: .5 },
+          { transform: 'scale(.7)' },
+          { transform: `translate(${dx * 0.32}px, ${dy * 1.05 - 22}px) scale(1.1)`, offset: .5 },
           { transform: `translate(${dx}px, ${dy}px) scale(.72)` },
         ],
-        { duration: 720, easing: 'cubic-bezier(.34,.02,.2,1)', fill: 'forwards' }
+        { duration: 860, easing: 'cubic-bezier(.3,.1,.28,1)', fill: 'forwards' }
       );
       flight.onfinish = () => {
         html.classList.add('mark-landed');
