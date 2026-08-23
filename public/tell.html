@@ -966,6 +966,28 @@
   html.burst-mode header { animation-delay: 1.02s; }
   html.burst-mode .brand__mark { opacity: 0; transition: opacity .25s ease; }
   html.burst-mode.mark-landed .brand__mark { opacity: 1; }
+  /* The intro copy is held out through the whole drop and burst — the
+     stage stays blank behind the falling ink — then brought in later,
+     once the story has landed. (.told is added after the burst; its
+     rules follow burst-mode's so they win while both are present.) */
+  html.burst-mode .hero__lead,
+  html.burst-mode .hero__scroll {
+    opacity: 0 !important;
+    transform: translateY(22px) !important;
+    animation: none !important;
+    transition: none !important;
+  }
+  html.told .hero__lead {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: opacity 1s ease, transform 1s cubic-bezier(.22,1,.36,1) !important;
+  }
+  html.told .hero__scroll {
+    opacity: .5 !important;
+    transform: none !important;
+    animation: scroll-pulse 2.4s ease-in-out infinite !important;
+    transition: opacity .8s ease !important;
+  }
 
   @media (prefers-reduced-motion: reduce) {
     header, .hero__scroll, .marquee__track, .art, .deco svg,
@@ -1822,7 +1844,7 @@
      ================================================ */
   const HUES = ['#0ae448', '#ff8709', '#fec5fb', '#9d95ff', '#00bae2', '#f100cb', '#fc1c46'];
   let overtureDone = false;
-  const FALL = 680;            /* the ink drop's fall, before it lands */
+  const FALL = 940;            /* the ink drop's fall, before it lands */
   const cxv0 = () => innerWidth / 2;
   const cyv0 = () => innerHeight / 2;
 
@@ -2063,16 +2085,18 @@
     const H = innerHeight;
     seed.animate(
       [
-        /* enters from just above the page, elongated by its own speed */
-        { transform: `translateY(${-0.62 * H}px) scaleX(.72) scaleY(1.7)`, opacity: 1 },
-        /* accelerates, stretching into a teardrop */
-        { transform: `translateY(${-0.1 * H}px) scaleX(.78) scaleY(1.95)`, opacity: 1, offset: .8 },
-        /* rounds as it reaches the paper */
-        { transform: 'translateY(0px) scaleX(1) scaleY(1)', opacity: 1, offset: .93 },
-        /* and flattens on impact */
-        { transform: 'translateY(0px) scaleX(1.34) scaleY(.62)', opacity: 1 },
+        /* enters from just above the page, heavy and barely moving */
+        { transform: `translateY(${-0.66 * H}px) scaleX(.72) scaleY(1.62)`, opacity: 1 },
+        /* gathers weight near the top before gravity takes it */
+        { transform: `translateY(${-0.5 * H}px) scaleX(.72) scaleY(1.7)`, opacity: 1, offset: .34 },
+        /* accelerates hard, stretching into a long teardrop */
+        { transform: `translateY(${-0.08 * H}px) scaleX(.82) scaleY(2.15)`, opacity: 1, offset: .86 },
+        /* rounds as it meets the paper */
+        { transform: 'translateY(0px) scaleX(1) scaleY(.98)', opacity: 1, offset: .94 },
+        /* and flattens hard on impact */
+        { transform: 'translateY(0px) scaleX(1.5) scaleY(.52)', opacity: 1 },
       ],
-      { duration: FALL, easing: 'cubic-bezier(.5,0,.82,.34)', fill: 'forwards' }
+      { duration: FALL, easing: 'cubic-bezier(.62,0,.86,.36)', fill: 'forwards' }
     );
 
     setTimeout(() => {
@@ -2084,8 +2108,8 @@
       const dy = mr.top + mr.height / 2 - innerHeight / 2;
       const flight = seed.animate(
         [
-          { transform: 'translateY(0px) scaleX(1.34) scaleY(.62)' },
-          { transform: `translateY(${-0.06 * H}px) scaleX(.9) scaleY(1.1)`, offset: .22 },
+          { transform: 'translateY(0px) scaleX(1.5) scaleY(.52)' },
+          { transform: `translateY(${-0.06 * H}px) scaleX(.9) scaleY(1.12)`, offset: .22 },
           { transform: `translate(${dx * 0.32}px, ${dy * 1.02 - 24}px) scale(1.05)`, offset: .58 },
           { transform: `translate(${dx}px, ${dy}px) scale(.72)` },
         ],
@@ -2095,6 +2119,9 @@
         html.classList.add('mark-landed');
         setTimeout(() => seed.remove(), 220);
       };
+      /* Once the story has landed, bring the intro copy in — later, and
+         on its own, after the burst has cleared */
+      setTimeout(() => html.classList.add('told'), 1500);
       setTimeout(() => html.classList.remove('burst-mode', 'mark-landed'), 2600);
     }, FALL);
   };
