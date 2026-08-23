@@ -770,22 +770,63 @@
   .wp-name { display: block; font-size: 27px; font-weight: 500; line-height: 1.02; }
   @media (max-width: 820px) { .work-preview { display: none; } }
 
-  .cap-list { display: flex; flex-direction: column; gap: 9px; position: relative; z-index: 6; max-width: 60%; }
+  /* ============================================
+     Capabilities — a spotlight list. Hovering one
+     row focuses it (the others recede), draws an
+     accent underline and unfurls a one-line descriptor.
+     ============================================ */
+  .cap-list { position: relative; z-index: 6; max-width: 76%; }
   @media (max-width: 820px) { .cap-list { max-width: 100%; } }
   .cap {
-    font-size: 27px;
-    font-weight: 400;
-    line-height: 1.2;
-    color: var(--ink);
+    --accent: var(--crimson);
     display: flex;
-    align-items: baseline;
-    gap: 22px;
+    align-items: flex-start;
+    gap: 26px;
+    padding: 24px 0;
+    border-top: 1px solid var(--hairline);
+    transition: opacity .4s ease;
   }
-  .cap .meta { min-width: 30px; font-weight: 500; }
-  .cap:nth-child(1) .meta { color: var(--hue-green); }
-  .cap:nth-child(2) .meta { color: var(--hue-orange); }
-  .cap:nth-child(3) .meta { color: var(--hue-lilac); }
-  .cap:nth-child(4) .meta { color: var(--hue-blue); }
+  .cap:last-child { border-bottom: 1px solid var(--hairline); }
+  .cap:nth-child(1) { --accent: var(--hue-green); }
+  .cap:nth-child(2) { --accent: var(--hue-orange); }
+  .cap:nth-child(3) { --accent: var(--hue-lilac); }
+  .cap:nth-child(4) { --accent: var(--hue-blue); }
+  .cap-list:hover .cap:not(:hover) { opacity: .3; }
+  .cap__k {
+    min-width: 26px; font-size: 14px; font-weight: 500;
+    color: var(--accent); padding-top: .55em;
+    font-variant-numeric: tabular-nums;
+  }
+  .cap__body { display: flex; flex-direction: column; transition: transform .5s cubic-bezier(.22,1,.36,1); }
+  .cap:hover .cap__body { transform: translateX(16px); }
+  .cap__name {
+    font-size: clamp(24px, 3vw, 40px);
+    font-weight: 400; line-height: 1.12;
+    color: var(--ink);
+    position: relative; width: fit-content;
+    transition: color .25s ease;
+  }
+  .cap:hover .cap__name { color: var(--accent); }
+  .cap__name::after {
+    content: ''; position: absolute; left: 0; bottom: -.06em;
+    height: 2px; width: 100%; background: var(--accent);
+    transform: scaleX(0); transform-origin: left center;
+    transition: transform .5s cubic-bezier(.22,1,.36,1);
+  }
+  .cap:hover .cap__name::after { transform: scaleX(1); }
+  .cap__desc {
+    font-size: 14px; line-height: 1.35; color: var(--muted);
+    max-height: 0; opacity: 0; overflow: hidden;
+    transition: max-height .5s cubic-bezier(.22,1,.36,1), opacity .4s ease, margin-top .5s ease;
+  }
+  .cap:hover .cap__desc { max-height: 3em; opacity: 1; margin-top: 12px; }
+  .cap__arrow {
+    margin-left: auto; align-self: center;
+    font-size: 24px; color: var(--accent);
+    opacity: 0; transform: translateX(-12px);
+    transition: opacity .3s ease, transform .45s cubic-bezier(.22,1,.36,1);
+  }
+  .cap:hover .cap__arrow { opacity: 1; transform: none; }
 
   /* ============================================
      Pinned scrub band — the statement rides
@@ -1487,11 +1528,39 @@
         </g>
       </svg>
     </div>
-    <div class="cap-list" data-stagger data-skew>
-      <div class="cap"><span class="meta">A</span>Narrative strategy &amp; positioning</div>
-      <div class="cap"><span class="meta">B</span>Brand identity &amp; systems</div>
-      <div class="cap"><span class="meta">C</span>Web design &amp; engineering</div>
-      <div class="cap"><span class="meta">D</span>Motion, film &amp; illustration</div>
+    <div class="cap-list" data-stagger>
+      <div class="cap">
+        <span class="cap__k">A</span>
+        <div class="cap__body">
+          <span class="cap__name">Narrative strategy &amp; positioning</span>
+          <span class="cap__desc">The true thing you're about — and the words that carry it.</span>
+        </div>
+        <span class="cap__arrow" aria-hidden="true">→</span>
+      </div>
+      <div class="cap">
+        <span class="cap__k">B</span>
+        <div class="cap__body">
+          <span class="cap__name">Brand identity &amp; systems</span>
+          <span class="cap__desc">Marks, type and colour, with the rules that keep them alive.</span>
+        </div>
+        <span class="cap__arrow" aria-hidden="true">→</span>
+      </div>
+      <div class="cap">
+        <span class="cap__k">C</span>
+        <div class="cap__body">
+          <span class="cap__name">Web design &amp; engineering</span>
+          <span class="cap__desc">Sites that move the way the story does.</span>
+        </div>
+        <span class="cap__arrow" aria-hidden="true">→</span>
+      </div>
+      <div class="cap">
+        <span class="cap__k">D</span>
+        <div class="cap__body">
+          <span class="cap__name">Motion, film &amp; illustration</span>
+          <span class="cap__desc">A voice, a rhythm and a face for the story.</span>
+        </div>
+        <span class="cap__arrow" aria-hidden="true">→</span>
+      </div>
     </div>
     <div data-bubble data-size="400" data-clip="1" style="right: 8%; top: 30%; width: 400px; height: 400px;"></div>
   </section>
