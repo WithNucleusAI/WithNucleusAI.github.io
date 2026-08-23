@@ -1991,6 +1991,20 @@
   /* Fire the release: the page is thrown out of the blast */
   const burst = () => {
     detonate();
+    /* A soft breath through the hero as the blast lands — a gentle swell
+       that eases back to rest, emanating from the impact point */
+    if (!reduced && 'animate' in Element.prototype) {
+      const hb = heroEl.getBoundingClientRect();
+      heroEl.style.transformOrigin = `50% ${innerHeight / 2 - hb.top}px`;
+      heroEl.animate(
+        [
+          { transform: 'scale(1)' },
+          { transform: 'scale(1.022)', offset: .32 },
+          { transform: 'scale(1)' },
+        ],
+        { duration: 720, easing: 'cubic-bezier(.22,.68,.3,1)', fill: 'none' }
+      );
+    }
     /* The cloud is born from the blast point and glides to its anchor */
     bubbleHold = false;
     cur.size = 24;
