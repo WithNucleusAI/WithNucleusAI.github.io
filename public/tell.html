@@ -791,185 +791,98 @@
   @media (max-width: 760px) { .progress { display: none; } }
 
   /* ============================================
-     Work — a full-bleed split gallery. A big index of
-     stories on the left drives a large sticky stage on
-     the right that cross-fades to the hovered project.
+     Work — a young studio's short, honest list.
      ============================================ */
-  .work-split {
-    display: grid;
-    grid-template-columns: 1.1fr 1fr;
-    gap: clamp(30px, 4.5vw, 84px);
-    align-items: start;
-    position: relative;
-    z-index: 6;
-  }
-  .work-list { position: relative; }
+  .work-list { position: relative; z-index: 6; max-width: 680px; }
   .work-item {
-    --accent: var(--crimson);
-    display: block;
-    position: relative;
-    padding: clamp(20px, 2.4vw, 38px) 0 clamp(20px, 2.4vw, 38px) clamp(42px, 3.8vw, 68px);
+    display: flex; align-items: baseline; gap: 24px;
+    padding: clamp(20px, 2.2vw, 30px) 0;
     border-top: 1px solid var(--hairline);
-    cursor: none;
-    transition: opacity .4s ease;
   }
   .work-item:last-child { border-bottom: 1px solid var(--hairline); }
-  .work-item:nth-child(1) { --accent: var(--hue-green); }
-  .work-item:nth-child(2) { --accent: var(--hue-orange); }
-  .work-item:nth-child(3) { --accent: var(--hue-lipstick); }
-  .work-item:nth-child(4) { --accent: var(--hue-lilac); }
-  .work-item:nth-child(5) { --accent: var(--hue-blue); }
   .work-item__index {
-    position: absolute; left: 0; top: calc(clamp(20px, 2.4vw, 38px) + .28em);
-    font-size: 15px; font-weight: 600; color: var(--accent);
-    font-variant-numeric: tabular-nums;
-    transition: transform .5s cubic-bezier(.22,1,.36,1);
+    min-width: 26px; font-size: 13px; font-weight: 500; color: var(--muted);
+    font-variant-numeric: tabular-nums; transition: color .3s ease;
   }
   .work-item__name {
-    display: block;
-    font-size: clamp(34px, 4.7vw, 78px);
-    font-weight: 600; line-height: .98; letter-spacing: -0.02em;
-    color: var(--ink);
+    font-size: clamp(24px, 2.7vw, 40px);
+    font-weight: 500; line-height: 1.05; letter-spacing: -0.01em; color: var(--ink);
     transition: color .3s ease, transform .5s cubic-bezier(.22,1,.36,1);
   }
-  .work-item.active .work-item__name,
-  .work-item:hover .work-item__name { color: var(--accent); transform: translateX(14px); }
-  .work-item.active .work-item__index,
-  .work-item:hover .work-item__index { transform: translateX(6px); }
   .work-item__meta {
-    display: block; margin-top: 15px;
-    font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--faint);
-    transition: color .3s ease, transform .5s cubic-bezier(.22,1,.36,1);
+    margin-left: auto; align-self: center; white-space: nowrap;
+    font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: var(--faint);
+    transition: color .3s ease;
   }
-  .work-item.active .work-item__meta,
-  .work-item:hover .work-item__meta { color: var(--muted); transform: translateX(14px); }
-  .work-item__desc {
-    display: block; max-width: 42ch; margin-top: 0;
-    font-size: 14.5px; line-height: 1.4; color: var(--muted);
-    max-height: 0; opacity: 0; overflow: hidden;
-    transition: max-height .5s cubic-bezier(.22,1,.36,1), opacity .4s ease, margin-top .5s ease, transform .5s cubic-bezier(.22,1,.36,1);
+  .work-item__arrow {
+    align-self: center; font-size: 19px; color: var(--crimson);
+    opacity: 0; transform: translateX(-10px);
+    transition: opacity .3s ease, transform .45s cubic-bezier(.22,1,.36,1);
   }
-  .work-item.active .work-item__desc,
-  .work-item:hover .work-item__desc { max-height: 4.5em; opacity: .92; margin-top: 14px; transform: translateX(14px); }
-
-  /* The big sticky stage */
-  .work-stage {
-    position: sticky; top: 100px;
-    height: min(72vh, 616px);
-    border-radius: 24px; overflow: hidden;
-    box-shadow: 0 44px 100px -38px rgba(14,16,15,.5);
+  .work-item:hover .work-item__index { color: var(--crimson); }
+  .work-item:hover .work-item__name { color: var(--crimson); transform: translateX(10px); }
+  .work-item:hover .work-item__arrow { opacity: 1; transform: none; }
+  .work-note {
+    margin-top: clamp(30px, 3.2vw, 46px); max-width: 460px;
+    font-size: 15px; line-height: 1.55; color: var(--muted);
+    position: relative; z-index: 6;
   }
-  .wp-plate {
-    position: absolute; inset: 0;
-    background: linear-gradient(150deg, var(--a), var(--b));
-    opacity: 0; visibility: hidden;
-    transform: scale(1.07);
-    transition: opacity .6s ease, transform .9s cubic-bezier(.22,1,.36,1), visibility 0s linear .6s;
+  .work-note a {
+    color: var(--ink); border-bottom: 1.5px solid var(--crimson);
+    padding-bottom: 1px; transition: color .25s ease;
   }
-  .wp-plate.show { opacity: 1; visibility: visible; transform: none; z-index: 1; transition: opacity .6s ease, transform .9s cubic-bezier(.22,1,.36,1); }
-  .wp-plate::after {
-    content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
-    background: linear-gradient(to top, rgba(10,10,20,.34), rgba(10,10,20,0) 46%);
-  }
-  .wp-art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; }
-  .wp-plate.show .wp-art { animation: wp-breathe 14s ease-in-out infinite; }
-  @keyframes wp-breathe { 0%,100% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.05) rotate(1.2deg); } }
-  .wp-num {
-    position: absolute; top: 4%; right: 6%; z-index: 2;
-    font-size: clamp(96px, 13vw, 188px); font-weight: 700; line-height: .8;
-    color: rgba(255,255,255,.15); letter-spacing: -0.03em;
-    font-variant-numeric: tabular-nums;
-  }
-  .wp-cap { position: absolute; left: clamp(26px,3vw,42px); right: clamp(26px,3vw,42px); bottom: clamp(28px,3vw,42px); color: #fff; z-index: 3; }
-  .wp-tag { display: block; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; opacity: .85; margin-bottom: 12px; }
-  .wp-name { display: block; font-size: clamp(30px, 3.3vw, 46px); font-weight: 600; line-height: 1; letter-spacing: -.01em; }
-  .wp-view { display: inline-flex; align-items: center; gap: 9px; margin-top: 18px; font-size: 14px; font-weight: 500; opacity: .92; }
-  @media (max-width: 900px) {
-    .work-split { grid-template-columns: 1fr; }
-    .work-stage { display: none; }
-    .work-item { padding-left: 40px; }
-    .work-item:hover .work-item__name, .work-item.active .work-item__name,
-    .work-item:hover .work-item__meta, .work-item.active .work-item__meta,
-    .work-item:hover .work-item__desc, .work-item.active .work-item__desc { transform: none; }
-  }
+  .work-note a:hover { color: var(--crimson); }
+  @media (max-width: 700px) { .work-item__meta { display: none; } }
   @media (max-width: 820px) { .work-preview { display: none; } }
 
   /* ============================================
-     Capabilities — a bold, full-width bento. Four cards
-     in alternating widths, each tinted in its hue, each
-     carrying a small looping animation of its craft.
+     How we tell it — an editorial ink grid. Four
+     disciplines, each with a hand-drawn ink mark that
+     inks itself in on reveal. Paper, ink, restraint.
      ============================================ */
   .caps {
     display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    grid-auto-rows: clamp(210px, 25vw, 320px);
-    gap: clamp(14px, 1.3vw, 22px);
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--hairline);
     position: relative; z-index: 6;
   }
-  .caps > :nth-child(1) { grid-column: 1 / 8; --accent: var(--hue-green); }
-  .caps > :nth-child(2) { grid-column: 8 / 13; --accent: var(--hue-orange); }
-  .caps > :nth-child(3) { grid-column: 1 / 6; --accent: var(--hue-lilac); }
-  .caps > :nth-child(4) { grid-column: 6 / 13; --accent: var(--hue-blue); }
-  @media (max-width: 820px) {
-    .caps { grid-template-columns: 1fr; grid-auto-rows: minmax(180px, auto); }
-    .caps > * { grid-column: 1 / -1 !important; }
-  }
+  @media (max-width: 760px) { .caps { grid-template-columns: 1fr; } }
   .cap-card {
-    --accent: var(--crimson);
-    position: relative; overflow: hidden;
-    border-radius: 20px;
-    padding: clamp(22px, 2.3vw, 36px);
-    background:
-      radial-gradient(120% 120% at 100% 0%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 60%),
-      color-mix(in srgb, var(--accent) 7%, var(--paper));
-    border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
-    display: flex; flex-direction: column; justify-content: space-between;
-    cursor: none;
-    transition: transform .55s cubic-bezier(.22,1,.36,1), box-shadow .5s ease, background .45s ease, border-color .45s ease;
+    position: relative;
+    padding: clamp(34px, 4vw, 62px) clamp(26px, 3vw, 52px) clamp(30px, 3.4vw, 50px);
+    border-bottom: 1px solid var(--hairline);
+    transition: background .4s ease;
   }
-  .cap-card:hover {
-    transform: translateY(-7px);
-    background:
-      radial-gradient(120% 120% at 100% 0%, color-mix(in srgb, var(--accent) 34%, transparent), transparent 62%),
-      color-mix(in srgb, var(--accent) 13%, var(--paper));
-    border-color: color-mix(in srgb, var(--accent) 46%, transparent);
-    box-shadow: 0 34px 66px -34px color-mix(in srgb, var(--accent) 62%, transparent);
+  .caps > .cap-card:nth-child(odd) { border-right: 1px solid var(--hairline); }
+  @media (max-width: 760px) { .caps > .cap-card:nth-child(odd) { border-right: none; } }
+  .cap-card:hover { background: rgba(252, 28, 70, .025); }
+  .cap-ill {
+    display: block; width: clamp(56px, 6vw, 82px); height: auto;
+    color: var(--ink); overflow: visible;
+    margin-bottom: clamp(26px, 3vw, 44px);
+    transition: color .35s ease;
   }
-  .cap-card__k {
-    font-size: 15px; font-weight: 600; color: var(--accent);
-    font-variant-numeric: tabular-nums; z-index: 2;
-  }
-  .cap-card__foot { position: relative; z-index: 2; }
+  .cap-card:hover .cap-ill { color: var(--crimson); }
+  .cap-ill path { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .cap-ill path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+  html:not(.js) .cap-ill path { stroke-dashoffset: 0; }
+  .caps.in .cap-ill path { animation: ink-in 1.5s cubic-bezier(.6,0,.35,1) forwards; }
+  .caps.in .cap-card:nth-child(2) .cap-ill path { animation-delay: .12s; }
+  .caps.in .cap-card:nth-child(3) .cap-ill path { animation-delay: .24s; }
+  .caps.in .cap-card:nth-child(4) .cap-ill path { animation-delay: .36s; }
+  @keyframes ink-in { to { stroke-dashoffset: 0; } }
+  .cap-card__head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 12px; }
+  .cap-card__k { font-size: 13px; font-weight: 600; color: var(--crimson); font-variant-numeric: tabular-nums; }
   .cap-card__name {
-    display: block; font-size: clamp(21px, 2.15vw, 33px);
-    font-weight: 600; line-height: 1.02; letter-spacing: -0.01em; color: var(--ink);
+    font-size: clamp(19px, 1.8vw, 26px);
+    font-weight: 600; line-height: 1.08; letter-spacing: -0.01em; color: var(--ink);
   }
   .cap-card__desc {
-    display: block; margin-top: 11px; max-width: 34ch;
-    font-size: 14px; line-height: 1.4; color: var(--muted);
-    opacity: .72; transition: opacity .4s ease;
+    font-size: 15px; line-height: 1.5; color: var(--muted); max-width: 34ch;
   }
-  .cap-card:hover .cap-card__desc { opacity: 1; }
-  /* Each card's looping craft animation, top-right */
-  .cap-anim {
-    position: absolute; z-index: 1;
-    top: clamp(20px, 2.2vw, 34px); right: clamp(20px, 2.2vw, 34px);
-    width: clamp(64px, 8vw, 104px); height: clamp(64px, 8vw, 104px);
-    color: var(--accent); overflow: visible;
+  @media (prefers-reduced-motion: reduce) {
+    .cap-ill path { stroke-dashoffset: 0; animation: none; }
   }
-  .cap-anim rect, .cap-anim line, .cap-anim circle, .cap-anim path { transform-box: fill-box; }
-  /* A — narrative: a written line draws and re-draws */
-  .cap-anim--write path { stroke-dasharray: 240; animation: cap-write 4.4s ease-in-out infinite; }
-  @keyframes cap-write { 0% { stroke-dashoffset: 240; } 34%, 80% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -240; } }
-  /* B — brand: a mark morphs */
-  .cap-anim--morph .mk { transform-origin: center; animation: cap-morph 6s ease-in-out infinite; }
-  @keyframes cap-morph { 0%,100% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(135deg) scale(.82); } }
-  /* C — web: orbiting nodes */
-  .cap-anim--orbit .orb { transform-box: view-box; transform-origin: 50px 50px; animation: cap-spin 7s linear infinite; }
-  @keyframes cap-spin { to { transform: rotate(360deg); } }
-  /* D — motion: an equaliser */
-  .cap-anim--eq rect { transform-origin: 50% 100%; animation: cap-eq 1.1s ease-in-out infinite; }
-  @keyframes cap-eq { 0%,100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
 
   /* ============================================
      Pinned scrub band — the statement rides
@@ -1633,102 +1546,27 @@
       <h2 class="heading-lg lines">Stories<br>We've Told</h2>
       <span class="section-count reveal" aria-hidden="true">Selected<span>·</span>2023–25</span>
     </div>
-    <div class="work-split">
-      <div class="work-list" data-stagger>
-        <a class="work-item" href="#" data-i="0">
-          <span class="work-item__index">01</span>
-          <span class="work-item__name">Harbor &amp; Pine</span>
-          <span class="work-item__meta">Heritage brand · 2024</span>
-          <span class="work-item__desc">A century-old furniture maker, retold for direct-to-consumer — a whole identity system built around the rings of a felled tree.</span>
-        </a>
-        <a class="work-item" href="#" data-i="1">
-          <span class="work-item__index">02</span>
-          <span class="work-item__name">Lumen Health</span>
-          <span class="work-item__meta">Digital · Identity · 2025</span>
-          <span class="work-item__desc">A telehealth platform given a human voice, a calm pulse, and a product people actually trust.</span>
-        </a>
-        <a class="work-item" href="#" data-i="2">
-          <span class="work-item__index">03</span>
-          <span class="work-item__name">Fieldnote</span>
-          <span class="work-item__meta">Brand · Web · 2024</span>
-          <span class="work-item__desc">A farm-to-table startup with a story worth planting — grown from a single seed of an idea into a national brand.</span>
-        </a>
-        <a class="work-item" href="#" data-i="3">
-          <span class="work-item__index">04</span>
-          <span class="work-item__name">Arclight</span>
-          <span class="work-item__meta">Rebrand · Motion · 2023</span>
-          <span class="work-item__desc">A security firm recast as the calm inside the storm — steady light, arced over the noise.</span>
-        </a>
-        <a class="work-item" href="#" data-i="4">
-          <span class="work-item__index">05</span>
-          <span class="work-item__name">Nomad Rail</span>
-          <span class="work-item__meta">Campaign · 2025</span>
-          <span class="work-item__desc">Rail travel, sold as the slow adventure it is — every line leading to a horizon worth the wait.</span>
-        </a>
-      </div>
-
-      <!-- The stage: a big story-plate cross-fades to the hovered project -->
-      <div class="work-stage" aria-hidden="true">
-        <div class="wp-plate show" style="--a:#16d15a; --b:#0a7d3c;">
-          <svg class="wp-art" viewBox="0 0 288 470" preserveAspectRatio="xMidYMid meet">
-            <g fill="none" stroke="rgba(255,255,255,.92)" stroke-width="3">
-              <ellipse cx="150" cy="170" rx="30" ry="26"/><ellipse cx="150" cy="170" rx="60" ry="52"/>
-              <ellipse cx="150" cy="170" rx="92" ry="80"/><ellipse cx="150" cy="170" rx="126" ry="110"/>
-            </g>
-            <circle cx="150" cy="170" r="6" fill="#fff"/>
-          </svg>
-          <span class="wp-num">01</span>
-          <div class="wp-cap"><span class="wp-tag">Heritage · Brand · 2024</span><span class="wp-name">Harbor &amp; Pine</span><span class="wp-view">View project →</span></div>
-        </div>
-        <div class="wp-plate" style="--a:#ff9a2b; --b:#d45f00;">
-          <svg class="wp-art" viewBox="0 0 288 470" preserveAspectRatio="xMidYMid meet">
-            <g fill="none" stroke="rgba(255,255,255,.32)" stroke-width="2.5">
-              <circle cx="144" cy="170" r="72"/><circle cx="144" cy="170" r="116"/>
-            </g>
-            <path d="M8 170 H92 l18 -74 l24 148 l19 -96 l13 46 H280" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span class="wp-num">02</span>
-          <div class="wp-cap"><span class="wp-tag">Digital · Identity · 2025</span><span class="wp-name">Lumen Health</span><span class="wp-view">View project →</span></div>
-        </div>
-        <div class="wp-plate" style="--a:#f100cb; --b:#a3008a;">
-          <svg class="wp-art" viewBox="0 0 288 470" preserveAspectRatio="xMidYMid meet">
-            <g stroke="#fff" stroke-width="4" stroke-linecap="round" fill="rgba(255,255,255,.16)">
-              <path d="M144 250 V120" fill="none"/>
-              <path d="M144 166 C100 166 80 138 80 108 C126 108 144 138 144 170 Z"/>
-              <path d="M144 192 C188 192 208 164 208 134 C162 134 144 164 144 196 Z"/>
-            </g>
-            <line x1="46" y1="252" x2="242" y2="252" stroke="#fff" stroke-width="3" stroke-dasharray="3 13" stroke-linecap="round"/>
-          </svg>
-          <span class="wp-num">03</span>
-          <div class="wp-cap"><span class="wp-tag">Brand · Web · 2024</span><span class="wp-name">Fieldnote</span><span class="wp-view">View project →</span></div>
-        </div>
-        <div class="wp-plate" style="--a:#9d95ff; --b:#6a5cf0;">
-          <svg class="wp-art" viewBox="0 0 288 470" preserveAspectRatio="xMidYMid meet">
-            <g fill="none" stroke="#fff" stroke-width="3.4">
-              <path d="M28 244 A130 130 0 0 1 260 244"/><path d="M64 244 A98 98 0 0 1 224 244"/><path d="M100 244 A64 64 0 0 1 188 244"/>
-            </g>
-            <g stroke="rgba(255,255,255,.4)" stroke-width="2.4" stroke-linecap="round">
-              <line x1="76" y1="286" x2="66" y2="330"/><line x1="144" y1="292" x2="144" y2="340"/><line x1="212" y1="286" x2="222" y2="330"/>
-            </g>
-            <circle cx="144" cy="244" r="6" fill="#fff"/>
-          </svg>
-          <span class="wp-num">04</span>
-          <div class="wp-cap"><span class="wp-tag">Rebrand · Motion · 2023</span><span class="wp-name">Arclight</span><span class="wp-view">View project →</span></div>
-        </div>
-        <div class="wp-plate" style="--a:#00bae2; --b:#0088c4;">
-          <svg class="wp-art" viewBox="0 0 288 470" preserveAspectRatio="xMidYMid meet">
-            <line x1="24" y1="96" x2="264" y2="96" stroke="rgba(255,255,255,.5)" stroke-width="2.4"/>
-            <g stroke="#fff" fill="none" stroke-width="3.4" stroke-linecap="round">
-              <line x1="84" y1="300" x2="140" y2="98"/><line x1="204" y1="300" x2="148" y2="98"/>
-              <line x1="104" y1="246" x2="184" y2="246"/><line x1="115" y1="200" x2="173" y2="200"/>
-              <line x1="123" y1="160" x2="165" y2="160"/><line x1="130" y1="128" x2="158" y2="128"/>
-            </g>
-          </svg>
-          <span class="wp-num">05</span>
-          <div class="wp-cap"><span class="wp-tag">Campaign · 2025</span><span class="wp-name">Nomad Rail</span><span class="wp-view">View project →</span></div>
-        </div>
-      </div>
+    <div class="work-list" data-stagger>
+      <a class="work-item" href="#contact">
+        <span class="work-item__index">01</span>
+        <span class="work-item__name">Harbor &amp; Pine</span>
+        <span class="work-item__meta">Heritage brand · 2024</span>
+        <span class="work-item__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="work-item" href="#contact">
+        <span class="work-item__index">02</span>
+        <span class="work-item__name">Lumen Health</span>
+        <span class="work-item__meta">Digital identity · 2025</span>
+        <span class="work-item__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="work-item" href="#contact">
+        <span class="work-item__index">03</span>
+        <span class="work-item__name">Fieldnote</span>
+        <span class="work-item__meta">Brand &amp; web · 2024</span>
+        <span class="work-item__arrow" aria-hidden="true">→</span>
+      </a>
     </div>
+    <p class="work-note reveal">A young studio — more stories in the making. <a href="#contact">Yours could be the next one.</a></p>
 
     <div data-bubble data-size="196" data-clip="1" style="right: 4%; top: 8%; width: 196px; height: 196px;"></div>
   </section>
@@ -1740,59 +1578,45 @@
       <h2 class="heading-lg lines">How We<br>Tell It</h2>
       <span class="section-count reveal" aria-hidden="true">Four<span>·</span>disciplines</span>
     </div>
-    <div class="caps" data-stagger>
+    <div class="caps reveal">
       <div class="cap-card">
-        <span class="cap-card__k">A</span>
-        <svg class="cap-anim cap-anim--write" viewBox="0 0 100 100" fill="none" aria-hidden="true">
-          <path d="M6 64 C 22 40 30 40 40 58 C 50 76 58 76 70 54 C 80 36 88 38 96 50" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+        <svg class="cap-ill" viewBox="0 0 100 78" aria-hidden="true">
+          <path pathLength="1" d="M60 16 L80 34 L70 44 L50 26 Z"/>
+          <path pathLength="1" d="M50 26 L60 40 L57 47"/>
+          <path pathLength="1" d="M66 24 L60 30"/>
+          <path pathLength="1" d="M10 66 C 26 60 33 70 45 64 C 55 59 60 62 68 57"/>
         </svg>
-        <div class="cap-card__foot">
-          <span class="cap-card__name">Narrative strategy &amp; positioning</span>
-          <span class="cap-card__desc">The true thing you're about — and the words that carry it.</span>
-        </div>
+        <div class="cap-card__head"><span class="cap-card__k">01</span><span class="cap-card__name">Narrative strategy &amp; positioning</span></div>
+        <p class="cap-card__desc">The true thing you're about — and the words that carry it.</p>
       </div>
       <div class="cap-card">
-        <span class="cap-card__k">B</span>
-        <svg class="cap-anim cap-anim--morph" viewBox="0 0 100 100" aria-hidden="true">
-          <rect class="mk" x="26" y="26" width="48" height="48" rx="15" fill="currentColor"/>
+        <svg class="cap-ill" viewBox="0 0 100 78" aria-hidden="true">
+          <path pathLength="1" d="M50 12 C 71 12 84 24 84 40 C 84 56 68 66 50 66 C 30 66 16 55 16 39 C 16 23 31 12 50 12 Z"/>
+          <path pathLength="1" d="M50 26 V52"/>
+          <path pathLength="1" d="M38 32 L62 46"/>
+          <path pathLength="1" d="M62 32 L38 46"/>
         </svg>
-        <div class="cap-card__foot">
-          <span class="cap-card__name">Brand identity &amp; systems</span>
-          <span class="cap-card__desc">Marks, type and colour, with the rules that keep them alive.</span>
-        </div>
+        <div class="cap-card__head"><span class="cap-card__k">02</span><span class="cap-card__name">Brand identity &amp; systems</span></div>
+        <p class="cap-card__desc">Marks, type and colour, with the rules that keep them alive.</p>
       </div>
       <div class="cap-card">
-        <span class="cap-card__k">C</span>
-        <svg class="cap-anim cap-anim--orbit" viewBox="0 0 100 100" aria-hidden="true">
-          <g stroke="currentColor" stroke-width="1.6" opacity=".4">
-            <line x1="50" y1="50" x2="50" y2="14"/><line x1="50" y1="50" x2="86" y2="62"/><line x1="50" y1="50" x2="16" y2="66"/>
-          </g>
-          <circle cx="50" cy="50" r="6.5" fill="currentColor"/>
-          <g class="orb">
-            <circle cx="50" cy="14" r="5" fill="currentColor"/>
-            <circle cx="86" cy="62" r="5" fill="currentColor"/>
-            <circle cx="16" cy="66" r="5" fill="currentColor"/>
-          </g>
+        <svg class="cap-ill" viewBox="0 0 100 78" aria-hidden="true">
+          <path pathLength="1" d="M14 16 H86 V62 H14 Z"/>
+          <path pathLength="1" d="M14 28 H86"/>
+          <path pathLength="1" d="M21 22 h.4 M28 22 h.4 M35 22 h.4"/>
+          <path pathLength="1" d="M24 40 H58 M24 48 H72 M24 56 H48"/>
         </svg>
-        <div class="cap-card__foot">
-          <span class="cap-card__name">Web design &amp; engineering</span>
-          <span class="cap-card__desc">Sites that move the way the story does — fast, and built to last.</span>
-        </div>
+        <div class="cap-card__head"><span class="cap-card__k">03</span><span class="cap-card__name">Web design &amp; engineering</span></div>
+        <p class="cap-card__desc">Sites that move the way the story does.</p>
       </div>
       <div class="cap-card">
-        <span class="cap-card__k">D</span>
-        <svg class="cap-anim cap-anim--eq" viewBox="0 0 100 100" aria-hidden="true">
-          <g fill="currentColor">
-            <rect x="14" y="20" width="12" height="60" rx="6" style="animation-delay:0s"/>
-            <rect x="34" y="20" width="12" height="60" rx="6" style="animation-delay:.18s"/>
-            <rect x="54" y="20" width="12" height="60" rx="6" style="animation-delay:.36s"/>
-            <rect x="74" y="20" width="12" height="60" rx="6" style="animation-delay:.24s"/>
-          </g>
+        <svg class="cap-ill" viewBox="0 0 100 78" aria-hidden="true">
+          <path pathLength="1" d="M22 20 H78 V58 H22 Z"/>
+          <path pathLength="1" d="M22 30 H78 M22 48 H78"/>
+          <path pathLength="1" d="M30 20 V58 M50 20 V58 M70 20 V58"/>
         </svg>
-        <div class="cap-card__foot">
-          <span class="cap-card__name">Motion, film &amp; illustration</span>
-          <span class="cap-card__desc">A voice, a rhythm and a face for the story.</span>
-        </div>
+        <div class="cap-card__head"><span class="cap-card__k">04</span><span class="cap-card__name">Motion, film &amp; illustration</span></div>
+        <p class="cap-card__desc">A voice, a rhythm and a face for the story.</p>
       </div>
     </div>
     <div data-bubble data-size="196" data-clip="1" style="right: 6%; top: 6%; width: 196px; height: 196px;"></div>
@@ -2443,25 +2267,6 @@
         attract = { x: r.right + scrollX + 170, y: r.top + scrollY + r.height / 2 };
       });
       item.addEventListener('mouseleave', () => { attract = null; });
-    });
-  }
-
-  /* Work gallery — the big stage cross-fades to the hovered project */
-  const workList = document.querySelector('.work-list');
-  const workStage = document.querySelector('.work-stage');
-  if (workList && workStage) {
-    const plates = [...workStage.querySelectorAll('.wp-plate')];
-    const items = [...workList.querySelectorAll('.work-item')];
-    let wActive = 0;
-    const setWork = (i) => {
-      if (i === wActive) return;
-      wActive = i;
-      plates.forEach((p, j) => p.classList.toggle('show', j === i));
-      items.forEach((it, j) => it.classList.toggle('active', j === i));
-    };
-    items.forEach((it, i) => {
-      it.addEventListener('mouseenter', () => setWork(i));
-      it.addEventListener('focus', () => setWork(i));
     });
   }
 
