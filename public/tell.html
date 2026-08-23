@@ -393,6 +393,8 @@
   .tagline { font-size: 14px; color: var(--muted); }
   @media (max-width: 900px) { .tagline { display: none; } }
   .header-actions { display: flex; align-items: center; gap: 22px; }
+  /* On phones the pill would crowd the burger — the menu carries "Contact" */
+  @media (max-width: 620px) { .header-actions .pill-crimson { display: none; } }
 
   .burger {
     background: transparent;
@@ -1396,6 +1398,9 @@
     100% { transform: scaleY(1.2) scaleX(.85); opacity: 1; }
   }
   @media (max-width: 700px) { #fleet { display: none; } }
+  /* On phones the travelling cloud can't clear full-width text — the
+     mobile read is clean editorial; the animated layer is a desktop stage */
+  @media (max-width: 700px) { .bubble, .tdot { display: none; } }
 
   @media (prefers-reduced-motion: reduce) {
     header, .hero__scroll, .marquee__track, .art, .deco svg,
@@ -2263,7 +2268,7 @@
       return {
         x: r.left + scrollX + r.width / 2,
         y: r.top + scrollY + r.height / 2,
-        size: Math.min(parseFloat(el.dataset.size), innerWidth * 0.78),
+        size: Math.min(parseFloat(el.dataset.size), innerWidth * (innerWidth < 760 ? 0.46 : 0.78)),
         clip: parseInt(el.dataset.clip, 10) || 0,
         hero: 'hero' in el.dataset,
       };
