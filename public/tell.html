@@ -1027,45 +1027,6 @@
   }
   @media (max-width: 700px) { #fleet { display: none; } }
 
-  /* ============================================
-     Finale — the campfire, the figure, the water
-     ============================================ */
-  #finale {
-    position: fixed;
-    inset: 0;
-    z-index: 34;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 1s ease;
-  }
-  #finale.lit { opacity: 1; }
-  #campfire {
-    position: absolute;
-    left: 54%;
-    bottom: 4.5vh;
-    transform: translateX(-50%);
-    width: clamp(160px, 17vw, 224px);
-  }
-  #campfire svg, #humanFig svg { width: 100%; height: auto; display: block; overflow: visible; }
-  .fl { transform-box: fill-box; transform-origin: 50% 100%; }
-  .fl1 { animation: fl-a .5s ease-in-out infinite alternate; }
-  .fl2 { animation: fl-b .38s ease-in-out infinite alternate; }
-  .fl3 { animation: fl-c .62s ease-in-out infinite alternate; }
-  @keyframes fl-a { from { transform: scaleY(.9) scaleX(1.04); } to { transform: scaleY(1.12) scaleX(.92) translateY(-4px); } }
-  @keyframes fl-b { from { transform: scaleY(.85) scaleX(1.06) skewX(4deg); } to { transform: scaleY(1.15) scaleX(.9) skewX(-5deg); } }
-  @keyframes fl-c { from { transform: scaleY(1.05) scaleX(.95); } to { transform: scaleY(.92) scaleX(1.08); } }
-  #humanFig {
-    position: absolute;
-    bottom: 4.5vh;
-    left: 0;
-    width: clamp(74px, 7.2vw, 98px);
-    transform: translateX(-160px);
-    will-change: transform;
-  }
-  #humanFig g { }
-  .ember, .steam, .wdrop { position: absolute; top: 0; left: 0; pointer-events: none; will-change: transform, opacity; border-radius: 50%; }
-  @media (max-width: 700px) { #finale { display: none; } }
-
   @media (prefers-reduced-motion: reduce) {
     header, .hero__scroll, .marquee__track, .art, .deco svg,
     .artg svg, .artg .book-page, .artg .drop-body, .artg .droplet,
@@ -1438,48 +1399,6 @@
   <div class="marquee" aria-hidden="true">
     <div class="marquee__track" id="marqueeTrack2">
       <span>Say it once — say it right —</span><span>Say it once — say it right —</span><span>Say it once — say it right —</span><span>Say it once — say it right —</span><span>Say it once — say it right —</span><span>Say it once — say it right —</span>
-    </div>
-  </div>
-
-  <!-- Finale: a campfire waits at the foot of the page. The fleet crashes
-       into it and burns, then a figure walks in and douses it -->
-  <div id="finale" aria-hidden="true">
-    <div id="fireFx"></div>
-    <div id="campfire">
-      <svg viewBox="0 0 240 210" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="120" cy="184" rx="82" ry="11" fill="rgba(23,20,15,.10)"/>
-        <g id="flames">
-          <path class="fl fl3" d="M78 176 C 66 130 104 120 96 84 C 92 66 120 60 118 30 C 140 64 150 58 148 100 C 168 120 172 150 162 176 Z" fill="#fc1c46" opacity=".55"/>
-          <path class="fl fl1" d="M86 176 C 78 138 106 126 100 96 C 96 74 122 74 120 48 C 136 76 146 72 144 104 C 158 124 160 152 152 176 Z" fill="#ff8709"/>
-          <path class="fl fl2" d="M100 176 C 94 146 110 136 106 112 C 104 94 122 96 120 74 C 132 96 138 96 136 118 C 146 136 146 158 140 176 Z" fill="#ffd23f"/>
-          <path class="fl fl2" d="M112 176 C 110 156 118 150 116 134 C 130 150 128 160 126 176 Z" fill="#fff3c4"/>
-        </g>
-        <g stroke="#1a1712" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" fill="#caa066">
-          <g transform="rotate(-13 120 176)"><rect x="54" y="168" width="132" height="18" rx="9"/><ellipse cx="57" cy="177" rx="5.5" ry="8.5" fill="#e6c79a"/><ellipse cx="57" cy="177" rx="2.4" ry="4" fill="none" stroke-width="1.6"/></g>
-          <g transform="rotate(11 120 178)"><rect x="52" y="170" width="136" height="18" rx="9"/><ellipse cx="184" cy="179" rx="5.5" ry="8.5" fill="#e6c79a"/><ellipse cx="184" cy="179" rx="2.4" ry="4" fill="none" stroke-width="1.6"/></g>
-          <rect x="88" y="160" width="66" height="15" rx="7.5"/>
-        </g>
-      </svg>
-    </div>
-    <div id="waterFx"></div>
-    <div id="humanFig">
-      <svg viewBox="0 0 120 210" xmlns="http://www.w3.org/2000/svg">
-        <g fill="#1a1712">
-          <path id="hLegB" d="M56 120 q-10 30 -18 62 q-1 8 7 8 q6 0 8 -7 l12 -55 z"/>
-          <path id="hLegF" d="M64 120 q10 28 12 60 q1 8 -7 8 q-6 0 -8 -7 l-13 -55 z"/>
-          <path d="M46 56 q14 -10 30 0 q6 6 4 20 l-4 46 q-16 8 -30 0 l-4 -46 q-2 -14 4 -20 z"/>
-          <circle cx="61" cy="40" r="15"/>
-          <path id="hArmFree" d="M50 64 q-14 16 -18 40 q-1 7 5 7 q5 0 7 -6 l14 -34 z"/>
-          <g id="hArmBucket">
-            <path d="M74 64 q16 12 22 34 q2 7 -5 8 q-6 1 -8 -6 l-16 -28 z"/>
-            <g id="hBucket" transform="translate(94 108)">
-              <path d="M-13 0 h26 l-4 26 h-18 z" fill="#e8e2d2" stroke="#1a1712" stroke-width="2.6" stroke-linejoin="round"/>
-              <path d="M-13 0 q13 -12 26 0" fill="none" stroke="#1a1712" stroke-width="2.4"/>
-              <rect x="-14" y="-2" width="28" height="5" rx="2.5" fill="#1a1712"/>
-            </g>
-          </g>
-        </g>
-      </svg>
     </div>
   </div>
 
@@ -1904,7 +1823,7 @@
     const denom = Math.max(1, document.documentElement.scrollHeight - innerHeight);
     const p = clampf(scrollY / denom, 0, 1);
     CRAFT.forEach((c) => {
-      if (!c.el || c.crashed) return;
+      if (!c.el) return;
       const tg = fleetPath(c, p);
       if (!c.cur) { c.cur = { x: tg.x, y: tg.y }; c.lastX = tg.x; c.lastY = tg.y; }
       c.cur.x += (tg.x - c.cur.x) * c.k;
@@ -1950,167 +1869,6 @@
         q.el.style.transform = `translate(${q.x.toFixed(1)}px,${q.y.toFixed(1)}px) translate(-50%,-50%) scale(${sxScale.toFixed(3)},${syScale.toFixed(3)})`;
       });
     });
-  }
-
-  /* ================================================
-     Finale — the campfire waits at the foot of the page.
-     Reaching the end sends the fleet crashing into it; the
-     fire flares, then a figure walks in and pours a bucket
-     of water over it until it hisses out into steam.
-     ================================================ */
-  const finaleEl = document.getElementById('finale');
-  const campfireEl = document.getElementById('campfire');
-  const flamesEl = document.getElementById('flames');
-  const fireFxEl = document.getElementById('fireFx');
-  const humanFig = document.getElementById('humanFig');
-  const hLegF = document.getElementById('hLegF');
-  const hLegB = document.getElementById('hLegB');
-  const hArmFree = document.getElementById('hArmFree');
-  const hArmBucket = document.getElementById('hArmBucket');
-  let finLit = false, finState = 'idle';
-  let fireLevel = 0, fireTarget = 0;
-  let humanX = 0, humanTargetX = 0, walkPhase = 0, walking = false, arrived = false;
-  let pourAmt = 0, pouring = false, steaming = false;
-  const finParts = [];
-  const finPart = (cls, host, x, y, o) => {
-    let q = finParts.find((z) => !z.live);
-    if (!q) { if (finParts.length > 110) return; q = { el: document.createElement('div') }; finParts.push(q); }
-    if (q.el.parentNode !== host) host.appendChild(q.el);
-    q.el.className = cls; q.el.style.cssText = o.css;
-    q.live = true; q.age = 0; q.x = x; q.y = y;
-    q.vx = o.vx; q.vy = o.vy; q.grav = o.grav || 0; q.s0 = o.s0; q.s1 = o.s1; q.op0 = o.op0; q.life = o.life;
-    return q;
-  };
-
-  function firePoint() {
-    const r = campfireEl.getBoundingClientRect();
-    return { x: r.left + r.width * 0.5, base: r.top + r.height * 0.80, mid: r.top + r.height * 0.52, top: r.top + r.height * 0.30 };
-  }
-
-  function diveCraft(c, delay) {
-    if (!c || !c.el) return;
-    setTimeout(() => {
-      c.crashed = true;
-      const fp = firePoint();
-      const sx = c.cur ? c.cur.x : innerWidth / 2, sy = c.cur ? c.cur.y : 0;
-      const midx = (sx + fp.x) / 2, midy = Math.min(sy, fp.mid) - 60;
-      c.el.animate([
-        { transform: `translate(${sx}px,${sy}px) translate(-50%,-50%) rotate(0deg)`, opacity: 1 },
-        { transform: `translate(${midx}px,${midy}px) translate(-50%,-50%) rotate(120deg)`, opacity: 1, offset: .45 },
-        { transform: `translate(${fp.x}px,${fp.mid}px) translate(-50%,-50%) rotate(320deg) scale(.35)`, opacity: 0 },
-      ], { duration: 640, easing: 'cubic-bezier(.45,0,.7,1)', fill: 'forwards' });
-      setTimeout(() => {
-        fireTarget = Math.min(1.75, fireTarget + 0.4);
-        for (let i = 0; i < 16; i++) {
-          const s = 3 + Math.random() * 5;
-          finPart('ember', fireFxEl, fp.x + R(-16, 16), fp.mid + R(-8, 20),
-            { css: `width:${s}px;height:${s}px;background:radial-gradient(circle,#ffe08a,#ff7a12 60%,rgba(252,28,70,0) 80%)`, vx: R(-70, 70), vy: R(-150, -60), grav: 120, s0: 1, s1: .2, op0: .95, life: R(.5, 1) });
-        }
-        c.el.style.display = 'none';
-      }, 600);
-    }, delay);
-  }
-
-  function runFinale() {
-    finState = 'crash';
-    const byKind = (k) => CRAFT.find((c) => c.kind === k);
-    diveCraft(byKind('plane'), 0);
-    diveCraft(byKind('rocket'), 240);
-    diveCraft(byKind('boat'), 480);
-    setTimeout(() => { fireTarget = 1.7; }, 700);           /* blaze */
-    setTimeout(() => { finState = 'walk'; walking = true; }, 1150);
-  }
-
-  function updateFinale(t, dt) {
-    if (reduced || innerWidth < 700 || !finaleEl) return;
-    const denom = Math.max(1, document.documentElement.scrollHeight - innerHeight);
-    const p = clampf(scrollY / denom, 0, 1);
-
-    if (!finLit && p > 0.8) { finLit = true; fireTarget = 0.72; finaleEl.classList.add('lit'); }
-    if (finLit && finState === 'idle' && p >= 0.965) runFinale();
-    if (!finLit) return;
-
-    fireLevel += (fireTarget - fireLevel) * 0.06;
-    const fp = firePoint();
-    if (flamesEl) flamesEl.setAttribute('transform', `translate(120 176) scale(${Math.max(0, fireLevel).toFixed(3)}) translate(-120 -176)`);
-
-    /* embers rise while the fire burns */
-    if (fireLevel > 0.15 && Math.random() < fireLevel * 0.5) {
-      const s = 2.5 + Math.random() * 3.5;
-      finPart('ember', fireFxEl, fp.x + R(-22, 22) * fireLevel, fp.base,
-        { css: `width:${s}px;height:${s}px;background:radial-gradient(circle,#ffdf7a,#ff7a12 65%,rgba(255,120,20,0) 80%)`, vx: R(-16, 16), vy: R(-70, -120), grav: 26, s0: 1, s1: .1, op0: .9, life: R(.7, 1.4) });
-    }
-    /* steam while extinguishing */
-    if (steaming && Math.random() < 0.7) {
-      const s = 12 + Math.random() * 16;
-      finPart('steam', fireFxEl, fp.x + R(-26, 26), fp.base - 6,
-        { css: `width:${s}px;height:${s}px;background:radial-gradient(circle,rgba(224,224,220,.6),rgba(224,224,220,0) 70%)`, vx: R(-20, 20), vy: R(-46, -78), grav: -4, s0: .5, s1: 2, op0: .5, life: R(1.4, 2.3) });
-    }
-
-    /* the figure walks in, then pours */
-    const hw = humanFig.offsetWidth || 90;
-    humanTargetX = fp.x - 16 - 0.80 * hw;
-    if (finState === 'walk' || finState === 'pour' || finState === 'out') {
-      if (walking) {
-        humanX += Math.sign(humanTargetX - humanX) * 360 * dt;
-        walkPhase += dt * 9;
-        if (Math.abs(humanTargetX - humanX) < 3) { humanX = humanTargetX; walking = false; arrived = true; setTimeout(startPour, 350); }
-        const sw = Math.sin(walkPhase);
-        hLegF.setAttribute('transform', `rotate(${(sw * 24).toFixed(1)} 62 122)`);
-        hLegB.setAttribute('transform', `rotate(${(-sw * 24).toFixed(1)} 58 122)`);
-        hArmFree.setAttribute('transform', `rotate(${(-sw * 18).toFixed(1)} 50 66)`);
-        const bob = -Math.abs(Math.sin(walkPhase * 2)) * 3;
-        humanFig.style.transform = `translateX(${humanX.toFixed(1)}px) translateY(${bob.toFixed(1)}px)`;
-      } else {
-        hLegF.setAttribute('transform', 'rotate(0 62 122)');
-        hLegB.setAttribute('transform', 'rotate(0 58 122)');
-        hArmFree.setAttribute('transform', 'rotate(0 50 66)');
-        humanFig.style.transform = `translateX(${humanX.toFixed(1)}px)`;
-      }
-    } else {
-      humanX = -hw - 60;
-      humanFig.style.transform = `translateX(${humanX.toFixed(1)}px)`;
-    }
-
-    /* pour: tip the bucket and stream water onto the fire */
-    if (pouring) pourAmt = Math.min(1, pourAmt + dt * 3.2); else pourAmt = Math.max(0, pourAmt - dt * 2.5);
-    hArmBucket.setAttribute('transform', `rotate(${(-pourAmt * 46).toFixed(1)} 74 66)`);
-    if (pouring && pourAmt > 0.55) {
-      const hr = humanFig.getBoundingClientRect();
-      const bx = hr.left + hw * 0.86, by = hr.top + (humanFig.offsetHeight || 150) * 0.46;
-      for (let i = 0; i < 2; i++) {
-        const s = 3 + Math.random() * 4;
-        finPart('wdrop', document.getElementById('waterFx'), bx + R(-4, 4), by,
-          { css: `width:${s}px;height:${s * 1.5}px;border-radius:50%;background:linear-gradient(#8fd0ec,#4aa6d8)`, vx: (fp.x - bx) / 0.42 * 0.5 + R(-20, 20), vy: R(-30, 20), grav: 900, s0: 1, s1: .8, op0: .85, life: .5 });
-      }
-      /* splash + hiss at the fire */
-      if (Math.random() < 0.6) {
-        const s = 4 + Math.random() * 5;
-        finPart('wdrop', document.getElementById('waterFx'), fp.x + R(-18, 18), fp.base,
-          { css: `width:${s}px;height:${s}px;border-radius:50%;background:radial-gradient(circle,rgba(190,225,240,.8),rgba(190,225,240,0) 70%)`, vx: R(-60, 60), vy: R(-90, -30), grav: 260, s0: 1, s1: .3, op0: .8, life: .5 });
-      }
-    }
-
-    /* advance every finale particle */
-    finParts.forEach((q) => {
-      if (!q.live) return;
-      q.age += dt;
-      if (q.age >= q.life) { q.live = false; q.el.style.opacity = '0'; return; }
-      const u = q.age / q.life;
-      q.vy += q.grav * dt; q.x += q.vx * dt; q.y += q.vy * dt;
-      const sc = q.s0 + (q.s1 - q.s0) * u;
-      q.el.style.opacity = (q.op0 * (1 - u)).toFixed(3);
-      q.el.style.transform = `translate(${q.x.toFixed(1)}px,${q.y.toFixed(1)}px) translate(-50%,-50%) scale(${sc.toFixed(3)})`;
-    });
-  }
-
-  function startPour() {
-    finState = 'pour';
-    pouring = true;
-    setTimeout(() => { steaming = true; fireTarget = 0.06; }, 650);   /* hiss it out */
-    setTimeout(() => { fireTarget = 0; }, 1400);
-    setTimeout(() => { pouring = false; finState = 'out'; }, 1700);
-    setTimeout(() => { steaming = false; }, 3600);
   }
 
   const frame = (ms) => {
@@ -2265,7 +2023,6 @@
     }
 
     updateFleet(t, dt);
-    updateFinale(t, dt);
   };
   requestAnimationFrame(frame);
 
