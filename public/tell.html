@@ -202,20 +202,51 @@
     0%, 100% { border-radius: 999px; }
     50% { border-radius: 44% 56% 50% 50% / 60% 42% 58% 40%; }
   }
-  .art--dawn {
-    width: clamp(210px, 30vw, 470px);
-    aspect-ratio: 1.12;
-    border-radius: 46% 54% 60% 40% / 50% 44% 56% 50%;
-    animation: morph-a 22s ease-in-out infinite;
+  /* Hero aurora — the first thing you see. Two soft washes of fresh
+     light drift and breathe against one another: a cool periwinkle→aqua
+     field over a warm coral→blush, blended into the paper so they read
+     as living light rather than a flat blob. */
+  .art--aurora {
+    width: clamp(280px, 42vw, 660px);
+    aspect-ratio: 1.14;
+    border-radius: 52% 48% 56% 44% / 54% 50% 50% 46%;
+    animation: morph-a 26s ease-in-out infinite, hue-breathe 20s ease-in-out infinite;
     background:
-      radial-gradient(circle at 40% 36%,
-        rgba(139,150,228,.60) 0%,
-        rgba(168,150,222,.46) 38%,
-        rgba(238,192,196,.26) 64%,
-        rgba(238,192,196,0) 80%);
-    filter: blur(7px);
+      radial-gradient(58% 58% at 32% 30%, rgba(120,150,255,.62) 0%, rgba(120,150,255,0) 62%),
+      radial-gradient(56% 56% at 72% 42%, rgba(0,205,220,.46) 0%, rgba(0,205,220,0) 60%),
+      radial-gradient(64% 64% at 50% 76%, rgba(157,149,255,.44) 0%, rgba(157,149,255,0) 66%);
+    filter: blur(24px);
     opacity: .82;
+    mix-blend-mode: multiply;
   }
+  .art--peach {
+    width: clamp(190px, 28vw, 460px);
+    aspect-ratio: 1.22;
+    border-radius: 46% 54% 60% 40% / 50% 44% 56% 50%;
+    animation: morph-c 17s ease-in-out infinite reverse, hue-breathe 24s ease-in-out infinite -6s;
+    background:
+      radial-gradient(58% 58% at 40% 38%, rgba(255,138,86,.46) 0%, rgba(255,138,86,0) 62%),
+      radial-gradient(60% 60% at 64% 62%, rgba(255,120,175,.44) 0%, rgba(255,120,175,0) 64%);
+    filter: blur(30px);
+    opacity: .72;
+    mix-blend-mode: multiply;
+  }
+  @keyframes hue-breathe {
+    0%, 100% { filter: blur(24px) hue-rotate(0deg) saturate(1); }
+    50% { filter: blur(30px) hue-rotate(-16deg) saturate(1.18); }
+  }
+  /* Bright accent orbs — pure hits of the studio palette scattered
+     through the hero, blurred to soft light and multiplied into the
+     paper so they stay vivid without ever reading as hard blobs. */
+  .art--orb {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 34%, var(--orb, #9d95ff) 0%, transparent 64%);
+    filter: blur(22px);
+    opacity: .58;
+    mix-blend-mode: multiply;
+  }
+  @media (max-width: 700px) { .art--orb { display: none; } }
   .art--amber {
     width: clamp(150px, 18vw, 280px);
     aspect-ratio: 2 / 1;
@@ -581,13 +612,58 @@
   }
   .js .lines.in .line > span { transform: none; }
 
-  /* Letters answer the cursor — lift, tilt, settle back */
+  /* Letters answer the cursor — a live proximity field, driven per-frame
+     in JS (see the hero type-field loop). No CSS transition here: the
+     motion is lerp-smoothed in script so it never lags the pointer. */
   .display .ch {
     display: inline-block;
+    will-change: transform;
+  }
+  /* No-JS / coarse-pointer fallback: a gentle hover lift */
+  html:not(.live-type) .display .ch {
     transition: transform .5s cubic-bezier(.34,1.56,.64,1), color .3s ease;
   }
-  .display .ch:hover { transform: translateY(-.07em) rotate(2.6deg); }
-  .display .ch:nth-child(even):hover { transform: translateY(-.05em) rotate(-2.4deg); }
+  html:not(.live-type) .display .ch:hover { transform: translateY(-.07em) rotate(2.6deg); }
+  html:not(.live-type) .display .ch:nth-child(even):hover { transform: translateY(-.05em) rotate(-2.4deg); }
+
+  /* The key word "story" sits knocked out on a crimson marker swipe */
+  .cyc {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    height: .82em;
+    line-height: .82;
+    vertical-align: baseline;
+    opacity: 0;
+    transition: opacity .5s ease;
+  }
+  html.told .cyc, html:not(.burst-mode) .cyc { opacity: 1 !important; }
+  .cyc__hl {
+    position: absolute;
+    left: -.04em; top: -.02em; bottom: .16em;
+    width: 100%;
+    background: linear-gradient(102deg, var(--crimson), #ff5a2a);
+    border-radius: 42% 58% 46% 60% / 60% 46% 58% 42%;
+    transform: rotate(-1.4deg);
+    transform-origin: left center;
+    transition: width .5s cubic-bezier(.7,0,.2,1);
+    z-index: 0;
+  }
+  .cyc__roll { position: relative; z-index: 1; display: block; will-change: transform; }
+  .cyc__roll b {
+    display: block; height: .82em; line-height: .82;
+    font-weight: 700; color: var(--paper);
+    padding: 0 .04em;
+  }
+  html.burst-mode .cyc { opacity: 0; }
+
+  /* Fine grain — a premium printed texture over the whole page */
+  .grain {
+    position: fixed; inset: 0; z-index: 90;
+    pointer-events: none; opacity: .05;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
 
   /* Work — stacked story rows, indices in the hue taxonomy */
   .work-item {
@@ -732,7 +808,7 @@
   }
   .deco svg { display: block; width: 100%; height: 100%; overflow: visible; }
   .deco--pinwheel { width: clamp(50px, 6.4vw, 96px); left: 44%; top: 11%; }
-  .deco--spring { width: clamp(54px, 7vw, 104px); left: 61%; top: 60%; }
+  .deco--spring { width: clamp(50px, 6.4vw, 96px); left: 55%; top: 74%; }
   .deco--aster { width: clamp(40px, 5vw, 72px); left: 30%; top: 79%; }
   .deco--mini { width: clamp(30px, 3vw, 44px); }
   .deco--pinwheel svg { animation: deco-spin 26s linear infinite; }
@@ -1107,12 +1183,17 @@
 
   <!-- Hero -->
   <section class="hero page">
-    <div class="art art--dawn" data-depth=".10" style="left: -4%; top: 46%;" aria-hidden="true"></div>
+    <div class="art art--aurora" data-depth=".13" style="left: -9%; top: 26%;" aria-hidden="true"></div>
+    <div class="art art--peach" data-depth=".06" data-rot="8" style="left: 16%; top: 60%;" aria-hidden="true"></div>
+    <div class="art art--orb" data-depth=".20" style="--orb: var(--hue-blue);     left: 3%;  top: 12%; width: clamp(120px,15vw,220px);" aria-hidden="true"></div>
+    <div class="art art--orb" data-depth=".16" style="--orb: var(--hue-green);    left: 6%;  top: 74%; width: clamp(120px,15vw,210px);" aria-hidden="true"></div>
+    <div class="art art--orb" data-depth=".10" style="--orb: var(--hue-orange);   left: 40%; top: 8%;  width: clamp(96px,11vw,170px);"  aria-hidden="true"></div>
+    <div class="art art--orb" data-depth=".23" style="--orb: var(--hue-lipstick); left: 34%; top: 80%; width: clamp(100px,12vw,180px);" aria-hidden="true"></div>
 
     <h1 class="display lines" id="heroHeadline">
       <span class="line"><span>Every</span></span>
       <span class="line"><span>company</span></span>
-      <span class="line"><span>has a story</span></span>
+      <span class="line"><span>has a </span><span class="cyc" id="cyc" aria-label="story"><span class="cyc__hl"></span><span class="cyc__roll" id="cycRoll"></span></span></span>
     </h1>
 
     <!-- Glyphs woven into the headline -->
@@ -1164,7 +1245,7 @@
 
     <span class="hero__scroll">(Scroll — the story follows)</span>
 
-    <div data-bubble data-hero data-size="520" data-clip="0" style="right: -11%; top: 70px; width: 520px; height: 520px;"></div>
+    <div data-bubble data-hero data-size="470" data-clip="0" style="right: -12%; top: 40px; width: 470px; height: 470px;"></div>
   </section>
 
   <!-- Marquee -->
@@ -1455,6 +1536,8 @@
     </div>
   </footer>
 
+  <div class="grain" aria-hidden="true"></div>
+
 <script>
   document.documentElement.classList.add('js');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1475,11 +1558,57 @@
 
   /* Hero letters answer the cursor individually — grouped into
      unbreakable words so lines can never split mid-word */
-  document.querySelectorAll('#heroHeadline .line > span').forEach((s) => {
+  document.querySelectorAll('#heroHeadline .line > span:not(.cyc)').forEach((s) => {
     s.innerHTML = s.textContent.split(' ').map((word) =>
       `<span class="wd">${[...word].map((c) => `<span class="ch">${c}</span>`).join('')}</span>`
     ).join(' ');
   });
+
+  /* ================================================
+     Live type field — the headline is alive. Every letter
+     breathes on a slow idle wave, and lifts, tilts, scales
+     and warms toward crimson as the cursor passes over it.
+     Positions are cached (measured with transforms cleared)
+     and the reaction is lerp-smoothed per letter in frame().
+     ================================================ */
+  const typeChars = [...document.querySelectorAll('#heroHeadline .ch')];
+  let typeGeo = [];
+  let letterFX = false;
+  const measureType = () => {
+    typeGeo = typeChars.map((el, i) => {
+      const keep = el.style.transform;
+      el.style.transform = 'none';
+      const r = el.getBoundingClientRect();
+      el.style.transform = keep;
+      return {
+        el, i,
+        cx: r.left + scrollX + r.width / 2,
+        cy: r.top + scrollY + r.height / 2,
+        lift: 0, tilt: 0, sc: 1, warm: 0,
+        seed: i * 0.7,
+      };
+    });
+  };
+  const INK_RGB = [14, 16, 15], CRIM_RGB = [252, 28, 70];
+
+  /* The headline's key word — "story" — sits knocked out in paper white
+     on a crimson marker that swipes itself in once the line has landed */
+  const cycRoll = document.getElementById('cycRoll');
+  if (cycRoll) {
+    cycRoll.innerHTML = '<b>Story</b>';
+    const cycHl = document.querySelector('#cyc .cyc__hl');
+    const word = cycRoll.querySelector('b');
+    const markerW = () => (word.getBoundingClientRect().width + 14) + 'px';
+    cycHl.style.width = '0px';
+    const revealMarker = () => {
+      cycHl.style.transition = 'width .6s cubic-bezier(.7,0,.2,1)';
+      cycHl.style.width = markerW();
+    };
+    setTimeout(revealMarker, reduced ? 200 : 2600);
+    addEventListener('resize', () => {
+      if (parseFloat(cycHl.style.width) > 0) cycHl.style.width = markerW();
+    });
+  }
 
   /* Load sequence */
   const heroEl = document.querySelector('.hero');
@@ -1487,6 +1616,8 @@
   const startHero = () => {
     heroEl.classList.add('in');
     heroHeadline.classList.add('in');
+    document.documentElement.classList.add('live-type');
+    setTimeout(() => { if (typeof measureType === 'function') measureType(); letterFX = true; }, 900);
     document.querySelectorAll('.bubble, .tdot, .art').forEach((el) => el.classList.add('in'));
     /* DrawSVG-style: the coil inks itself in after the headline lands */
     if (!reduced) {
@@ -1581,11 +1712,12 @@
   const decos = [...document.querySelectorAll('.deco')].map((el) => ({
     el, depth: parseFloat(el.dataset.mdepth) || 16, x: 0, y: 0,
   }));
-  let mnx = 0, mny = 0;
+  let mnx = 0, mny = 0, pointerSeen = false;
   if (finePointer) {
     addEventListener('mousemove', (e) => {
       mnx = e.clientX / innerWidth - 0.5;
       mny = e.clientY / innerHeight - 0.5;
+      pointerSeen = true;
     });
   }
 
@@ -1675,6 +1807,7 @@
         trackW: scrubTrack.scrollWidth,
       };
     }
+    measureType();
   };
   measure();
   addEventListener('resize', measure);
@@ -1959,8 +2092,11 @@
         const dy = Math.cos(t * spd * 0.8 + i * 1.7) * (10 + (i % 2) * 8);
         const dr = Math.sin(t * 0.22 + i * 1.4) * (5 + (i % 3) * 3);
         const sc = 1 + Math.sin(t * spd * 0.6 + i) * 0.04 + artKick * 0.14;
+        /* the whole colour field leans toward the cursor for depth */
+        const px = mnx * a.depth * 150;
+        const pmy = mny * a.depth * 110;
         a.el.style.transform =
-          `translate3d(${dx}px, ${py + dy}px, 0) rotate(${a.rot + dr}deg) scale(${sc})`;
+          `translate3d(${dx + px}px, ${py + dy + pmy}px, 0) rotate(${a.rot + dr}deg) scale(${sc})`;
       });
     }
 
@@ -1969,6 +2105,41 @@
       heroLines.forEach((l, i) => {
         l.style.transform = `translateY(${-scrollY * 0.035 * i}px)`;
       });
+    }
+
+    /* Live type field — every headline letter breathes on a slow idle
+       wave, and lifts / tilts / warms toward crimson as the cursor passes.
+       Lerp-smoothed per letter; only after the overture has settled. */
+    if (letterFX && scrollY < innerHeight * 0.9) {
+      const active = finePointer && !reduced && pointerSeen;
+      const cvx = (mnx + 0.5) * innerWidth, cvy = (mny + 0.5) * innerHeight;
+      const R = 168;
+      for (const c of typeGeo) {
+        let tl = 0, tt = 0, ts = 1, tw = 0;
+        if (active) {
+          const dx = cvx - (c.cx - scrollX);
+          const dy = cvy - (c.cy - scrollY);
+          const f = Math.max(0, 1 - Math.hypot(dx, dy) / R);
+          const e = f * f * (3 - 2 * f);
+          tl = -e * 18;
+          tt = clampf(-dx / R, -1, 1) * e * 12;
+          ts = 1 + e * 0.22;
+          tw = e;
+        }
+        const br = reduced ? 0 : Math.sin(t * 1.05 + c.seed) * 1.5;
+        c.lift += (tl - c.lift) * 0.16;
+        c.tilt += (tt - c.tilt) * 0.16;
+        c.sc += (ts - c.sc) * 0.16;
+        c.warm += (tw - c.warm) * 0.16;
+        c.el.style.transform =
+          `translateY(${(c.lift + br).toFixed(2)}px) rotate(${c.tilt.toFixed(2)}deg) scale(${c.sc.toFixed(3)})`;
+        if (c.warm > 0.004) {
+          const w = c.warm;
+          c.el.style.color = `rgb(${INK_RGB[0] + (CRIM_RGB[0] - INK_RGB[0]) * w | 0},${INK_RGB[1] + (CRIM_RGB[1] - INK_RGB[1]) * w | 0},${INK_RGB[2] + (CRIM_RGB[2] - INK_RGB[2]) * w | 0})`;
+        } else if (c.el.style.color) {
+          c.el.style.color = '';
+        }
+      }
     }
 
     /* Marquees ride the scroll velocity, drifting opposite ways */
@@ -2343,6 +2514,9 @@
          on its own, after the burst has cleared — and set the fleet sailing */
       setTimeout(() => {
         html.classList.add('told');
+        html.classList.add('live-type');
+        measureType();
+        letterFX = true;
         if (fleetEl) { fleetReady = true; fleetEl.classList.add('sailing'); }
       }, 1500);
       setTimeout(() => html.classList.remove('burst-mode', 'mark-landed'), 2600);
