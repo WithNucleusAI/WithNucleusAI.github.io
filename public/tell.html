@@ -1006,24 +1006,16 @@
      ============================================ */
   #squirrel {
     position: fixed;
-    left: 1.6%;
+    left: 1.8%;
     bottom: 0;
-    width: clamp(80px, 7vw, 104px);
+    width: clamp(84px, 7.4vw, 112px);
     z-index: 44;
     pointer-events: none;
     opacity: 0;
     will-change: transform, opacity;
   }
   #squirrel svg { width: 100%; height: auto; overflow: visible; display: block; }
-  #squirrel g { transform-box: fill-box; }
-  #sqRoot   { transform-origin: 50% 92%; }
-  #sqTail   { transform-origin: 82% 86%; }
-  #sqLegB, #sqLegF { transform-origin: 50% 9%; }
-  #sqArmB   { transform-origin: 50% 12%; }
-  #sqArmF   { transform-origin: 50% 8%; }
-  #sqTorso  { transform-origin: 50% 96%; }
-  #sqHead   { transform-origin: 46% 88%; }
-  #sqEyes   { transform-origin: 50% 50%; }
+  #sqHead { transform-box: fill-box; transform-origin: 30% 90%; }
   /* z z z — only while dozing */
   .sq-z {
     position: absolute;
@@ -1493,51 +1485,30 @@
        whole scroll journey, sitting and dozing off whenever you pause -->
   <div id="squirrel" aria-hidden="true">
     <div class="sq-z" id="sqZ"><span>z</span><span>z</span><span>z</span></div>
-    <svg viewBox="0 0 170 160" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="sqFur" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#c07b3e"/><stop offset="1" stop-color="#a5622e"/>
-        </linearGradient>
-        <linearGradient id="sqTailg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#c98a4b"/><stop offset=".7" stop-color="#a5622e"/><stop offset="1" stop-color="#8a4f22"/>
-        </linearGradient>
-      </defs>
-      <g id="sqRoot">
-        <g id="sqTail">
-          <path d="M60 128 C 20 126 6 96 12 68 C 16 44 34 20 60 18 C 46 30 40 52 46 70 C 52 90 66 104 78 112 C 74 122 68 128 60 128 Z"
-                fill="url(#sqTailg)" stroke="#6e3f1c" stroke-width="3" stroke-linejoin="round"/>
-          <path d="M52 34 C 40 46 36 62 42 78 C 30 62 30 44 42 30 C 46 30 50 32 52 34 Z" fill="#e9c893" opacity=".8"/>
-        </g>
-        <g id="sqLegB"><ellipse cx="70" cy="140" rx="13" ry="8" fill="#8a4f22"/>
-          <rect x="62" y="112" width="15" height="26" rx="7" fill="url(#sqFur)" stroke="#6e3f1c" stroke-width="2.5"/></g>
-        <g id="sqTorso">
-          <ellipse cx="86" cy="104" rx="30" ry="34" fill="url(#sqFur)" stroke="#6e3f1c" stroke-width="3"/>
-          <ellipse cx="92" cy="112" rx="18" ry="23" fill="#f2dcb4"/>
-        </g>
-        <g id="sqLegF"><ellipse cx="100" cy="141" rx="13" ry="8" fill="#a5622e"/>
-          <rect x="93" y="113" width="15" height="27" rx="7" fill="url(#sqFur)" stroke="#6e3f1c" stroke-width="2.5"/></g>
-        <g id="sqArmB"><rect x="74" y="96" width="11" height="24" rx="5.5" fill="#a5622e" stroke="#6e3f1c" stroke-width="2"/></g>
-        <g id="sqHead">
-          <path d="M74 30 C 70 14 80 8 90 16 C 86 22 82 28 82 36 Z" fill="#a5622e" stroke="#6e3f1c" stroke-width="2.5"/>
-          <path d="M112 26 C 116 10 106 6 97 14 C 101 20 104 26 104 34 Z" fill="#c07b3e" stroke="#6e3f1c" stroke-width="2.5"/>
-          <path d="M78 24 C 76 16 82 14 87 18 C 84 21 82 24 82 30 Z" fill="#e7a6ab"/>
-          <path d="M108 20 C 110 12 104 11 100 15 C 102 18 104 21 104 27 Z" fill="#e7a6ab"/>
-          <circle cx="96" cy="54" r="27" fill="url(#sqFur)" stroke="#6e3f1c" stroke-width="3"/>
-          <ellipse cx="106" cy="64" rx="15" ry="12" fill="#f2dcb4"/>
-          <circle cx="82" cy="64" r="7" fill="#f19aa6" opacity=".45"/>
-          <circle cx="118" cy="66" r="6" fill="#f19aa6" opacity=".45"/>
-          <g id="sqEyes">
-            <circle cx="88" cy="50" r="7.5" fill="#241a12"/>
-            <circle cx="110" cy="50" r="8" fill="#241a12"/>
-            <circle cx="90.5" cy="47.5" r="2.4" fill="#fff"/>
-            <circle cx="112.5" cy="47.5" r="2.6" fill="#fff"/>
+    <svg viewBox="0 0 220 215" xmlns="http://www.w3.org/2000/svg">
+      <g stroke="#1a1712" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round">
+        <path id="sqTailPath" d="" fill="#fdf9ee"/>
+        <g id="sqSquash">
+          <path d="M58 196 q-2 -12 8 -16 l30 4 q6 10 -2 16 z" fill="#fdf9ee"/>
+          <ellipse cx="74" cy="150" rx="33" ry="39" fill="#fdf9ee"/>
+          <path d="M92 178 C 78 150 84 116 108 98 C 130 82 156 92 160 118 C 164 146 140 176 116 184 C 106 187 98 186 92 178 Z" fill="#fdf9ee"/>
+          <path d="M132 168 q-4 12 4 18" fill="none"/>
+          <path d="M146 166 q0 12 8 16" fill="none"/>
+          <ellipse cx="140" cy="188" rx="9" ry="5.5" fill="#fdf9ee"/>
+          <path d="M50 138 q-7 3 -9 10 M48 158 q-8 2 -10 9 M96 120 q6 -6 14 -6" fill="none" stroke-width="2"/>
+          <g id="sqHead">
+            <path d="M150 52 C 152 34 164 30 170 42 C 169 52 161 57 156 58 Z" fill="#fdf9ee"/>
+            <path d="M126 52 C 122 36 112 34 108 45 C 110 54 118 57 123 57 Z" fill="#fdf9ee"/>
+            <ellipse cx="140" cy="80" rx="31" ry="28" fill="#fdf9ee"/>
+            <path d="M162 76 q16 4 14 18 q-2 10 -16 10" fill="#fdf9ee" stroke-width="3"/>
+            <circle id="sqEye" cx="150" cy="72" r="5.6" fill="#1a1712" stroke="none"/>
+            <circle id="sqEyeHi" cx="152" cy="70" r="1.8" fill="#fff" stroke="none"/>
+            <path id="sqLid" d="M143 68 q7 -5 14 -1" fill="none" stroke-width="2.6" opacity="0"/>
+            <circle cx="176" cy="88" r="4" fill="#fc1c46" stroke="none"/>
+            <path d="M176 92 q-1 6 -8 6" fill="none" stroke-width="2.2"/>
+            <path d="M112 42 q-3 -5 -5 -10 M170 40 q3 -5 4 -10" fill="none" stroke-width="1.8"/>
           </g>
-          <g id="sqLids"></g>
-          <ellipse cx="116" cy="62" rx="4" ry="3.2" fill="#3a2415"/>
-          <path d="M116 65 C 116 70 112 72 108 70" fill="none" stroke="#6e3f1c" stroke-width="2" stroke-linecap="round"/>
         </g>
-        <g id="sqArmF"><rect x="100" y="92" width="11" height="26" rx="5.5" fill="#c07b3e" stroke="#6e3f1c" stroke-width="2"/>
-          <ellipse cx="105" cy="118" rx="7" ry="5" fill="#a5622e"/></g>
       </g>
     </svg>
   </div>
@@ -1859,81 +1830,124 @@
   const heroLines = [...heroHeadline.querySelectorAll('.line')];
 
   /* ================================================
-     Scout — the scroll-following squirrel. A procedural
-     bound cycle driven by scroll distance, blended into
-     a sit pose when you pause and a doze when you linger.
+     Scout — an ink-drawn squirrel. The drawn pose IS the
+     sit pose; running is whole-body squash & stretch plus
+     a fluid, follow-through tail (a tapering brush-stroke
+     path regenerated each frame), so nothing reads as a
+     rotating stick. Sits when you pause; dozes — breathing
+     and z z z — when you linger.
      ================================================ */
   const sqEl = document.getElementById('squirrel');
-  const sqRootG = document.getElementById('sqRoot');
-  const sqTailG = document.getElementById('sqTail');
-  const sqLegBG = document.getElementById('sqLegB');
-  const sqLegFG = document.getElementById('sqLegF');
-  const sqArmBG = document.getElementById('sqArmB');
-  const sqArmFG = document.getElementById('sqArmF');
-  const sqTorsoG = document.getElementById('sqTorso');
+  const sqSquashG = document.getElementById('sqSquash');
+  const sqTailEl = document.getElementById('sqTailPath');
   const sqHeadG = document.getElementById('sqHead');
-  const sqEyesG = document.getElementById('sqEyes');
+  const sqEye = document.getElementById('sqEye');
+  const sqEyeHi = document.getElementById('sqEyeHi');
+  const sqLid = document.getElementById('sqLid');
   const sqLerp = (a, b, t) => a + (b - a) * t;
-  const SQTAU = Math.PI * 2;
+
+  /* The tail is a spine of points that spring toward a rest curl; the
+     outline is offset from the spine with a tapering half-width */
+  const SQ_REST = [{ x: 78, y: 168 }, { x: 52, y: 150 }, { x: 34, y: 118 }, { x: 34, y: 78 }, { x: 52, y: 44 }, { x: 82, y: 30 }, { x: 104, y: 36 }];
+  const SQ_WID = [15, 24, 29, 29, 24, 15, 5];
+  const sqSpine = SQ_REST.map((p) => ({ x: p.x, y: p.y }));
+  const sqRestD = SQ_REST.map((p, i) => i ? { x: SQ_REST[i].x - SQ_REST[i - 1].x, y: SQ_REST[i].y - SQ_REST[i - 1].y } : { x: 0, y: 0 });
+  const sqSmooth = (pts) => {
+    let d = `M${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+    for (let i = 1; i < pts.length - 1; i++) {
+      const mx = (pts[i].x + pts[i + 1].x) / 2, my = (pts[i].y + pts[i + 1].y) / 2;
+      d += `Q${pts[i].x.toFixed(1)} ${pts[i].y.toFixed(1)} ${mx.toFixed(1)} ${my.toFixed(1)}`;
+    }
+    const l = pts[pts.length - 1];
+    return d + `L${l.x.toFixed(1)} ${l.y.toFixed(1)}`;
+  };
+  const sqTailPath = () => {
+    const L = [], R = [];
+    for (let i = 0; i < sqSpine.length; i++) {
+      const a = sqSpine[Math.max(0, i - 1)], b = sqSpine[Math.min(sqSpine.length - 1, i + 1)];
+      let dx = b.x - a.x, dy = b.y - a.y; const len = Math.hypot(dx, dy) || 1; dx /= len; dy /= len;
+      const nx = -dy, ny = dx, w = SQ_WID[i];
+      L.push({ x: sqSpine[i].x + nx * w, y: sqSpine[i].y + ny * w });
+      R.push({ x: sqSpine[i].x - nx * w, y: sqSpine[i].y - ny * w });
+    }
+    const tip = sqSpine[sqSpine.length - 1];
+    return sqSmooth(L) + `L${tip.x.toFixed(1)} ${tip.y.toFixed(1)}` + sqSmooth(R.reverse()).replace('M', 'L') + 'Z';
+  };
+  for (let s = 0; s < 40; s++) {
+    for (let i = 1; i < sqSpine.length; i++) {
+      sqSpine[i].x += (sqSpine[i - 1].x + sqRestD[i].x - sqSpine[i].x) * 0.5;
+      sqSpine[i].y += (sqSpine[i - 1].y + sqRestD[i].y - sqSpine[i].y) * 0.5;
+    }
+  }
+  if (sqTailEl) sqTailEl.setAttribute('d', sqTailPath());
+
   let sqReady = false;
-  let sqPhase = 0, sqRun = 0, sqSit = 0, sqSleep = 0;
-  let sqPrevScroll = scrollY, sqStill = 0, sqTailLag = 0;
+  let sqPhase = 0, sqPhasePrev = 0, sqRun = 0, sqSit = 0, sqSleep = 0;
+  let sqPrevScroll = scrollY, sqStill = 0;
   let sqBlink = 1, sqBlinkT = 0, sqBlinkNext = 2;
-  let sqLean = 0, sqHopBoost = 0, sqStrides = 0, sqNextHop = 4 + Math.floor(Math.random() * 4);
+  let sqHopBoost = 0, sqStrides = 0, sqNextHop = 4 + Math.floor(Math.random() * 4);
+  let sqBoundPrev = 0, sqSway = 0, sqBreath = 0;
+  const SQ_PX = 110, SQ_PY = 198;
 
   function updateSquirrel(dt) {
-    if (!sqReady || reduced || !sqRootG) return;
+    if (!sqReady || reduced || !sqSquashG) return;
     const ds = scrollY - sqPrevScroll; sqPrevScroll = scrollY;
     const ads = Math.abs(ds);
     const moving = ads > 0.6;
 
     sqRun += ((moving ? 1 : 0) - sqRun) * (moving ? 0.2 : 0.06);
     sqStill = moving ? 0 : sqStill + dt;
-    sqSit  += ((sqStill > 0.6 ? 1 : 0) - sqSit) * 0.07;
+    sqSit += ((sqStill > 0.55 ? 1 : 0) - sqSit) * 0.07;
     sqSleep += ((sqStill > 3.0 ? 1 : 0) - sqSleep) * 0.028;
 
     const speed = Math.min(1, Math.abs(scrollVel) / 22);
-    const prevPhase = sqPhase;
-    sqPhase += (ads * 0.016 + sqRun * (2.4 + speed * 3.4) * dt) * (1 - sqSit * 0.9);
-    if (Math.floor(sqPhase) !== Math.floor(prevPhase)) {
+    sqPhasePrev = sqPhase;
+    sqPhase += (ads * 0.014 + sqRun * (2.2 + speed * 3.2) * dt) * (1 - sqSit * 0.92);
+    if (Math.floor(sqPhase) !== Math.floor(sqPhasePrev)) {
       sqStrides++;
-      if (sqStrides >= sqNextHop && sqRun > 0.55) { sqHopBoost = 1; sqNextHop = sqStrides + 4 + Math.floor(Math.random() * 5); }
+      if (sqStrides >= sqNextHop && sqRun > 0.5) { sqHopBoost = 1; sqNextHop = sqStrides + 4 + Math.floor(Math.random() * 5); }
     }
-    sqHopBoost *= (1 - dt * 2.6);
+    sqHopBoost *= (1 - dt * 2.4);
 
-    const ph = sqPhase * SQTAU;
-    const hop = Math.max(0, Math.sin((sqPhase % 1) * Math.PI));
-    const boundY = -(hop * (17 + sqHopBoost * 40)) * sqRun * (1 - sqSit);
-    sqLean += ((speed * 12 * sqRun * (1 - sqSit)) - sqLean) * 0.12;
+    const frac = sqPhase - Math.floor(sqPhase);
+    const run01 = sqRun * (1 - sqSit);
+    const hop = Math.sin(frac * Math.PI);
+    const boundY = -(hop * (24 + sqHopBoost * 42)) * run01;
+    sqBreath += dt;
+    const breathe = Math.sin(sqBreath * 2.1) * 0.032 * sqSleep + Math.sin(sqBreath * 1.4) * 0.012 * Math.max(0, sqSit - sqSleep);
+    const land = Math.max(0, Math.cos(frac * Math.PI * 2));
+    const sy = 1 + hop * 0.16 * run01 - land * 0.11 * run01 + breathe;
+    const sx = 1 / sy;
+    const pitch = Math.sin(frac * Math.PI * 2) * 5 * run01 + speed * 5 * run01;
 
-    const legB = sqLerp(-18 + 34 * Math.sin(ph), 10, sqSit);
-    const legF = sqLerp(18 - 34 * Math.sin(ph), -10, sqSit);
-    const armB = sqLerp(26 * Math.sin(ph) - 4, 34, sqSit);
-    const armF = sqLerp(-26 * Math.sin(ph) - 8, -42, sqSit);
-    const torso = sqLerp(5 * Math.sin(ph + 0.5), -10, sqSit);
-    const headRunSit = sqLerp(-3 * Math.sin(ph) - 2, 5, sqSit);
-    const head = sqLerp(headRunSit, 17, sqSleep);
-    const tailBase = sqLerp(-14 - speed * 16, 26, sqSit);
-    const tailFlow = Math.sin(ph - 0.8) * (6 + speed * 8) * sqRun * (1 - sqSit);
-    sqTailLag += ((-boundY * 0.4) - sqTailLag) * 0.16;
-    const tail = tailBase + tailFlow + sqTailLag;
+    sqSquashG.setAttribute('transform',
+      `translate(0 ${boundY.toFixed(2)}) translate(${SQ_PX} ${SQ_PY}) rotate(${pitch.toFixed(2)}) scale(${sx.toFixed(3)} ${sy.toFixed(3)}) translate(${-SQ_PX} ${-SQ_PY})`);
+
+    const headBob = -Math.sin(frac * Math.PI * 2 + 0.6) * 3 * run01;
+    const headTilt = sqLerp(headBob, 11, sqSleep);
+    sqHeadG.style.transform = `rotate(${headTilt.toFixed(2)}deg)`;
 
     sqBlinkT += dt;
-    if (sqBlinkT > sqBlinkNext) {
-      sqBlink = 0;
-      if (sqBlinkT > sqBlinkNext + 0.1) { sqBlink = 1; sqBlinkT = 0; sqBlinkNext = 1.8 + Math.random() * 3.5; }
-    }
-    const eyeScale = sqLerp(sqBlink, 0.05, Math.min(1, sqSleep * 1.5));
+    if (sqBlinkT > sqBlinkNext) { sqBlink = 0; if (sqBlinkT > sqBlinkNext + 0.11) { sqBlink = 1; sqBlinkT = 0; sqBlinkNext = 1.8 + Math.random() * 3.6; } }
+    const open = sqLerp(sqBlink, 0, Math.min(1, sqSleep * 1.6));
+    sqEye.style.opacity = open; sqEyeHi.style.opacity = open; sqLid.style.opacity = 1 - open;
 
-    sqRootG.style.transform = `translate(0px, ${boundY.toFixed(2)}px) rotate(${sqLean.toFixed(2)}deg)`;
-    sqLegBG.style.transform = `rotate(${legB.toFixed(2)}deg)`;
-    sqLegFG.style.transform = `rotate(${legF.toFixed(2)}deg)`;
-    sqArmBG.style.transform = `rotate(${armB.toFixed(2)}deg)`;
-    sqArmFG.style.transform = `rotate(${armF.toFixed(2)}deg)`;
-    sqTorsoG.style.transform = `rotate(${torso.toFixed(2)}deg)`;
-    sqHeadG.style.transform = `rotate(${(head * 0.4).toFixed(2)}deg) translateY(${(sqSleep * 3).toFixed(2)}px)`;
-    sqTailG.style.transform = `rotate(${tail.toFixed(2)}deg)`;
-    sqEyesG.style.transform = `scaleY(${eyeScale.toFixed(3)})`;
+    const boundVel = boundY - sqBoundPrev; sqBoundPrev = boundY;
+    const idle = Math.max(0, sqSit - sqSleep);
+    const targetSway = -boundVel * 0.05 + Math.sin(frac * Math.PI * 2 - 0.7) * 0.5 * run01
+      + Math.sin(sqBreath * 1.1) * 0.07 * idle;
+    sqSway += (targetSway - sqSway) * 0.25;
+    sqSpine[0].x = 78; sqSpine[0].y = 168 + boundY * 0.7;
+    for (let i = 1; i < sqSpine.length; i++) {
+      const f = i / sqSpine.length;
+      const ca = Math.cos(sqSway * f), sa = Math.sin(sqSway * f);
+      const off = sqRestD[i];
+      const tx = sqSpine[i - 1].x + (off.x * ca - off.y * sa);
+      const ty = sqSpine[i - 1].y + (off.x * sa + off.y * ca);
+      sqSpine[i].x += (tx - sqSpine[i].x) * 0.45;
+      sqSpine[i].y += (ty - sqSpine[i].y) * 0.45;
+    }
+    sqTailEl.setAttribute('d', sqTailPath());
 
     const sleeping = sqSleep > 0.5;
     if (sleeping !== sqEl.classList.contains('sleeping')) sqEl.classList.toggle('sleeping', sleeping);
@@ -1949,9 +1963,9 @@
     const from = -(innerHeight * 0.92);
     sqEl.animate(
       [
-        { transform: `translateY(${from}px) rotate(-260deg) scale(.7)`, opacity: 0 },
-        { transform: `translateY(${from}px) rotate(-260deg) scale(.7)`, opacity: 1, offset: .06 },
-        { transform: 'translateY(-16px) rotate(10deg) scale(1.04)', offset: .8 },
+        { transform: `translateY(${from}px) rotate(-250deg) scale(.7)`, opacity: 0 },
+        { transform: `translateY(${from}px) rotate(-250deg) scale(.7)`, opacity: 1, offset: .06 },
+        { transform: 'translateY(-14px) rotate(9deg) scale(1.04)', offset: .8 },
         { transform: 'translateY(2px) rotate(-3deg) scale(1)', offset: .92 },
         { transform: 'translateY(0px) rotate(0deg) scale(1)' },
       ],
