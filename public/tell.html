@@ -203,13 +203,18 @@
     50% { border-radius: 44% 56% 50% 50% / 60% 42% 58% 40%; }
   }
   .art--dawn {
-    width: clamp(170px, 24vw, 360px);
-    aspect-ratio: 1;
+    width: clamp(210px, 30vw, 470px);
+    aspect-ratio: 1.12;
     border-radius: 46% 54% 60% 40% / 50% 44% 56% 50%;
-    animation: morph-a 17s ease-in-out infinite;
+    animation: morph-a 22s ease-in-out infinite;
     background:
-      radial-gradient(circle at 30% 25%, rgba(255,255,255,.5), transparent 45%),
-      linear-gradient(135deg, var(--hue-pink) 5%, var(--hue-blue) 95%);
+      radial-gradient(circle at 40% 36%,
+        rgba(139,150,228,.60) 0%,
+        rgba(168,150,222,.46) 38%,
+        rgba(238,192,196,.26) 64%,
+        rgba(238,192,196,0) 80%);
+    filter: blur(7px);
+    opacity: .82;
   }
   .art--amber {
     width: clamp(150px, 18vw, 280px);
