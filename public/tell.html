@@ -36,7 +36,7 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; overflow-x: clip; }
 
   body {
     background: var(--paper);
@@ -44,7 +44,10 @@
     font-family: var(--font-sui);
     font-size: 15px;
     line-height: 1.15;
-    overflow-x: hidden;
+    /* clip (not hidden) kills the horizontal wobble on mobile without
+       turning the body into a scroll container that breaks the sticky band */
+    overflow-x: clip;
+    max-width: 100%;
   }
 
   a { color: inherit; text-decoration: none; }
@@ -1354,10 +1357,41 @@
     0%, 100% { transform: rotate(4deg) skewX(4deg); }
     50% { transform: rotate(-5deg) skewX(-5deg); }
   }
-  @media (max-width: 900px) { #fleet { display: none; } }
-  /* On phones and tablets the travelling cloud can't clear the type — the
-     small-screen read is clean editorial; the animated layer is a desktop stage */
-  @media (max-width: 900px) { .bubble, .tdot { display: none; } }
+  /* ============================================
+     Mobile — a version made FOR the phone, not a
+     squeezed desktop: every element stays, but the
+     type, spacing and pacing are re-cut to the
+     single column so nothing runs off the edge.
+     ============================================ */
+  @media (max-width: 600px) {
+    :root { --margin-x: 22px; }
+
+    /* Hero — headline sized to the column (no more clipped STORY), and a
+       tighter top so the story starts sooner */
+    .hero { padding-top: 118px; min-height: 90vh; padding-bottom: 56px; }
+    .hero .display { font-size: clamp(36px, 11.2vw, 60px); line-height: 0.98; }
+    .hero .display .line:nth-child(2) { margin-left: clamp(0px, 6vw, 40px); }
+    .hero .display .line:nth-child(3) { margin-left: 0; }
+    .hero__lead { margin-top: 30px; }
+    .hero__scroll { margin-top: 42px; }
+
+    /* The statement band — smaller type so more of the sentence reads at a
+       glance as it scrubs, a shorter track so it doesn't over-scroll, and the
+       pen-arc/asterisk pulled clear of the words */
+    .scrub { height: 200vh; }
+    .scrub__track { font-size: clamp(30px, 10vw, 56px); gap: .3em; }
+    .scrub__bez { top: 6vh; left: auto; right: 3%; width: clamp(168px, 42vw, 230px); }
+    .scrub__star { bottom: 8vh; left: 7%; width: clamp(40px, 12vw, 60px); }
+
+    /* Fleet flies on phones too — the boat, plane and crane weave down as a
+       soft background layer (rocket + kite sit out to keep the column calm) */
+    #fleet.sailing { opacity: .4; }
+    #craftRocket, #craftKite { display: none; }
+
+    /* The story-thread runs through the single column here, so let it recede
+       to a faint whisper behind the words instead of a line across them */
+    #threadPath { stroke: rgba(252, 28, 70, .18); stroke-width: 1.5; }
+  }
 
   @media (prefers-reduced-motion: reduce) {
     header, .hero__scroll, .marquee__track, .art, .deco svg,
@@ -2130,7 +2164,7 @@
       const r = el.getBoundingClientRect();
       /* character display height — a small corner companion on phones */
       let size = parseFloat(el.dataset.size) || 280;
-      if (narrow) size = Math.min(size * 0.42, 118);
+      if (narrow) size = Math.min(size * 0.4, 104);
       return {
         x: r.left + scrollX + r.width / 2,
         y: r.top + scrollY + r.height / 2,
@@ -2374,11 +2408,14 @@
   }
 
   function updateFleet(t, dt) {
-    if (!fleetReady || reduced || innerWidth < 700 || !fleetEl) return;
+    if (!fleetReady || reduced || !fleetEl) return;
+    const mob = innerWidth < 600;
     const denom = Math.max(1, document.documentElement.scrollHeight - innerHeight);
     const p = clampf(scrollY / denom, 0, 1);
     CRAFT.forEach((c) => {
       if (!c.el) return;
+      /* phones fly a calmer, thinner fleet — the boat, plane and crane */
+      if (mob && (c.kind === 'rocket' || c.kind === 'kite')) return;
       const tg = fleetPath(c, p);
       if (!c.cur) { c.cur = { x: tg.x, y: tg.y }; c.lastX = tg.x; c.lastY = tg.y; }
       c.cur.x += (tg.x - c.cur.x) * c.k;
@@ -2461,10 +2498,10 @@
 
     let sx, sy;
     if (innerWidth < 760) {
-      /* phones: a small companion tucked in the bottom-right, out of the
-         reading column — it still swaps pose section to section */
-      sx = innerWidth - cur.size * 0.5 - 8;
-      sy = innerHeight - cur.size * 0.52 - 14;
+      /* phones: a small companion tucked into the very bottom-right corner,
+         clear of the reading column — it still swaps pose section to section */
+      sx = innerWidth - cur.size * 0.42 - 4;
+      sy = innerHeight - cur.size * 0.46 - 8;
     } else {
       const half = cur.size * 0.42;
       sx = Math.max(half, Math.min(innerWidth - half, cur.x - scrollX));
@@ -2863,7 +2900,12 @@
   const runOverture = () => {
     if (overtureDone) return;
     overtureDone = true;
-    if (reduced || innerWidth < 700 || !('animate' in Element.prototype)) { startHero(); return; }
+    if (reduced || innerWidth < 700 || !('animate' in Element.prototype)) {
+      startHero();
+      /* no overture on phones — set the fleet sailing straight away */
+      if (fleetEl && !reduced) { fleetReady = true; fleetEl.classList.add('sailing'); }
+      return;
+    }
 
     const html = document.documentElement;
     html.classList.add('burst-mode');   /* settles headline lines for measuring */
