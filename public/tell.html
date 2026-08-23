@@ -1002,52 +1002,6 @@
   }
 
   /* ============================================
-     Scout — the scroll-following squirrel
-     ============================================ */
-  #squirrel {
-    position: fixed;
-    left: 1.8%;
-    bottom: 0;
-    width: clamp(84px, 7.4vw, 112px);
-    z-index: 44;
-    pointer-events: none;
-    opacity: 0;
-    will-change: transform, opacity;
-  }
-  #squirrel svg { width: 100%; height: auto; overflow: visible; display: block; }
-  #sqHead { transform-box: fill-box; transform-origin: 30% 90%; }
-  /* z z z — only while dozing */
-  .sq-z {
-    position: absolute;
-    left: 72%;
-    top: -6%;
-    width: 60px;
-    height: 60px;
-    opacity: 0;
-    transition: opacity .4s ease;
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-    font-weight: 700;
-    color: #9b8f7e;
-  }
-  #squirrel.sleeping .sq-z { opacity: 1; }
-  .sq-z span {
-    position: absolute;
-    left: 0; top: 30px;
-    opacity: 0;
-  }
-  #squirrel.sleeping .sq-z span { animation: sq-zfloat 2.7s ease-in-out infinite; }
-  .sq-z span:nth-child(1) { font-size: 13px; animation-delay: 0s; }
-  .sq-z span:nth-child(2) { font-size: 17px; animation-delay: .9s; }
-  .sq-z span:nth-child(3) { font-size: 22px; animation-delay: 1.8s; }
-  @keyframes sq-zfloat {
-    0%   { opacity: 0; transform: translate(0, 6px) rotate(-6deg) scale(.7); }
-    20%  { opacity: .9; }
-    70%  { opacity: .8; }
-    100% { opacity: 0; transform: translate(26px, -34px) rotate(10deg) scale(1.1); }
-  }
-  @media (max-width: 700px) { #squirrel { display: none; } }
-
-  /* ============================================
      Sky scene — rocket meets paper plane, they scatter
      ============================================ */
   #crashScene {
@@ -1481,38 +1435,6 @@
     <div id="crashDebris"></div>
   </div>
 
-  <!-- Scout — a cute squirrel who tumbles in with the burst and runs the
-       whole scroll journey, sitting and dozing off whenever you pause -->
-  <div id="squirrel" aria-hidden="true">
-    <div class="sq-z" id="sqZ"><span>z</span><span>z</span><span>z</span></div>
-    <svg viewBox="0 0 220 215" xmlns="http://www.w3.org/2000/svg">
-      <g stroke="#1a1712" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round">
-        <path id="sqTailPath" d="" fill="#fdf9ee"/>
-        <g id="sqSquash">
-          <path d="M58 196 q-2 -12 8 -16 l30 4 q6 10 -2 16 z" fill="#fdf9ee"/>
-          <ellipse cx="74" cy="150" rx="33" ry="39" fill="#fdf9ee"/>
-          <path d="M92 178 C 78 150 84 116 108 98 C 130 82 156 92 160 118 C 164 146 140 176 116 184 C 106 187 98 186 92 178 Z" fill="#fdf9ee"/>
-          <path d="M132 168 q-4 12 4 18" fill="none"/>
-          <path d="M146 166 q0 12 8 16" fill="none"/>
-          <ellipse cx="140" cy="188" rx="9" ry="5.5" fill="#fdf9ee"/>
-          <path d="M50 138 q-7 3 -9 10 M48 158 q-8 2 -10 9 M96 120 q6 -6 14 -6" fill="none" stroke-width="2"/>
-          <g id="sqHead">
-            <path d="M150 52 C 152 34 164 30 170 42 C 169 52 161 57 156 58 Z" fill="#fdf9ee"/>
-            <path d="M126 52 C 122 36 112 34 108 45 C 110 54 118 57 123 57 Z" fill="#fdf9ee"/>
-            <ellipse cx="140" cy="80" rx="31" ry="28" fill="#fdf9ee"/>
-            <path d="M162 76 q16 4 14 18 q-2 10 -16 10" fill="#fdf9ee" stroke-width="3"/>
-            <circle id="sqEye" cx="150" cy="72" r="5.6" fill="#1a1712" stroke="none"/>
-            <circle id="sqEyeHi" cx="152" cy="70" r="1.8" fill="#fff" stroke="none"/>
-            <path id="sqLid" d="M143 68 q7 -5 14 -1" fill="none" stroke-width="2.6" opacity="0"/>
-            <circle cx="176" cy="88" r="4" fill="#fc1c46" stroke="none"/>
-            <path d="M176 92 q-1 6 -8 6" fill="none" stroke-width="2.2"/>
-            <path d="M112 42 q-3 -5 -5 -10 M170 40 q3 -5 4 -10" fill="none" stroke-width="1.8"/>
-          </g>
-        </g>
-      </g>
-    </svg>
-  </div>
-
   <!-- Footer -->
   <footer class="page">
     <div class="footer-mark" aria-hidden="true">Tell<i>.</i></div>
@@ -1830,151 +1752,6 @@
   const heroLines = [...heroHeadline.querySelectorAll('.line')];
 
   /* ================================================
-     Scout — an ink-drawn squirrel. The drawn pose IS the
-     sit pose; running is whole-body squash & stretch plus
-     a fluid, follow-through tail (a tapering brush-stroke
-     path regenerated each frame), so nothing reads as a
-     rotating stick. Sits when you pause; dozes — breathing
-     and z z z — when you linger.
-     ================================================ */
-  const sqEl = document.getElementById('squirrel');
-  const sqSquashG = document.getElementById('sqSquash');
-  const sqTailEl = document.getElementById('sqTailPath');
-  const sqHeadG = document.getElementById('sqHead');
-  const sqEye = document.getElementById('sqEye');
-  const sqEyeHi = document.getElementById('sqEyeHi');
-  const sqLid = document.getElementById('sqLid');
-  const sqLerp = (a, b, t) => a + (b - a) * t;
-
-  /* The tail is a spine of points that spring toward a rest curl; the
-     outline is offset from the spine with a tapering half-width */
-  const SQ_REST = [{ x: 78, y: 168 }, { x: 52, y: 150 }, { x: 34, y: 118 }, { x: 34, y: 78 }, { x: 52, y: 44 }, { x: 82, y: 30 }, { x: 104, y: 36 }];
-  const SQ_WID = [15, 24, 29, 29, 24, 15, 5];
-  const sqSpine = SQ_REST.map((p) => ({ x: p.x, y: p.y }));
-  const sqRestD = SQ_REST.map((p, i) => i ? { x: SQ_REST[i].x - SQ_REST[i - 1].x, y: SQ_REST[i].y - SQ_REST[i - 1].y } : { x: 0, y: 0 });
-  const sqSmooth = (pts) => {
-    let d = `M${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
-    for (let i = 1; i < pts.length - 1; i++) {
-      const mx = (pts[i].x + pts[i + 1].x) / 2, my = (pts[i].y + pts[i + 1].y) / 2;
-      d += `Q${pts[i].x.toFixed(1)} ${pts[i].y.toFixed(1)} ${mx.toFixed(1)} ${my.toFixed(1)}`;
-    }
-    const l = pts[pts.length - 1];
-    return d + `L${l.x.toFixed(1)} ${l.y.toFixed(1)}`;
-  };
-  const sqTailPath = () => {
-    const L = [], R = [];
-    for (let i = 0; i < sqSpine.length; i++) {
-      const a = sqSpine[Math.max(0, i - 1)], b = sqSpine[Math.min(sqSpine.length - 1, i + 1)];
-      let dx = b.x - a.x, dy = b.y - a.y; const len = Math.hypot(dx, dy) || 1; dx /= len; dy /= len;
-      const nx = -dy, ny = dx, w = SQ_WID[i];
-      L.push({ x: sqSpine[i].x + nx * w, y: sqSpine[i].y + ny * w });
-      R.push({ x: sqSpine[i].x - nx * w, y: sqSpine[i].y - ny * w });
-    }
-    const tip = sqSpine[sqSpine.length - 1];
-    return sqSmooth(L) + `L${tip.x.toFixed(1)} ${tip.y.toFixed(1)}` + sqSmooth(R.reverse()).replace('M', 'L') + 'Z';
-  };
-  for (let s = 0; s < 40; s++) {
-    for (let i = 1; i < sqSpine.length; i++) {
-      sqSpine[i].x += (sqSpine[i - 1].x + sqRestD[i].x - sqSpine[i].x) * 0.5;
-      sqSpine[i].y += (sqSpine[i - 1].y + sqRestD[i].y - sqSpine[i].y) * 0.5;
-    }
-  }
-  if (sqTailEl) sqTailEl.setAttribute('d', sqTailPath());
-
-  let sqReady = false;
-  let sqPhase = 0, sqPhasePrev = 0, sqRun = 0, sqSit = 0, sqSleep = 0;
-  let sqPrevScroll = scrollY, sqStill = 0;
-  let sqBlink = 1, sqBlinkT = 0, sqBlinkNext = 2;
-  let sqHopBoost = 0, sqStrides = 0, sqNextHop = 4 + Math.floor(Math.random() * 4);
-  let sqBoundPrev = 0, sqSway = 0, sqBreath = 0;
-  const SQ_PX = 110, SQ_PY = 198;
-
-  function updateSquirrel(dt) {
-    if (!sqReady || reduced || !sqSquashG) return;
-    const ds = scrollY - sqPrevScroll; sqPrevScroll = scrollY;
-    const ads = Math.abs(ds);
-    const moving = ads > 0.6;
-
-    sqRun += ((moving ? 1 : 0) - sqRun) * (moving ? 0.2 : 0.06);
-    sqStill = moving ? 0 : sqStill + dt;
-    sqSit += ((sqStill > 0.55 ? 1 : 0) - sqSit) * 0.07;
-    sqSleep += ((sqStill > 3.0 ? 1 : 0) - sqSleep) * 0.028;
-
-    const speed = Math.min(1, Math.abs(scrollVel) / 22);
-    sqPhasePrev = sqPhase;
-    sqPhase += (ads * 0.014 + sqRun * (2.2 + speed * 3.2) * dt) * (1 - sqSit * 0.92);
-    if (Math.floor(sqPhase) !== Math.floor(sqPhasePrev)) {
-      sqStrides++;
-      if (sqStrides >= sqNextHop && sqRun > 0.5) { sqHopBoost = 1; sqNextHop = sqStrides + 4 + Math.floor(Math.random() * 5); }
-    }
-    sqHopBoost *= (1 - dt * 2.4);
-
-    const frac = sqPhase - Math.floor(sqPhase);
-    const run01 = sqRun * (1 - sqSit);
-    const hop = Math.sin(frac * Math.PI);
-    const boundY = -(hop * (24 + sqHopBoost * 42)) * run01;
-    sqBreath += dt;
-    const breathe = Math.sin(sqBreath * 2.1) * 0.032 * sqSleep + Math.sin(sqBreath * 1.4) * 0.012 * Math.max(0, sqSit - sqSleep);
-    const land = Math.max(0, Math.cos(frac * Math.PI * 2));
-    const sy = 1 + hop * 0.16 * run01 - land * 0.11 * run01 + breathe;
-    const sx = 1 / sy;
-    const pitch = Math.sin(frac * Math.PI * 2) * 5 * run01 + speed * 5 * run01;
-
-    sqSquashG.setAttribute('transform',
-      `translate(0 ${boundY.toFixed(2)}) translate(${SQ_PX} ${SQ_PY}) rotate(${pitch.toFixed(2)}) scale(${sx.toFixed(3)} ${sy.toFixed(3)}) translate(${-SQ_PX} ${-SQ_PY})`);
-
-    const headBob = -Math.sin(frac * Math.PI * 2 + 0.6) * 3 * run01;
-    const headTilt = sqLerp(headBob, 11, sqSleep);
-    sqHeadG.style.transform = `rotate(${headTilt.toFixed(2)}deg)`;
-
-    sqBlinkT += dt;
-    if (sqBlinkT > sqBlinkNext) { sqBlink = 0; if (sqBlinkT > sqBlinkNext + 0.11) { sqBlink = 1; sqBlinkT = 0; sqBlinkNext = 1.8 + Math.random() * 3.6; } }
-    const open = sqLerp(sqBlink, 0, Math.min(1, sqSleep * 1.6));
-    sqEye.style.opacity = open; sqEyeHi.style.opacity = open; sqLid.style.opacity = 1 - open;
-
-    const boundVel = boundY - sqBoundPrev; sqBoundPrev = boundY;
-    const idle = Math.max(0, sqSit - sqSleep);
-    const targetSway = -boundVel * 0.05 + Math.sin(frac * Math.PI * 2 - 0.7) * 0.5 * run01
-      + Math.sin(sqBreath * 1.1) * 0.07 * idle;
-    sqSway += (targetSway - sqSway) * 0.25;
-    sqSpine[0].x = 78; sqSpine[0].y = 168 + boundY * 0.7;
-    for (let i = 1; i < sqSpine.length; i++) {
-      const f = i / sqSpine.length;
-      const ca = Math.cos(sqSway * f), sa = Math.sin(sqSway * f);
-      const off = sqRestD[i];
-      const tx = sqSpine[i - 1].x + (off.x * ca - off.y * sa);
-      const ty = sqSpine[i - 1].y + (off.x * sa + off.y * ca);
-      sqSpine[i].x += (tx - sqSpine[i].x) * 0.45;
-      sqSpine[i].y += (ty - sqSpine[i].y) * 0.45;
-    }
-    sqTailEl.setAttribute('d', sqTailPath());
-
-    const sleeping = sqSleep > 0.5;
-    if (sleeping !== sqEl.classList.contains('sleeping')) sqEl.classList.toggle('sleeping', sleeping);
-  }
-
-  /* Scout tumbles in out of the blast, then lands and takes over */
-  function sqDropIn() {
-    if (!sqEl) return;
-    if (reduced || innerWidth < 700 || !('animate' in Element.prototype)) {
-      sqEl.style.opacity = '1'; sqReady = true; sqPrevScroll = scrollY; return;
-    }
-    sqEl.style.opacity = '1';
-    const from = -(innerHeight * 0.92);
-    sqEl.animate(
-      [
-        { transform: `translateY(${from}px) rotate(-250deg) scale(.7)`, opacity: 0 },
-        { transform: `translateY(${from}px) rotate(-250deg) scale(.7)`, opacity: 1, offset: .06 },
-        { transform: 'translateY(-14px) rotate(9deg) scale(1.04)', offset: .8 },
-        { transform: 'translateY(2px) rotate(-3deg) scale(1)', offset: .92 },
-        { transform: 'translateY(0px) rotate(0deg) scale(1)' },
-      ],
-      { duration: 1150, easing: 'cubic-bezier(.5,0,.35,1)', fill: 'backwards' }
-    );
-    setTimeout(() => { sqReady = true; sqPrevScroll = scrollY; }, 1080);
-  }
-
-  /* ================================================
      Sky scene — a rocket climbs and a paper plane glides
      across the mid-page sky; they meet and scatter into
      paper and sparks. Fully scrubbed to the chapters
@@ -2187,7 +1964,6 @@
       });
     }
 
-    updateSquirrel(dt);
     updateCrash();
   };
   requestAnimationFrame(frame);
@@ -2355,8 +2131,6 @@
     bubbleHold = false;
     cur.size = 24;
     startHero();
-    /* Scout tumbles out of the blast a beat later and lands to run */
-    setTimeout(sqDropIn, 260);
   };
 
   /* Arm the artifact flights: held inside the mark through the charge
@@ -2418,7 +2192,7 @@
   const runOverture = () => {
     if (overtureDone) return;
     overtureDone = true;
-    if (reduced || innerWidth < 700 || !('animate' in Element.prototype)) { startHero(); sqDropIn(); return; }
+    if (reduced || innerWidth < 700 || !('animate' in Element.prototype)) { startHero(); return; }
 
     const html = document.documentElement;
     html.classList.add('burst-mode');   /* settles headline lines for measuring */
