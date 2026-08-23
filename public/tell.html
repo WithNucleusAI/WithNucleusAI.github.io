@@ -2956,6 +2956,13 @@
     }, FALL);
   };
   boot = runOverture;
+
+  /* Safety net — whatever happens with the intro (skipped, interrupted,
+     or throttled in a preview frame), make sure Pip takes the stage. */
+  setTimeout(() => {
+    bubbleHold = false;
+    if (mascotEl && !mascotEl.classList.contains('live')) mascotEl.classList.add('live');
+  }, 1500);
 </script>
 </body>
 </html>
