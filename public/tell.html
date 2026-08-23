@@ -515,58 +515,31 @@
   /* ============================================
      The thought bubble — inked on paper
      ============================================ */
-  .bubble {
+  .mascot {
     position: fixed;
     top: 0; left: 0;
-    width: 680px;
-    height: 680px;
-    z-index: 5;
+    z-index: 6;
     pointer-events: none;
     will-change: transform;
-  }
-  .bubble svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-  .bubble__media {
-    position: absolute;
-    inset: 0;
-    clip-path: url(#cloudClip);
-    background: var(--ink);
-  }
-  .bubble__media video {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transform: scale(1.04);
     opacity: 0;
-    transition: opacity .8s ease;
+    transition: opacity .7s ease;
   }
-  .bubble__media video.on { opacity: 1; }
-  .bubble__outline {
-    fill: none;
-    stroke: var(--ink);
-    stroke-width: 1.8;
-    vector-effect: non-scaling-stroke;
+  .mascot.live { opacity: 1; }
+  .mascot__pose {
+    position: absolute;
+    left: 0; top: 0;
+    height: 300px;
+    width: auto;
+    transform: translate(-50%, -54%);
+    transform-origin: 50% 62%;
+    opacity: 0;
+    transition: opacity .55s ease;
+    -webkit-user-select: none; user-select: none;
+    -webkit-user-drag: none;
   }
-  .bubble__outline--sketch {
-    stroke-width: 1;
-    opacity: .3;
-  }
-  .tdot {
-    position: fixed;
-    top: 0; left: 0;
-    z-index: 5;
-    pointer-events: none;
-    border: 1.5px solid var(--ink);
-    border-radius: 58% 42% 55% 45% / 48% 55% 45% 52%;
-    background: var(--paper);
-    will-change: transform;
-  }
-  .tdot--1 { width: 44px; height: 40px; }
-  .tdot--2 { width: 24px; height: 22px; }
-  .tdot--3 { width: 12px; height: 11px; }
+  .mascot__pose.on { opacity: 1; }
 
-  [data-bubble] {
+  [data-mascot] {
     position: absolute;
     pointer-events: none;
     visibility: hidden;
@@ -1444,22 +1417,16 @@
     </div>
   </nav>
 
-  <!-- The travelling thought bubble -->
-  <div class="bubble" aria-hidden="true">
-    <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-      <defs>
-        <clipPath id="cloudClip" clipPathUnits="objectBoundingBox">
-          <path id="cloudClipPath" d=""></path>
-        </clipPath>
-      </defs>
-      <path id="cloudOutline2" class="bubble__outline bubble__outline--sketch" d=""></path>
-      <path id="cloudOutline" class="bubble__outline" d=""></path>
-    </svg>
-    <div class="bubble__media">
-      <video id="vid0" muted playsinline preload="auto"></video>
-      <video id="vid1" muted loop playsinline preload="auto"></video>
-      <video id="vid2" muted loop playsinline preload="auto"></video>
-    </div>
+  <!-- The mascot — Pip the storyteller travels down the page with the scroll,
+       shifting pose section to section. Real character, not a video clip. -->
+  <div class="mascot" aria-hidden="true">
+    <img class="mascot__pose" data-pose="hero"   src="mascot/pip-hero.png"   alt="" width="1000" height="646">
+    <img class="mascot__pose" data-pose="proud"  src="mascot/pip-proud.png"  alt="" width="785"  height="900">
+    <img class="mascot__pose" data-pose="pen"    src="mascot/pip-pen.png"    alt="" width="900"  height="830">
+    <img class="mascot__pose" data-pose="sprint" src="mascot/pip-sprint.png" alt="" width="1000" height="566">
+    <img class="mascot__pose" data-pose="relax"  src="mascot/pip-relax.png"  alt="" width="807"  height="900">
+    <img class="mascot__pose" data-pose="listen" src="mascot/pip-listen.png" alt="" width="894"  height="900">
+    <img class="mascot__pose" data-pose="base"   src="mascot/pip-base.png"   alt="" width="766"  height="860">
   </div>
   <div class="tdot tdot--1" aria-hidden="true"></div>
   <div class="tdot tdot--2" aria-hidden="true"></div>
@@ -1529,7 +1496,7 @@
 
     <span class="hero__scroll">(Scroll — the story follows)</span>
 
-    <div data-bubble data-hero data-size="470" data-clip="0" style="right: -12%; top: 40px; width: 470px; height: 470px;"></div>
+    <div data-mascot data-hero data-pose="hero" data-size="276" style="right: 4%; top: 66px; width: 300px; height: 300px;"></div>
   </section>
 
   <!-- Marquee -->
@@ -1568,7 +1535,7 @@
     </div>
     <p class="work-note reveal">A young studio — more stories in the making. <a href="#contact">Yours could be the next one.</a></p>
 
-    <div data-bubble data-size="196" data-clip="1" style="right: 4%; top: 8%; width: 196px; height: 196px;"></div>
+    <div data-mascot data-pose="proud" data-size="300" style="right: 6%; top: 26%; width: 300px; height: 300px;"></div>
   </section>
 
   <!-- Capabilities -->
@@ -1619,7 +1586,7 @@
         <p class="cap-card__desc">A voice, a rhythm and a face for the story.</p>
       </div>
     </div>
-    <div data-bubble data-size="196" data-clip="1" style="right: 6%; top: 6%; width: 196px; height: 196px;"></div>
+    <div data-mascot data-pose="pen" data-size="272" style="right: 7%; top: 4%; width: 280px; height: 280px;"></div>
   </section>
 
   <!-- Statement — pinned band, the sentence scrubs across with the scroll -->
@@ -1658,7 +1625,7 @@
         </svg>
       </div>
     </div>
-    <div data-bubble data-size="230" data-clip="0" style="left: 5%; top: 46%; width: 230px; height: 230px;"></div>
+    <div data-mascot data-pose="sprint" data-size="242" style="left: 7%; top: 62%; width: 260px; height: 260px;"></div>
   </section>
 
   <!-- Chapters -->
@@ -1710,7 +1677,7 @@
         </div>
       </div>
     </div>
-    <div data-bubble data-size="330" data-clip="0" style="right: 2%; top: 50%; width: 330px; height: 330px;"></div>
+    <div data-mascot data-pose="relax" data-size="300" style="right: 5%; top: 16%; width: 300px; height: 300px;"></div>
   </section>
 
   <!-- Contact -->
@@ -1765,7 +1732,7 @@
         </button>
       </div>
     </form>
-    <div data-bubble data-size="380" data-clip="2" style="right: 6%; top: 34%; width: 380px; height: 380px;"></div>
+    <div data-mascot data-pose="listen" data-size="300" style="right: 8%; top: 18%; width: 300px; height: 300px;"></div>
   </section>
 
   <!-- Second marquee — drifts the other way -->
@@ -1843,6 +1810,7 @@
 
   <!-- Footer -->
   <footer class="page">
+    <div data-mascot data-pose="base" data-size="248" style="right: 12%; top: 12%; width: 248px; height: 248px;"></div>
     <div class="footer-mark" aria-hidden="true">Tell<i>.</i></div>
     <div class="footer-row">
       <span>&copy; 2026 Tell</span>
@@ -1872,8 +1840,7 @@
   const finePointer = matchMedia('(pointer: fine)').matches;
 
   /* Story films — clip 0 scrubs with scroll, clips 1 and 2 loop */
-  const VEXT = document.createElement('video').canPlayType('video/mp4; codecs="avc1.42E01E"') ? 'mp4' : 'webm';
-  const CLIPS = [0, 1, 2].map((i) => `tell/story-${i}-hd.${VEXT}`);
+  /* mascot poses swap by section — no video, a real character on the paper */
 
   /* Split big headings into rising lines */
   document.querySelectorAll('h2.lines').forEach((h) => {
@@ -1946,7 +1913,8 @@
     heroHeadline.classList.add('in');
     document.documentElement.classList.add('live-type');
     setTimeout(() => { if (typeof measureType === 'function') measureType(); letterFX = true; }, 900);
-    document.querySelectorAll('.bubble, .tdot, .art').forEach((el) => el.classList.add('in'));
+    document.querySelectorAll('.art').forEach((el) => el.classList.add('in'));
+    document.querySelector('.mascot')?.classList.add('live');
     /* DrawSVG-style: the coil inks itself in after the headline lands */
     if (!reduced) {
       document.querySelectorAll('.draw-in path').forEach((p) => {
@@ -2137,66 +2105,35 @@
     });
   }
 
-  /* The travelling thought bubble — see tell-v2 for the dark original */
-  const bubble = document.querySelector('.bubble');
-  const dots = [...document.querySelectorAll('.tdot')];
-  const outline = document.getElementById('cloudOutline');
-  const outline2 = document.getElementById('cloudOutline2');
-  const clipPathEl = document.getElementById('cloudClipPath');
-  const vids = [document.getElementById('vid0'), document.getElementById('vid1'), document.getElementById('vid2')];
-  const BASE = 680;
-
-  const BUMPS = 13;
-  const seeds = Array.from({ length: BUMPS }, () => Math.random() * 100);
-  let jitterA = new Array(BUMPS).fill(0);
-  let jitterB = new Array(BUMPS).fill(0);
-  const reseed = () => {
-    jitterA = jitterA.map(() => (Math.random() - 0.5) * 2.6);
-    jitterB = jitterB.map(() => (Math.random() - 0.5) * 3.4);
+  /* The mascot — Pip travels the page and changes pose per section */
+  const mascotEl = document.querySelector('.mascot');
+  const poseEls = mascotEl ? [...mascotEl.querySelectorAll('.mascot__pose')] : [];
+  const poseMap = {};
+  poseEls.forEach((el) => { poseMap[el.dataset.pose] = el; });
+  /* poses that naturally face RIGHT; flipped when the character travels left */
+  const POSE_FACE = { hero: 1, sprint: 1, proud: 1, pen: -1, relax: 1, listen: 1, base: 1 };
+  let curPose = null;
+  const setPose = (name) => {
+    if (name === curPose || !poseMap[name]) return;
+    curPose = name;
+    poseEls.forEach((el) => el.classList.toggle('on', el.dataset.pose === name));
   };
-  reseed();
-
-  const cloudPath = (unit, jitter) => {
-    const cx = 50, cy = 50, rx = 42.5, ry = 39.5;
-    const pts = [];
-    for (let i = 0; i < BUMPS; i++) {
-      const a = (i / BUMPS) * Math.PI * 2 + seeds[i] * 0.002;
-      const j = reduced ? 0 : jitter[i];
-      pts.push([cx + Math.cos(a) * (rx + j), cy + Math.sin(a) * (ry + j)]);
-    }
-    const s = unit ? 0.01 : 1;
-    let d = `M ${pts[0][0] * s} ${pts[0][1] * s}`;
-    for (let i = 0; i < BUMPS; i++) {
-      const [x1, y1] = pts[i];
-      const [x2, y2] = pts[(i + 1) % BUMPS];
-      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
-      const ox = mx - 50, oy = my - 50;
-      const olen = Math.hypot(ox, oy) || 1;
-      const push = 7.5;
-      d += ` Q ${(mx + (ox / olen) * push) * s} ${(my + (oy / olen) * push) * s} ${x2 * s} ${y2 * s}`;
-    }
-    return d + ' Z';
-  };
-
-  const redrawCloud = () => {
-    outline.setAttribute('d', cloudPath(false, jitterA));
-    outline2.setAttribute('d', cloudPath(false, jitterB));
-    clipPathEl.setAttribute('d', cloudPath(true, jitterA));
-  };
-  redrawCloud();
-  if (!reduced) setInterval(() => { reseed(); redrawCloud(); }, 130);
 
   /* Waypoints + colored-artifact parallax anchors */
   let anchors = [];
   let arts = [];
   const measure = () => {
-    anchors = [...document.querySelectorAll('[data-bubble]')].map((el) => {
+    const narrow = innerWidth < 760;
+    anchors = [...document.querySelectorAll('[data-mascot]')].map((el) => {
       const r = el.getBoundingClientRect();
+      /* character display height — a small corner companion on phones */
+      let size = parseFloat(el.dataset.size) || 280;
+      if (narrow) size = Math.min(size * 0.42, 118);
       return {
         x: r.left + scrollX + r.width / 2,
         y: r.top + scrollY + r.height / 2,
-        size: Math.min(parseFloat(el.dataset.size), innerWidth * (innerWidth < 760 ? 0.46 : 0.78)),
-        clip: parseInt(el.dataset.clip, 10) || 0,
+        size,
+        pose: el.dataset.pose || 'base',
         hero: 'hero' in el.dataset,
       };
     }).sort((a, b) => a.y - b.y);
@@ -2205,16 +2142,6 @@
       const r = el.getBoundingClientRect();
       return { el, y: r.top + scrollY + r.height / 2, depth: parseFloat(el.dataset.depth) || 0.12, rot: parseFloat(el.dataset.rot) || 0 };
     });
-    /* Keep the cloud clear of the COMPANY line at any viewport width */
-    const heroAnchor = anchors.find((a) => a.hero);
-    const l2 = document.querySelector('#heroHeadline .line:nth-child(2) > span');
-    if (heroAnchor && l2) {
-      heroAnchor.size = Math.min(heroAnchor.size, innerWidth * 0.30);
-      const wordRight = l2.getBoundingClientRect().right + scrollX;
-      const clear = wordRight + heroAnchor.size / 2 + 30;
-      const cap = innerWidth - heroAnchor.size * 0.28;
-      heroAnchor.x = Math.min(Math.max(heroAnchor.x, clear), cap);
-    }
     const sb = document.getElementById('scrubBand');
     if (sb) {
       scrubGeo = {
@@ -2258,17 +2185,6 @@
   addEventListener('load', measure);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
 
-  /* Work rows attract the bubble */
-  let attract = null;
-  if (finePointer) {
-    document.querySelectorAll('.work-item').forEach((item) => {
-      item.addEventListener('mouseenter', () => {
-        const r = item.getBoundingClientRect();
-        attract = { x: r.right + scrollX + 170, y: r.top + scrollY + r.height / 2 };
-      });
-      item.addEventListener('mouseleave', () => { attract = null; });
-    });
-  }
 
   /* ============================================
      Living ink — a slow flow-field of calligraphic strokes
@@ -2352,59 +2268,30 @@
 
   const target = () => {
     const s = scrollY + innerHeight * 0.5;
-    if (!anchors.length) return { x: innerWidth / 2, y: innerHeight / 2, size: 400, clip: 0 };
-    let tg;
-    if (s <= anchors[0].y) tg = { ...anchors[0] };
-    else if (s >= anchors[anchors.length - 1].y) tg = { ...anchors[anchors.length - 1] };
-    else {
-      let i = 0;
-      while (s > anchors[i + 1].y) i++;
-      const a = anchors[i], b = anchors[i + 1];
-      const t = ease((s - a.y) / (b.y - a.y));
-      tg = {
-        x: a.x + (b.x - a.x) * t,
-        y: a.y + (b.y - a.y) * t,
-        size: a.size + (b.size - a.size) * t,
-        clip: t < 0.5 ? a.clip : b.clip,
-      };
-    }
-    if (attract) {
-      tg.x += (attract.x - tg.x) * 0.35;
-      tg.y += (attract.y - tg.y) * 0.35;
-    }
-    return tg;
+    if (!anchors.length) return { x: innerWidth / 2, y: innerHeight / 2, size: 280, pose: 'base' };
+    if (s <= anchors[0].y) return { ...anchors[0] };
+    if (s >= anchors[anchors.length - 1].y) return { ...anchors[anchors.length - 1] };
+    let i = 0;
+    while (s > anchors[i + 1].y) i++;
+    const a = anchors[i], b = anchors[i + 1];
+    const t = ease((s - a.y) / (b.y - a.y));
+    return {
+      x: a.x + (b.x - a.x) * t,
+      y: a.y + (b.y - a.y) * t,
+      size: a.size + (b.size - a.size) * t,
+      /* hold each pose until the character is most of the way to the next stop */
+      pose: t < 0.62 ? a.pose : b.pose,
+    };
   };
 
-  /* Clip switching: 0 scrubs, 1 and 2 loop */
-  vids.forEach((v, i) => { v.src = CLIPS[i]; });
-  vids[0].addEventListener('loadedmetadata', () => { vids[0].currentTime = 0.001; });
-  let activeClip = -1;
-  const setClip = (idx) => {
-    if (idx === activeClip) return;
-    activeClip = idx;
-    vids.forEach((v, i) => {
-      v.classList.toggle('on', i === idx);
-      if (i === idx && i !== 0 && !reduced) v.play().catch(() => {});
-      if (i !== idx && i !== 0) v.pause();
-    });
-  };
-  setClip(0);
-
-  /* The glide loop */
-  const cur = { x: innerWidth * 0.72, y: innerHeight * 0.45, size: 600 };
-  const dotState = dots.map(() => ({ x: cur.x, y: cur.y }));
-  const DOT_K = [0.10, 0.075, 0.055];
-  const DOT_OFF = [
-    { x: -0.30, y: 0.44 },
-    { x: -0.40, y: 0.56 },
-    { x: -0.47, y: 0.65 },
-  ];
+  /* The glide loop — the mascot eases toward its section stop */
+  const cur = { x: innerWidth * 0.82, y: innerHeight * 0.4, size: 300 };
   let prevX = cur.x;
-  let bubbleHold = false; /* overture: pin the cloud inside the burst point */
+  let bubbleHold = false; /* overture: hold the mascot off-stage during the intro */
   let prevScroll = scrollY;
   let scrollVel = 0;
   let artKick = 0;
-  let scrubCur = 0;
+  let faceCur = 1;
   let marqueeX = 0;
   let lastMs = 0;
   let t0 = 0;
@@ -2553,34 +2440,13 @@
     prevScroll = scrollY;
 
     const tg = target();
-    setClip(tg.clip);
+    setPose(tg.pose);
 
-    /* Scrub the hero film across its on-stage windows */
-    const v0 = vids[0];
-    if (v0.duration && anchors.length > 1) {
-      const s = scrollY + innerHeight * 0.5;
-      let win = null;
-      for (let i = 0; i < anchors.length; i++) {
-        const start = i === 0 ? innerHeight * 0.5 : (anchors[i - 1].y + anchors[i].y) / 2;
-        const end = i === anchors.length - 1
-          ? anchors[i].y + innerHeight
-          : (anchors[i].y + anchors[i + 1].y) / 2;
-        if (s >= start && s < end) { win = anchors[i].clip === 0 ? { start, end } : null; break; }
-      }
-      if (win) {
-        const gp = clamp01((s - win.start) / (win.end - win.start));
-        const tt = gp * (v0.duration - 0.08);
-        scrubCur += (tt - scrubCur) * (reduced ? 1 : 0.16);
-        if (!v0.seeking && Math.abs(v0.currentTime - scrubCur) > 0.02) {
-          v0.currentTime = scrubCur;
-        }
-      }
-    }
-
-    /* Bubble travel */
-    const swayX = reduced ? 0 : Math.sin(t * 0.7) * 10;
-    const swayY = reduced ? 0 : Math.cos(t * 0.9) * 12;
-    const k = reduced ? 1 : 0.075;
+    /* The mascot eases toward its section stop, then breathes in place —
+       a small idle bob + a gentle lean into its travel. Not a video. */
+    const swayX = reduced ? 0 : Math.sin(t * 0.7) * 6;
+    const bobY  = reduced ? 0 : Math.sin(t * 1.45) * 5;
+    const k = reduced ? 1 : 0.072;
     if (!bubbleHold) {
       cur.x += (tg.x - cur.x) * k;
       cur.y += (tg.y - cur.y) * k;
@@ -2589,38 +2455,29 @@
 
     const vx = cur.x - prevX;
     prevX = cur.x;
-    const rot = reduced ? 0 : Math.max(-6, Math.min(6, vx * 0.35)) + Math.sin(t * 0.5) * 1.5;
+    const tilt = reduced ? 0 : Math.max(-5, Math.min(5, vx * 0.35)) + Math.sin(t * 0.6) * 1.1;
 
-    const scale = cur.size / BASE;
-    const sx = Math.max(cur.size * 0.3, Math.min(innerWidth - cur.size * 0.3, cur.x - scrollX));
-    /* Never let the cloud ride up into the header band */
-    const sy = Math.max(88 + cur.size * 0.5, cur.y - scrollY);
-    bubble.style.transform =
-      `translate3d(${sx - BASE / 2 + swayX}px, ${sy - BASE / 2 + swayY}px, 0) rotate(${rot}deg) scale(${scale})`;
-
-    /* Fade the cloud out through the dense Work + Studio band */
-    if (!bubbleHold) {
-      const mid = scrollY + innerHeight * 0.5;
-      const wantFade = (mid > denseTop - innerHeight * 0.22 && mid < denseBottom - innerHeight * 0.05) ? 0.045 : 1;
-      cloudFade += (wantFade - cloudFade) * (reduced ? 1 : 0.09);
-      bubble.style.transition = 'none';   /* the JS lerp owns opacity now */
-      bubble.style.opacity = cloudFade.toFixed(3);
+    let sx, sy;
+    if (innerWidth < 760) {
+      /* phones: a small companion tucked in the bottom-right, out of the
+         reading column — it still swaps pose section to section */
+      sx = innerWidth - cur.size * 0.5 - 8;
+      sy = innerHeight - cur.size * 0.52 - 14;
+    } else {
+      const half = cur.size * 0.42;
+      sx = Math.max(half, Math.min(innerWidth - half, cur.x - scrollX));
+      /* keep the character clear of the header band */
+      sy = Math.max(96 + cur.size * 0.4, cur.y - scrollY);
     }
-
-    /* Dots chase the bubble's on-screen position so they stay attached
-       even when the cloud is held below the header */
-    dots.forEach((dot, i) => {
-      const off = DOT_OFF[i];
-      const tx = sx + off.x * cur.size + swayX * (0.6 - i * 0.15);
-      const ty = sy + off.y * cur.size + swayY * (0.6 - i * 0.15);
-      const st = dotState[i];
-      const dk = reduced ? 1 : DOT_K[i];
-      st.x += (tx - st.x) * dk;
-      st.y += (ty - st.y) * dk;
-      const ds = bubbleHold ? 0 : Math.max(0.12, scale);
-      dot.style.transform = `translate3d(${st.x}px, ${st.y}px, 0) scale(${ds})`;
-      if (!bubbleHold) dot.style.opacity = cloudFade.toFixed(3);
-    });
+    if (mascotEl) {
+      mascotEl.style.transform =
+        `translate3d(${(sx + swayX).toFixed(1)}px, ${(sy + bobY).toFixed(1)}px, 0)`;
+      const pel = poseMap[curPose];
+      if (pel) {
+        pel.style.height = cur.size.toFixed(0) + 'px';
+        pel.style.transform = `translate(-50%, -54%) rotate(${tilt.toFixed(2)}deg)`;
+      }
+    }
 
     /* Colored artifacts — each with its own drift amplitude and tempo,
        swelling gently when the scroll moves fast */
@@ -2936,9 +2793,12 @@
         { duration: 760, easing: 'cubic-bezier(.22,.68,.3,1)', fill: 'none' }
       );
     }
-    /* The cloud is born from the blast point and glides to its anchor */
+    /* Pip sweeps in from the top of the sky and glides down to the hero stop */
     bubbleHold = false;
-    cur.size = 24;
+    cur.x = scrollX + innerWidth * 0.86;
+    cur.y = scrollY - innerHeight * 0.32;
+    cur.size = 120;
+    prevX = cur.x;
     startHero();
   };
 
@@ -3006,14 +2866,12 @@
     const html = document.documentElement;
     html.classList.add('burst-mode');   /* settles headline lines for measuring */
 
-    /* Blank stage: cloud, dots, letters and artifacts all wait compressed
-       inside the mark; nothing is visible but the mark itself */
+    /* Blank stage: the mascot waits off-stage, letters and artifacts wait
+       compressed inside the mark; nothing is visible but the mark itself */
     bubbleHold = true;
     cur.x = scrollX + innerWidth / 2;
     cur.y = scrollY + innerHeight / 2;
-    cur.size = 2;
     prevX = cur.x;
-    dotState.forEach((st) => { st.x = cur.x; st.y = cur.y; });
     /* Measure + arm synchronously so the settled layout never paints */
     armLetters(FALL);
     armFlyers(FALL);
