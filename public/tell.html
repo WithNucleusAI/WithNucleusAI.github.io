@@ -440,7 +440,8 @@
     min-height: 94vh;
   }
   .hero .display { position: relative; z-index: 6; }
-  .hero .display .line:nth-child(2) { margin-left: 6vw; }
+  .hero .display .line:nth-child(2) { margin-left: 10vw; }
+  .hero .display .line:nth-child(3) { margin-left: 3vw; }
   .hero__lead {
     max-width: 400px;
     margin-top: 43px;
@@ -572,16 +573,96 @@
   .cap:nth-child(3) .meta { color: var(--hue-lilac); }
   .cap:nth-child(4) .meta { color: var(--hue-blue); }
 
-  .statement {
-    font-size: clamp(27px, 4.6vw, 72px);
-    font-weight: 400;
-    line-height: 1.1;
-    max-width: 1100px;
+  /* ============================================
+     Pinned scrub band — the statement rides
+     horizontally with the scroll (pin + scrub)
+     ============================================ */
+  .scrub {
+    height: 280vh;
+    padding: 0;
+  }
+  .scrub__pin {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
+  .scrub__track {
+    display: inline-flex;
+    align-items: center;
+    gap: .42em;
+    white-space: nowrap;
+    font-size: clamp(56px, 10.5vw, 150px);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--ink);
+    will-change: transform;
     position: relative;
     z-index: 6;
   }
-  .statement .w { color: var(--faint); transition: color .3s ease; }
-  .statement .w.lit { color: var(--ink); }
+  /* Sticker chips — pop as the sentence crosses (progress-keyed) */
+  .chip {
+    display: inline-flex;
+    padding: .05em .28em .12em;
+    border-radius: .14em;
+    rotate: var(--tilt, -3deg);
+    color: var(--ink);
+  }
+  .chip--green { background: var(--hue-green); }
+  .chip--pink { background: var(--hue-pink); }
+  .js .chip {
+    scale: .5;
+    opacity: 0;
+    transition: scale .55s cubic-bezier(.34,1.56,.64,1), opacity .25s ease;
+  }
+  .js .chip.pop { scale: none; opacity: 1; }
+  .scrub__bez {
+    position: absolute;
+    top: 10vh;
+    left: 54%;
+    width: clamp(220px, 26vw, 380px);
+    z-index: 6;
+    pointer-events: none;
+  }
+  .scrub__bez svg { width: 100%; overflow: visible; display: block; }
+  .scrub__star {
+    position: absolute;
+    bottom: 14vh;
+    left: 16%;
+    width: clamp(48px, 6vw, 88px);
+    z-index: 6;
+    pointer-events: none;
+    will-change: transform;
+  }
+  .scrub__star svg { width: 100%; display: block; overflow: visible; }
+
+  /* ============================================
+     Glyph decorations — woven into the type,
+     drifting on mouse parallax
+     ============================================ */
+  .deco {
+    position: absolute;
+    z-index: 7;
+    pointer-events: none;
+    will-change: transform;
+  }
+  .deco svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .deco--pinwheel { width: clamp(50px, 6.4vw, 96px); left: 44%; top: 11%; }
+  .deco--spring { width: clamp(54px, 7vw, 104px); left: 61%; top: 60%; }
+  .deco--aster { width: clamp(40px, 5vw, 72px); left: 30%; top: 79%; }
+  .deco--mini { width: clamp(30px, 3vw, 44px); }
+  .deco--pinwheel svg { animation: deco-spin 26s linear infinite; }
+  .deco--aster svg { animation: deco-spin 40s linear infinite reverse; }
+  .deco--spring svg { animation: deco-bob 6s ease-in-out infinite; }
+  @keyframes deco-spin { to { rotate: 360deg; } }
+  @keyframes deco-bob {
+    0%, 100% { translate: 0 0; rotate: 0deg; }
+    50% { translate: 0 -10px; rotate: 7deg; }
+  }
 
   .chapters {
     display: flex;
@@ -725,7 +806,8 @@
   .js [data-stagger].in > * { opacity: 1; transform: none; }
 
   @media (prefers-reduced-motion: reduce) {
-    header, .hero__scroll, .marquee__track, .art { animation: none; }
+    header, .hero__scroll, .marquee__track, .art, .deco svg { animation: none; }
+    .js .chip { scale: none; opacity: 1; transition: none; }
     .js .lines .line > span,
     .js .hero__lead, .js .hero__scroll,
     .js .bubble, .js .tdot, .js .art,
@@ -803,6 +885,48 @@
       <span class="line"><span>has a story</span></span>
     </h1>
 
+    <!-- Glyphs woven into the headline -->
+    <div class="deco deco--pinwheel" data-mdepth="26" aria-hidden="true">
+      <svg viewBox="0 0 100 100">
+        <defs>
+          <linearGradient id="gradPin" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ff8709"/><stop offset="1" stop-color="#fec5fb"/>
+          </linearGradient>
+        </defs>
+        <g fill="url(#gradPin)" stroke="var(--paper)" stroke-width="5">
+          <path d="M50 46 L50 6 A44 44 0 0 1 94 50 Z"/>
+          <path d="M54 50 L94 50 A44 44 0 0 1 50 94 Z"/>
+          <path d="M50 54 L50 94 A44 44 0 0 1 6 50 Z"/>
+          <path d="M46 50 L6 50 A44 44 0 0 1 50 6 Z"/>
+        </g>
+      </svg>
+    </div>
+    <div class="deco deco--spring draw-in" data-mdepth="44" aria-hidden="true">
+      <svg viewBox="0 0 100 110">
+        <defs>
+          <linearGradient id="gradSpring" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#9d95ff"/><stop offset="1" stop-color="#f100cb"/>
+          </linearGradient>
+        </defs>
+        <path d="M22 12 C74 0, 82 30, 34 30 C-8 30, 4 56, 46 52 C86 48, 90 74, 44 74 C6 74, 12 100, 52 96"
+              fill="none" stroke="url(#gradSpring)" stroke-width="11" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="deco deco--aster" data-mdepth="16" aria-hidden="true">
+      <svg viewBox="0 0 100 100">
+        <defs>
+          <linearGradient id="gradAster" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#f100cb"/><stop offset="1" stop-color="#ff8709"/>
+          </linearGradient>
+        </defs>
+        <g stroke="url(#gradAster)" stroke-width="13" stroke-linecap="round">
+          <line x1="50" y1="8" x2="50" y2="92"/>
+          <line x1="14" y1="29" x2="86" y2="71"/>
+          <line x1="86" y1="29" x2="14" y2="71"/>
+        </g>
+      </svg>
+    </div>
+
     <p class="hero__lead lead">
       — <em>we design how yours is told.</em> Brand identity, digital
       experiences, and motion for companies with something to say.
@@ -826,6 +950,15 @@
     <div class="section-head">
       <span class="eyebrow reveal">Selected Work</span>
       <h2 class="heading-lg lines">Stories<br>We've Told</h2>
+      <div class="deco deco--mini" data-mdepth="10" style="left: 42%; top: 4%;" aria-hidden="true">
+        <svg viewBox="0 0 100 100">
+          <g stroke="url(#gradAster)" stroke-width="13" stroke-linecap="round">
+            <line x1="50" y1="8" x2="50" y2="92"/>
+            <line x1="14" y1="29" x2="86" y2="71"/>
+            <line x1="86" y1="29" x2="14" y2="71"/>
+          </g>
+        </svg>
+      </div>
     </div>
     <div data-stagger>
       <a class="work-item" href="#">
@@ -883,15 +1016,43 @@
     <div data-bubble data-size="400" data-clip="1" style="right: 8%; top: 30%; width: 400px; height: 400px;"></div>
   </section>
 
-  <!-- Statement -->
-  <section class="page">
-    <div class="art art--violet" data-depth=".13" data-rot="-18" style="right: 0%; top: 58%;" aria-hidden="true"></div>
-    <p class="statement" id="statement">
-      A brand is not what you say about yourself. It is the story
-      people retell. We find yours, give it a voice, and make it
-      worth retelling.
-    </p>
-    <div data-bubble data-size="220" data-clip="0" style="left: 6%; top: 108%; width: 220px; height: 220px;"></div>
+  <!-- Statement — pinned band, the sentence scrubs across with the scroll -->
+  <section class="scrub" id="scrubBand">
+    <div class="art art--violet" data-depth=".05" data-rot="-18" style="right: 2%; top: 12%;" aria-hidden="true"></div>
+    <div class="scrub__pin">
+      <div class="scrub__track" id="scrubTrack">
+        <span>We turn</span>
+        <span>what you do</span>
+        <span>into a</span>
+        <span class="chip chip--green" style="--tilt: -4deg">story</span>
+        <span>people</span>
+        <span class="chip chip--pink" style="--tilt: 3deg">retell</span>
+      </div>
+
+      <!-- The arc of a story, drawn as you scrub -->
+      <div class="scrub__bez" aria-hidden="true">
+        <svg viewBox="0 0 320 160">
+          <line id="bezL1" x1="24" y1="130" x2="60" y2="25" stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 5"/>
+          <line id="bezL2" x1="300" y1="34" x2="210" y2="140" stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 5"/>
+          <path id="bezPath" d="M 24 130 C 60 25, 210 140, 300 34" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="24" cy="130" r="5" fill="var(--ink)"/>
+          <circle cx="300" cy="34" r="5" fill="var(--ink)"/>
+          <rect id="bezB1" x="54" y="19" width="12" height="12" rx="2" fill="var(--hue-green)" stroke="var(--ink)" stroke-width="1.5"/>
+          <rect id="bezB2" x="204" y="134" width="12" height="12" rx="2" fill="var(--hue-green)" stroke="var(--ink)" stroke-width="1.5"/>
+        </svg>
+      </div>
+
+      <div class="scrub__star" id="scrubStar" aria-hidden="true">
+        <svg viewBox="0 0 100 100">
+          <g stroke="url(#gradAster)" stroke-width="13" stroke-linecap="round">
+            <line x1="50" y1="8" x2="50" y2="92"/>
+            <line x1="14" y1="29" x2="86" y2="71"/>
+            <line x1="86" y1="29" x2="14" y2="71"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <div data-bubble data-size="230" data-clip="0" style="left: 5%; top: 46%; width: 230px; height: 230px;"></div>
   </section>
 
   <!-- Chapters -->
@@ -926,6 +1087,16 @@
     <div class="section-head">
       <span class="eyebrow reveal">Contact</span>
       <h2 class="heading-lg lines">Tell Us<br>Yours</h2>
+      <div class="deco deco--mini" data-mdepth="12" style="left: 38%; top: 10%;" aria-hidden="true">
+        <svg viewBox="0 0 100 100">
+          <g fill="url(#gradPin)" stroke="var(--paper)" stroke-width="5">
+            <path d="M50 46 L50 6 A44 44 0 0 1 94 50 Z"/>
+            <path d="M54 50 L94 50 A44 44 0 0 1 50 94 Z"/>
+            <path d="M50 54 L50 94 A44 44 0 0 1 6 50 Z"/>
+            <path d="M46 50 L6 50 A44 44 0 0 1 50 6 Z"/>
+          </g>
+        </svg>
+      </div>
     </div>
     <form class="contact-form reveal" action="#" method="post">
       <input class="field" type="text" name="name" placeholder="Your name" autocomplete="name">
@@ -973,6 +1144,18 @@
     heroEl.classList.add('in');
     heroHeadline.classList.add('in');
     document.querySelectorAll('.bubble, .tdot, .art').forEach((el) => el.classList.add('in'));
+    /* DrawSVG-style: the coil inks itself in after the headline lands */
+    if (!reduced) {
+      document.querySelectorAll('.draw-in path').forEach((p) => {
+        const L = p.getTotalLength();
+        p.style.strokeDasharray = L;
+        p.style.strokeDashoffset = L;
+        requestAnimationFrame(() => {
+          p.style.transition = 'stroke-dashoffset 1.4s cubic-bezier(.22,1,.36,1) 1.15s';
+          p.style.strokeDashoffset = 0;
+        });
+      });
+    }
   };
   const heroFallback = setTimeout(startHero, 700);
   if (document.fonts && document.fonts.ready) {
@@ -1037,11 +1220,28 @@
     cta.addEventListener('mouseleave', () => { cta.style.transform = ''; });
   }
 
-  /* Statement words */
-  const statement = document.getElementById('statement');
-  const words = statement.textContent.trim().split(/\s+/);
-  statement.innerHTML = words.map((w) => `<span class="w">${w}</span>`).join(' ');
-  const wEls = [...statement.querySelectorAll('.w')];
+  /* Pinned scrub band + glyph decorations */
+  const scrubTrack = document.getElementById('scrubTrack');
+  const scrubStar = document.getElementById('scrubStar');
+  const chipEls = [...document.querySelectorAll('.chip')];
+  const bezPath = document.getElementById('bezPath');
+  const bezL1 = document.getElementById('bezL1');
+  const bezL2 = document.getElementById('bezL2');
+  const bezB1 = document.getElementById('bezB1');
+  const bezB2 = document.getElementById('bezB2');
+  let scrubP = 0;
+  let scrubGeo = null;
+
+  const decos = [...document.querySelectorAll('.deco')].map((el) => ({
+    el, depth: parseFloat(el.dataset.mdepth) || 16, x: 0, y: 0,
+  }));
+  let mnx = 0, mny = 0;
+  if (finePointer) {
+    addEventListener('mousemove', (e) => {
+      mnx = e.clientX / innerWidth - 0.5;
+      mny = e.clientY / innerHeight - 0.5;
+    });
+  }
 
   /* The travelling thought bubble — see tell-v2 for the dark original */
   const bubble = document.querySelector('.bubble');
@@ -1110,6 +1310,14 @@
       const r = el.getBoundingClientRect();
       return { el, y: r.top + scrollY + r.height / 2, depth: parseFloat(el.dataset.depth) || 0.12, rot: parseFloat(el.dataset.rot) || 0 };
     });
+    const sb = document.getElementById('scrubBand');
+    if (sb) {
+      scrubGeo = {
+        top: sb.getBoundingClientRect().top + scrollY,
+        height: sb.offsetHeight,
+        trackW: scrubTrack.scrollWidth,
+      };
+    }
   };
   measure();
   addEventListener('resize', measure);
@@ -1292,11 +1500,39 @@
       marqueeTrack.style.transform = `translate3d(${marqueeX}px, 0, 0)`;
     }
 
-    /* Statement words light with progress */
-    const sr = statement.getBoundingClientRect();
-    const p = clamp01((innerHeight * 0.8 - sr.top) / (sr.height + innerHeight * 0.4));
-    const lit = Math.floor(p * wEls.length);
-    wEls.forEach((w, i) => w.classList.toggle('lit', i < lit));
+    /* Pinned band — the sentence scrubs across; the story arc draws itself;
+       chips pop at fixed points of the traversal */
+    if (scrubGeo) {
+      const span = Math.max(1, scrubGeo.height - innerHeight);
+      const spT = clamp01((scrollY - scrubGeo.top) / span);
+      scrubP += (spT - scrubP) * (reduced ? 1 : 0.12);
+      const startX = innerWidth * 0.7;
+      const endX = -(scrubGeo.trackW - innerWidth * 0.3);
+      scrubTrack.style.transform = `translate3d(${startX + (endX - startX) * scrubP}px, 0, 0)`;
+
+      const c1x = 60 + 80 * scrubP, c1y = 25 + 120 * scrubP;
+      const c2x = 210 + 60 * scrubP, c2y = 140 - 122 * scrubP;
+      bezPath.setAttribute('d', `M 24 130 C ${c1x} ${c1y}, ${c2x} ${c2y}, 300 34`);
+      bezL1.setAttribute('x2', c1x); bezL1.setAttribute('y2', c1y);
+      bezL2.setAttribute('x2', c2x); bezL2.setAttribute('y2', c2y);
+      bezB1.setAttribute('x', c1x - 6); bezB1.setAttribute('y', c1y - 6);
+      bezB2.setAttribute('x', c2x - 6); bezB2.setAttribute('y', c2y - 6);
+      const bl = bezPath.getTotalLength();
+      bezPath.style.strokeDasharray = bl;
+      bezPath.style.strokeDashoffset = bl * (1 - Math.min(1, scrubP * 1.5));
+
+      scrubStar.style.transform = `rotate(${scrubP * 540}deg)`;
+      chipEls.forEach((c, i) => c.classList.toggle('pop', scrubP > 0.32 + i * 0.28));
+    }
+
+    /* Glyphs drift on mouse parallax */
+    if (!reduced) {
+      decos.forEach((d) => {
+        d.x += (mnx * d.depth - d.x) * 0.06;
+        d.y += (mny * d.depth - d.y) * 0.06;
+        d.el.style.transform = `translate3d(${d.x}px, ${d.y}px, 0)`;
+      });
+    }
   };
   requestAnimationFrame(frame);
 </script>
