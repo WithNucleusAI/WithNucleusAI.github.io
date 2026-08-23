@@ -999,26 +999,77 @@
     max-width: 640px;
     display: flex;
     flex-direction: column;
-    gap: 36px;
+    gap: 26px;
     margin-top: 65px;
     position: relative;
     z-index: 6;
   }
+  .field-wrap { position: relative; }
   .field {
+    width: 100%;
     background: transparent;
     color: var(--ink);
     font-family: var(--font-sui);
-    font-size: 17px;
+    font-size: 18px;
     line-height: 1.2;
     border: none;
-    border-bottom: 1px solid var(--ink);
+    border-bottom: 1px solid var(--hairline);
     border-radius: 0;
-    padding: 7.2px 21.6px 7.2px 0;
+    padding: 26px 0 12px;
     outline: none;
   }
-  .field::placeholder { color: var(--muted); }
-  .field:focus { border-bottom-color: var(--crimson); }
-  textarea.field { resize: vertical; min-height: 86px; }
+  .field::placeholder { color: transparent; }
+  textarea.field { resize: vertical; min-height: 64px; }
+  /* Floating label */
+  .field-label {
+    position: absolute; left: 0; top: 26px;
+    color: var(--muted); font-size: 18px;
+    pointer-events: none;
+    transform-origin: left top;
+    transition: transform .4s cubic-bezier(.22,1,.36,1), color .3s ease;
+  }
+  .field:focus + .field-label,
+  .field:not(:placeholder-shown) + .field-label {
+    transform: translateY(-22px) scale(.7);
+  }
+  .field:focus + .field-label { color: var(--crimson); }
+  /* Focus line draws over the hairline in crimson */
+  .field-line {
+    position: absolute; left: 0; bottom: 0; height: 2px; width: 100%;
+    background: var(--crimson);
+    transform: scaleX(0); transform-origin: left center;
+    transition: transform .45s cubic-bezier(.22,1,.36,1);
+  }
+  .field:focus ~ .field-line { transform: scaleX(1); }
+
+  /* Paper-plane send button — the plane takes off on send */
+  .send-btn {
+    display: inline-flex; align-items: center; gap: 13px;
+    margin-top: 10px;
+    background: none; border: none; padding: 6px 0;
+    font-family: var(--font-sui); font-size: 16px; font-weight: 500;
+    color: var(--ink); cursor: none; position: relative;
+  }
+  .send-btn__label { position: relative; }
+  .send-btn__label::after {
+    content: ''; position: absolute; left: 0; bottom: -4px;
+    height: 1.5px; width: 100%; background: var(--crimson);
+    transform: scaleX(0); transform-origin: left center;
+    transition: transform .4s cubic-bezier(.22,1,.36,1);
+  }
+  .send-btn:hover .send-btn__label::after { transform: scaleX(1); }
+  .send-btn__plane {
+    width: 24px; height: 24px; display: block;
+    transition: transform .45s cubic-bezier(.22,1,.36,1);
+  }
+  .send-btn:hover .send-btn__plane { transform: translate(6px, -6px) rotate(10deg); }
+  .send-btn.sent .send-btn__plane { animation: plane-launch 1s cubic-bezier(.5,0,.2,1) forwards; }
+  @keyframes plane-launch {
+    0% { transform: translate(0,0) rotate(0); opacity: 1; }
+    45% { transform: translate(120px, -80px) rotate(24deg); opacity: 0; }
+    46% { transform: translate(-40px, 30px) rotate(-8deg); opacity: 0; }
+    100% { transform: translate(0,0) rotate(0); opacity: 1; }
+  }
 
   /* ============================================
      Footer
@@ -1723,12 +1774,29 @@
         </svg>
       </div>
     </div>
-    <form class="contact-form reveal" action="#" method="post">
-      <input class="field" type="text" name="name" placeholder="Your name" autocomplete="name">
-      <input class="field" type="email" name="email" placeholder="Email address" autocomplete="email">
-      <textarea class="field" name="message" placeholder="Start at the beginning — what's your story?"></textarea>
+    <form class="contact-form reveal" action="#" method="post" id="contactForm">
+      <div class="field-wrap">
+        <input class="field" id="f-name" type="text" name="name" placeholder=" " autocomplete="name">
+        <label class="field-label" for="f-name">Your name</label>
+        <span class="field-line" aria-hidden="true"></span>
+      </div>
+      <div class="field-wrap">
+        <input class="field" id="f-email" type="email" name="email" placeholder=" " autocomplete="email">
+        <label class="field-label" for="f-email">Email address</label>
+        <span class="field-line" aria-hidden="true"></span>
+      </div>
+      <div class="field-wrap">
+        <textarea class="field" id="f-msg" name="message" placeholder=" "></textarea>
+        <label class="field-label" for="f-msg">Start at the beginning — what's your story?</label>
+        <span class="field-line" aria-hidden="true"></span>
+      </div>
       <div>
-        <button class="ghost" type="submit">Send it over</button>
+        <button class="send-btn" type="submit" id="sendBtn">
+          <span class="send-btn__label">Send it over</span>
+          <svg class="send-btn__plane" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M22 2 L11 13 M22 2 L15 22 L11 13 L2 9 Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/>
+          </svg>
+        </button>
       </div>
     </form>
     <div data-bubble data-size="380" data-clip="2" style="right: 6%; top: 34%; width: 380px; height: 380px;"></div>
@@ -1948,6 +2016,25 @@
       cta.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * strength}px, ${(e.clientY - r.top - r.height / 2) * strength}px)`;
     });
     cta.addEventListener('mouseleave', () => { cta.style.transform = ''; });
+  }
+
+  /* Contact — the paper plane takes off when the story is sent */
+  const contactForm = document.getElementById('contactForm');
+  const sendBtn = document.getElementById('sendBtn');
+  if (contactForm && sendBtn) {
+    const label = sendBtn.querySelector('.send-btn__label');
+    const original = label.textContent;
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (sendBtn.classList.contains('sent')) return;
+      sendBtn.classList.add('sent');
+      setTimeout(() => { label.textContent = 'On its way —'; }, 380);
+      setTimeout(() => {
+        sendBtn.classList.remove('sent');
+        label.textContent = original;
+        contactForm.reset();
+      }, 2600);
+    });
   }
 
   /* Pinned scrub band + glyph decorations */
