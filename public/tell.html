@@ -240,6 +240,62 @@
       radial-gradient(circle at 30% 25%, rgba(255,255,255,.5), transparent 45%),
       linear-gradient(114deg, var(--hue-green) 15%, var(--hue-lightgreen) 80%);
   }
+  /* Story glyphs — meaningful shapes, each with its own life */
+  .artg svg { width: 100%; display: block; overflow: visible; }
+  .artg { border-radius: 0 !important; animation: none !important; background: none !important; }
+  .artg--speech { width: clamp(120px, 15vw, 230px); }
+  .artg--speech svg { animation: glyph-bob 5.5s ease-in-out infinite; }
+  .artg--quote { width: clamp(90px, 10vw, 160px); }
+  .artg--quote svg { animation: glyph-sway 7s ease-in-out infinite; }
+  .artg--book { width: clamp(120px, 15vw, 220px); }
+  .artg--book .book-page {
+    transform-box: fill-box;
+    transform-origin: left center;
+    animation: page-flip 6s ease-in-out infinite;
+  }
+  .artg--drop { width: clamp(64px, 8vw, 120px); }
+  .artg--drop .drop-body {
+    transform-box: fill-box;
+    transform-origin: center bottom;
+    animation: drop-squash 4s ease-in-out infinite;
+  }
+  .artg--drop .droplet { animation: drip 4s ease-in infinite; }
+  .artg--bang { width: clamp(60px, 7vw, 110px); }
+  .artg--bang svg { animation: bang-jump 4.6s ease-in-out infinite; }
+
+  @keyframes glyph-bob {
+    0%, 100% { translate: 0 0; rotate: 0deg; }
+    50% { translate: 0 -12px; rotate: -5deg; }
+  }
+  @keyframes glyph-sway {
+    0%, 100% { rotate: -5deg; }
+    50% { rotate: 6deg; }
+  }
+  @keyframes page-flip {
+    0%, 46%, 100% { transform: scaleX(1); }
+    58% { transform: scaleX(0.06) skewY(-8deg); }
+    70% { transform: scaleX(1); }
+  }
+  @keyframes drop-squash {
+    0%, 40%, 100% { transform: scale(1); }
+    55% { transform: scaleY(1.12) scaleX(.94); }
+    62% { transform: scaleY(.9) scaleX(1.08); }
+    75% { transform: scale(1); }
+  }
+  @keyframes drip {
+    0%, 52% { transform: translateY(0); opacity: 0; }
+    58% { opacity: 1; }
+    95% { transform: translateY(95px); opacity: 1; }
+    100% { transform: translateY(100px); opacity: 0; }
+  }
+  @keyframes bang-jump {
+    0%, 58%, 100% { transform: translateY(0); }
+    66% { transform: translateY(-16%) scaleY(1.05); }
+    74% { transform: translateY(0) scaleY(.9) scaleX(1.08); }
+    82% { transform: translateY(-5%); }
+    88% { transform: translateY(0); }
+  }
+
   .art--sea {
     width: clamp(120px, 14vw, 220px);
     aspect-ratio: 2 / 1;
@@ -518,6 +574,14 @@
   }
   .js .lines.in .line > span { transform: none; }
 
+  /* Letters answer the cursor — lift, tilt, settle back */
+  .display .ch {
+    display: inline-block;
+    transition: transform .5s cubic-bezier(.34,1.56,.64,1), color .3s ease;
+  }
+  .display .ch:hover { transform: translateY(-.07em) rotate(2.6deg); }
+  .display .ch:nth-child(even):hover { transform: translateY(-.05em) rotate(-2.4deg); }
+
   /* Work — stacked story rows, indices in the hue taxonomy */
   .work-item {
     display: block;
@@ -548,6 +612,15 @@
   .work-item:nth-child(3):hover .work-item__name { color: var(--hue-lipstick); }
   .work-item:nth-child(4):hover .work-item__name { color: var(--hue-lilac); }
   .work-item:nth-child(5):hover .work-item__name { color: var(--hue-blue); }
+  .work-item__name::after {
+    content: '→';
+    display: inline-block;
+    margin-left: .3em;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: opacity .3s ease, transform .35s cubic-bezier(.22,1,.36,1);
+  }
+  .work-item:hover .work-item__name::after { opacity: 1; transform: none; }
   .work-item__desc {
     font-size: 14px;
     line-height: 1.25;
@@ -691,6 +764,10 @@
     min-width: clamp(120px, 16vw, 220px);
   }
   .chapter__desc { font-size: 17px; line-height: 1.25; color: var(--muted); max-width: 420px; }
+  .chapter__name { transition: color .3s ease, letter-spacing .35s cubic-bezier(.22,1,.36,1); }
+  .chapter:nth-child(1):hover .chapter__name { color: var(--hue-green); letter-spacing: .01em; }
+  .chapter:nth-child(2):hover .chapter__name { color: var(--hue-orange); letter-spacing: .01em; }
+  .chapter:nth-child(3):hover .chapter__name { color: var(--hue-blue); letter-spacing: .01em; }
 
   /* ============================================
      Contact
@@ -738,8 +815,17 @@
   }
   .footer-mark i {
     font-style: normal;
+    display: inline-block;
     color: var(--crimson);
     -webkit-text-stroke: 0px transparent;
+    animation: period-bounce 3.4s cubic-bezier(.34,1.56,.64,1) infinite;
+  }
+  @keyframes period-bounce {
+    0%, 62%, 100% { transform: translateY(0); }
+    70% { transform: translateY(-.28em) scaleY(1.05); }
+    78% { transform: translateY(0) scaleY(.85) scaleX(1.15); }
+    84% { transform: translateY(-.08em); }
+    90% { transform: translateY(0); }
   }
   .footer-row {
     display: flex;
@@ -806,8 +892,11 @@
   .js [data-stagger].in > * { opacity: 1; transform: none; }
 
   @media (prefers-reduced-motion: reduce) {
-    header, .hero__scroll, .marquee__track, .art, .deco svg { animation: none; }
+    header, .hero__scroll, .marquee__track, .art, .deco svg,
+    .artg svg, .artg .book-page, .artg .drop-body, .artg .droplet,
+    .footer-mark i { animation: none; }
     .js .chip { scale: none; opacity: 1; transition: none; }
+    .display .ch { transition: none; }
     .js .lines .line > span,
     .js .hero__lead, .js .hero__scroll,
     .js .bubble, .js .tdot, .js .art,
@@ -934,7 +1023,7 @@
 
     <span class="hero__scroll">(Scroll — the story follows)</span>
 
-    <div data-bubble data-size="600" data-clip="0" style="right: -3%; top: 90px; width: 600px; height: 600px;"></div>
+    <div data-bubble data-size="520" data-clip="0" style="right: -11%; top: 70px; width: 520px; height: 520px;"></div>
   </section>
 
   <!-- Marquee -->
@@ -946,7 +1035,30 @@
 
   <!-- Work -->
   <section id="work" class="page">
-    <div class="art art--amber" data-depth=".16" style="right: -2%; top: 6%;" aria-hidden="true"></div>
+    <div class="art artg artg--speech" data-depth=".16" style="right: 0%; top: 5%;" aria-hidden="true">
+      <svg viewBox="0 0 120 110">
+        <defs>
+          <linearGradient id="gSpeech" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ff8709"/><stop offset="1" stop-color="#ffd28a"/>
+          </linearGradient>
+        </defs>
+        <path d="M14 10 h84 a12 12 0 0 1 12 12 v38 a12 12 0 0 1 -12 12 H56 L30 96 L38 72 H26 a12 12 0 0 1 -12 -12 Z" fill="url(#gSpeech)"/>
+        <g fill="#0e100f" opacity=".85">
+          <circle cx="42" cy="40" r="5"/><circle cx="60" cy="40" r="5"/><circle cx="78" cy="40" r="5"/>
+        </g>
+      </svg>
+    </div>
+    <div class="art artg artg--drop" data-depth=".22" style="left: -1%; top: 56%;" aria-hidden="true">
+      <svg viewBox="0 0 100 200">
+        <defs>
+          <linearGradient id="gDrop" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#9d95ff"/><stop offset="1" stop-color="#00bae2"/>
+          </linearGradient>
+        </defs>
+        <path class="drop-body" d="M50 6 C50 6 22 44 22 62 a28 28 0 0 0 56 0 C78 44 50 6 50 6 Z" fill="url(#gDrop)"/>
+        <circle class="droplet" cx="50" cy="100" r="7" fill="url(#gDrop)"/>
+      </svg>
+    </div>
     <div class="section-head">
       <span class="eyebrow reveal">Selected Work</span>
       <h2 class="heading-lg lines">Stories<br>We've Told</h2>
@@ -960,7 +1072,7 @@
         </svg>
       </div>
     </div>
-    <div data-stagger>
+    <div data-stagger data-skew>
       <a class="work-item" href="#">
         <div class="work-item__row">
           <span class="work-item__index">01</span>
@@ -1007,7 +1119,20 @@
       <h2 class="heading-lg lines">How We<br>Tell It</h2>
     </div>
     <div class="art art--sea" data-depth=".20" style="left: -2%; top: 62%;" aria-hidden="true"></div>
-    <div class="cap-list" data-stagger>
+    <div class="art artg artg--quote" data-depth=".14" style="right: 9%; top: 20%;" aria-hidden="true">
+      <svg viewBox="0 0 160 120">
+        <defs>
+          <linearGradient id="gQuote" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#9d95ff"/><stop offset="1" stop-color="#f100cb"/>
+          </linearGradient>
+        </defs>
+        <g fill="url(#gQuote)">
+          <path d="M12 50 a30 30 0 0 1 30 -30 v16 a16 16 0 0 0 -14 14 h16 v34 H12 Z"/>
+          <path d="M88 50 a30 30 0 0 1 30 -30 v16 a16 16 0 0 0 -14 14 h16 v34 H88 Z"/>
+        </g>
+      </svg>
+    </div>
+    <div class="cap-list" data-stagger data-skew>
       <div class="cap"><span class="meta">A</span>Narrative strategy &amp; positioning</div>
       <div class="cap"><span class="meta">B</span>Brand identity &amp; systems</div>
       <div class="cap"><span class="meta">C</span>Web design &amp; engineering</div>
@@ -1061,8 +1186,23 @@
       <span class="eyebrow reveal">The Process</span>
       <h2 class="heading-lg lines">Three<br>Chapters</h2>
     </div>
-    <div class="art art--sun" data-depth=".24" style="right: 6%; top: 12%;" aria-hidden="true"></div>
-    <div class="chapters" data-stagger>
+    <div class="art artg artg--book" data-depth=".2" style="right: 5%; top: 12%;" aria-hidden="true">
+      <svg viewBox="0 0 140 100">
+        <defs>
+          <linearGradient id="gBookL" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#00bae2"/><stop offset="1" stop-color="#abff84"/>
+          </linearGradient>
+          <linearGradient id="gBookR" x1="1" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#0ae448"/><stop offset="1" stop-color="#abff84"/>
+          </linearGradient>
+        </defs>
+        <path d="M70 20 C52 8 28 8 12 14 V80 C28 74 52 74 70 86 Z" fill="url(#gBookL)"/>
+        <path d="M70 20 C88 8 112 8 128 14 V80 C112 74 88 74 70 86 Z" fill="url(#gBookR)"/>
+        <path class="book-page" d="M70 20 C86 10 106 9 120 13 V78 C106 73 86 74 70 86 Z" fill="#fffcf2" opacity=".85"/>
+        <line x1="70" y1="20" x2="70" y2="86" stroke="#0e100f" stroke-width="2.5"/>
+      </svg>
+    </div>
+    <div class="chapters" data-stagger data-skew>
       <div class="chapter">
         <span class="chapter__num">01</span>
         <span class="chapter__name">Listen</span>
@@ -1083,7 +1223,17 @@
 
   <!-- Contact -->
   <section id="contact" class="page">
-    <div class="art art--emerald" data-depth=".18" data-rot="-24" style="left: -3%; top: 16%;" aria-hidden="true"></div>
+    <div class="art artg artg--bang" data-depth=".18" style="left: 3%; top: 14%;" aria-hidden="true">
+      <svg viewBox="0 0 100 120">
+        <defs>
+          <linearGradient id="gBang" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#f100cb"/><stop offset="1" stop-color="#ff8709"/>
+          </linearGradient>
+        </defs>
+        <path d="M42 8 h16 a9 9 0 0 1 9 10 l-7 48 a10 10 0 0 1 -20 0 l-7 -48 a9 9 0 0 1 9 -10 Z" fill="url(#gBang)"/>
+        <circle cx="50" cy="102" r="11" fill="url(#gBang)"/>
+      </svg>
+    </div>
     <div class="section-head">
       <span class="eyebrow reveal">Contact</span>
       <h2 class="heading-lg lines">Tell Us<br>Yours</h2>
@@ -1108,6 +1258,13 @@
     </form>
     <div data-bubble data-size="380" data-clip="2" style="right: 6%; top: 34%; width: 380px; height: 380px;"></div>
   </section>
+
+  <!-- Second marquee — drifts the other way -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track" id="marqueeTrack2">
+      <span>Say it once — say it right —</span><span>Say it once — say it right —</span><span>Say it once — say it right —</span><span>Say it once — say it right —</span><span>Say it once — say it right —</span><span>Say it once — say it right —</span>
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer class="page">
@@ -1135,6 +1292,13 @@
   });
   document.querySelectorAll('.lines').forEach((el) => {
     [...el.querySelectorAll('.line > span')].forEach((s, i) => s.style.setProperty('--d', `${i * 110}ms`));
+  });
+
+  /* Hero letters answer the cursor individually */
+  document.querySelectorAll('#heroHeadline .line > span').forEach((s) => {
+    s.innerHTML = [...s.textContent].map((c) =>
+      c === ' ' ? ' ' : `<span class="ch">${c}</span>`
+    ).join('');
   });
 
   /* Load sequence */
@@ -1397,6 +1561,10 @@
   let lastMs = 0;
   let t0 = 0;
   const marqueeTrack = document.getElementById('marqueeTrack');
+  const marqueeTrack2 = document.getElementById('marqueeTrack2');
+  const skewEls = [...document.querySelectorAll('[data-skew]')];
+  let marqueeX2 = 0;
+  let skewCur = 0;
   const heroLines = [...heroHeadline.querySelectorAll('.line')];
 
   const frame = (ms) => {
@@ -1492,12 +1660,26 @@
       });
     }
 
-    /* Marquee rides the scroll velocity */
+    /* Marquees ride the scroll velocity, drifting opposite ways */
     if (marqueeTrack && !reduced) {
       const half = marqueeTrack.scrollWidth / 2;
       marqueeX -= (70 + Math.min(520, Math.abs(scrollVel) * 26)) * dt;
       if (marqueeX <= -half) marqueeX += half;
       marqueeTrack.style.transform = `translate3d(${marqueeX}px, 0, 0)`;
+    }
+    if (marqueeTrack2 && !reduced) {
+      const half2 = marqueeTrack2.scrollWidth / 2;
+      if (marqueeX2 === 0) marqueeX2 = -half2;
+      marqueeX2 += (70 + Math.min(520, Math.abs(scrollVel) * 26)) * dt;
+      if (marqueeX2 >= 0) marqueeX2 -= half2;
+      marqueeTrack2.style.transform = `translate3d(${marqueeX2}px, 0, 0)`;
+    }
+
+    /* Lists lean with the scroll, then settle upright */
+    if (!reduced) {
+      const skT = Math.max(-3.2, Math.min(3.2, scrollVel * 0.055));
+      skewCur += (skT - skewCur) * 0.1;
+      skewEls.forEach((el) => { el.style.transform = `skewY(${skewCur}deg)`; });
     }
 
     /* Pinned band — the sentence scrubs across; the story arc draws itself;
