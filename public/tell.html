@@ -694,6 +694,29 @@
     background: var(--crimson); transform: translateX(-50%);
     box-shadow: 0 0 0 3px rgba(252,28,70,.18);
   }
+  /* Section navigator — clickable stops along the rail */
+  .progress__dot {
+    position: absolute; left: 50%; top: 0;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--paper); border: 1.5px solid var(--faint);
+    padding: 0; margin: 0; cursor: none; pointer-events: auto;
+    transform: translate(-50%, -50%);
+    transition: border-color .3s ease, background .3s ease, transform .35s cubic-bezier(.34,1.56,.64,1);
+  }
+  .progress__dot:hover, .progress__dot.active {
+    background: var(--crimson); border-color: var(--crimson);
+    transform: translate(-50%, -50%) scale(1.35);
+  }
+  .progress__label {
+    position: absolute; left: 16px; top: 50%;
+    font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted); white-space: nowrap; pointer-events: none;
+    opacity: 0; transform: translate(6px, -50%);
+    transition: opacity .3s ease, transform .35s cubic-bezier(.22,1,.36,1);
+  }
+  .progress__dot:hover .progress__label, .progress__dot.active .progress__label {
+    opacity: 1; transform: translate(0, -50%);
+  }
   @media (max-width: 760px) { .progress { display: none; } }
 
   /* Work — stacked story rows, indices in the hue taxonomy */
@@ -2099,8 +2122,32 @@
   const chapterRows = [...document.querySelectorAll('.chapter')];
   let chaptersGeo = null;
 
-  /* Reading progress line */
+  /* Reading progress line + section navigator */
   const progressFill = document.getElementById('progressFill');
+  const progressEl = document.querySelector('.progress');
+  const NAV_SECTIONS = [
+    { id: 'work', label: 'Work' },
+    { id: 'capabilities', label: 'Studio' },
+    { id: 'chaptersSection', label: 'Process' },
+    { id: 'contact', label: 'Contact' },
+  ];
+  let navDots = [];
+  if (progressEl && progressFill) {
+    navDots = NAV_SECTIONS.map((s) => {
+      const el = document.createElement('button');
+      el.className = 'progress__dot';
+      el.type = 'button';
+      el.setAttribute('aria-label', s.label);
+      el.innerHTML = `<span class="progress__label">${s.label}</span>`;
+      el.addEventListener('click', () => {
+        const t = document.getElementById(s.id);
+        if (t) scrollTo({ top: t.getBoundingClientRect().top + scrollY - 40, behavior: reduced ? 'auto' : 'smooth' });
+      });
+      progressEl.appendChild(el);
+      return { el, id: s.id, top: 0, frac: 0 };
+    });
+  }
+  let navActive = -1;
 
   const decos = [...document.querySelectorAll('.deco')].map((el) => ({
     el, depth: parseFloat(el.dataset.mdepth) || 16, x: 0, y: 0,
@@ -2212,6 +2259,16 @@
           return n.top + n.height / 2 + scrollY;
         }),
       };
+    }
+    if (navDots.length) {
+      const navMax = document.documentElement.scrollHeight - innerHeight;
+      navDots.forEach((d) => {
+        const t = document.getElementById(d.id);
+        if (!t) return;
+        d.top = t.getBoundingClientRect().top + scrollY;
+        d.frac = Math.max(0, Math.min(1, navMax > 0 ? d.top / navMax : 0));
+        d.el.style.top = (d.frac * 100).toFixed(2) + '%';
+      });
     }
     measureType();
   };
@@ -2644,6 +2701,16 @@
     if (progressFill) {
       const max = document.documentElement.scrollHeight - innerHeight;
       progressFill.style.height = (clamp01(max > 0 ? scrollY / max : 0) * 100).toFixed(2) + '%';
+    }
+    /* Section navigator — light the stop we're currently in */
+    if (navDots.length) {
+      const mark = scrollY + innerHeight * 0.4;
+      let act = -1;
+      for (let i = 0; i < navDots.length; i++) { if (navDots[i].top <= mark) act = i; }
+      if (act !== navActive) {
+        navActive = act;
+        navDots.forEach((d, i) => d.el.classList.toggle('active', i === act));
+      }
     }
 
     /* Chapters — the narrative thread fills as you read down */
