@@ -1446,11 +1446,25 @@
   #craftBoat   { width: clamp(34px, 3.3vw, 46px); }
   #craftPlane  { width: clamp(33px, 3.2vw, 46px); }
   #craftRocket { width: clamp(30px, 2.9vw, 40px); }
+  #craftCrane  { width: clamp(38px, 3.7vw, 52px); }
+  #craftKite   { width: clamp(30px, 2.9vw, 40px); }
   .ftrail { position: absolute; top: 0; left: 0; pointer-events: none; will-change: transform, opacity; }
   #rkFlame { transform-box: fill-box; transform-origin: 50% 0%; animation: rk-flame .11s steps(2, jump-none) infinite; }
   @keyframes rk-flame {
     0%   { transform: scaleY(.75) scaleX(1.05); opacity: .9; }
     100% { transform: scaleY(1.2) scaleX(.85); opacity: 1; }
+  }
+  /* the crane's wing beats slowly as it glides */
+  #craneWing { transform-box: fill-box; transform-origin: 46% 92%; animation: crane-flap 2.1s ease-in-out infinite; }
+  @keyframes crane-flap {
+    0%, 100% { transform: rotate(0deg) scaleY(1); }
+    50% { transform: rotate(-15deg) scaleY(.82); }
+  }
+  /* the kite's tail ripples in the wind */
+  #kiteTail { transform-box: fill-box; transform-origin: 50% 0%; animation: kite-sway 2.4s ease-in-out infinite; }
+  @keyframes kite-sway {
+    0%, 100% { transform: rotate(4deg) skewX(4deg); }
+    50% { transform: rotate(-5deg) skewX(-5deg); }
   }
   @media (max-width: 900px) { #fleet { display: none; } }
   /* On phones and tablets the travelling cloud can't clear the type — the
@@ -1971,6 +1985,35 @@
         <path d="M30 4 C 41 16 44 26 44 40 L 16 40 C 16 26 19 16 30 4 Z" fill="#fc1c46" stroke="#0e100f" stroke-width="2.5" stroke-linejoin="round"/>
         <circle cx="30" cy="49" r="6.5" fill="#7cc4e0" stroke="#0e100f" stroke-width="2.5"/>
         <path d="M22 62 h16" stroke="#0e100f" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+      </svg>
+    </div>
+    <div class="craft" id="craftCrane">
+      <svg viewBox="0 0 86 60" xmlns="http://www.w3.org/2000/svg">
+        <path d="M42 32 L60 8 L52 34 Z" fill="#d9cca8" stroke="#0e100f" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M6 24 L34 34 L26 43 Z" fill="#e3d8bf" stroke="#0e100f" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M24 36 L58 30 L50 46 L32 44 Z" fill="#e7dcc4" stroke="#0e100f" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M26 34 L58 30 L76 18 L54 27 L38 29 Z" fill="#fffcf2" stroke="#0e100f" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M68 21 L85 13 L70 27 Z" fill="#fffcf2" stroke="#0e100f" stroke-width="2.2" stroke-linejoin="round"/>
+        <path id="craneWing" d="M36 33 L56 3 L62 33 Z" fill="#fffcf2" stroke="#0e100f" stroke-width="2.2" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="craft" id="craftKite">
+      <svg viewBox="0 0 64 150" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="kiteG" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#9d95ff"/><stop offset="1" stop-color="#f100cb"/>
+          </linearGradient>
+        </defs>
+        <path d="M32 46 L32 3" stroke="#0e100f" stroke-width="1.4" opacity=".3"/>
+        <path d="M32 8 L54 48 L32 82 L10 48 Z" fill="url(#kiteG)" stroke="#0e100f" stroke-width="2.4" stroke-linejoin="round"/>
+        <path d="M32 8 L32 82 M10 48 L54 48" stroke="#0e100f" stroke-width="1.7"/>
+        <path d="M20 30 L32 40 L44 30" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
+        <g id="kiteTail">
+          <path d="M32 82 Q45 100 29 116 Q15 132 35 148" fill="none" stroke="#0e100f" stroke-width="2" stroke-linecap="round"/>
+          <path d="M40 96 l10 -3 -9 -4 z" fill="#fc1c46"/>
+          <path d="M28 116 l-10 -2 9 -4 z" fill="#ff8709"/>
+          <path d="M35 134 l10 -1 -9 -5 z" fill="#00bae2"/>
+        </g>
       </svg>
     </div>
   </div>
@@ -2585,18 +2628,22 @@
     smoke:  { n: 20, sp: 11, idle: 20, off: 13, css: 'border-radius:50%;background:radial-gradient(circle,rgba(122,118,110,.6),rgba(122,118,110,0) 70%)' },
     flame:  { n: 32, sp: 5,  idle: 70, off: 15, css: 'border-radius:50%;background:radial-gradient(circle,rgba(255,232,150,.95),rgba(255,120,20,.7) 45%,rgba(252,28,70,0) 74%)' },
     wake:   { n: 18, sp: 15, idle: 14, off: 12, css: 'border-radius:50%;border:2px solid rgba(120,175,205,.55);background:radial-gradient(circle,rgba(210,232,242,.4),rgba(210,232,242,0) 72%)' },
+    trace:  { n: 16, sp: 24, idle: 5,  off: 9,  css: 'border-radius:50%;background:rgba(14,16,15,.5)' },
   };
   const CRAFT = fleetEl ? [
     { el: document.getElementById('craftBoat'),   base: .34, a1: .32, f1: 2.3, p1: .5, a2: .08, f2: 5.0, p2: 1.2, yTop: .18, yBot: .84, ay: .08, fy: 1.9, py: .8, k: .05,  sw: [.6, 10, .5, 8], kind: 'boat',   trail: 'wake' },
     { el: document.getElementById('craftPlane'),  base: .58, a1: .36, f1: 3.2, p1: 2.3, a2: .10, f2: 6.2, p2: .3, yTop: .10, yBot: .95, ay: .11, fy: 2.7, py: 2.0, k: .07, sw: [.9, 11, .8, 9], kind: 'plane',  trail: 'smoke' },
     { el: document.getElementById('craftRocket'), base: .48, a1: .28, f1: 4.0, p1: 4.1, a2: .07, f2: 7.4, p2: 2.6, yTop: .06, yBot: .99, ay: .07, fy: 3.3, py: 3.5, k: .085, sw: [1.1, 8, 1.0, 7], kind: 'rocket', trail: 'flame' },
+    { el: document.getElementById('craftCrane'),  base: .44, a1: .34, f1: 2.7, p1: 1.4, a2: .09, f2: 5.6, p2: 3.0, yTop: .12, yBot: .90, ay: .10, fy: 2.2, py: 1.1, k: .06,  sw: [.7, 13, .62, 10], kind: 'crane', trail: 'trace' },
+    { el: document.getElementById('craftKite'),   base: .66, a1: .30, f1: 1.9, p1: 3.3, a2: .11, f2: 4.4, p2: 1.6, yTop: .14, yBot: .88, ay: .06, fy: 1.6, py: 2.5, k: .045, sw: [.55, 16, .48, 12], kind: 'kite',  trail: null },
   ] : [];
   CRAFT.forEach((c) => {
     if (!c.el) return;
     c.cur = null; c.rot = null; c.lastX = 0; c.lastY = 0; c.emit = 0; c.pi = 0;
-    const tr = TRAIL[c.trail];
-    const base = c.trail === 'flame' ? 15 : c.trail === 'wake' ? 24 : 30;
     c.pool = [];
+    if (!c.trail) return;
+    const tr = TRAIL[c.trail];
+    const base = c.trail === 'flame' ? 15 : c.trail === 'wake' ? 24 : c.trail === 'trace' ? 6 : 30;
     for (let i = 0; i < tr.n; i++) {
       const el = document.createElement('div'); el.className = 'ftrail';
       el.style.cssText = tr.css + `;width:${base}px;height:${base}px;opacity:0`;
@@ -2624,6 +2671,9 @@
     } else if (c.trail === 'smoke') {
       p.vx = -hx * 12 + R(-9, 9); p.vy = -hy * 12 - 14 + R(-6, 6);
       p.s0 = .3; p.s1 = R(1.1, 1.6); p.op0 = .3; p.life = R(1.5, 2.3); p.sxy = 1;
+    } else if (c.trail === 'trace') { /* a dotted flight path */
+      p.vx = R(-2, 2); p.vy = R(-2, 2);
+      p.s0 = .55; p.s1 = .15; p.op0 = .5; p.life = R(.9, 1.5); p.sxy = 1;
     } else { /* wake */
       p.vx = -hx * 8 + R(-6, 6); p.vy = -hy * 8 + 7 + R(-3, 3);
       p.s0 = .3; p.s1 = R(1.3, 1.8); p.op0 = .5; p.life = R(1.3, 1.9); p.sxy = 2.1;
@@ -2650,8 +2700,9 @@
 
       /* banking with weight — smooth the heading, add flutter on top */
       let targetBase, flutter;
-      if (c.kind === 'plane') { targetBase = headDeg; flutter = Math.sin(t * 2.1 + c.p1) * 2.6; }
+      if (c.kind === 'plane' || c.kind === 'crane') { targetBase = headDeg; flutter = Math.sin(t * 2.1 + c.p1) * 2.6; }
       else if (c.kind === 'rocket') { targetBase = headDeg + 90; flutter = Math.sin(t * 2.6 + c.p1) * 2.6; }
+      else if (c.kind === 'kite') { targetBase = clampf((rx - c.lastX) * 9, -15, 15); flutter = Math.sin(t * 1.5 + c.p1) * 6; }
       else { targetBase = clampf((rx - c.lastX) * 8, -7, 7); flutter = Math.sin(t * 1.2 + c.p1) * 7; }
       if (c.rot === null) c.rot = targetBase;
       c.rot = angLerp(c.rot, targetBase, 0.14);
@@ -2659,12 +2710,14 @@
       c.el.style.transform = `translate(${rx.toFixed(1)}px,${ry.toFixed(1)}px) translate(-50%,-50%) rotate(${rot.toFixed(1)}deg)`;
 
       /* emit the trail by distance travelled, plus a little idle emission */
-      const tr = TRAIL[c.trail];
       const dist = Math.hypot(rx - c.lastX, ry - c.lastY);
       c.lastX = rx; c.lastY = ry;
-      c.emit += dist + tr.idle * dt;
-      let guard = 0;
-      while (c.emit >= tr.sp && guard++ < 6) { c.emit -= tr.sp; spawnTrail(c, rx, ry, hx, hy); }
+      if (c.trail) {
+        const tr = TRAIL[c.trail];
+        c.emit += dist + tr.idle * dt;
+        let guard = 0;
+        while (c.emit >= tr.sp && guard++ < 6) { c.emit -= tr.sp; spawnTrail(c, rx, ry, hx, hy); }
+      }
 
       /* advance the trail particles */
       c.pool.forEach((q) => {
