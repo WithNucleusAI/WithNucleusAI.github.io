@@ -908,6 +908,18 @@
     background: var(--crimson);
     pointer-events: none;
   }
+  /* The motion-blur streak the drop drags behind it as it accelerates */
+  .drip-trail {
+    position: fixed;
+    z-index: 96;
+    width: 15px;
+    border-radius: 8px;
+    background: linear-gradient(to top, rgba(252,28,70,.42), rgba(252,28,70,0));
+    transform-origin: 50% 100%;
+    filter: blur(4px);
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
   .ov-flash {
     position: fixed;
     inset: 0;
@@ -2083,6 +2095,28 @@
     document.body.appendChild(seed);
 
     const H = innerHeight;
+
+    /* A faint blurred streak dragged behind the drop — its bottom rides
+       the drop's centre (shared translateY + easing) while scaleY grows
+       it into a smear through the fast descent, then collapses on impact */
+    const trail = document.createElement('div');
+    trail.className = 'drip-trail';
+    trail.style.left = `${innerWidth / 2 - 7.5}px`;
+    trail.style.height = '90px';
+    trail.style.top = `${innerHeight / 2 - 90}px`;
+    document.body.appendChild(trail);
+    trail.animate(
+      [
+        { transform: `translateY(${-0.66 * H}px) scaleY(0)`, opacity: 0 },
+        { transform: `translateY(${-0.5 * H}px) scaleY(.25)`, opacity: .18, offset: .34 },
+        { transform: `translateY(${-0.08 * H}px) scaleY(1)`, opacity: .32, offset: .86 },
+        { transform: 'translateY(0px) scaleY(.45)', opacity: 0, offset: .94 },
+        { transform: 'translateY(0px) scaleY(0)', opacity: 0 },
+      ],
+      { duration: FALL, easing: 'cubic-bezier(.62,0,.86,.36)', fill: 'forwards' }
+    );
+    setTimeout(() => trail.remove(), FALL + 80);
+
     seed.animate(
       [
         /* enters from just above the page, heavy and barely moving */
