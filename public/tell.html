@@ -893,6 +893,49 @@
   }
   .js [data-stagger].in > * { opacity: 1; transform: none; }
 
+  /* ============================================
+     The overture — every story starts with a
+     single mark. It pulses, bursts, and the page
+     falls into place out of the explosion.
+     ============================================ */
+  .seed {
+    position: fixed;
+    z-index: 95;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--crimson);
+    pointer-events: none;
+  }
+  .shockwave {
+    position: fixed;
+    z-index: 94;
+    width: 44px;
+    height: 44px;
+    border: 1.5px solid var(--ink);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .confetti {
+    position: fixed;
+    z-index: 93;
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+  /* While the burst is flying, WAAPI owns the artifacts —
+     the CSS entrance states step aside */
+  html.burst-mode .bubble,
+  html.burst-mode .tdot,
+  html.burst-mode .art,
+  html.burst-mode .deco {
+    opacity: 1 !important;
+    scale: none !important;
+    transition: none !important;
+  }
+  html.burst-mode header { animation-delay: 1.02s; }
+  html.burst-mode .brand__mark { opacity: 0; transition: opacity .25s ease; }
+  html.burst-mode.mark-landed .brand__mark { opacity: 1; }
+
   @media (prefers-reduced-motion: reduce) {
     header, .hero__scroll, .marquee__track, .art, .deco svg,
     .artg svg, .artg .book-page, .artg .drop-body, .artg .droplet,
@@ -1324,9 +1367,11 @@
       });
     }
   };
-  const heroFallback = setTimeout(startHero, 700);
+  /* boot is upgraded to the full overture once the stage is wired */
+  let boot = startHero;
+  const heroFallback = setTimeout(() => boot(), 700);
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(() => { clearTimeout(heroFallback); requestAnimationFrame(startHero); });
+    document.fonts.ready.then(() => { clearTimeout(heroFallback); requestAnimationFrame(() => boot()); });
   }
 
   /* Scroll reveals */
@@ -1567,6 +1612,7 @@
     { x: -0.47, y: 0.65 },
   ];
   let prevX = cur.x;
+  let bubbleHold = false; /* overture: pin the cloud inside the burst point */
   let prevScroll = scrollY;
   let scrollVel = 0;
   let artKick = 0;
@@ -1620,9 +1666,11 @@
     const swayX = reduced ? 0 : Math.sin(t * 0.7) * 10;
     const swayY = reduced ? 0 : Math.cos(t * 0.9) * 12;
     const k = reduced ? 1 : 0.075;
-    cur.x += (tg.x - cur.x) * k;
-    cur.y += (tg.y - cur.y) * k;
-    cur.size += (tg.size - cur.size) * k;
+    if (!bubbleHold) {
+      cur.x += (tg.x - cur.x) * k;
+      cur.y += (tg.y - cur.y) * k;
+      cur.size += (tg.size - cur.size) * k;
+    }
 
     const vx = cur.x - prevX;
     prevX = cur.x;
@@ -1645,7 +1693,7 @@
       const dk = reduced ? 1 : DOT_K[i];
       st.x += (tx - st.x) * dk;
       st.y += (ty - st.y) * dk;
-      const ds = Math.max(0.4, scale);
+      const ds = bubbleHold ? 0 : Math.max(0.12, scale);
       dot.style.transform = `translate3d(${st.x}px, ${st.y}px, 0) scale(${ds})`;
     });
 
@@ -1731,6 +1779,152 @@
     }
   };
   requestAnimationFrame(frame);
+
+  /* ================================================
+     The overture — a lone crimson period pulses on
+     the blank paper, bursts into a shockwave of hue
+     confetti, and every artifact flies out of the
+     explosion into its place. The period itself
+     arcs up and lands as the brand mark.
+     ================================================ */
+  const HUES = ['#0ae448', '#ff8709', '#fec5fb', '#9d95ff', '#00bae2', '#f100cb'];
+  let overtureDone = false;
+
+  const burst = () => {
+    const cxv = innerWidth / 2, cyv = innerHeight / 2;
+
+    /* Shockwave ring */
+    const ring = document.createElement('div');
+    ring.className = 'shockwave';
+    ring.style.left = `${cxv - 22}px`;
+    ring.style.top = `${cyv - 22}px`;
+    document.body.appendChild(ring);
+    ring.animate(
+      [
+        { transform: 'scale(.2)', opacity: .55 },
+        { transform: `scale(${(Math.max(innerWidth, innerHeight) / 44) * 1.05})`, opacity: 0 },
+      ],
+      { duration: 760, easing: 'cubic-bezier(.16,.8,.3,1)', fill: 'forwards' }
+    );
+    setTimeout(() => ring.remove(), 800);
+
+    /* Confetti — hue debris that flies out and falls away */
+    for (let i = 0; i < 26; i++) {
+      const p = document.createElement('div');
+      p.className = 'confetti';
+      const s = 8 + Math.random() * 16;
+      p.style.width = `${s}px`;
+      p.style.height = `${Math.random() < .4 ? s : s * (0.4 + Math.random() * 0.6)}px`;
+      p.style.borderRadius = Math.random() < .5 ? '50%' : '3px';
+      p.style.background = HUES[i % HUES.length];
+      p.style.left = `${cxv}px`;
+      p.style.top = `${cyv}px`;
+      document.body.appendChild(p);
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 180 + Math.random() * Math.max(innerWidth, innerHeight) * 0.42;
+      const tx = Math.cos(ang) * dist;
+      const ty = Math.sin(ang) * dist * 0.85;
+      const rot = Math.random() * 420 - 210;
+      p.animate(
+        [
+          { transform: 'translate(-50%,-50%) scale(.2) rotate(0deg)', opacity: 1 },
+          { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(1) rotate(${rot}deg)`, opacity: 1, offset: .62 },
+          { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty + 80 + Math.random() * 70}px)) scale(.85) rotate(${rot * 1.3}deg)`, opacity: 0 },
+        ],
+        { duration: 1050 + Math.random() * 520, easing: 'cubic-bezier(.18,.85,.3,1)', fill: 'forwards' }
+      );
+      setTimeout(() => p.remove(), 1900);
+    }
+
+    /* The cloud begins its growth out of the burst point */
+    bubbleHold = false;
+    cur.size = 24;
+
+    startHero();
+  };
+
+  /* Arm the artifact flights: hidden at the centre through the
+     anticipation (backwards fill), launching at the burst moment */
+  const armFlyers = (launchDelay) => {
+    const cxv = innerWidth / 2, cyv = innerHeight / 2;
+    const flyers = [...document.querySelectorAll('.deco, .art')].filter((el) => {
+      const r = el.getBoundingClientRect();
+      return r.bottom > -80 && r.top < innerHeight + 80 && r.width > 0;
+    });
+    flyers.forEach((el, i) => {
+      const r = el.getBoundingClientRect();
+      const dx = cxv - (r.left + r.width / 2);
+      const dy = cyv - (r.top + r.height / 2);
+      const spin = Math.random() * 160 - 80;
+      el.animate(
+        [
+          { transform: `translate(${dx}px, ${dy}px) scale(0) rotate(${spin}deg)`, opacity: .95 },
+          { transform: `translate(${dx * 0.12}px, ${dy * 0.12 - 34}px) scale(1.1) rotate(${spin * -0.2}deg)`, opacity: 1, offset: .68 },
+          { transform: 'none', opacity: 1 },
+        ],
+        { duration: 950 + (i % 6) * 130, delay: launchDelay, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' }
+      );
+    });
+  };
+
+  const runOverture = () => {
+    if (overtureDone) return;
+    overtureDone = true;
+    if (reduced || innerWidth < 700 || !('animate' in Element.prototype)) { startHero(); return; }
+
+    const html = document.documentElement;
+    html.classList.add('burst-mode');
+
+    /* Blank stage: the cloud and dots wait inside the burst point,
+       the flyers hold at the centre until launch */
+    bubbleHold = true;
+    cur.x = scrollX + innerWidth / 2;
+    cur.y = scrollY + innerHeight / 2;
+    cur.size = 2;
+    prevX = cur.x;
+    dotState.forEach((st) => { st.x = cur.x; st.y = cur.y; });
+    armFlyers(560);
+
+    const seed = document.createElement('div');
+    seed.className = 'seed';
+    seed.style.left = `${innerWidth / 2 - 9}px`;
+    seed.style.top = `${innerHeight / 2 - 9}px`;
+    document.body.appendChild(seed);
+
+    /* Anticipation: the period arrives, swells, and coils */
+    seed.animate(
+      [
+        { transform: 'scale(0)' },
+        { transform: 'scale(1)', offset: .38 },
+        { transform: 'scale(1.35)', offset: .72 },
+        { transform: 'scale(.62)' },
+      ],
+      { duration: 470, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'forwards' }
+    );
+
+    setTimeout(() => {
+      burst();
+      /* The period becomes the brand mark */
+      const mark = document.querySelector('.brand__mark');
+      const mr = mark.getBoundingClientRect();
+      const dx = mr.left + mr.width / 2 - innerWidth / 2;
+      const dy = mr.top + mr.height / 2 - innerHeight / 2;
+      const flight = seed.animate(
+        [
+          { transform: 'scale(.62)' },
+          { transform: `translate(${dx * 0.4}px, ${dy * 1.12}px) scale(1)`, offset: .6 },
+          { transform: `translate(${dx}px, ${dy}px) scale(.75)` },
+        ],
+        { duration: 680, easing: 'cubic-bezier(.3,.1,.25,1)', fill: 'forwards' }
+      );
+      flight.onfinish = () => {
+        html.classList.add('mark-landed');
+        setTimeout(() => seed.remove(), 220);
+      };
+      setTimeout(() => html.classList.remove('burst-mode', 'mark-landed'), 2400);
+    }, 540);
+  };
+  boot = runOverture;
 </script>
 </body>
 </html>
