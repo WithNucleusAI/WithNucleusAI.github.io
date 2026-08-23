@@ -1455,10 +1455,10 @@
     100% { transform: scaleY(1.2) scaleX(.85); opacity: 1; }
   }
   /* the crane's wing beats slowly as it glides */
-  #craneWing { transform-box: fill-box; transform-origin: 46% 92%; animation: crane-flap 2.1s ease-in-out infinite; }
+  #craneWing { transform-box: fill-box; transform-origin: 50% 100%; animation: crane-flap 2s ease-in-out infinite; }
   @keyframes crane-flap {
     0%, 100% { transform: rotate(0deg) scaleY(1); }
-    50% { transform: rotate(-15deg) scaleY(.82); }
+    50% { transform: rotate(-6deg) scaleY(.7); }
   }
   /* the kite's tail ripples in the wind */
   #kiteTail { transform-box: fill-box; transform-origin: 50% 0%; animation: kite-sway 2.4s ease-in-out infinite; }
@@ -1988,13 +1988,12 @@
       </svg>
     </div>
     <div class="craft" id="craftCrane">
-      <svg viewBox="0 0 86 60" xmlns="http://www.w3.org/2000/svg">
-        <path d="M42 32 L60 8 L52 34 Z" fill="#d9cca8" stroke="#0e100f" stroke-width="2" stroke-linejoin="round"/>
-        <path d="M6 24 L34 34 L26 43 Z" fill="#e3d8bf" stroke="#0e100f" stroke-width="2.2" stroke-linejoin="round"/>
-        <path d="M24 36 L58 30 L50 46 L32 44 Z" fill="#e7dcc4" stroke="#0e100f" stroke-width="2.2" stroke-linejoin="round"/>
-        <path d="M26 34 L58 30 L76 18 L54 27 L38 29 Z" fill="#fffcf2" stroke="#0e100f" stroke-width="2.2" stroke-linejoin="round"/>
-        <path d="M68 21 L85 13 L70 27 Z" fill="#fffcf2" stroke="#0e100f" stroke-width="2.2" stroke-linejoin="round"/>
-        <path id="craneWing" d="M36 33 L56 3 L62 33 Z" fill="#fffcf2" stroke="#0e100f" stroke-width="2.2" stroke-linejoin="round"/>
+      <svg viewBox="0 0 92 58" xmlns="http://www.w3.org/2000/svg">
+        <path d="M42 34 L54 12 L49 36 Z" fill="#d9cca8" stroke="#0e100f" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M52 33 L88 20 L62 41 Z" fill="#fffcf2" stroke="#0e100f" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M34 33 L4 20 L30 41 Z" fill="#e3d8bf" stroke="#0e100f" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M32 33 L58 33 L50 46 L38 46 Z" fill="#e7dcc4" stroke="#0e100f" stroke-width="2.2" stroke-linejoin="round"/>
+        <path id="craneWing" d="M34 34 L54 3 L60 34 Z" fill="#fffcf2" stroke="#0e100f" stroke-width="2.2" stroke-linejoin="round"/>
       </svg>
     </div>
     <div class="craft" id="craftKite">
