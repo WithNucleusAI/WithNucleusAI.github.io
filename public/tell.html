@@ -1019,7 +1019,7 @@
   #craftBoat   { width: clamp(34px, 3.3vw, 46px); }
   #craftPlane  { width: clamp(33px, 3.2vw, 46px); }
   #craftRocket { width: clamp(30px, 2.9vw, 40px); }
-  .fdot { position: absolute; top: 0; left: 0; border-radius: 50%; pointer-events: none; will-change: transform, opacity; }
+  .ftrail { position: absolute; top: 0; left: 0; pointer-events: none; will-change: transform, opacity; }
   #rkFlame { transform-box: fill-box; transform-origin: 50% 0%; animation: rk-flame .11s steps(2, jump-none) infinite; }
   @keyframes rk-flame {
     0%   { transform: scaleY(.75) scaleX(1.05); opacity: .9; }
@@ -1759,29 +1759,37 @@
   /* ================================================
      Paper fleet — a boat, a paper plane and a rocket weave
      down the whole page. Each eases toward a moving target
-     along its own serpentine path (the way the thought-cloud
-     navigates), banks into its heading, flutters, and trails
-     a few lagging dots. Driven by overall page progress.
+     along its own graceful serpentine (the way the thought-
+     cloud navigates), banks into its heading with weight, and
+     leaves a themed trail: smoke off the plane, flame off the
+     rocket, a spreading wake off the boat.
      ================================================ */
   const fleetEl = document.getElementById('fleet');
   const FTAU = Math.PI * 2;
   const clampf = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const angLerp = (cur, tgt, t) => cur + (((tgt - cur + 540) % 360) - 180) * t;
+  /* per-kind trail behaviour */
+  const TRAIL = {
+    smoke:  { n: 20, sp: 11, idle: 20, off: 13, css: 'border-radius:50%;background:radial-gradient(circle,rgba(122,118,110,.6),rgba(122,118,110,0) 70%)' },
+    flame:  { n: 32, sp: 5,  idle: 70, off: 15, css: 'border-radius:50%;background:radial-gradient(circle,rgba(255,232,150,.95),rgba(255,120,20,.7) 45%,rgba(252,28,70,0) 74%)' },
+    wake:   { n: 18, sp: 15, idle: 14, off: 12, css: 'border-radius:50%;border:2px solid rgba(120,175,205,.55);background:radial-gradient(circle,rgba(210,232,242,.4),rgba(210,232,242,0) 72%)' },
+  };
   const CRAFT = fleetEl ? [
-    { el: document.getElementById('craftBoat'),   base: .34, a1: .30, f1: 3.0, p1: .5, a2: .09, f2: 6.6, p2: 1.2, yTop: .18, yBot: .84, ay: .07, fy: 2.4, py: .8, k: .06, sw: [.6, 10, .5, 8], kind: 'boat',   dotc: 'rgba(120,116,110,.35)' },
-    { el: document.getElementById('craftPlane'),  base: .58, a1: .34, f1: 4.2, p1: 2.3, a2: .11, f2: 8.0, p2: .3, yTop: .10, yBot: .95, ay: .10, fy: 3.3, py: 2.0, k: .08, sw: [.9, 11, .8, 9], kind: 'plane',  dotc: 'rgba(14,16,15,.28)' },
-    { el: document.getElementById('craftRocket'), base: .48, a1: .26, f1: 5.4, p1: 4.1, a2: .08, f2: 9.6, p2: 2.6, yTop: .06, yBot: .99, ay: .06, fy: 4.1, py: 3.5, k: .10, sw: [1.1, 8, 1.0, 7], kind: 'rocket', dotc: 'rgba(252,28,70,.32)' },
+    { el: document.getElementById('craftBoat'),   base: .34, a1: .32, f1: 2.3, p1: .5, a2: .08, f2: 5.0, p2: 1.2, yTop: .18, yBot: .84, ay: .08, fy: 1.9, py: .8, k: .05,  sw: [.6, 10, .5, 8], kind: 'boat',   trail: 'wake' },
+    { el: document.getElementById('craftPlane'),  base: .58, a1: .36, f1: 3.2, p1: 2.3, a2: .10, f2: 6.2, p2: .3, yTop: .10, yBot: .95, ay: .11, fy: 2.7, py: 2.0, k: .07, sw: [.9, 11, .8, 9], kind: 'plane',  trail: 'smoke' },
+    { el: document.getElementById('craftRocket'), base: .48, a1: .28, f1: 4.0, p1: 4.1, a2: .07, f2: 7.4, p2: 2.6, yTop: .06, yBot: .99, ay: .07, fy: 3.3, py: 3.5, k: .085, sw: [1.1, 8, 1.0, 7], kind: 'rocket', trail: 'flame' },
   ] : [];
   CRAFT.forEach((c) => {
     if (!c.el) return;
-    c.cur = null; c.prevX = 0; c.dots = [];
-    for (let i = 0; i < 3; i++) {
-      const d = document.createElement('div'); d.className = 'fdot';
-      const s = 7 - i * 1.7;
-      d.style.width = d.style.height = `${s}px`;
-      d.style.background = c.dotc;
-      d.style.opacity = `${0.5 - i * 0.13}`;
-      fleetEl.insertBefore(d, fleetEl.firstChild);   /* behind the craft */
-      c.dots.push({ el: d, x: 0, y: 0, k: 0.2 - i * 0.05 });
+    c.cur = null; c.rot = null; c.lastX = 0; c.lastY = 0; c.emit = 0; c.pi = 0;
+    const tr = TRAIL[c.trail];
+    const base = c.trail === 'flame' ? 15 : c.trail === 'wake' ? 24 : 30;
+    c.pool = [];
+    for (let i = 0; i < tr.n; i++) {
+      const el = document.createElement('div'); el.className = 'ftrail';
+      el.style.cssText = tr.css + `;width:${base}px;height:${base}px;opacity:0`;
+      fleetEl.insertBefore(el, fleetEl.firstChild);   /* behind the craft */
+      c.pool.push({ el, live: false, age: 0, life: 1, x: 0, y: 0, vx: 0, vy: 0, s0: 1, s1: 1, op0: 1 });
     }
   });
   let fleetReady = false;
@@ -1791,31 +1799,74 @@
     y: innerHeight * clampf(c.yTop + (c.yBot - c.yTop) * p + c.ay * Math.sin(FTAU * c.fy * p + c.py), 0.04, 0.99),
   });
 
-  function updateFleet(t) {
+  const R = (a, b) => a + Math.random() * (b - a);
+  function spawnTrail(c, x, y, hx, hy) {
+    const p = c.pool[c.pi]; c.pi = (c.pi + 1) % c.pool.length;
+    const tr = TRAIL[c.trail];
+    p.live = true; p.age = 0;
+    p.x = x - hx * tr.off + R(-3, 3);
+    p.y = y - hy * tr.off + R(-3, 3);
+    if (c.trail === 'flame') {
+      p.vx = -hx * 42 + R(-18, 18); p.vy = -hy * 42 + R(-18, 18);
+      p.s0 = R(.9, 1.3); p.s1 = .06; p.op0 = .92; p.life = R(.36, .6); p.sxy = 1;
+    } else if (c.trail === 'smoke') {
+      p.vx = -hx * 12 + R(-9, 9); p.vy = -hy * 12 - 14 + R(-6, 6);
+      p.s0 = .3; p.s1 = R(1.1, 1.6); p.op0 = .3; p.life = R(1.5, 2.3); p.sxy = 1;
+    } else { /* wake */
+      p.vx = -hx * 8 + R(-6, 6); p.vy = -hy * 8 + 7 + R(-3, 3);
+      p.s0 = .3; p.s1 = R(1.3, 1.8); p.op0 = .5; p.life = R(1.3, 1.9); p.sxy = 2.1;
+    }
+  }
+
+  function updateFleet(t, dt) {
     if (!fleetReady || reduced || innerWidth < 700 || !fleetEl) return;
     const denom = Math.max(1, document.documentElement.scrollHeight - innerHeight);
     const p = clampf(scrollY / denom, 0, 1);
     CRAFT.forEach((c) => {
       if (!c.el) return;
       const tg = fleetPath(c, p);
-      if (!c.cur) { c.cur = { x: tg.x, y: tg.y }; c.prevX = tg.x; c.dots.forEach((d) => { d.x = tg.x; d.y = tg.y; }); }
+      if (!c.cur) { c.cur = { x: tg.x, y: tg.y }; c.lastX = tg.x; c.lastY = tg.y; }
       c.cur.x += (tg.x - c.cur.x) * c.k;
       c.cur.y += (tg.y - c.cur.y) * c.k;
-      const fwd = fleetPath(c, Math.min(1, p + 0.003)), back = fleetPath(c, Math.max(0, p - 0.003));
-      const headDeg = Math.atan2(fwd.y - back.y, fwd.x - back.x) * 180 / Math.PI;
-      const vx = c.cur.x - c.prevX; c.prevX = c.cur.x;
+      const fwd = fleetPath(c, Math.min(1, p + 0.004)), bk = fleetPath(c, Math.max(0, p - 0.004));
+      const headRad = Math.atan2(fwd.y - bk.y, fwd.x - bk.x);
+      const headDeg = headRad * 180 / Math.PI;
+      const hx = Math.cos(headRad), hy = Math.sin(headRad);
       const swx = Math.sin(t * c.sw[0] + c.p1) * c.sw[1];
       const swy = Math.cos(t * c.sw[2] + c.p1) * c.sw[3];
       const rx = c.cur.x + swx, ry = c.cur.y + swy;
-      let rot;
-      if (c.kind === 'plane') rot = headDeg + Math.sin(t * 2.1 + c.p1) * 3;
-      else if (c.kind === 'rocket') rot = headDeg + 90 + Math.sin(t * 2.6 + c.p1) * 3;
-      else rot = Math.sin(t * 1.2 + c.p1) * 8 + clampf(vx * 0.6, -6, 6);
+
+      /* banking with weight — smooth the heading, add flutter on top */
+      let targetBase, flutter;
+      if (c.kind === 'plane') { targetBase = headDeg; flutter = Math.sin(t * 2.1 + c.p1) * 2.6; }
+      else if (c.kind === 'rocket') { targetBase = headDeg + 90; flutter = Math.sin(t * 2.6 + c.p1) * 2.6; }
+      else { targetBase = clampf((rx - c.lastX) * 8, -7, 7); flutter = Math.sin(t * 1.2 + c.p1) * 7; }
+      if (c.rot === null) c.rot = targetBase;
+      c.rot = angLerp(c.rot, targetBase, 0.14);
+      const rot = c.rot + flutter;
       c.el.style.transform = `translate(${rx.toFixed(1)}px,${ry.toFixed(1)}px) translate(-50%,-50%) rotate(${rot.toFixed(1)}deg)`;
-      c.dots.forEach((d) => {
-        d.x += (rx - d.x) * d.k;
-        d.y += (ry - d.y) * d.k;
-        d.el.style.transform = `translate(${d.x.toFixed(1)}px,${d.y.toFixed(1)}px) translate(-50%,-50%)`;
+
+      /* emit the trail by distance travelled, plus a little idle emission */
+      const tr = TRAIL[c.trail];
+      const dist = Math.hypot(rx - c.lastX, ry - c.lastY);
+      c.lastX = rx; c.lastY = ry;
+      c.emit += dist + tr.idle * dt;
+      let guard = 0;
+      while (c.emit >= tr.sp && guard++ < 6) { c.emit -= tr.sp; spawnTrail(c, rx, ry, hx, hy); }
+
+      /* advance the trail particles */
+      c.pool.forEach((q) => {
+        if (!q.live) return;
+        q.age += dt;
+        if (q.age >= q.life) { q.live = false; q.el.style.opacity = '0'; return; }
+        const u = q.age / q.life;
+        q.x += q.vx * dt; q.y += q.vy * dt;
+        const sc = q.s0 + (q.s1 - q.s0) * u;
+        const op = c.trail === 'flame' ? q.op0 * (1 - u) * (1 - u) : q.op0 * (1 - u);
+        const sxScale = c.trail === 'wake' ? sc * q.sxy : sc;
+        const syScale = c.trail === 'wake' ? sc * 0.5 : sc;
+        q.el.style.opacity = op.toFixed(3);
+        q.el.style.transform = `translate(${q.x.toFixed(1)}px,${q.y.toFixed(1)}px) translate(-50%,-50%) scale(${sxScale.toFixed(3)},${syScale.toFixed(3)})`;
       });
     });
   }
@@ -1971,7 +2022,7 @@
       });
     }
 
-    updateFleet(t);
+    updateFleet(t, dt);
   };
   requestAnimationFrame(frame);
 
