@@ -666,35 +666,64 @@
   }
 
   /* Work — stacked story rows, indices in the hue taxonomy */
+  /* ============================================
+     Work — an interactive gallery. Each row carries
+     an accent bar and editorial meta; hovering one
+     summons an original story-plate that trails the
+     cursor through the open right-hand column.
+     ============================================ */
+  .work-list { position: relative; z-index: 6; }
   .work-item {
     display: block;
-    padding: 29px 0;
-    max-width: 60%;
+    padding: 30px 0;
+    max-width: 62%;
     position: relative;
     z-index: 6;
-    transition: transform .4s cubic-bezier(.22,1,.36,1);
+    border-top: 1px solid var(--hairline);
+    transition: transform .5s cubic-bezier(.22,1,.36,1);
+    --accent: var(--crimson);
   }
+  .work-item:last-child { border-bottom: 1px solid var(--hairline); }
   @media (max-width: 820px) { .work-item { max-width: 100%; } }
-  .work-item:hover { transform: translateX(22px); }
-  .work-item__row { display: flex; align-items: baseline; gap: 22px; }
-  .work-item__index { font-size: 14px; font-weight: 500; min-width: 30px; }
-  .work-item:nth-child(1) .work-item__index { color: var(--hue-green); }
-  .work-item:nth-child(2) .work-item__index { color: var(--hue-orange); }
-  .work-item:nth-child(3) .work-item__index { color: var(--hue-lipstick); }
-  .work-item:nth-child(4) .work-item__index { color: var(--hue-lilac); }
-  .work-item:nth-child(5) .work-item__index { color: var(--hue-blue); }
+  .work-item:nth-child(1) { --accent: var(--hue-green); }
+  .work-item:nth-child(2) { --accent: var(--hue-orange); }
+  .work-item:nth-child(3) { --accent: var(--hue-lipstick); }
+  .work-item:nth-child(4) { --accent: var(--hue-lilac); }
+  .work-item:nth-child(5) { --accent: var(--hue-blue); }
+  .work-item:hover { transform: translateX(30px); }
+  .work-item__bar {
+    position: absolute;
+    left: -30px; top: 50px;
+    width: 16px; height: 3px;
+    background: var(--accent);
+    transform: scaleX(0); transform-origin: left center;
+    transition: transform .5s cubic-bezier(.22,1,.36,1);
+  }
+  .work-item:hover .work-item__bar { transform: scaleX(1); }
+  .work-item__row { display: flex; align-items: baseline; gap: 24px; }
+  .work-item__index {
+    font-size: 14px; font-weight: 500; min-width: 30px;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
   .work-item__name {
-    font-size: clamp(27px, 3.4vw, 48px);
+    font-size: clamp(28px, 3.6vw, 52px);
     font-weight: 400;
-    line-height: 1.15;
+    line-height: 1.1;
     color: var(--ink);
     transition: color .25s ease;
   }
-  .work-item:nth-child(1):hover .work-item__name { color: var(--hue-green); }
-  .work-item:nth-child(2):hover .work-item__name { color: var(--hue-orange); }
-  .work-item:nth-child(3):hover .work-item__name { color: var(--hue-lipstick); }
-  .work-item:nth-child(4):hover .work-item__name { color: var(--hue-lilac); }
-  .work-item:nth-child(5):hover .work-item__name { color: var(--hue-blue); }
+  .work-item:hover .work-item__name { color: var(--accent); }
+  .work-item__meta {
+    margin-left: auto;
+    align-self: center;
+    font-size: 12px; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--faint);
+    white-space: nowrap;
+    opacity: 0; transform: translateX(-8px);
+    transition: opacity .35s ease, transform .45s cubic-bezier(.22,1,.36,1), color .25s ease;
+  }
+  .work-item:hover .work-item__meta { opacity: 1; transform: none; color: var(--muted); }
   .work-item__name::after {
     content: '→';
     display: inline-block;
@@ -706,11 +735,40 @@
   .work-item:hover .work-item__name::after { opacity: 1; transform: none; }
   .work-item__desc {
     font-size: 14px;
-    line-height: 1.25;
+    line-height: 1.3;
     color: var(--muted);
-    margin-top: 7px;
-    margin-left: 52px;
+    margin-top: 10px;
+    margin-left: 54px;
+    max-width: 44ch;
+    opacity: .78;
+    transition: opacity .3s ease;
   }
+  .work-item:hover .work-item__desc { opacity: 1; }
+
+  /* Cursor-trailing story plate */
+  .work-preview {
+    position: fixed; left: 0; top: 0;
+    width: 288px; height: 366px;
+    z-index: 40; pointer-events: none;
+    opacity: 0;
+    transition: opacity .4s ease;
+    will-change: transform;
+  }
+  .work-preview.on { opacity: 1; }
+  .wp-plate {
+    position: absolute; inset: 0;
+    border-radius: 18px; overflow: hidden;
+    background: linear-gradient(150deg, var(--a), var(--b));
+    box-shadow: 0 34px 80px -24px rgba(14,16,15,.55);
+    opacity: 0; transform: scale(.92) rotate(-2.5deg);
+    transition: opacity .4s ease, transform .55s cubic-bezier(.22,1,.36,1);
+  }
+  .wp-plate.show { opacity: 1; transform: none; }
+  .wp-art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .wp-cap { position: absolute; left: 24px; right: 24px; bottom: 22px; color: #fff; z-index: 2; }
+  .wp-tag { display: block; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; opacity: .82; margin-bottom: 7px; }
+  .wp-name { display: block; font-size: 27px; font-weight: 500; line-height: 1.02; }
+  @media (max-width: 820px) { .work-preview { display: none; } }
 
   .cap-list { display: flex; flex-direction: column; gap: 9px; position: relative; z-index: 6; max-width: 60%; }
   @media (max-width: 820px) { .cap-list { max-width: 100%; } }
@@ -1294,43 +1352,118 @@
         </svg>
       </div>
     </div>
-    <div data-stagger data-skew>
-      <a class="work-item" href="#">
+    <div class="work-list" data-stagger data-skew>
+      <a class="work-item" href="#" data-preview="0">
+        <span class="work-item__bar" aria-hidden="true"></span>
         <div class="work-item__row">
           <span class="work-item__index">01</span>
           <span class="work-item__name">Harbor &amp; Pine</span>
+          <span class="work-item__meta">Heritage brand · 2024</span>
         </div>
         <p class="work-item__desc">A century-old furniture maker, retold for direct-to-consumer</p>
       </a>
-      <a class="work-item" href="#">
+      <a class="work-item" href="#" data-preview="1">
+        <span class="work-item__bar" aria-hidden="true"></span>
         <div class="work-item__row">
           <span class="work-item__index">02</span>
           <span class="work-item__name">Lumen Health</span>
+          <span class="work-item__meta">Digital · Identity · 2025</span>
         </div>
         <p class="work-item__desc">A telehealth platform given a human voice</p>
       </a>
-      <a class="work-item" href="#">
+      <a class="work-item" href="#" data-preview="2">
+        <span class="work-item__bar" aria-hidden="true"></span>
         <div class="work-item__row">
           <span class="work-item__index">03</span>
           <span class="work-item__name">Fieldnote</span>
+          <span class="work-item__meta">Brand · Web · 2024</span>
         </div>
         <p class="work-item__desc">A farm-to-table startup with a story worth planting</p>
       </a>
-      <a class="work-item" href="#">
+      <a class="work-item" href="#" data-preview="3">
+        <span class="work-item__bar" aria-hidden="true"></span>
         <div class="work-item__row">
           <span class="work-item__index">04</span>
           <span class="work-item__name">Arclight</span>
+          <span class="work-item__meta">Rebrand · Motion · 2023</span>
         </div>
         <p class="work-item__desc">A security firm recast as the calm inside the storm</p>
       </a>
-      <a class="work-item" href="#">
+      <a class="work-item" href="#" data-preview="4">
+        <span class="work-item__bar" aria-hidden="true"></span>
         <div class="work-item__row">
           <span class="work-item__index">05</span>
           <span class="work-item__name">Nomad Rail</span>
+          <span class="work-item__meta">Campaign · 2025</span>
         </div>
         <p class="work-item__desc">Rail travel, sold as the slow adventure it is</p>
       </a>
     </div>
+
+    <!-- Story-plates: original art per project, summoned on hover -->
+    <div class="work-preview" aria-hidden="true">
+      <div class="wp-plate" style="--a:#16d15a; --b:#0a7d3c;">
+        <svg class="wp-art" viewBox="0 0 288 366" preserveAspectRatio="xMidYMid slice">
+          <g fill="none" stroke="rgba(255,255,255,.92)" stroke-width="3">
+            <ellipse cx="150" cy="150" rx="26" ry="22"/>
+            <ellipse cx="150" cy="150" rx="52" ry="45"/>
+            <ellipse cx="150" cy="150" rx="80" ry="70"/>
+            <ellipse cx="150" cy="150" rx="112" ry="98"/>
+          </g>
+          <circle cx="150" cy="150" r="5" fill="#fff"/>
+        </svg>
+        <div class="wp-cap"><span class="wp-tag">Heritage · Brand</span><span class="wp-name">Harbor &amp; Pine</span></div>
+      </div>
+      <div class="wp-plate" style="--a:#ff9a2b; --b:#d45f00;">
+        <svg class="wp-art" viewBox="0 0 288 366" preserveAspectRatio="xMidYMid slice">
+          <g fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2.5">
+            <circle cx="150" cy="150" r="60"/><circle cx="150" cy="150" r="96"/>
+          </g>
+          <path d="M18 150 H86 l16 -66 l22 128 l17 -86 l12 42 H270" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="wp-cap"><span class="wp-tag">Digital · Identity</span><span class="wp-name">Lumen Health</span></div>
+      </div>
+      <div class="wp-plate" style="--a:#f100cb; --b:#a3008a;">
+        <svg class="wp-art" viewBox="0 0 288 366" preserveAspectRatio="xMidYMid slice">
+          <g stroke="#fff" stroke-width="3.5" stroke-linecap="round" fill="rgba(255,255,255,.16)">
+            <path d="M144 214 V116" fill="none"/>
+            <path d="M144 152 C108 152 92 130 92 106 C128 106 144 130 144 154 Z"/>
+            <path d="M144 172 C180 172 196 150 196 126 C160 126 144 150 144 174 Z"/>
+          </g>
+          <line x1="58" y1="214" x2="230" y2="214" stroke="#fff" stroke-width="2.5" stroke-dasharray="3 11" stroke-linecap="round"/>
+        </svg>
+        <div class="wp-cap"><span class="wp-tag">Brand · Web</span><span class="wp-name">Fieldnote</span></div>
+      </div>
+      <div class="wp-plate" style="--a:#9d95ff; --b:#6a5cf0;">
+        <svg class="wp-art" viewBox="0 0 288 366" preserveAspectRatio="xMidYMid slice">
+          <g fill="none" stroke="#fff" stroke-width="3">
+            <path d="M40 214 A116 116 0 0 1 260 214"/>
+            <path d="M72 214 A88 88 0 0 1 228 214"/>
+            <path d="M104 214 A58 58 0 0 1 196 214"/>
+          </g>
+          <g stroke="rgba(255,255,255,.4)" stroke-width="2" stroke-linecap="round">
+            <line x1="86" y1="250" x2="78" y2="286"/><line x1="150" y1="256" x2="150" y2="298"/><line x1="214" y1="250" x2="222" y2="286"/>
+          </g>
+          <circle cx="150" cy="214" r="5" fill="#fff"/>
+        </svg>
+        <div class="wp-cap"><span class="wp-tag">Rebrand · Motion</span><span class="wp-name">Arclight</span></div>
+      </div>
+      <div class="wp-plate" style="--a:#00bae2; --b:#0088c4;">
+        <svg class="wp-art" viewBox="0 0 288 366" preserveAspectRatio="xMidYMid slice">
+          <line x1="34" y1="96" x2="254" y2="96" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
+          <g stroke="#fff" fill="none" stroke-width="3" stroke-linecap="round">
+            <line x1="92" y1="250" x2="140" y2="98"/>
+            <line x1="196" y1="250" x2="148" y2="98"/>
+            <line x1="110" y1="206" x2="178" y2="206"/>
+            <line x1="119" y1="174" x2="169" y2="174"/>
+            <line x1="126" y1="146" x2="162" y2="146"/>
+            <line x1="131" y1="122" x2="157" y2="122"/>
+          </g>
+        </svg>
+        <div class="wp-cap"><span class="wp-tag">Campaign</span><span class="wp-name">Nomad Rail</span></div>
+      </div>
+    </div>
+
     <div data-bubble data-size="340" data-clip="1" style="right: 4%; top: 46%; width: 340px; height: 340px;"></div>
   </section>
 
@@ -1713,10 +1846,12 @@
     el, depth: parseFloat(el.dataset.mdepth) || 16, x: 0, y: 0,
   }));
   let mnx = 0, mny = 0, pointerSeen = false;
+  let pxMouse = innerWidth / 2, pyMouse = innerHeight / 2;
   if (finePointer) {
     addEventListener('mousemove', (e) => {
       mnx = e.clientX / innerWidth - 0.5;
       mny = e.clientY / innerHeight - 0.5;
+      pxMouse = e.clientX; pyMouse = e.clientY;
       pointerSeen = true;
     });
   }
@@ -1824,6 +1959,40 @@
       });
       item.addEventListener('mouseleave', () => { attract = null; });
     });
+  }
+
+  /* Work gallery — a story-plate trails the cursor over the list */
+  let workPreviewTick = null;
+  const workList = document.querySelector('.work-list');
+  const workPreview = document.querySelector('.work-preview');
+  if (workList && workPreview && finePointer && !reduced) {
+    const plates = [...workPreview.querySelectorAll('.wp-plate')];
+    const wp = { cx: pxMouse, cy: pyMouse, active: -1 };
+    document.querySelectorAll('.work-item').forEach((item) => {
+      item.addEventListener('mouseenter', () => {
+        const i = +item.dataset.preview;
+        if (wp.active < 0) { wp.cx = pxMouse; wp.cy = pyMouse; } /* no glide-in from off-screen */
+        wp.active = i;
+        workPreview.classList.add('on');
+        plates.forEach((p, j) => p.classList.toggle('show', j === i));
+      });
+    });
+    workList.addEventListener('mouseleave', () => {
+      wp.active = -1;
+      workPreview.classList.remove('on');
+      plates.forEach((p) => p.classList.remove('show'));
+    });
+    workPreviewTick = () => {
+      if (wp.active < 0) return;
+      /* trail the cursor, but biased into the open right column and kept
+         fully on-screen so it never sits over the row you're reading */
+      const tx = clampf(pxMouse + 80, innerWidth * 0.47, innerWidth - 308);
+      const ty = clampf(pyMouse - 40, 96, innerHeight - 386);
+      wp.cx += (tx - wp.cx) * 0.16;
+      wp.cy += (ty - wp.cy) * 0.16;
+      const tilt = clampf((tx - wp.cx) * 0.5, -9, 9);
+      workPreview.style.transform = `translate3d(${wp.cx.toFixed(1)}px, ${wp.cy.toFixed(1)}px, 0) rotate(${tilt.toFixed(2)}deg)`;
+    };
   }
 
   const ease = (t) => t * t * (3 - 2 * t);
@@ -2197,6 +2366,8 @@
         d.el.style.transform = `translate3d(${d.x}px, ${d.y}px, 0)`;
       });
     }
+
+    if (workPreviewTick) workPreviewTick();
 
     updateFleet(t, dt);
   };
