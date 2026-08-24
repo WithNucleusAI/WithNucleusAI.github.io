@@ -550,6 +550,15 @@
     visibility: hidden;
   }
 
+  /* Inline mascot stops — the phone version of Pip. Hidden on desktop
+     (where the fixed traveller does the job); on phones they place him in
+     each section's whitespace so he scrolls up the page with the story. */
+  .m-stop { display: none; }
+  @keyframes m-float {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50%      { transform: translateY(-9px) rotate(1.5deg); }
+  }
+
   /* ============================================
      Hero
      ============================================ */
@@ -1368,13 +1377,26 @@
   @media (max-width: 600px) {
     :root { --margin-x: 22px; }
 
-    /* Pip is docked in the bottom-right corner and anchored by his own box,
-       so every pose sits fully on-screen (no more clipping off the edge).
-       The JS keeps him alive in place — float, hop, lean. */
-    .mascot { left: auto; right: 0; top: auto; bottom: 0; }
-    .mascot__pose {
-      left: auto; top: auto; right: 15px; bottom: 12px;
-      transform-origin: bottom center;
+    /* On phones Pip TRAVELS inline — a stop in each section's whitespace, so
+       he scrolls up the page with the content, section to section, walking
+       the story. The fixed desktop traveller steps aside. */
+    .mascot { display: none; }
+    .m-stop {
+      display: block;
+      margin: clamp(30px, 9vw, 66px) 0 clamp(4px, 2vw, 14px);
+      opacity: 0;
+      transition: opacity .7s ease, transform .85s cubic-bezier(.22,1,.36,1);
+      will-change: transform, opacity;
+    }
+    .m-stop[data-side="right"]  { text-align: right; transform: translate(36px, 28px); }
+    .m-stop[data-side="left"]   { text-align: left;  transform: translate(-36px, 28px); }
+    .m-stop[data-side="center"] { text-align: center; transform: translateY(28px); }
+    .m-stop.in { opacity: 1; transform: none; }
+    .m-stop img {
+      display: inline-block;
+      height: clamp(140px, 41vw, 178px);
+      width: auto; max-width: 94%;
+      animation: m-float 4.6s ease-in-out infinite;
     }
 
     /* Hero — headline sized to the column (no more clipped STORY), and a
@@ -1422,6 +1444,8 @@
     }
     .statement .w { color: var(--ink); }
     .cursor-dot, .cursor-ring { display: none; }
+    .m-stop { opacity: 1; transform: none; transition: none; }
+    .m-stop img { animation: none; }
   }
 </style>
 </head>
@@ -1543,6 +1567,7 @@
     <span class="hero__scroll">(Scroll — the story follows)</span>
 
     <div data-mascot data-hero data-pose="hero" data-size="276" style="right: 4%; top: 66px; width: 300px; height: 300px;"></div>
+    <div class="m-stop" data-side="right" aria-hidden="true"><img src="mascot/pip-hero.png" alt="" width="1000" height="646"></div>
   </section>
 
   <!-- Marquee -->
@@ -1582,6 +1607,7 @@
     <p class="work-note reveal">A young studio — more stories in the making. <a href="#contact">Yours could be the next one.</a></p>
 
     <div data-mascot data-pose="proud" data-size="300" style="right: 6%; top: 26%; width: 300px; height: 300px;"></div>
+    <div class="m-stop" data-side="left" aria-hidden="true"><img src="mascot/pip-proud.png" alt="" width="785" height="900"></div>
   </section>
 
   <!-- Capabilities -->
@@ -1633,6 +1659,7 @@
       </div>
     </div>
     <div data-mascot data-pose="pen" data-size="272" style="right: 7%; top: 4%; width: 280px; height: 280px;"></div>
+    <div class="m-stop" data-side="right" aria-hidden="true"><img src="mascot/pip-pen.png" alt="" width="900" height="830"></div>
   </section>
 
   <!-- Statement — pinned band, the sentence scrubs across with the scroll -->
@@ -1724,6 +1751,7 @@
       </div>
     </div>
     <div data-mascot data-pose="relax" data-size="300" style="right: 5%; top: 16%; width: 300px; height: 300px;"></div>
+    <div class="m-stop" data-side="left" aria-hidden="true"><img src="mascot/pip-relax.png" alt="" width="807" height="900"></div>
   </section>
 
   <!-- Contact -->
@@ -1779,6 +1807,7 @@
       </div>
     </form>
     <div data-mascot data-pose="listen" data-size="300" style="right: 8%; top: 18%; width: 300px; height: 300px;"></div>
+    <div class="m-stop" data-side="right" aria-hidden="true"><img src="mascot/pip-listen.png" alt="" width="894" height="900"></div>
   </section>
 
   <!-- Second marquee — drifts the other way -->
@@ -1857,6 +1886,7 @@
   <!-- Footer -->
   <footer class="page">
     <div data-mascot data-pose="base" data-size="248" style="right: 12%; top: 12%; width: 248px; height: 248px;"></div>
+    <div class="m-stop" data-side="center" aria-hidden="true"><img src="mascot/pip-base.png" alt="" width="766" height="860"></div>
     <div class="footer-mark" aria-hidden="true">Tell<i>.</i></div>
     <div class="footer-row">
       <span>&copy; 2026 Tell</span>
@@ -1990,7 +2020,7 @@
       if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
     }
   }, { threshold: 0.15 });
-  document.querySelectorAll('.reveal, [data-stagger], h2.lines').forEach((el) => io.observe(el));
+  document.querySelectorAll('.reveal, [data-stagger], h2.lines, .m-stop').forEach((el) => io.observe(el));
 
   /* Menu */
   const menu = document.querySelector('.menu');
