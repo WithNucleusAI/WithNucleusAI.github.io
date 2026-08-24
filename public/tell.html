@@ -389,15 +389,20 @@
   .brand {
     display: flex;
     align-items: center;
-    gap: 9px;
-    color: var(--ink);
-    font-size: 17px;
+    gap: 10px;
+    color: var(--crimson);
+    font-size: clamp(22px, 2.3vw, 28px);
     font-weight: 700;
+    line-height: 1;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.005em;
   }
-  .brand__mark { width: 15px; height: 15px; }
+  .brand__mark { width: clamp(21px, 2.2vw, 26px); height: clamp(21px, 2.2vw, 26px); flex: none; }
   .tagline { font-size: 14px; color: var(--muted); }
+
+  /* Brand highlight — the word "Tell" carries the studio's crimson wherever
+     it appears, so the name reads as the through-line of the whole page */
+  .tw { color: var(--crimson); }
   @media (max-width: 900px) { .tagline { display: none; } }
   .header-actions { display: flex; align-items: center; gap: 22px; }
   /* On phones the pill would crowd the burger — the menu carries "Contact" */
@@ -1614,7 +1619,7 @@
   <section id="capabilities" class="page">
     <div class="section-head">
       <span class="eyebrow reveal">Capabilities</span>
-      <h2 class="heading-lg lines">How We<br>Tell It</h2>
+      <h2 class="heading-lg lines">How We<br><span class="tw">Tell</span> It</h2>
       <span class="section-count reveal" aria-hidden="true">Four<span>·</span>disciplines</span>
     </div>
     <div class="caps reveal">
@@ -1769,7 +1774,7 @@
     </div>
     <div class="section-head">
       <span class="eyebrow reveal">Contact</span>
-      <h2 class="heading-lg lines">Tell Us<br>Yours</h2>
+      <h2 class="heading-lg lines"><span class="tw">Tell</span> Us<br>Yours</h2>
       <div class="deco deco--mini" data-mdepth="12" style="left: 38%; top: 10%;" aria-hidden="true">
         <svg viewBox="0 0 100 100">
           <g fill="url(#gradPin)" stroke="var(--paper)" stroke-width="5">
@@ -1889,7 +1894,7 @@
     <div class="m-stop" data-side="center" aria-hidden="true"><img data-pip="base" alt="" width="766" height="860"></div>
     <div class="footer-mark" aria-hidden="true">Tell<i>.</i></div>
     <div class="footer-row">
-      <span>&copy; 2026 Tell</span>
+      <span>&copy; 2026 <span class="tw">Tell</span></span>
       <a href="mailto:hello@tell.studio">hello@tell.studio</a>
       <span>Every company has a story.</span>
     </div>
