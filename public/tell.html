@@ -611,10 +611,11 @@
   .marquee__track span:nth-child(3n+1) { -webkit-text-stroke: 1px var(--hue-green); }
   .marquee__track span:nth-child(3n+2) { -webkit-text-stroke: 1px var(--hue-orange); }
   .marquee__track span:nth-child(3n)   { -webkit-text-stroke: 1px var(--hue-blue); }
-  /* words ink themselves in as the cursor passes over the running line */
-  .marquee__track span:nth-child(3n+1):hover { color: var(--hue-green); }
-  .marquee__track span:nth-child(3n+2):hover { color: var(--hue-orange); }
-  .marquee__track span:nth-child(3n):hover   { color: var(--hue-blue); }
+  /* the running line inks itself in with colour as it scrolls into view
+     (scroll-driven, so it works on every device — no cursor needed) */
+  .marquee.lit .marquee__track span:nth-child(3n+1) { color: var(--hue-green); }
+  .marquee.lit .marquee__track span:nth-child(3n+2) { color: var(--hue-orange); }
+  .marquee.lit .marquee__track span:nth-child(3n)   { color: var(--hue-blue); }
   @keyframes marquee {
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
@@ -1130,9 +1131,10 @@
     background-size: 0% 100%;
     -webkit-background-clip: text;
     background-clip: text;
-    transition: background-size .9s cubic-bezier(.22,1,.36,1);
+    transition: background-size .12s linear;
   }
-  .footer-mark:hover { background-size: 100% 100%; }
+  /* the wordmark inks itself crimson as you scroll it into view — the JS
+     drives background-size from the footer's scroll progress (no hover) */
   .footer-mark i {
     font-style: normal;
     display: inline-block;
@@ -1383,14 +1385,13 @@
     .scrub__bez { top: 6vh; left: auto; right: 3%; width: clamp(168px, 42vw, 230px); }
     .scrub__star { bottom: 8vh; left: 7%; width: clamp(40px, 12vw, 60px); }
 
-    /* Fleet flies on phones too — the boat, plane and crane weave down as a
-       soft background layer (rocket + kite sit out to keep the column calm) */
-    #fleet.sailing { opacity: .4; }
-    #craftRocket, #craftKite { display: none; }
+    /* The whole fleet flies on phones too — boat, plane, rocket, crane and
+       kite weave down the page just like the desktop stage */
+    #fleet.sailing { opacity: .82; }
 
     /* The story-thread runs through the single column here, so let it recede
        to a faint whisper behind the words instead of a line across them */
-    #threadPath { stroke: rgba(252, 28, 70, .18); stroke-width: 1.5; }
+    #threadPath { stroke: rgba(252, 28, 70, .2); stroke-width: 1.6; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -2333,6 +2334,8 @@
   let t0 = 0;
   const marqueeTrack = document.getElementById('marqueeTrack');
   const marqueeTrack2 = document.getElementById('marqueeTrack2');
+  const marquees = [...document.querySelectorAll('.marquee')];
+  const footerMark = document.querySelector('.footer-mark');
   const skewEls = [...document.querySelectorAll('[data-skew]')];
   let marqueeX2 = 0;
   let skewCur = 0;
@@ -2409,13 +2412,10 @@
 
   function updateFleet(t, dt) {
     if (!fleetReady || reduced || !fleetEl) return;
-    const mob = innerWidth < 600;
     const denom = Math.max(1, document.documentElement.scrollHeight - innerHeight);
     const p = clampf(scrollY / denom, 0, 1);
     CRAFT.forEach((c) => {
       if (!c.el) return;
-      /* phones fly a calmer, thinner fleet — the boat, plane and crane */
-      if (mob && (c.kind === 'rocket' || c.kind === 'kite')) return;
       const tg = fleetPath(c, p);
       if (!c.cur) { c.cur = { x: tg.x, y: tg.y }; c.lastX = tg.x; c.lastY = tg.y; }
       c.cur.x += (tg.x - c.cur.x) * c.k;
@@ -2594,6 +2594,19 @@
       marqueeX2 += (70 + Math.min(520, Math.abs(scrollVel) * 26)) * dt;
       if (marqueeX2 >= 0) marqueeX2 -= half2;
       marqueeTrack2.style.transform = `translate3d(${marqueeX2}px, 0, 0)`;
+    }
+
+    /* Colour inks into the running lines as they scroll into view, and into
+       the footer wordmark as you reach the foot of the page — scroll-driven,
+       so it lands the same on desktop and touch, no cursor required */
+    for (const m of marquees) {
+      const r = m.getBoundingClientRect();
+      m.classList.toggle('lit', r.top < innerHeight * 0.92 && r.bottom > innerHeight * 0.06);
+    }
+    if (footerMark) {
+      const r = footerMark.getBoundingClientRect();
+      const fp = clamp01((innerHeight - r.top) / (innerHeight * 0.55));
+      footerMark.style.backgroundSize = (fp * 100).toFixed(1) + '% 100%';
     }
 
     /* Lists lean with the scroll, then settle upright */
@@ -2900,9 +2913,9 @@
   const runOverture = () => {
     if (overtureDone) return;
     overtureDone = true;
-    if (reduced || innerWidth < 700 || !('animate' in Element.prototype)) {
+    if (reduced || !('animate' in Element.prototype)) {
       startHero();
-      /* no overture on phones — set the fleet sailing straight away */
+      /* reduced-motion / very old browsers: skip the burst, just set sail */
       if (fleetEl && !reduced) { fleetReady = true; fleetEl.classList.add('sailing'); }
       return;
     }
