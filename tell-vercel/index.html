@@ -1,0 +1,3082 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tell — Every company has a story</title>
+<meta name="description" content="Tell is a web design and branding firm. Every company has a story — we design how yours is told.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ============================================
+     Tokens — ink on paper, with the Tween-study
+     gradient palette as the colored artifacts
+     ============================================ */
+  :root {
+    --paper: #fffcf2;
+    --ink: #0e100f;
+    --muted: #6f6f65;
+    --faint: #c6c2b4;
+    --hairline: rgba(14, 16, 15, .16);
+    --crimson: #fc1c46;
+
+    --hue-green: #0ae448;
+    --hue-lightgreen: #abff84;
+    --hue-orange: #ff8709;
+    --hue-pink: #fec5fb;
+    --hue-lilac: #9d95ff;
+    --hue-blue: #00bae2;
+    --hue-lipstick: #f100cb;
+
+    --font-sui: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --page-max: 1400px;
+    --margin-x: clamp(24px, 9vw, 126px);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; overflow-x: clip; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sui);
+    font-size: 15px;
+    line-height: 1.15;
+    /* clip (not hidden) kills the horizontal wobble on mobile without
+       turning the body into a scroll container that breaks the sticky band */
+    overflow-x: clip;
+    max-width: 100%;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  ::selection { background: var(--crimson); color: #fff; }
+  /* Keyboard focus — a clear crimson ring for keyboard users only,
+     without disturbing pointer interactions */
+  :focus-visible { outline: 2px solid var(--crimson); outline-offset: 4px; border-radius: 3px; }
+  .field:focus-visible { outline: none; } /* fields carry their own focus line */
+
+  .page {
+    max-width: var(--page-max);
+    margin: 0 auto;
+    padding-left: var(--margin-x);
+    padding-right: var(--margin-x);
+  }
+
+  /* ============================================
+     Type roles
+     ============================================ */
+  .display {
+    font-size: clamp(52px, 12vw, 170px);
+    font-weight: 700;
+    line-height: 0.96;
+    letter-spacing: -0.009em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .heading-lg {
+    font-size: clamp(40px, 6.5vw, 91px);
+    font-weight: 700;
+    line-height: 0.94;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .lead {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.25;
+    color: var(--muted);
+  }
+  .eyebrow {
+    font-size: 15px;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--muted);
+  }
+  .eyebrow::before {
+    content: '';
+    display: inline-block; vertical-align: middle;
+    width: 36px; height: 1px; margin-right: 15px; margin-bottom: 3px;
+    background: var(--crimson);
+    transform: scaleX(0); transform-origin: left center;
+    transition: transform .8s cubic-bezier(.22,1,.36,1) .15s;
+  }
+  .eyebrow.in::before { transform: scaleX(1); }
+  .meta {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  /* ============================================
+     Buttons — one crimson pill, ghost everything else
+     ============================================ */
+  .pill-crimson {
+    display: inline-flex;
+    align-items: center;
+    background: var(--crimson);
+    color: #fff;
+    border: none;
+    border-radius: 9999px;
+    padding: 0 30px;
+    font-family: var(--font-sui);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 2.6;
+    text-transform: uppercase;
+    letter-spacing: -0.009em;
+    cursor: none;
+    will-change: transform;
+  }
+
+  .ghost {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    color: var(--ink);
+    font-family: var(--font-sui);
+    font-size: 15px;
+    font-weight: 400;
+    cursor: none;
+    position: relative;
+  }
+  .ghost::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    height: 1px;
+    width: 100%;
+    background: var(--ink);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .35s cubic-bezier(.22,1,.36,1);
+  }
+  .ghost:hover::after { transform: scaleX(1); }
+
+  /* ============================================
+     Custom cursor — ink ring and dot
+     ============================================ */
+  @media (pointer: fine) {
+    html.has-cursor body,
+    html.has-cursor a,
+    html.has-cursor button { cursor: none; }
+    html.has-cursor input,
+    html.has-cursor textarea { cursor: text; }
+  }
+  .cursor-dot, .cursor-ring {
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 200;
+    pointer-events: none;
+    border-radius: 50%;
+    will-change: transform;
+  }
+  .cursor-dot {
+    width: 5px; height: 5px;
+    background: var(--ink);
+    margin: -2.5px 0 0 -2.5px;
+  }
+  .cursor-ring {
+    width: 34px; height: 34px;
+    border: 1px solid rgba(14,16,15,.45);
+    margin: -17px 0 0 -17px;
+    transition: width .3s cubic-bezier(.22,1,.36,1), height .3s cubic-bezier(.22,1,.36,1), margin .3s cubic-bezier(.22,1,.36,1), border-color .3s ease;
+  }
+  .cursor-ring.big {
+    width: 62px; height: 62px;
+    margin: -31px 0 0 -31px;
+    border-color: rgba(14,16,15,.85);
+  }
+
+  /* ============================================
+     Colored artifacts — soft gradient shapes from
+     the Tween study, printed on the paper
+     ============================================ */
+  .art {
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+    will-change: transform, border-radius;
+  }
+  /* Each shape breathes through its own morph cycle at its own tempo —
+     the shapes never hold still, and no two move at the same speed */
+  @keyframes morph-a {
+    0%, 100% { border-radius: 46% 54% 60% 40% / 50% 44% 56% 50%; }
+    33% { border-radius: 62% 38% 40% 60% / 40% 60% 44% 56%; }
+    66% { border-radius: 36% 64% 58% 42% / 62% 36% 64% 38%; }
+  }
+  @keyframes morph-b {
+    0%, 100% { border-radius: 999px 999px 24px 24px; }
+    33% { border-radius: 56% 44% 52% 48% / 56% 46% 54% 44%; }
+    66% { border-radius: 24px 999px 999px 24px; }
+  }
+  @keyframes morph-c {
+    0%, 100% { border-radius: 999px; }
+    50% { border-radius: 44% 56% 50% 50% / 60% 42% 58% 40%; }
+  }
+  /* Hero aurora — the first thing you see. Two soft washes of fresh
+     light drift and breathe against one another: a cool periwinkle→aqua
+     field over a warm coral→blush, blended into the paper so they read
+     as living light rather than a flat blob. */
+  .art--aurora {
+    width: clamp(280px, 42vw, 660px);
+    aspect-ratio: 1.14;
+    border-radius: 52% 48% 56% 44% / 54% 50% 50% 46%;
+    animation: morph-a 26s ease-in-out infinite, hue-breathe 20s ease-in-out infinite;
+    background:
+      radial-gradient(58% 58% at 32% 30%, rgba(120,150,255,.62) 0%, rgba(120,150,255,0) 62%),
+      radial-gradient(56% 56% at 72% 42%, rgba(0,205,220,.46) 0%, rgba(0,205,220,0) 60%),
+      radial-gradient(64% 64% at 50% 76%, rgba(157,149,255,.44) 0%, rgba(157,149,255,0) 66%);
+    filter: blur(24px);
+    opacity: .82;
+    mix-blend-mode: multiply;
+  }
+  .art--peach {
+    width: clamp(190px, 28vw, 460px);
+    aspect-ratio: 1.22;
+    border-radius: 46% 54% 60% 40% / 50% 44% 56% 50%;
+    animation: morph-c 17s ease-in-out infinite reverse, hue-breathe 24s ease-in-out infinite -6s;
+    background:
+      radial-gradient(58% 58% at 40% 38%, rgba(255,138,86,.46) 0%, rgba(255,138,86,0) 62%),
+      radial-gradient(60% 60% at 64% 62%, rgba(255,120,175,.44) 0%, rgba(255,120,175,0) 64%);
+    filter: blur(30px);
+    opacity: .72;
+    mix-blend-mode: multiply;
+  }
+  @keyframes hue-breathe {
+    0%, 100% { filter: blur(24px) hue-rotate(0deg) saturate(1); }
+    50% { filter: blur(30px) hue-rotate(-16deg) saturate(1.18); }
+  }
+  /* Bright accent orbs — pure hits of the studio palette scattered
+     through the hero, blurred to soft light and multiplied into the
+     paper so they stay vivid without ever reading as hard blobs. */
+  .art--orb {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 34%, var(--orb, #9d95ff) 0%, transparent 64%);
+    filter: blur(22px);
+    opacity: .58;
+    mix-blend-mode: multiply;
+  }
+  @media (max-width: 700px) { .art--orb { display: none; } }
+  .art--amber {
+    width: clamp(150px, 18vw, 280px);
+    aspect-ratio: 2 / 1;
+    border-radius: 999px 999px 24px 24px;
+    animation: morph-b 13s ease-in-out infinite;
+    background:
+      radial-gradient(circle at 32% 18%, rgba(255,255,255,.45), transparent 48%),
+      linear-gradient(120deg, var(--hue-orange) 15%, #ffd28a 100%);
+  }
+  .art--violet {
+    width: clamp(180px, 20vw, 320px);
+    aspect-ratio: 5 / 2;
+    border-radius: 999px;
+    transform: rotate(-18deg);
+    animation: morph-c 21s ease-in-out infinite;
+    background:
+      radial-gradient(circle at 28% 22%, rgba(255,255,255,.45), transparent 45%),
+      linear-gradient(114deg, var(--hue-lilac) 10%, var(--hue-lipstick) 100%);
+  }
+  .art--emerald {
+    width: clamp(130px, 15vw, 230px);
+    aspect-ratio: 2 / 1;
+    border-radius: 999px;
+    transform: rotate(-24deg);
+    animation: morph-c 11s ease-in-out infinite reverse;
+    background:
+      radial-gradient(circle at 30% 25%, rgba(255,255,255,.5), transparent 45%),
+      linear-gradient(114deg, var(--hue-green) 15%, var(--hue-lightgreen) 80%);
+  }
+  /* Story glyphs — meaningful shapes, each with its own life */
+  .artg svg { width: 100%; display: block; overflow: visible; }
+  .artg { border-radius: 0 !important; animation: none !important; background: none !important; }
+  .artg--speech { width: clamp(120px, 15vw, 230px); }
+  .artg--speech svg { animation: glyph-bob 5.5s ease-in-out infinite; }
+  .artg--quote { width: clamp(90px, 10vw, 160px); }
+  .artg--quote svg { animation: glyph-sway 7s ease-in-out infinite; }
+  .artg--book { width: clamp(120px, 15vw, 220px); }
+  .artg--book .book-page {
+    transform-box: fill-box;
+    transform-origin: left center;
+    animation: page-flip 6s ease-in-out infinite;
+  }
+  .artg--drop { width: clamp(64px, 8vw, 120px); }
+  .artg--drop .drop-body {
+    transform-box: fill-box;
+    transform-origin: center bottom;
+    animation: drop-squash 4s ease-in-out infinite;
+  }
+  .artg--drop .droplet { animation: drip 4s ease-in infinite; }
+  .artg--bang { width: clamp(60px, 7vw, 110px); }
+  .artg--bang svg { animation: bang-jump 4.6s ease-in-out infinite; }
+
+  @keyframes glyph-bob {
+    0%, 100% { translate: 0 0; rotate: 0deg; }
+    50% { translate: 0 -12px; rotate: -5deg; }
+  }
+  @keyframes glyph-sway {
+    0%, 100% { rotate: -5deg; }
+    50% { rotate: 6deg; }
+  }
+  @keyframes page-flip {
+    0%, 46%, 100% { transform: scaleX(1); }
+    58% { transform: scaleX(0.06) skewY(-8deg); }
+    70% { transform: scaleX(1); }
+  }
+  @keyframes drop-squash {
+    0%, 40%, 100% { transform: scale(1); }
+    55% { transform: scaleY(1.12) scaleX(.94); }
+    62% { transform: scaleY(.9) scaleX(1.08); }
+    75% { transform: scale(1); }
+  }
+  @keyframes drip {
+    0%, 52% { transform: translateY(0); opacity: 0; }
+    58% { opacity: 1; }
+    95% { transform: translateY(95px); opacity: 1; }
+    100% { transform: translateY(100px); opacity: 0; }
+  }
+  @keyframes bang-jump {
+    0%, 58%, 100% { transform: translateY(0); }
+    66% { transform: translateY(-16%) scaleY(1.05); }
+    74% { transform: translateY(0) scaleY(.9) scaleX(1.08); }
+    82% { transform: translateY(-5%); }
+    88% { transform: translateY(0); }
+  }
+
+  .art--sea {
+    width: clamp(120px, 14vw, 220px);
+    aspect-ratio: 2 / 1;
+    border-radius: 999px;
+    animation: morph-b 15s ease-in-out infinite reverse;
+    background:
+      radial-gradient(circle at 30% 22%, rgba(255,255,255,.5), transparent 45%),
+      linear-gradient(120deg, var(--hue-blue) 10%, var(--hue-lightgreen) 100%);
+  }
+  .art--sun {
+    width: clamp(80px, 9vw, 140px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    animation: morph-a 9s ease-in-out infinite;
+    background:
+      radial-gradient(circle at 32% 26%, rgba(255,255,255,.55), transparent 48%),
+      linear-gradient(135deg, var(--hue-lipstick) 10%, var(--hue-orange) 100%);
+  }
+
+  /* ============================================
+     Header
+     ============================================ */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 50;
+    background: var(--paper);
+    border-bottom: 1px solid var(--hairline);
+    animation: fade-in .8s ease both;
+  }
+  .header-row {
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--ink);
+    font-size: 17px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .brand__mark { width: 15px; height: 15px; }
+  .tagline { font-size: 14px; color: var(--muted); }
+  @media (max-width: 900px) { .tagline { display: none; } }
+  .header-actions { display: flex; align-items: center; gap: 22px; }
+  /* On phones the pill would crowd the burger — the menu carries "Contact" */
+  @media (max-width: 620px) { .header-actions .pill-crimson { display: none; } }
+
+  .burger {
+    background: transparent;
+    border: none;
+    cursor: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 14px;
+    width: 26px;
+    padding: 0;
+  }
+  .burger span {
+    display: block;
+    height: 1px;
+    width: 100%;
+    background: var(--ink);
+    transition: transform .35s cubic-bezier(.22,1,.36,1);
+  }
+  .burger:hover span:first-child { transform: translateY(2px); }
+  .burger:hover span:last-child { transform: translateY(-2px); }
+
+  /* ============================================
+     Full-screen menu
+     ============================================ */
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: var(--paper);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 var(--margin-x);
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .45s ease, visibility 0s linear .45s;
+  }
+  .menu.open { visibility: visible; opacity: 1; transition: opacity .45s ease; }
+  .menu__close {
+    position: absolute;
+    top: 29px;
+    right: var(--margin-x);
+    background: transparent;
+    border: none;
+    cursor: none;
+    width: 26px;
+    height: 26px;
+  }
+  .menu__close span {
+    position: absolute;
+    top: 50%; left: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--ink);
+  }
+  .menu__close span:first-child { transform: rotate(45deg); }
+  .menu__close span:last-child { transform: rotate(-45deg); }
+  .menu__ghost {
+    position: absolute;
+    left: var(--margin-x); bottom: 4vh;
+    font-size: clamp(180px, 40vw, 560px);
+    font-weight: 700; line-height: .8; letter-spacing: -0.03em;
+    text-transform: uppercase;
+    color: transparent; -webkit-text-stroke: 1px rgba(14,16,15,.06);
+    pointer-events: none; user-select: none;
+    opacity: 0; transform: translateY(40px) scale(.98);
+    transition: opacity .8s ease .1s, transform .9s cubic-bezier(.22,1,.36,1) .1s;
+  }
+  .menu.open .menu__ghost { opacity: 1; transform: none; }
+  .menu__links { display: flex; flex-direction: column; position: relative; z-index: 2; }
+  .menu__links:hover .menu__link:not(:hover) { opacity: .32; }
+  .menu__link {
+    --accent: var(--crimson);
+    display: flex;
+    align-items: baseline;
+    gap: 26px;
+    padding: 8px 0;
+    font-size: clamp(40px, 6.5vw, 88px);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--ink);
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity .6s cubic-bezier(.22,1,.36,1), transform .6s cubic-bezier(.22,1,.36,1);
+  }
+  .menu.open .menu__link { opacity: 1; transform: none; }
+  .menu.open .menu__links .menu__link:nth-child(1) { transition-delay: .05s; }
+  .menu.open .menu__links .menu__link:nth-child(2) { transition-delay: .12s; }
+  .menu.open .menu__links .menu__link:nth-child(3) { transition-delay: .19s; }
+  .menu.open .menu__links .menu__link:nth-child(4) { transition-delay: .26s; }
+  .menu__i { font-size: 14px; font-weight: 500; color: var(--accent); align-self: flex-start; padding-top: .5em; font-variant-numeric: tabular-nums; }
+  .menu__name { position: relative; transition: color .25s ease, transform .45s cubic-bezier(.22,1,.36,1); }
+  .menu__link:hover .menu__name { color: var(--accent); transform: translateX(18px); }
+  .menu__arrow {
+    align-self: center; font-size: .5em; color: var(--accent);
+    opacity: 0; transform: translateX(-16px);
+    transition: opacity .3s ease, transform .45s cubic-bezier(.22,1,.36,1);
+  }
+  .menu__link:hover .menu__arrow { opacity: 1; transform: translateX(18px); }
+  .menu__foot {
+    position: absolute; left: var(--margin-x); right: var(--margin-x); bottom: 34px;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+    font-size: 14px; color: var(--muted); z-index: 2;
+    opacity: 0; transform: translateY(16px);
+    transition: opacity .6s ease .34s, transform .6s cubic-bezier(.22,1,.36,1) .34s;
+  }
+  .menu.open .menu__foot { opacity: 1; transform: none; }
+  .menu__foot a { color: var(--muted); transition: color .25s ease; }
+  .menu__foot a:hover { color: var(--crimson); }
+
+  /* ============================================
+     The thought bubble — inked on paper
+     ============================================ */
+  .mascot {
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 6;
+    pointer-events: none;
+    will-change: transform;
+    opacity: 0;
+    transition: opacity .7s ease;
+  }
+  .mascot.live { opacity: 1; }
+  .mascot__pose {
+    position: absolute;
+    left: 0; top: 0;
+    height: 300px;
+    width: auto;
+    max-width: none;   /* the sandbox injects img{max-width:100%}; our
+                          zero-width fixed host would clamp it to 0 */
+    transform: translate(-50%, -54%);
+    transform-origin: 50% 62%;
+    opacity: 0;
+    transition: opacity .55s ease;
+    -webkit-user-select: none; user-select: none;
+    -webkit-user-drag: none;
+  }
+  .mascot__pose.on { opacity: 1; }
+
+  [data-mascot] {
+    position: absolute;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  /* Inline mascot stops — the phone version of Pip. Hidden on desktop
+     (where the fixed traveller does the job); on phones they place him in
+     each section's whitespace so he scrolls up the page with the story. */
+  .m-stop { display: none; }
+  @keyframes m-float {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50%      { transform: translateY(-9px) rotate(1.5deg); }
+  }
+
+  /* ============================================
+     Hero
+     ============================================ */
+  .hero {
+    position: relative;
+    padding-top: 180px;
+    padding-bottom: clamp(86px, 10vw, 108px);
+    min-height: 94vh;
+  }
+  .hero .display { position: relative; z-index: 6; }
+  .hero .display .line { white-space: nowrap; }
+  .hero .display .line:nth-child(2) { margin-left: clamp(0px, 10vw, 140px); }
+  .hero .display .line:nth-child(3) { margin-left: clamp(0px, 2vw, 28px); }
+  .display .wd { display: inline-block; white-space: nowrap; }
+  .hero__lead {
+    max-width: 400px;
+    margin-top: 43px;
+    position: relative;
+    z-index: 6;
+  }
+  .hero__lead em { font-style: normal; color: var(--ink); }
+  .hero__scroll {
+    margin-top: 65px;
+    display: inline-block;
+    font-size: 14px;
+    color: var(--muted);
+    animation: scroll-pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes scroll-pulse {
+    0%, 100% { opacity: .5; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(6px); }
+  }
+
+  /* ============================================
+     Marquee — hue-stroked runaway line
+     ============================================ */
+  .marquee {
+    overflow: hidden;
+    padding: clamp(43px, 6vw, 86px) 0 0;
+    white-space: nowrap;
+  }
+  .marquee__track {
+    display: inline-block;
+    will-change: transform;
+    animation: marquee 26s linear infinite;
+  }
+  .js .marquee__track { animation: none; }
+  .marquee__track span {
+    display: inline-block;
+    font-size: clamp(40px, 6.5vw, 91px);
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    color: transparent;
+    padding-right: 22px;
+  }
+  .marquee__track span { transition: color .3s ease; }
+  .marquee__track span:nth-child(3n+1) { -webkit-text-stroke: 1px var(--hue-green); }
+  .marquee__track span:nth-child(3n+2) { -webkit-text-stroke: 1px var(--hue-orange); }
+  .marquee__track span:nth-child(3n)   { -webkit-text-stroke: 1px var(--hue-blue); }
+  /* the running line inks itself in with colour as it scrolls into view
+     (scroll-driven, so it works on every device — no cursor needed) */
+  .marquee.lit .marquee__track span:nth-child(3n+1) { color: var(--hue-green); }
+  .marquee.lit .marquee__track span:nth-child(3n+2) { color: var(--hue-orange); }
+  .marquee.lit .marquee__track span:nth-child(3n)   { color: var(--hue-blue); }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ============================================
+     Sections
+     ============================================ */
+  section {
+    padding-top: clamp(86px, 10vw, 108px);
+    padding-bottom: clamp(43px, 5vw, 65px);
+    position: relative;
+  }
+  .section-head { margin-bottom: 65px; position: relative; z-index: 6; }
+  .section-head .eyebrow { display: block; margin-bottom: 22px; }
+  .section-count {
+    position: absolute; right: 0; top: 4px;
+    font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--faint);
+  }
+  .section-count span { margin: 0 7px; color: var(--crimson); }
+  @media (max-width: 700px) { .section-count { display: none; } }
+
+  .lines .line {
+    display: block;
+    overflow: hidden;
+    padding: .08em .04em .14em;
+    margin: -.08em -.04em -.14em;
+  }
+  .js .lines .line > span {
+    display: inline-block;
+    transform: translateY(115%);
+    transition: transform .9s cubic-bezier(.16,1,.3,1);
+    transition-delay: var(--d, 0s);
+  }
+  .js .lines.in .line > span { transform: none; }
+
+  /* Letters answer the cursor — a live proximity field, driven per-frame
+     in JS (see the hero type-field loop). No CSS transition here: the
+     motion is lerp-smoothed in script so it never lags the pointer. */
+  .display .ch {
+    display: inline-block;
+    will-change: transform;
+  }
+  /* No-JS / coarse-pointer fallback: a gentle hover lift */
+  html:not(.live-type) .display .ch {
+    transition: transform .5s cubic-bezier(.34,1.56,.64,1), color .3s ease;
+  }
+  html:not(.live-type) .display .ch:hover { transform: translateY(-.07em) rotate(2.6deg); }
+  html:not(.live-type) .display .ch:nth-child(even):hover { transform: translateY(-.05em) rotate(-2.4deg); }
+
+  /* The key word "story" sits knocked out on a crimson marker swipe */
+  .cyc {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    height: .82em;
+    line-height: .82;
+    vertical-align: baseline;
+    opacity: 0;
+    transition: opacity .5s ease;
+  }
+  html.told .cyc, html:not(.burst-mode) .cyc { opacity: 1 !important; }
+  .cyc__hl {
+    position: absolute;
+    left: -.04em; top: -.02em; bottom: .16em;
+    width: 100%;
+    background: linear-gradient(102deg, var(--crimson), #ff5a2a);
+    border-radius: 42% 58% 46% 60% / 60% 46% 58% 42%;
+    transform: rotate(-1.4deg);
+    transform-origin: left center;
+    transition: width .5s cubic-bezier(.7,0,.2,1);
+    z-index: 0;
+  }
+  .cyc__roll { position: relative; z-index: 1; display: block; will-change: transform; }
+  .cyc__roll b {
+    display: block; height: .82em; line-height: .82;
+    font-weight: 700; color: var(--paper);
+    padding: 0 .04em;
+  }
+  html.burst-mode .cyc { opacity: 0; }
+
+  /* Fine grain — a premium printed texture over the whole page */
+  .grain {
+    position: fixed; inset: 0; z-index: 90;
+    pointer-events: none; opacity: .05;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Living ink flow-field — fills the paper's negative space with motion */
+  #inkFlow {
+    position: fixed; inset: 0; z-index: 2;
+    pointer-events: none;
+  }
+  @media (max-width: 900px) { #inkFlow { display: none; } }
+
+  /* Story thread — a crimson line writes itself down the page as you scroll */
+  #threadWrap {
+    position: absolute; top: 0; left: 0; width: 100%;
+    z-index: 1; pointer-events: none; overflow: hidden;
+    opacity: 0; transition: opacity 1s ease;
+  }
+  html.told #threadWrap, html:not(.burst-mode) #threadWrap { opacity: 1; }
+  #threadSvg { width: 100%; height: 100%; display: block; }
+  #threadPath {
+    stroke: rgba(252, 28, 70, .42);
+    stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* Reading progress — a story-line inked down the left margin */
+  .progress {
+    position: fixed; left: max(18px, 2.2vw); top: 118px; bottom: 40px;
+    width: 2px; z-index: 30; pointer-events: none; border-radius: 2px;
+    background: var(--hairline);
+    opacity: 0; transition: opacity .7s ease;
+  }
+  html.told .progress, html:not(.burst-mode) .progress { opacity: 1; }
+  .progress__fill {
+    position: absolute; left: 0; top: 0; width: 100%; height: 0;
+    background: linear-gradient(180deg, var(--crimson), #ff8709);
+    border-radius: 2px;
+  }
+  .progress__fill::after {
+    content: ''; position: absolute; left: 50%; bottom: -3px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--crimson); transform: translateX(-50%);
+    box-shadow: 0 0 0 3px rgba(252,28,70,.18);
+  }
+  /* Section navigator — clickable stops along the rail */
+  .progress__dot {
+    position: absolute; left: 50%; top: 0;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--paper); border: 1.5px solid var(--faint);
+    padding: 0; margin: 0; cursor: none; pointer-events: auto;
+    transform: translate(-50%, -50%);
+    transition: border-color .3s ease, background .3s ease, transform .35s cubic-bezier(.34,1.56,.64,1);
+  }
+  .progress__dot:hover, .progress__dot.active {
+    background: var(--crimson); border-color: var(--crimson);
+    transform: translate(-50%, -50%) scale(1.35);
+  }
+  .progress__label {
+    position: absolute; left: 16px; top: 50%;
+    font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted); white-space: nowrap; pointer-events: none;
+    opacity: 0; transform: translate(6px, -50%);
+    transition: opacity .3s ease, transform .35s cubic-bezier(.22,1,.36,1);
+  }
+  .progress__dot:hover .progress__label, .progress__dot.active .progress__label {
+    opacity: 1; transform: translate(0, -50%);
+  }
+  @media (max-width: 760px) { .progress { display: none; } }
+
+  /* ============================================
+     Work — a young studio's short, honest list.
+     ============================================ */
+  .work-list { position: relative; z-index: 6; max-width: 680px; }
+  .work-item {
+    display: flex; align-items: baseline; gap: 24px;
+    padding: clamp(20px, 2.2vw, 30px) 0;
+    border-top: 1px solid var(--hairline);
+  }
+  .work-item:last-child { border-bottom: 1px solid var(--hairline); }
+  .work-item__index {
+    min-width: 26px; font-size: 13px; font-weight: 500; color: var(--muted);
+    font-variant-numeric: tabular-nums; transition: color .3s ease;
+  }
+  .work-item__name {
+    font-size: clamp(24px, 2.7vw, 40px);
+    font-weight: 500; line-height: 1.05; letter-spacing: -0.01em; color: var(--ink);
+    transition: color .3s ease, transform .5s cubic-bezier(.22,1,.36,1);
+  }
+  .work-item__meta {
+    margin-left: auto; align-self: center; white-space: nowrap;
+    font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: var(--faint);
+    transition: color .3s ease;
+  }
+  .work-item__arrow {
+    align-self: center; font-size: 19px; color: var(--crimson);
+    opacity: 0; transform: translateX(-10px);
+    transition: opacity .3s ease, transform .45s cubic-bezier(.22,1,.36,1);
+  }
+  .work-item:hover .work-item__index { color: var(--crimson); }
+  .work-item:hover .work-item__name { color: var(--crimson); transform: translateX(10px); }
+  .work-item:hover .work-item__arrow { opacity: 1; transform: none; }
+  .work-note {
+    margin-top: clamp(30px, 3.2vw, 46px); max-width: 460px;
+    font-size: 15px; line-height: 1.55; color: var(--muted);
+    position: relative; z-index: 6;
+  }
+  .work-note a {
+    color: var(--ink); border-bottom: 1.5px solid var(--crimson);
+    padding-bottom: 1px; transition: color .25s ease;
+  }
+  .work-note a:hover { color: var(--crimson); }
+  @media (max-width: 700px) { .work-item__meta { display: none; } }
+  @media (max-width: 820px) { .work-preview { display: none; } }
+
+  /* ============================================
+     How we tell it — an editorial ink grid. Four
+     disciplines, each with a hand-drawn ink mark that
+     inks itself in on reveal. Paper, ink, restraint.
+     ============================================ */
+  .caps {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--hairline);
+    position: relative; z-index: 6;
+  }
+  @media (max-width: 760px) { .caps { grid-template-columns: 1fr; } }
+  .cap-card {
+    position: relative;
+    padding: clamp(34px, 4vw, 62px) clamp(26px, 3vw, 52px) clamp(30px, 3.4vw, 50px);
+    border-bottom: 1px solid var(--hairline);
+    transition: background .4s ease;
+  }
+  .caps > .cap-card:nth-child(odd) { border-right: 1px solid var(--hairline); }
+  @media (max-width: 760px) { .caps > .cap-card:nth-child(odd) { border-right: none; } }
+  .cap-card:hover { background: rgba(252, 28, 70, .025); }
+  .cap-ill {
+    display: block; width: clamp(56px, 6vw, 82px); height: auto;
+    color: var(--ink); overflow: visible;
+    margin-bottom: clamp(26px, 3vw, 44px);
+    transition: color .35s ease;
+  }
+  .cap-card:hover .cap-ill { color: var(--crimson); }
+  .cap-ill path { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .cap-ill path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+  html:not(.js) .cap-ill path { stroke-dashoffset: 0; }
+  .caps.in .cap-ill path { animation: ink-in 1.5s cubic-bezier(.6,0,.35,1) forwards; }
+  .caps.in .cap-card:nth-child(2) .cap-ill path { animation-delay: .12s; }
+  .caps.in .cap-card:nth-child(3) .cap-ill path { animation-delay: .24s; }
+  .caps.in .cap-card:nth-child(4) .cap-ill path { animation-delay: .36s; }
+  @keyframes ink-in { to { stroke-dashoffset: 0; } }
+  .cap-card__head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 12px; }
+  .cap-card__k { font-size: 13px; font-weight: 600; color: var(--crimson); font-variant-numeric: tabular-nums; }
+  .cap-card__name {
+    font-size: clamp(19px, 1.8vw, 26px);
+    font-weight: 600; line-height: 1.08; letter-spacing: -0.01em; color: var(--ink);
+  }
+  .cap-card__desc {
+    font-size: 15px; line-height: 1.5; color: var(--muted); max-width: 34ch;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cap-ill path { stroke-dashoffset: 0; animation: none; }
+  }
+
+  /* ============================================
+     Pinned scrub band — the statement rides
+     horizontally with the scroll (pin + scrub)
+     ============================================ */
+  .scrub {
+    height: 280vh;
+    padding: 0;
+  }
+  .scrub__pin {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
+  .scrub__track {
+    display: inline-flex;
+    align-items: center;
+    gap: .42em;
+    white-space: nowrap;
+    font-size: clamp(56px, 10.5vw, 150px);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--ink);
+    will-change: transform;
+    position: relative;
+    z-index: 6;
+  }
+  /* Sticker chips — pop as the sentence crosses (progress-keyed) */
+  .chip {
+    display: inline-flex;
+    padding: .05em .28em .12em;
+    border-radius: .14em;
+    rotate: var(--tilt, -3deg);
+    color: var(--ink);
+  }
+  .chip--green { background: var(--hue-green); }
+  .chip--pink { background: var(--hue-pink); }
+  .js .chip {
+    scale: .5;
+    opacity: 0;
+    transition: scale .55s cubic-bezier(.34,1.56,.64,1), opacity .25s ease;
+  }
+  .js .chip.pop { scale: none; opacity: 1; }
+  .scrub__bez {
+    position: absolute;
+    top: 10vh;
+    left: 54%;
+    width: clamp(220px, 26vw, 380px);
+    z-index: 6;
+    pointer-events: none;
+  }
+  .scrub__bez svg { width: 100%; overflow: visible; display: block; }
+  .scrub__star {
+    position: absolute;
+    bottom: 14vh;
+    left: 16%;
+    width: clamp(48px, 6vw, 88px);
+    z-index: 6;
+    pointer-events: none;
+    will-change: transform;
+  }
+  .scrub__star svg { width: 100%; display: block; overflow: visible; }
+
+  /* ============================================
+     Glyph decorations — woven into the type,
+     drifting on mouse parallax
+     ============================================ */
+  .deco {
+    position: absolute;
+    z-index: 7;
+    pointer-events: none;
+    will-change: transform;
+  }
+  .deco svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .deco--pinwheel { width: clamp(50px, 6.4vw, 96px); left: 44%; top: 11%; }
+  .deco--spring { width: clamp(50px, 6.4vw, 96px); left: 55%; top: 74%; }
+  .deco--aster { width: clamp(40px, 5vw, 72px); left: 30%; top: 79%; }
+  .deco--mini { width: clamp(30px, 3vw, 44px); }
+  .deco--pinwheel svg { animation: deco-spin 26s linear infinite; }
+  .deco--aster svg { animation: deco-spin 40s linear infinite reverse; }
+  .deco--spring svg { animation: deco-bob 6s ease-in-out infinite; }
+  @keyframes deco-spin { to { rotate: 360deg; } }
+  @keyframes deco-bob {
+    0%, 100% { translate: 0 0; rotate: 0deg; }
+    50% { translate: 0 -10px; rotate: 7deg; }
+  }
+
+  /* ============================================
+     Chapters — the process as a narrative thread.
+     A rail draws down the left as you scroll; each
+     chapter's node lights in its accent as the thread
+     reaches it, and passed chapters read as "told".
+     ============================================ */
+  .chapters {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 6;
+    padding-left: 56px;
+    max-width: 62%;
+  }
+  @media (max-width: 900px) { .chapters { max-width: 100%; } }
+  .chapters__rail {
+    position: absolute; left: 15px; top: 26px; bottom: 26px;
+    width: 2px; background: var(--hairline);
+    overflow: hidden; border-radius: 2px;
+  }
+  .chapters__fill {
+    position: absolute; left: 0; top: 0; width: 100%; height: 0;
+    background: linear-gradient(180deg, var(--hue-green), var(--hue-orange) 52%, var(--hue-blue));
+    border-radius: 2px;
+  }
+  .chapter {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: clamp(24px, 3vw, 52px);
+    padding: clamp(38px, 4.4vw, 66px) 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .chapter:first-child { border-top: 1px solid var(--hairline); }
+  .chapter__node {
+    position: absolute; left: -41px; top: 50%;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--paper);
+    border: 2px solid var(--faint);
+    transform: translate(-50%, -50%) scale(1);
+    transition: border-color .35s ease, background .35s ease, transform .45s cubic-bezier(.34,1.56,.64,1), box-shadow .35s ease;
+  }
+  .chapter.lit .chapter__node {
+    background: var(--accent); border-color: var(--accent);
+    transform: translate(-50%, -50%) scale(1.3);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 20%, transparent);
+  }
+  .chapter__num {
+    font-size: clamp(46px, 5.6vw, 96px);
+    font-weight: 700; line-height: .82;
+    min-width: clamp(78px, 8.5vw, 150px);
+    color: color-mix(in srgb, var(--accent) 26%, transparent);
+    font-variant-numeric: tabular-nums; letter-spacing: -0.03em;
+    transition: color .4s ease, transform .5s cubic-bezier(.22,1,.36,1);
+  }
+  .chapter.lit .chapter__num { color: var(--accent); }
+  .chapter:hover .chapter__num { transform: translateX(8px); }
+  .chapter__body { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+  .chapter__name {
+    font-size: clamp(30px, 3.6vw, 56px);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    line-height: .96;
+    color: var(--ink);
+    opacity: .5;
+    transition: color .3s ease, letter-spacing .35s cubic-bezier(.22,1,.36,1), opacity .4s ease, transform .5s cubic-bezier(.22,1,.36,1);
+  }
+  .chapter.lit .chapter__name { opacity: 1; }
+  .chapter:hover .chapter__name { color: var(--accent); letter-spacing: .005em; opacity: 1; transform: translateX(8px); }
+  .chapter__desc {
+    font-size: clamp(15px, 1.25vw, 18px); line-height: 1.4; color: var(--muted); max-width: 46ch;
+    opacity: .5; transition: opacity .4s ease, transform .5s cubic-bezier(.22,1,.36,1);
+  }
+  .chapter.lit .chapter__desc { opacity: 1; }
+  .chapter:hover .chapter__desc { transform: translateX(8px); }
+
+  /* ============================================
+     Contact
+     ============================================ */
+  .contact-form {
+    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+    margin-top: 65px;
+    position: relative;
+    z-index: 6;
+  }
+  .field-wrap { position: relative; }
+  .field {
+    width: 100%;
+    background: transparent;
+    color: var(--ink);
+    font-family: var(--font-sui);
+    font-size: 18px;
+    line-height: 1.2;
+    border: none;
+    border-bottom: 1px solid var(--hairline);
+    border-radius: 0;
+    padding: 26px 0 12px;
+    outline: none;
+  }
+  .field::placeholder { color: transparent; }
+  textarea.field { resize: vertical; min-height: 64px; }
+  /* Floating label */
+  .field-label {
+    position: absolute; left: 0; top: 26px;
+    color: var(--muted); font-size: 18px;
+    pointer-events: none;
+    transform-origin: left top;
+    transition: transform .4s cubic-bezier(.22,1,.36,1), color .3s ease;
+  }
+  .field:focus + .field-label,
+  .field:not(:placeholder-shown) + .field-label {
+    transform: translateY(-22px) scale(.7);
+  }
+  .field:focus + .field-label { color: var(--crimson); }
+  /* Focus line draws over the hairline in crimson */
+  .field-line {
+    position: absolute; left: 0; bottom: 0; height: 2px; width: 100%;
+    background: var(--crimson);
+    transform: scaleX(0); transform-origin: left center;
+    transition: transform .45s cubic-bezier(.22,1,.36,1);
+  }
+  .field:focus ~ .field-line { transform: scaleX(1); }
+
+  /* Paper-plane send button — the plane takes off on send */
+  .send-btn {
+    display: inline-flex; align-items: center; gap: 13px;
+    margin-top: 10px;
+    background: none; border: none; padding: 6px 0;
+    font-family: var(--font-sui); font-size: 16px; font-weight: 500;
+    color: var(--ink); cursor: none; position: relative;
+  }
+  .send-btn__label { position: relative; }
+  .send-btn__label::after {
+    content: ''; position: absolute; left: 0; bottom: -4px;
+    height: 1.5px; width: 100%; background: var(--crimson);
+    transform: scaleX(0); transform-origin: left center;
+    transition: transform .4s cubic-bezier(.22,1,.36,1);
+  }
+  .send-btn:hover .send-btn__label::after { transform: scaleX(1); }
+  .send-btn__plane {
+    width: 24px; height: 24px; display: block;
+    transition: transform .45s cubic-bezier(.22,1,.36,1);
+  }
+  .send-btn:hover .send-btn__plane { transform: translate(6px, -6px) rotate(10deg); }
+  .send-btn.sent .send-btn__plane { animation: plane-launch 1s cubic-bezier(.5,0,.2,1) forwards; }
+  @keyframes plane-launch {
+    0% { transform: translate(0,0) rotate(0); opacity: 1; }
+    45% { transform: translate(120px, -80px) rotate(24deg); opacity: 0; }
+    46% { transform: translate(-40px, 30px) rotate(-8deg); opacity: 0; }
+    100% { transform: translate(0,0) rotate(0); opacity: 1; }
+  }
+
+  /* ============================================
+     Footer
+     ============================================ */
+  footer { padding: clamp(86px, 10vw, 108px) 0 43px; overflow: hidden; position: relative; }
+  .footer-mark {
+    font-size: clamp(90px, 17vw, 240px);
+    font-weight: 700;
+    line-height: .9;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(14,16,15,.35);
+    margin-bottom: clamp(43px, 6vw, 72px);
+    position: relative;
+    z-index: 6;
+    cursor: default;
+    /* the wordmark inks itself crimson on hover */
+    background: linear-gradient(100deg, var(--crimson), #ff8709) no-repeat;
+    background-size: 0% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    transition: background-size .12s linear;
+  }
+  /* the wordmark inks itself crimson as you scroll it into view — the JS
+     drives background-size from the footer's scroll progress (no hover) */
+  .footer-mark i {
+    font-style: normal;
+    display: inline-block;
+    color: var(--crimson);
+    -webkit-text-stroke: 0px transparent;
+    animation: period-bounce 3.4s cubic-bezier(.34,1.56,.64,1) infinite;
+  }
+  @keyframes period-bounce {
+    0%, 62%, 100% { transform: translateY(0); }
+    70% { transform: translateY(-.28em) scaleY(1.05); }
+    78% { transform: translateY(0) scaleY(.85) scaleX(1.15); }
+    84% { transform: translateY(-.08em); }
+    90% { transform: translateY(0); }
+  }
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 22px;
+    font-size: 14px;
+    color: var(--muted);
+    position: relative;
+    z-index: 6;
+  }
+  .footer-row a { color: var(--muted); transition: color .25s ease; }
+  .footer-row a:hover { color: var(--ink); }
+
+  /* ============================================
+     Motion
+     ============================================ */
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+  .js .hero__lead, .js .hero__scroll {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity .8s ease .9s, transform .8s cubic-bezier(.22,1,.36,1) .9s;
+  }
+  .js .hero__scroll { transition-delay: 1.1s; }
+  .hero.in .hero__lead, .hero.in .hero__scroll { opacity: 1; transform: none; }
+
+  .js .tdot {
+    opacity: 0;
+    scale: 0;
+    transition: opacity .25s ease, scale .6s cubic-bezier(.34,1.56,.64,1);
+  }
+  .js .tdot--3 { transition-delay: .35s; }
+  .js .tdot--2 { transition-delay: .52s; }
+  .js .tdot--1 { transition-delay: .69s; }
+  .js .tdot.in { opacity: 1; scale: none; }
+  .js .bubble {
+    opacity: 0;
+    scale: .25;
+    transition: opacity .4s ease .9s, scale 1s cubic-bezier(.34,1.56,.64,1) .9s;
+  }
+  .js .bubble.in { opacity: 1; scale: none; }
+
+  .js .art {
+    opacity: 0;
+    scale: .5;
+    transition: opacity .8s ease 1.3s, scale 1.1s cubic-bezier(.34,1.56,.64,1) 1.3s;
+  }
+  .js .art.in { opacity: 1; scale: none; }
+
+  .js .reveal {
+    opacity: 0;
+    transform: translateY(36px);
+    transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1);
+  }
+  .js .reveal.in { opacity: 1; transform: none; }
+
+  .js [data-stagger] > * {
+    opacity: 0;
+    transform: translateY(29px);
+    transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1);
+    transition-delay: var(--d, 0s);
+  }
+  .js [data-stagger].in > * { opacity: 1; transform: none; }
+
+  /* ============================================
+     The overture — every story begins as one mark.
+     It gathers charge, detonates in ink and colour,
+     and the entire page is thrown into place out of
+     the blast. No two elements land at once.
+     ============================================ */
+  .seed {
+    position: fixed;
+    z-index: 97;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--crimson);
+    pointer-events: none;
+  }
+  /* The motion-blur streak the drop drags behind it as it accelerates */
+  .drip-trail {
+    position: fixed;
+    z-index: 96;
+    width: 15px;
+    border-radius: 8px;
+    background: linear-gradient(to top, rgba(252,28,70,.52), rgba(252,28,70,0));
+    transform-origin: 50% 100%;
+    filter: blur(4px);
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+  .ov-flash {
+    position: fixed;
+    inset: 0;
+    z-index: 92;
+    background: var(--paper);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .ov-bloom {
+    position: fixed;
+    z-index: 92;
+    width: 46vmax;
+    height: 46vmax;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(14,16,15,.22), rgba(252,28,70,.10) 42%, rgba(14,16,15,0) 68%);
+    filter: blur(10px);
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+  .ray {
+    position: fixed;
+    z-index: 93;
+    width: 2px;
+    transform-origin: 50% 100%;
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+  .shard {
+    position: fixed;
+    z-index: 94;
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+  .inkdrop {
+    position: fixed;
+    z-index: 96;
+    background: var(--ink);
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+  /* While the burst is flying, WAAPI owns the stage —
+     the CSS entrance states step aside so the pieces
+     can be thrown from the blast point */
+  html.burst-mode .bubble,
+  html.burst-mode .tdot,
+  html.burst-mode .art,
+  html.burst-mode .deco {
+    scale: none !important;
+    transition: none !important;
+  }
+  html.burst-mode #heroHeadline .line > span {
+    transform: none !important;
+    transition: none !important;
+  }
+  html.burst-mode #heroHeadline .ch { will-change: transform, opacity; }
+  html.burst-mode header { animation-delay: 1.02s; }
+  html.burst-mode .brand__mark { opacity: 0; transition: opacity .25s ease; }
+  html.burst-mode.mark-landed .brand__mark { opacity: 1; }
+  /* The intro copy is held out through the whole drop and burst — the
+     stage stays blank behind the falling ink — then brought in later,
+     once the story has landed. (.told is added after the burst; its
+     rules follow burst-mode's so they win while both are present.) */
+  html.burst-mode .hero__lead,
+  html.burst-mode .hero__scroll {
+    opacity: 0 !important;
+    transform: translateY(22px) !important;
+    animation: none !important;
+    transition: none !important;
+  }
+  html.told .hero__lead {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: opacity 1s ease, transform 1s cubic-bezier(.22,1,.36,1) !important;
+  }
+  html.told .hero__scroll {
+    opacity: .5 !important;
+    transform: none !important;
+    animation: scroll-pulse 2.4s ease-in-out infinite !important;
+    transition: opacity .8s ease !important;
+  }
+
+  /* ============================================
+     Paper fleet — a boat, a plane and a rocket weave
+     down the page, navigating like the thought-cloud
+     ============================================ */
+  #fleet {
+    position: fixed;
+    inset: 0;
+    z-index: 33;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .8s ease;
+  }
+  #fleet.sailing { opacity: 1; }
+  .craft { position: absolute; top: 0; left: 0; will-change: transform; }
+  .craft svg { width: 100%; height: auto; display: block; overflow: visible; }
+  #craftBoat   { width: clamp(34px, 3.3vw, 46px); }
+  #craftPlane  { width: clamp(33px, 3.2vw, 46px); }
+  #craftRocket { width: clamp(30px, 2.9vw, 40px); }
+  #craftCrane  { width: clamp(38px, 3.7vw, 52px); }
+  #craftKite   { width: clamp(30px, 2.9vw, 40px); }
+  .ftrail { position: absolute; top: 0; left: 0; pointer-events: none; will-change: transform, opacity; }
+  #rkFlame { transform-box: fill-box; transform-origin: 50% 0%; animation: rk-flame .11s steps(2, jump-none) infinite; }
+  @keyframes rk-flame {
+    0%   { transform: scaleY(.75) scaleX(1.05); opacity: .9; }
+    100% { transform: scaleY(1.2) scaleX(.85); opacity: 1; }
+  }
+  /* the crane's wing beats slowly as it glides */
+  #craneWing { transform-box: fill-box; transform-origin: 50% 100%; animation: crane-flap 2s ease-in-out infinite; }
+  @keyframes crane-flap {
+    0%, 100% { transform: rotate(0deg) scaleY(1); }
+    50% { transform: rotate(-6deg) scaleY(.7); }
+  }
+  /* the kite's tail ripples in the wind */
+  #kiteTail { transform-box: fill-box; transform-origin: 50% 0%; animation: kite-sway 2.4s ease-in-out infinite; }
+  @keyframes kite-sway {
+    0%, 100% { transform: rotate(4deg) skewX(4deg); }
+    50% { transform: rotate(-5deg) skewX(-5deg); }
+  }
+  /* ============================================
+     Mobile — a version made FOR the phone, not a
+     squeezed desktop: every element stays, but the
+     type, spacing and pacing are re-cut to the
+     single column so nothing runs off the edge.
+     ============================================ */
+  @media (max-width: 600px) {
+    :root { --margin-x: 22px; }
+
+    /* On phones Pip TRAVELS inline — a stop in each section's whitespace, so
+       he scrolls up the page with the content, section to section, walking
+       the story. The fixed desktop traveller steps aside. */
+    .mascot { display: none; }
+    .m-stop {
+      display: block;
+      margin: clamp(30px, 9vw, 66px) 0 clamp(4px, 2vw, 14px);
+      opacity: 0;
+      transition: opacity .7s ease, transform .85s cubic-bezier(.22,1,.36,1);
+      will-change: transform, opacity;
+    }
+    .m-stop[data-side="right"]  { text-align: right; transform: translate(36px, 28px); }
+    .m-stop[data-side="left"]   { text-align: left;  transform: translate(-36px, 28px); }
+    .m-stop[data-side="center"] { text-align: center; transform: translateY(28px); }
+    .m-stop.in { opacity: 1; transform: none; }
+    .m-stop img {
+      display: inline-block;
+      height: clamp(140px, 41vw, 178px);
+      width: auto; max-width: 94%;
+      animation: m-float 4.6s ease-in-out infinite;
+    }
+
+    /* Hero — headline sized to the column (no more clipped STORY), and a
+       tighter top so the story starts sooner */
+    .hero { padding-top: 118px; min-height: 90vh; padding-bottom: 56px; }
+    .hero .display { font-size: clamp(36px, 11.2vw, 60px); line-height: 0.98; }
+    .hero .display .line:nth-child(2) { margin-left: clamp(0px, 6vw, 40px); }
+    .hero .display .line:nth-child(3) { margin-left: 0; }
+    .hero__lead { margin-top: 30px; }
+    .hero__scroll { margin-top: 42px; }
+
+    /* The statement band — smaller type so more of the sentence reads at a
+       glance as it scrubs, a shorter track so it doesn't over-scroll, and the
+       pen-arc/asterisk pulled clear of the words */
+    .scrub { height: 200vh; }
+    .scrub__track { font-size: clamp(30px, 10vw, 56px); gap: .3em; }
+    .scrub__bez { top: 6vh; left: auto; right: 3%; width: clamp(168px, 42vw, 230px); }
+    .scrub__star { bottom: 8vh; left: 7%; width: clamp(40px, 12vw, 60px); }
+
+    /* The whole fleet flies on phones too — boat, plane, rocket, crane and
+       kite weave down the page just like the desktop stage */
+    #fleet.sailing { opacity: .82; }
+
+    /* The story-thread runs through the single column here, so let it recede
+       to a faint whisper behind the words instead of a line across them */
+    #threadPath { stroke: rgba(252, 28, 70, .2); stroke-width: 1.6; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    header, .hero__scroll, .marquee__track, .art, .deco svg,
+    .artg svg, .artg .book-page, .artg .drop-body, .artg .droplet,
+    .footer-mark i { animation: none; }
+    .js .chip { scale: none; opacity: 1; transition: none; }
+    .display .ch { transition: none; }
+    .js .lines .line > span,
+    .js .hero__lead, .js .hero__scroll,
+    .js .bubble, .js .tdot, .js .art,
+    .js .reveal,
+    .js [data-stagger] > *,
+    .menu__link {
+      opacity: 1;
+      transform: none;
+      scale: none;
+      transition: none;
+    }
+    .statement .w { color: var(--ink); }
+    .cursor-dot, .cursor-ring { display: none; }
+    .m-stop { opacity: 1; transform: none; transition: none; }
+    .m-stop img { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="page header-row">
+      <a class="brand" href="#">
+        <svg class="brand__mark" viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M10 1.5c4.7 0 8.5 2.9 8.5 6.6 0 3.6-3.8 6.5-8.5 6.5-.8 0-1.6-.1-2.3-.3L4 17l.9-3.6C2.9 12.2 1.5 10.3 1.5 8.1c0-3.7 3.8-6.6 8.5-6.6z" fill="#fc1c46"/>
+        </svg>
+        Tell
+      </a>
+      <span class="tagline">Every company has a story</span>
+      <div class="header-actions">
+        <a class="pill-crimson" id="magneticCta" href="#contact">Tell us yours</a>
+        <button class="burger" aria-label="Open menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Full-screen menu -->
+  <nav class="menu" aria-hidden="true">
+    <button class="menu__close" aria-label="Close menu"><span></span><span></span></button>
+    <span class="menu__ghost" aria-hidden="true">Tell</span>
+    <div class="menu__links">
+      <a class="menu__link" href="#work" style="--accent: var(--hue-green);"><span class="menu__i">01</span><span class="menu__name">Stories</span><span class="menu__arrow" aria-hidden="true">→</span></a>
+      <a class="menu__link" href="#capabilities" style="--accent: var(--hue-orange);"><span class="menu__i">02</span><span class="menu__name">Studio</span><span class="menu__arrow" aria-hidden="true">→</span></a>
+      <a class="menu__link" href="#chaptersSection" style="--accent: var(--hue-lilac);"><span class="menu__i">03</span><span class="menu__name">Process</span><span class="menu__arrow" aria-hidden="true">→</span></a>
+      <a class="menu__link" href="#contact" style="--accent: var(--hue-blue);"><span class="menu__i">04</span><span class="menu__name">Contact</span><span class="menu__arrow" aria-hidden="true">→</span></a>
+    </div>
+    <div class="menu__foot">
+      <a href="mailto:hello@tell.studio">hello@tell.studio</a>
+      <span>Every company has a story.</span>
+    </div>
+  </nav>
+
+  <!-- The mascot — Pip the storyteller travels down the page with the scroll,
+       shifting pose section to section. Real character, not a video clip. -->
+  <div class="mascot" aria-hidden="true">
+    <img class="mascot__pose" data-pose="hero"   data-pip="hero"   alt="" width="1000" height="646">
+    <img class="mascot__pose" data-pose="proud"  data-pip="proud"  alt="" width="785"  height="900">
+    <img class="mascot__pose" data-pose="pen"    data-pip="pen"    alt="" width="900"  height="830">
+    <img class="mascot__pose" data-pose="sprint" data-pip="sprint" alt="" width="1000" height="566">
+    <img class="mascot__pose" data-pose="relax"  data-pip="relax"  alt="" width="807"  height="900">
+    <img class="mascot__pose" data-pose="listen" data-pip="listen" alt="" width="894"  height="900">
+    <img class="mascot__pose" data-pose="base"   data-pip="base"   alt="" width="766"  height="860">
+  </div>
+  <div class="tdot tdot--1" aria-hidden="true"></div>
+  <div class="tdot tdot--2" aria-hidden="true"></div>
+  <div class="tdot tdot--3" aria-hidden="true"></div>
+
+  <!-- Hero -->
+  <section class="hero page">
+    <div class="art art--aurora" data-depth=".13" style="left: -9%; top: 26%;" aria-hidden="true"></div>
+    <div class="art art--peach" data-depth=".06" data-rot="8" style="left: 16%; top: 60%;" aria-hidden="true"></div>
+    <div class="art art--orb" data-depth=".20" style="--orb: var(--hue-blue);     left: 3%;  top: 12%; width: clamp(120px,15vw,220px);" aria-hidden="true"></div>
+    <div class="art art--orb" data-depth=".16" style="--orb: var(--hue-green);    left: 6%;  top: 74%; width: clamp(120px,15vw,210px);" aria-hidden="true"></div>
+    <div class="art art--orb" data-depth=".10" style="--orb: var(--hue-orange);   left: 40%; top: 8%;  width: clamp(96px,11vw,170px);"  aria-hidden="true"></div>
+    <div class="art art--orb" data-depth=".23" style="--orb: var(--hue-lipstick); left: 34%; top: 80%; width: clamp(100px,12vw,180px);" aria-hidden="true"></div>
+
+    <h1 class="display lines" id="heroHeadline">
+      <span class="line"><span>Every</span></span>
+      <span class="line"><span>company</span></span>
+      <span class="line"><span>has a </span><span class="cyc" id="cyc" aria-label="story"><span class="cyc__hl"></span><span class="cyc__roll" id="cycRoll"></span></span></span>
+    </h1>
+
+    <!-- Glyphs woven into the headline -->
+    <div class="deco deco--pinwheel" data-mdepth="26" aria-hidden="true">
+      <svg viewBox="0 0 100 100">
+        <defs>
+          <linearGradient id="gradPin" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ff8709"/><stop offset="1" stop-color="#fec5fb"/>
+          </linearGradient>
+        </defs>
+        <g fill="url(#gradPin)" stroke="var(--paper)" stroke-width="5">
+          <path d="M50 46 L50 6 A44 44 0 0 1 94 50 Z"/>
+          <path d="M54 50 L94 50 A44 44 0 0 1 50 94 Z"/>
+          <path d="M50 54 L50 94 A44 44 0 0 1 6 50 Z"/>
+          <path d="M46 50 L6 50 A44 44 0 0 1 50 6 Z"/>
+        </g>
+      </svg>
+    </div>
+    <div class="deco deco--spring draw-in" data-mdepth="44" aria-hidden="true">
+      <svg viewBox="0 0 100 110">
+        <defs>
+          <linearGradient id="gradSpring" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#9d95ff"/><stop offset="1" stop-color="#f100cb"/>
+          </linearGradient>
+        </defs>
+        <path d="M22 12 C74 0, 82 30, 34 30 C-8 30, 4 56, 46 52 C86 48, 90 74, 44 74 C6 74, 12 100, 52 96"
+              fill="none" stroke="url(#gradSpring)" stroke-width="11" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="deco deco--aster" data-mdepth="16" aria-hidden="true">
+      <svg viewBox="0 0 100 100">
+        <defs>
+          <linearGradient id="gradAster" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#f100cb"/><stop offset="1" stop-color="#ff8709"/>
+          </linearGradient>
+        </defs>
+        <g stroke="url(#gradAster)" stroke-width="13" stroke-linecap="round">
+          <line x1="50" y1="8" x2="50" y2="92"/>
+          <line x1="14" y1="29" x2="86" y2="71"/>
+          <line x1="86" y1="29" x2="14" y2="71"/>
+        </g>
+      </svg>
+    </div>
+
+    <p class="hero__lead lead">
+      — <em>we design how yours is told.</em> Brand identity, digital
+      experiences, and motion for companies with something to say.
+    </p>
+
+    <span class="hero__scroll">(Scroll — the story follows)</span>
+
+    <div data-mascot data-hero data-pose="hero" data-size="276" style="right: 4%; top: 66px; width: 300px; height: 300px;"></div>
+    <div class="m-stop" data-side="right" aria-hidden="true"><img data-pip="hero" alt="" width="1000" height="646"></div>
+  </section>
+
+  <!-- Marquee -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track" id="marqueeTrack">
+      <span>Every story worth telling —</span><span>Every story worth telling —</span><span>Every story worth telling —</span><span>Every story worth telling —</span><span>Every story worth telling —</span><span>Every story worth telling —</span>
+    </div>
+  </div>
+
+  <!-- Work -->
+  <section id="work" class="page">
+    <div class="section-head">
+      <span class="eyebrow reveal">Selected Work</span>
+      <h2 class="heading-lg lines">Stories<br>We've Told</h2>
+      <span class="section-count reveal" aria-hidden="true">Selected<span>·</span>2023–25</span>
+    </div>
+    <div class="work-list" data-stagger>
+      <a class="work-item" href="#contact">
+        <span class="work-item__index">01</span>
+        <span class="work-item__name">Harbor &amp; Pine</span>
+        <span class="work-item__meta">Heritage brand · 2024</span>
+        <span class="work-item__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="work-item" href="#contact">
+        <span class="work-item__index">02</span>
+        <span class="work-item__name">Lumen Health</span>
+        <span class="work-item__meta">Digital identity · 2025</span>
+        <span class="work-item__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="work-item" href="#contact">
+        <span class="work-item__index">03</span>
+        <span class="work-item__name">Fieldnote</span>
+        <span class="work-item__meta">Brand &amp; web · 2024</span>
+        <span class="work-item__arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+    <p class="work-note reveal">A young studio — more stories in the making. <a href="#contact">Yours could be the next one.</a></p>
+
+    <div data-mascot data-pose="proud" data-size="300" style="right: 6%; top: 26%; width: 300px; height: 300px;"></div>
+    <div class="m-stop" data-side="left" aria-hidden="true"><img data-pip="proud" alt="" width="785" height="900"></div>
+  </section>
+
+  <!-- Capabilities -->
+  <section id="capabilities" class="page">
+    <div class="section-head">
+      <span class="eyebrow reveal">Capabilities</span>
+      <h2 class="heading-lg lines">How We<br>Tell It</h2>
+      <span class="section-count reveal" aria-hidden="true">Four<span>·</span>disciplines</span>
+    </div>
+    <div class="caps reveal">
+      <div class="cap-card">
+        <svg class="cap-ill" viewBox="0 0 100 78" aria-hidden="true">
+          <path pathLength="1" d="M60 16 L80 34 L70 44 L50 26 Z"/>
+          <path pathLength="1" d="M50 26 L60 40 L57 47"/>
+          <path pathLength="1" d="M66 24 L60 30"/>
+          <path pathLength="1" d="M10 66 C 26 60 33 70 45 64 C 55 59 60 62 68 57"/>
+        </svg>
+        <div class="cap-card__head"><span class="cap-card__k">01</span><span class="cap-card__name">Narrative strategy &amp; positioning</span></div>
+        <p class="cap-card__desc">The true thing you're about — and the words that carry it.</p>
+      </div>
+      <div class="cap-card">
+        <svg class="cap-ill" viewBox="0 0 100 78" aria-hidden="true">
+          <path pathLength="1" d="M50 12 C 71 12 84 24 84 40 C 84 56 68 66 50 66 C 30 66 16 55 16 39 C 16 23 31 12 50 12 Z"/>
+          <path pathLength="1" d="M50 26 V52"/>
+          <path pathLength="1" d="M38 32 L62 46"/>
+          <path pathLength="1" d="M62 32 L38 46"/>
+        </svg>
+        <div class="cap-card__head"><span class="cap-card__k">02</span><span class="cap-card__name">Brand identity &amp; systems</span></div>
+        <p class="cap-card__desc">Marks, type and colour, with the rules that keep them alive.</p>
+      </div>
+      <div class="cap-card">
+        <svg class="cap-ill" viewBox="0 0 100 78" aria-hidden="true">
+          <path pathLength="1" d="M14 16 H86 V62 H14 Z"/>
+          <path pathLength="1" d="M14 28 H86"/>
+          <path pathLength="1" d="M21 22 h.4 M28 22 h.4 M35 22 h.4"/>
+          <path pathLength="1" d="M24 40 H58 M24 48 H72 M24 56 H48"/>
+        </svg>
+        <div class="cap-card__head"><span class="cap-card__k">03</span><span class="cap-card__name">Web design &amp; engineering</span></div>
+        <p class="cap-card__desc">Sites that move the way the story does.</p>
+      </div>
+      <div class="cap-card">
+        <svg class="cap-ill" viewBox="0 0 100 78" aria-hidden="true">
+          <path pathLength="1" d="M22 20 H78 V58 H22 Z"/>
+          <path pathLength="1" d="M22 30 H78 M22 48 H78"/>
+          <path pathLength="1" d="M30 20 V58 M50 20 V58 M70 20 V58"/>
+        </svg>
+        <div class="cap-card__head"><span class="cap-card__k">04</span><span class="cap-card__name">Motion, film &amp; illustration</span></div>
+        <p class="cap-card__desc">A voice, a rhythm and a face for the story.</p>
+      </div>
+    </div>
+    <div data-mascot data-pose="pen" data-size="272" style="right: 7%; top: 4%; width: 280px; height: 280px;"></div>
+    <div class="m-stop" data-side="right" aria-hidden="true"><img data-pip="pen" alt="" width="900" height="830"></div>
+  </section>
+
+  <!-- Statement — pinned band, the sentence scrubs across with the scroll -->
+  <section class="scrub" id="scrubBand">
+    <div class="art art--violet" data-depth=".05" data-rot="-18" style="right: 2%; top: 12%;" aria-hidden="true"></div>
+    <div class="scrub__pin">
+      <div class="scrub__track" id="scrubTrack">
+        <span>We turn</span>
+        <span>what you do</span>
+        <span>into a</span>
+        <span class="chip chip--green" style="--tilt: -4deg">story</span>
+        <span>people</span>
+        <span class="chip chip--pink" style="--tilt: 3deg">retell</span>
+      </div>
+
+      <!-- The arc of a story, drawn as you scrub -->
+      <div class="scrub__bez" aria-hidden="true">
+        <svg viewBox="0 0 320 160">
+          <line id="bezL1" x1="24" y1="130" x2="60" y2="25" stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 5"/>
+          <line id="bezL2" x1="300" y1="34" x2="210" y2="140" stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 5"/>
+          <path id="bezPath" d="M 24 130 C 60 25, 210 140, 300 34" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="24" cy="130" r="5" fill="var(--ink)"/>
+          <circle cx="300" cy="34" r="5" fill="var(--ink)"/>
+          <rect id="bezB1" x="54" y="19" width="12" height="12" rx="2" fill="var(--hue-green)" stroke="var(--ink)" stroke-width="1.5"/>
+          <rect id="bezB2" x="204" y="134" width="12" height="12" rx="2" fill="var(--hue-green)" stroke="var(--ink)" stroke-width="1.5"/>
+        </svg>
+      </div>
+
+      <div class="scrub__star" id="scrubStar" aria-hidden="true">
+        <svg viewBox="0 0 100 100">
+          <g stroke="url(#gradAster)" stroke-width="13" stroke-linecap="round">
+            <line x1="50" y1="8" x2="50" y2="92"/>
+            <line x1="14" y1="29" x2="86" y2="71"/>
+            <line x1="86" y1="29" x2="14" y2="71"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <div data-mascot data-pose="sprint" data-size="242" style="left: 7%; top: 62%; width: 260px; height: 260px;"></div>
+  </section>
+
+  <!-- Chapters -->
+  <section class="page" id="chaptersSection">
+    <div class="section-head">
+      <span class="eyebrow reveal">The Process</span>
+      <h2 class="heading-lg lines">Three<br>Chapters</h2>
+    </div>
+    <div class="art artg artg--book" data-depth=".2" style="right: 5%; top: 12%;" aria-hidden="true">
+      <svg viewBox="0 0 140 100">
+        <defs>
+          <linearGradient id="gBookL" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#00bae2"/><stop offset="1" stop-color="#abff84"/>
+          </linearGradient>
+          <linearGradient id="gBookR" x1="1" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#0ae448"/><stop offset="1" stop-color="#abff84"/>
+          </linearGradient>
+        </defs>
+        <path d="M70 20 C52 8 28 8 12 14 V80 C28 74 52 74 70 86 Z" fill="url(#gBookL)"/>
+        <path d="M70 20 C88 8 112 8 128 14 V80 C112 74 88 74 70 86 Z" fill="url(#gBookR)"/>
+        <path class="book-page" d="M70 20 C86 10 106 9 120 13 V78 C106 73 86 74 70 86 Z" fill="#fffcf2" opacity=".85"/>
+        <line x1="70" y1="20" x2="70" y2="86" stroke="#0e100f" stroke-width="2.5"/>
+      </svg>
+    </div>
+    <div class="chapters" data-stagger>
+      <div class="chapters__rail" aria-hidden="true"><span class="chapters__fill" id="chaptersFill"></span></div>
+      <div class="chapter" style="--accent: var(--hue-green);">
+        <span class="chapter__node" aria-hidden="true"></span>
+        <span class="chapter__num">01</span>
+        <div class="chapter__body">
+          <span class="chapter__name">Listen</span>
+          <p class="chapter__desc">We find the story you already are — founders, customers, archives, ambition.</p>
+        </div>
+      </div>
+      <div class="chapter" style="--accent: var(--hue-orange);">
+        <span class="chapter__node" aria-hidden="true"></span>
+        <span class="chapter__num">02</span>
+        <div class="chapter__body">
+          <span class="chapter__name">Shape</span>
+          <p class="chapter__desc">We give it form: a voice, an identity, a design system that can carry it.</p>
+        </div>
+      </div>
+      <div class="chapter" style="--accent: var(--hue-blue);">
+        <span class="chapter__node" aria-hidden="true"></span>
+        <span class="chapter__num">03</span>
+        <div class="chapter__body">
+          <span class="chapter__name">Tell</span>
+          <p class="chapter__desc">We build the stages where it's told — web, film, motion, and every touchpoint after.</p>
+        </div>
+      </div>
+    </div>
+    <div data-mascot data-pose="relax" data-size="300" style="right: 5%; top: 16%; width: 300px; height: 300px;"></div>
+    <div class="m-stop" data-side="left" aria-hidden="true"><img data-pip="relax" alt="" width="807" height="900"></div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="page">
+    <div class="art artg artg--bang" data-depth=".18" style="left: 3%; top: 14%;" aria-hidden="true">
+      <svg viewBox="0 0 100 120">
+        <defs>
+          <linearGradient id="gBang" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#f100cb"/><stop offset="1" stop-color="#ff8709"/>
+          </linearGradient>
+        </defs>
+        <path d="M42 8 h16 a9 9 0 0 1 9 10 l-7 48 a10 10 0 0 1 -20 0 l-7 -48 a9 9 0 0 1 9 -10 Z" fill="url(#gBang)"/>
+        <circle cx="50" cy="102" r="11" fill="url(#gBang)"/>
+      </svg>
+    </div>
+    <div class="section-head">
+      <span class="eyebrow reveal">Contact</span>
+      <h2 class="heading-lg lines">Tell Us<br>Yours</h2>
+      <div class="deco deco--mini" data-mdepth="12" style="left: 38%; top: 10%;" aria-hidden="true">
+        <svg viewBox="0 0 100 100">
+          <g fill="url(#gradPin)" stroke="var(--paper)" stroke-width="5">
+            <path d="M50 46 L50 6 A44 44 0 0 1 94 50 Z"/>
+            <path d="M54 50 L94 50 A44 44 0 0 1 50 94 Z"/>
+            <path d="M50 54 L50 94 A44 44 0 0 1 6 50 Z"/>
+            <path d="M46 50 L6 50 A44 44 0 0 1 50 6 Z"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <form class="contact-form reveal" action="#" method="post" id="contactForm">
+      <div class="field-wrap">
+        <input class="field" id="f-name" type="text" name="name" placeholder=" " autocomplete="name">
+        <label class="field-label" for="f-name">Your name</label>
+        <span class="field-line" aria-hidden="true"></span>
+      </div>
+      <div class="field-wrap">
+        <input class="field" id="f-email" type="email" name="email" placeholder=" " autocomplete="email">
+        <label class="field-label" for="f-email">Email address</label>
+        <span class="field-line" aria-hidden="true"></span>
+      </div>
+      <div class="field-wrap">
+        <textarea class="field" id="f-msg" name="message" placeholder=" "></textarea>
+        <label class="field-label" for="f-msg">Start at the beginning — what's your story?</label>
+        <span class="field-line" aria-hidden="true"></span>
+      </div>
+      <div>
+        <button class="send-btn" type="submit" id="sendBtn">
+          <span class="send-btn__label">Send it over</span>
+          <svg class="send-btn__plane" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M22 2 L11 13 M22 2 L15 22 L11 13 L2 9 Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </form>
+    <div data-mascot data-pose="listen" data-size="300" style="right: 8%; top: 18%; width: 300px; height: 300px;"></div>
+    <div class="m-stop" data-side="right" aria-hidden="true"><img data-pip="listen" alt="" width="894" height="900"></div>
+  </section>
+
+  <!-- Second marquee — drifts the other way -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track" id="marqueeTrack2">
+      <span>Say it once — say it right —</span><span>Say it once — say it right —</span><span>Say it once — say it right —</span><span>Say it once — say it right —</span><span>Say it once — say it right —</span><span>Say it once — say it right —</span>
+    </div>
+  </div>
+
+  <!-- Paper fleet: a boat, a paper plane and a rocket weave down the whole
+       page on three different serpentine paths, each easing toward a moving
+       target the way the thought-cloud navigates -->
+  <div id="fleet" aria-hidden="true">
+    <div class="craft" id="craftBoat">
+      <svg viewBox="0 0 64 50" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 30 Q4 42 16 45 L48 45 Q60 42 58 30 Z" fill="#fffcf2" stroke="#0e100f" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M31 30 L54 30 L48 45 L31 45 Z" fill="#e7dcc4"/>
+        <path d="M11 29 L32 7 L53 29 Z" fill="#fffcf2" stroke="#0e100f" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M32 7 L53 29 L32 29 Z" fill="#e7dcc4"/>
+        <path d="M11 29 L53 29 M32 7 L32 30" stroke="#0e100f" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M6 30 Q4 42 16 45 L48 45 Q60 42 58 30 Z" fill="none" stroke="#0e100f" stroke-width="2.5" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="craft" id="craftPlane">
+      <svg viewBox="0 0 66 44" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 9 L62 22 L18 23 Z" fill="#fffcf2"/>
+        <path d="M18 23 L62 22 L6 35 Z" fill="#e3d8bf"/>
+        <path d="M4 9 L62 22 L6 35 L18 23 Z" fill="none" stroke="#0e100f" stroke-width="2.5" stroke-linejoin="round"/>
+        <line x1="18" y1="23" x2="40" y2="21" stroke="#0e100f" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <div class="craft" id="craftRocket">
+      <svg viewBox="0 0 60 96" xmlns="http://www.w3.org/2000/svg">
+        <g id="rkFlame">
+          <path d="M22 64 Q30 98 38 64 Q34 80 30 80 Q26 80 22 64 Z" fill="#ff8709"/>
+          <path d="M25 64 Q30 88 35 64 Q32 76 30 76 Q28 76 25 64 Z" fill="#ffd23f"/>
+        </g>
+        <path d="M16 52 C 5 58 3 68 6 74 L 17 66 Z" fill="#fc1c46" stroke="#0e100f" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M44 52 C 55 58 57 68 54 74 L 43 66 Z" fill="#fc1c46" stroke="#0e100f" stroke-width="2.5" stroke-linejoin="round"/>
+        <rect x="16" y="36" width="28" height="32" rx="10" fill="#fffcf2" stroke="#0e100f" stroke-width="2.5"/>
+        <path d="M30 4 C 41 16 44 26 44 40 L 16 40 C 16 26 19 16 30 4 Z" fill="#fc1c46" stroke="#0e100f" stroke-width="2.5" stroke-linejoin="round"/>
+        <circle cx="30" cy="49" r="6.5" fill="#7cc4e0" stroke="#0e100f" stroke-width="2.5"/>
+        <path d="M22 62 h16" stroke="#0e100f" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+      </svg>
+    </div>
+    <div class="craft" id="craftCrane">
+      <svg viewBox="0 0 92 58" xmlns="http://www.w3.org/2000/svg">
+        <path d="M42 34 L54 12 L49 36 Z" fill="#d9cca8" stroke="#0e100f" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M52 33 L88 20 L62 41 Z" fill="#fffcf2" stroke="#0e100f" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M34 33 L4 20 L30 41 Z" fill="#e3d8bf" stroke="#0e100f" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M32 33 L58 33 L50 46 L38 46 Z" fill="#e7dcc4" stroke="#0e100f" stroke-width="2.2" stroke-linejoin="round"/>
+        <path id="craneWing" d="M34 34 L54 3 L60 34 Z" fill="#fffcf2" stroke="#0e100f" stroke-width="2.2" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="craft" id="craftKite">
+      <svg viewBox="0 0 64 150" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="kiteG" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#9d95ff"/><stop offset="1" stop-color="#f100cb"/>
+          </linearGradient>
+        </defs>
+        <path d="M32 46 L32 3" stroke="#0e100f" stroke-width="1.4" opacity=".3"/>
+        <path d="M32 8 L54 48 L32 82 L10 48 Z" fill="url(#kiteG)" stroke="#0e100f" stroke-width="2.4" stroke-linejoin="round"/>
+        <path d="M32 8 L32 82 M10 48 L54 48" stroke="#0e100f" stroke-width="1.7"/>
+        <path d="M20 30 L32 40 L44 30" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>
+        <g id="kiteTail">
+          <path d="M32 82 Q45 100 29 116 Q15 132 35 148" fill="none" stroke="#0e100f" stroke-width="2" stroke-linecap="round"/>
+          <path d="M40 96 l10 -3 -9 -4 z" fill="#fc1c46"/>
+          <path d="M28 116 l-10 -2 9 -4 z" fill="#ff8709"/>
+          <path d="M35 134 l10 -1 -9 -5 z" fill="#00bae2"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="page">
+    <div data-mascot data-pose="base" data-size="248" style="right: 12%; top: 12%; width: 248px; height: 248px;"></div>
+    <div class="m-stop" data-side="center" aria-hidden="true"><img data-pip="base" alt="" width="766" height="860"></div>
+    <div class="footer-mark" aria-hidden="true">Tell<i>.</i></div>
+    <div class="footer-row">
+      <span>&copy; 2026 Tell</span>
+      <a href="mailto:hello@tell.studio">hello@tell.studio</a>
+      <span>Every company has a story.</span>
+    </div>
+  </footer>
+
+  <!-- Story thread — a crimson line writes itself down the page on scroll -->
+  <div id="threadWrap" aria-hidden="true">
+    <svg id="threadSvg" preserveAspectRatio="none" fill="none">
+      <path id="threadPath" vector-effect="non-scaling-stroke"></path>
+    </svg>
+  </div>
+
+  <!-- Living ink — a slow flow-field of strokes drifts over the paper -->
+  <canvas id="inkFlow" aria-hidden="true"></canvas>
+
+  <!-- Reading progress — the story so far, inked down the margin -->
+  <div class="progress" aria-hidden="true"><span class="progress__fill" id="progressFill"></span></div>
+
+  <div class="grain" aria-hidden="true"></div>
+
+<script>
+  document.documentElement.classList.add('js');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const finePointer = matchMedia('(pointer: fine)').matches;
+
+  /* Pip images — one source of truth. Locally each resolves to its file;
+     the artifact build swaps PIP for a data-URI map so every picture is
+     embedded exactly once (not per <img>), keeping the page light. */
+  const PIP = null; /*__PIP_MAP__*/
+  document.querySelectorAll('img[data-pip]').forEach((el) => {
+    el.src = PIP ? PIP[el.dataset.pip] : 'mascot/pip-' + el.dataset.pip + '.png';
+  });
+
+  /* Story films — clip 0 scrubs with scroll, clips 1 and 2 loop */
+  /* mascot poses swap by section — no video, a real character on the paper */
+
+  /* Split big headings into rising lines */
+  document.querySelectorAll('h2.lines').forEach((h) => {
+    const parts = h.innerHTML.split(/<br\s*\/?>/i);
+    h.innerHTML = parts.map((p) => `<span class="line"><span>${p.trim()}</span></span>`).join('');
+  });
+  document.querySelectorAll('.lines').forEach((el) => {
+    [...el.querySelectorAll('.line > span')].forEach((s, i) => s.style.setProperty('--d', `${i * 110}ms`));
+  });
+
+  /* Hero letters answer the cursor individually — grouped into
+     unbreakable words so lines can never split mid-word */
+  document.querySelectorAll('#heroHeadline .line > span:not(.cyc)').forEach((s) => {
+    s.innerHTML = s.textContent.split(' ').map((word) =>
+      `<span class="wd">${[...word].map((c) => `<span class="ch">${c}</span>`).join('')}</span>`
+    ).join(' ');
+  });
+
+  /* ================================================
+     Live type field — the headline is alive. Every letter
+     breathes on a slow idle wave, and lifts, tilts, scales
+     and warms toward crimson as the cursor passes over it.
+     Positions are cached (measured with transforms cleared)
+     and the reaction is lerp-smoothed per letter in frame().
+     ================================================ */
+  const typeChars = [...document.querySelectorAll('#heroHeadline .ch')];
+  let typeGeo = [];
+  let letterFX = false;
+  const measureType = () => {
+    typeGeo = typeChars.map((el, i) => {
+      const keep = el.style.transform;
+      el.style.transform = 'none';
+      const r = el.getBoundingClientRect();
+      el.style.transform = keep;
+      return {
+        el, i,
+        cx: r.left + scrollX + r.width / 2,
+        cy: r.top + scrollY + r.height / 2,
+        lift: 0, tilt: 0, sc: 1, warm: 0,
+        seed: i * 0.7,
+      };
+    });
+  };
+  const INK_RGB = [14, 16, 15], CRIM_RGB = [252, 28, 70];
+
+  /* The headline's key word — "story" — sits knocked out in paper white
+     on a crimson marker that swipes itself in once the line has landed */
+  const cycRoll = document.getElementById('cycRoll');
+  if (cycRoll) {
+    cycRoll.innerHTML = '<b>Story</b>';
+    const cycHl = document.querySelector('#cyc .cyc__hl');
+    const word = cycRoll.querySelector('b');
+    const markerW = () => (word.getBoundingClientRect().width + 14) + 'px';
+    cycHl.style.width = '0px';
+    const revealMarker = () => {
+      cycHl.style.transition = 'width .6s cubic-bezier(.7,0,.2,1)';
+      cycHl.style.width = markerW();
+    };
+    setTimeout(revealMarker, reduced ? 200 : 2600);
+    addEventListener('resize', () => {
+      if (parseFloat(cycHl.style.width) > 0) cycHl.style.width = markerW();
+    });
+  }
+
+  /* Load sequence */
+  const heroEl = document.querySelector('.hero');
+  const heroHeadline = document.getElementById('heroHeadline');
+  const startHero = () => {
+    heroEl.classList.add('in');
+    heroHeadline.classList.add('in');
+    document.documentElement.classList.add('live-type');
+    setTimeout(() => { if (typeof measureType === 'function') measureType(); letterFX = true; }, 900);
+    document.querySelectorAll('.art').forEach((el) => el.classList.add('in'));
+    document.querySelector('.mascot')?.classList.add('live');
+    /* DrawSVG-style: the coil inks itself in after the headline lands */
+    if (!reduced) {
+      document.querySelectorAll('.draw-in path').forEach((p) => {
+        const L = p.getTotalLength();
+        p.style.strokeDasharray = L;
+        p.style.strokeDashoffset = L;
+        requestAnimationFrame(() => {
+          p.style.transition = 'stroke-dashoffset 1.4s cubic-bezier(.22,1,.36,1) 1.15s';
+          p.style.strokeDashoffset = 0;
+        });
+      });
+    }
+  };
+  /* boot is upgraded to the full overture once the stage is wired */
+  let boot = startHero;
+  const heroFallback = setTimeout(() => boot(), 700);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => { clearTimeout(heroFallback); requestAnimationFrame(() => boot()); });
+  }
+
+  /* Scroll reveals */
+  document.querySelectorAll('[data-stagger]').forEach((el) => {
+    [...el.children].forEach((child, i) => child.style.setProperty('--d', `${i * 90}ms`));
+  });
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal, [data-stagger], h2.lines, .m-stop').forEach((el) => io.observe(el));
+
+  /* Menu */
+  const menu = document.querySelector('.menu');
+  const burger = document.querySelector('.burger');
+  const setMenu = (open) => {
+    menu.classList.toggle('open', open);
+    menu.setAttribute('aria-hidden', String(!open));
+    burger.setAttribute('aria-expanded', String(open));
+  };
+  burger.addEventListener('click', () => setMenu(true));
+  menu.querySelector('.menu__close').addEventListener('click', () => setMenu(false));
+  menu.querySelectorAll('.menu__link').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+
+  /* Custom cursor */
+  if (finePointer && !reduced) {
+    document.documentElement.classList.add('has-cursor');
+    const dot = document.createElement('div');
+    dot.className = 'cursor-dot';
+    const ring = document.createElement('div');
+    ring.className = 'cursor-ring';
+    document.body.append(ring, dot);
+    let mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my;
+    addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
+    const followCursor = () => {
+      requestAnimationFrame(followCursor);
+      dot.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
+      rx += (mx - rx) * 0.22;
+      ry += (my - ry) * 0.22;
+      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
+    };
+    requestAnimationFrame(followCursor);
+    document.addEventListener('mouseover', (e) => {
+      ring.classList.toggle('big', !!e.target.closest('a, button, .work-item, input, textarea'));
+    });
+  }
+
+  /* Magnetic CTA */
+  const cta = document.getElementById('magneticCta');
+  if (cta && !reduced && finePointer) {
+    const strength = 0.35;
+    cta.addEventListener('mousemove', (e) => {
+      const r = cta.getBoundingClientRect();
+      cta.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * strength}px, ${(e.clientY - r.top - r.height / 2) * strength}px)`;
+    });
+    cta.addEventListener('mouseleave', () => { cta.style.transform = ''; });
+  }
+
+  /* Contact — the paper plane takes off when the story is sent */
+  const contactForm = document.getElementById('contactForm');
+  const sendBtn = document.getElementById('sendBtn');
+  if (contactForm && sendBtn) {
+    const label = sendBtn.querySelector('.send-btn__label');
+    const original = label.textContent;
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (sendBtn.classList.contains('sent')) return;
+      sendBtn.classList.add('sent');
+      setTimeout(() => { label.textContent = 'On its way —'; }, 380);
+      setTimeout(() => {
+        sendBtn.classList.remove('sent');
+        label.textContent = original;
+        contactForm.reset();
+      }, 2600);
+    });
+  }
+
+  /* Pinned scrub band + glyph decorations */
+  const scrubTrack = document.getElementById('scrubTrack');
+  const scrubStar = document.getElementById('scrubStar');
+  const chipEls = [...document.querySelectorAll('.chip')];
+  const bezPath = document.getElementById('bezPath');
+  const bezL1 = document.getElementById('bezL1');
+  const bezL2 = document.getElementById('bezL2');
+  const bezB1 = document.getElementById('bezB1');
+  const bezB2 = document.getElementById('bezB2');
+  let scrubP = 0;
+  let scrubGeo = null;
+
+  /* Chapters narrative thread */
+  const chaptersRail = document.querySelector('.chapters__rail');
+  const chaptersFill = document.getElementById('chaptersFill');
+  const chapterRows = [...document.querySelectorAll('.chapter')];
+  let chaptersGeo = null;
+
+  /* The travelling cloud fades out across the dense full-width sections
+     (Work + Studio) where it can't clear the type, and blooms back where
+     there's room — the empty space there is filled with motion instead. */
+  let denseTop = 1e9, denseBottom = 1e9, cloudFade = 1;
+
+  /* Story thread — a crimson line that writes itself down the whole page */
+  const threadWrap = document.getElementById('threadWrap');
+  const threadSvg = document.getElementById('threadSvg');
+  const threadPath = document.getElementById('threadPath');
+  let threadLen = 0;
+  const buildThread = () => {
+    if (!threadWrap || !threadPath) return;
+    const H = document.documentElement.scrollHeight;
+    threadWrap.style.height = H + 'px';
+    threadSvg.setAttribute('viewBox', `0 0 1000 ${H}`);
+    const step = Math.max(360, innerHeight * 0.72);
+    const pts = [];
+    let i = 0;
+    for (let y = innerHeight * 0.42; y < H - 80; y += step, i++) {
+      const x = 500 + Math.sin(i * 1.25 + 0.6) * 300 + Math.sin(i * 0.5) * 90;
+      pts.push([Math.max(110, Math.min(890, x)), y]);
+    }
+    if (pts.length < 2) { threadLen = 0; return; }
+    let d = `M ${pts[0][0].toFixed(0)} ${pts[0][1].toFixed(0)}`;
+    for (let k = 1; k < pts.length; k++) {
+      const [x0, y0] = pts[k - 1], [x1, y1] = pts[k], my = (y0 + y1) / 2;
+      d += ` C ${x0.toFixed(0)} ${my.toFixed(0)}, ${x1.toFixed(0)} ${my.toFixed(0)}, ${x1.toFixed(0)} ${y1.toFixed(0)}`;
+    }
+    threadPath.setAttribute('d', d);
+    threadLen = threadPath.getTotalLength();
+    threadPath.style.strokeDasharray = threadLen;
+    threadPath.style.strokeDashoffset = threadLen;
+  };
+
+  /* Reading progress line + section navigator */
+  const progressFill = document.getElementById('progressFill');
+  const progressEl = document.querySelector('.progress');
+  const NAV_SECTIONS = [
+    { id: 'work', label: 'Work' },
+    { id: 'capabilities', label: 'Studio' },
+    { id: 'chaptersSection', label: 'Process' },
+    { id: 'contact', label: 'Contact' },
+  ];
+  let navDots = [];
+  if (progressEl && progressFill) {
+    navDots = NAV_SECTIONS.map((s) => {
+      const el = document.createElement('button');
+      el.className = 'progress__dot';
+      el.type = 'button';
+      el.setAttribute('aria-label', s.label);
+      el.innerHTML = `<span class="progress__label">${s.label}</span>`;
+      el.addEventListener('click', () => {
+        const t = document.getElementById(s.id);
+        if (t) scrollTo({ top: t.getBoundingClientRect().top + scrollY - 40, behavior: reduced ? 'auto' : 'smooth' });
+      });
+      progressEl.appendChild(el);
+      return { el, id: s.id, top: 0, frac: 0 };
+    });
+  }
+  let navActive = -1;
+
+  const decos = [...document.querySelectorAll('.deco')].map((el) => ({
+    el, depth: parseFloat(el.dataset.mdepth) || 16, x: 0, y: 0,
+  }));
+  let mnx = 0, mny = 0, pointerSeen = false;
+  let pxMouse = innerWidth / 2, pyMouse = innerHeight / 2;
+  if (finePointer) {
+    addEventListener('mousemove', (e) => {
+      mnx = e.clientX / innerWidth - 0.5;
+      mny = e.clientY / innerHeight - 0.5;
+      pxMouse = e.clientX; pyMouse = e.clientY;
+      pointerSeen = true;
+    });
+  }
+
+  /* The mascot — Pip travels the page and changes pose per section */
+  const mascotEl = document.querySelector('.mascot');
+  const poseEls = mascotEl ? [...mascotEl.querySelectorAll('.mascot__pose')] : [];
+  const poseMap = {};
+  poseEls.forEach((el) => { poseMap[el.dataset.pose] = el; });
+  /* poses that naturally face RIGHT; flipped when the character travels left */
+  const POSE_FACE = { hero: 1, sprint: 1, proud: 1, pen: -1, relax: 1, listen: 1, base: 1 };
+  let curPose = null;
+  const setPose = (name) => {
+    if (name === curPose || !poseMap[name]) return;
+    curPose = name;
+    poseEls.forEach((el) => el.classList.toggle('on', el.dataset.pose === name));
+  };
+
+  /* Waypoints + colored-artifact parallax anchors */
+  let anchors = [];
+  let arts = [];
+  const measure = () => {
+    const narrow = innerWidth < 600;
+    anchors = [...document.querySelectorAll('[data-mascot]')].map((el) => {
+      const r = el.getBoundingClientRect();
+      /* character display height — a small corner companion on phones */
+      let size = parseFloat(el.dataset.size) || 280;
+      if (narrow) size = Math.min(size * 0.36, 96);
+      return {
+        x: r.left + scrollX + r.width / 2,
+        y: r.top + scrollY + r.height / 2,
+        size,
+        pose: el.dataset.pose || 'base',
+        hero: 'hero' in el.dataset,
+      };
+    }).sort((a, b) => a.y - b.y);
+    arts = [...document.querySelectorAll('.art')].map((el) => {
+      el.style.transform = '';
+      const r = el.getBoundingClientRect();
+      return { el, y: r.top + scrollY + r.height / 2, depth: parseFloat(el.dataset.depth) || 0.12, rot: parseFloat(el.dataset.rot) || 0 };
+    });
+    const sb = document.getElementById('scrubBand');
+    if (sb) {
+      scrubGeo = {
+        top: sb.getBoundingClientRect().top + scrollY,
+        height: sb.offsetHeight,
+        trackW: scrubTrack.scrollWidth,
+      };
+    }
+    const wsec = document.getElementById('work');
+    const csec = document.getElementById('capabilities');
+    if (wsec && csec) {
+      denseTop = wsec.getBoundingClientRect().top + scrollY;
+      denseBottom = csec.getBoundingClientRect().bottom + scrollY;
+    }
+    buildThread();
+    if (chaptersRail) {
+      const rr = chaptersRail.getBoundingClientRect();
+      chaptersGeo = {
+        railTop: rr.top + scrollY,
+        railH: rr.height || 1,
+        nodes: chapterRows.map((row) => {
+          const n = row.querySelector('.chapter__node').getBoundingClientRect();
+          return n.top + n.height / 2 + scrollY;
+        }),
+      };
+    }
+    if (navDots.length) {
+      const navMax = document.documentElement.scrollHeight - innerHeight;
+      navDots.forEach((d) => {
+        const t = document.getElementById(d.id);
+        if (!t) return;
+        d.top = t.getBoundingClientRect().top + scrollY;
+        d.frac = Math.max(0, Math.min(1, navMax > 0 ? d.top / navMax : 0));
+        d.el.style.top = (d.frac * 100).toFixed(2) + '%';
+      });
+    }
+    measureType();
+  };
+  measure();
+  addEventListener('resize', measure);
+  addEventListener('load', measure);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+
+  /* ============================================
+     Living ink — a slow flow-field of calligraphic strokes
+     drifts over the paper, filling the negative space with
+     motion. Ink mostly, a rare stroke in a studio hue.
+     ============================================ */
+  const hexA = (hex, a) => {
+    const n = parseInt(hex.slice(1), 16);
+    return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a.toFixed(3)})`;
+  };
+  let inkTick = null;
+  const inkCanvas = document.getElementById('inkFlow');
+  if (inkCanvas && inkCanvas.getContext && !reduced && innerWidth > 900) {
+    const ictx = inkCanvas.getContext('2d');
+    const HUES = ['#0ae448', '#ff8709', '#f100cb', '#9d95ff', '#00bae2'];
+    let iW = 0, iH = 0, iDPR = 1, parts = [];
+    const TAIL = 150;  /* points of history → long, graceful ink strokes */
+    const iseed = (p) => {
+      p = p || {};
+      p.x = Math.random() * iW; p.y = Math.random() * iH;
+      p.hist = []; p.age = 0; p.life = 340 + Math.random() * 460;
+      p.sp = 0.7 + Math.random() * 0.8;
+      p.hue = Math.random() < 0.16 ? HUES[(Math.random() * HUES.length) | 0] : null;
+      return p;
+    };
+    const iresize = () => {
+      iDPR = Math.min(2, devicePixelRatio || 1);
+      iW = innerWidth; iH = innerHeight;
+      inkCanvas.width = iW * iDPR; inkCanvas.height = iH * iDPR;
+      inkCanvas.style.width = iW + 'px'; inkCanvas.style.height = iH + 'px';
+      ictx.setTransform(iDPR, 0, 0, iDPR, 0, 0);
+      const N = Math.min(96, Math.round((iW * iH) / 26000));
+      parts = []; for (let i = 0; i < N; i++) parts.push(iseed());
+    };
+    iresize();
+    addEventListener('resize', iresize);
+    const ifield = (x, y, t) =>
+      Math.sin(x * 0.0016 + t * 0.035) * 1.5 +
+      Math.cos(y * 0.0018 - t * 0.03) * 1.5 +
+      Math.sin((x - y) * 0.0011 + t * 0.018) * 1.05;
+    const IR = 190;  /* the cursor stirs the ink within this radius */
+    inkTick = (t) => {
+      ictx.clearRect(0, 0, iW, iH);
+      ictx.lineCap = 'round'; ictx.lineJoin = 'round';
+      const stir = finePointer && pointerSeen;
+      for (const p of parts) {
+        const a = ifield(p.x, p.y, t);
+        p.x += Math.cos(a) * p.sp; p.y += Math.sin(a) * p.sp;
+        /* the cursor swirls nearby ink around itself, like a finger in water */
+        if (stir) {
+          const dx = p.x - pxMouse, dy = p.y - pyMouse, d2 = dx * dx + dy * dy;
+          if (d2 < IR * IR) {
+            const d = Math.sqrt(d2) || 1, infl = 1 - d / IR, sa = Math.atan2(dy, dx) + 1.5708;
+            p.x += Math.cos(sa) * infl * infl * 3.4 + (dx / d) * infl * 0.7;
+            p.y += Math.sin(sa) * infl * infl * 3.4 + (dy / d) * infl * 0.7;
+          }
+        }
+        p.hist.push(p.x, p.y);
+        if (p.hist.length > TAIL * 2) p.hist.splice(0, 2);
+        if (++p.age > p.life || p.x < -40 || p.x > iW + 40 || p.y < -40 || p.y > iH + 40) { iseed(p); continue; }
+        const h = p.hist, n = h.length / 2, fin = Math.min(1, p.age / 60) * Math.min(1, (p.life - p.age) / 80);
+        ictx.lineWidth = p.hue ? 1.25 : 0.95;
+        /* draw the tail in a few alpha bands — cheap, still fades to the head */
+        const CH = 6, per = Math.ceil(n / CH);
+        for (let c = 0; c < CH; c++) {
+          const s = c * per, e = Math.min(n, s + per + 1);
+          if (e - s < 2) continue;
+          const f = (c + 1) / CH, al = f * f * (p.hue ? 0.19 : 0.12) * fin;
+          ictx.strokeStyle = p.hue ? hexA(p.hue, al) : `rgba(14,16,15,${al.toFixed(3)})`;
+          ictx.beginPath();
+          ictx.moveTo(h[s * 2], h[s * 2 + 1]);
+          for (let i = s + 1; i < e; i++) ictx.lineTo(h[i * 2], h[i * 2 + 1]);
+          ictx.stroke();
+        }
+      }
+    };
+  }
+
+  const ease = (t) => t * t * (3 - 2 * t);
+  const clamp01 = (v) => Math.max(0, Math.min(1, v));
+
+  const target = () => {
+    const s = scrollY + innerHeight * 0.5;
+    if (!anchors.length) return { x: innerWidth / 2, y: innerHeight / 2, size: 280, pose: 'base' };
+    if (s <= anchors[0].y) return { ...anchors[0] };
+    if (s >= anchors[anchors.length - 1].y) return { ...anchors[anchors.length - 1] };
+    let i = 0;
+    while (s > anchors[i + 1].y) i++;
+    const a = anchors[i], b = anchors[i + 1];
+    const t = ease((s - a.y) / (b.y - a.y));
+    return {
+      x: a.x + (b.x - a.x) * t,
+      y: a.y + (b.y - a.y) * t,
+      size: a.size + (b.size - a.size) * t,
+      /* hold each pose until the character is most of the way to the next stop */
+      pose: t < 0.62 ? a.pose : b.pose,
+    };
+  };
+
+  /* The glide loop — the mascot eases toward its section stop */
+  const cur = { x: innerWidth * 0.82, y: innerHeight * 0.4, size: 300 };
+  let prevX = cur.x;
+  let lastPose = null;        /* to fire a little hop when the pose changes */
+  let poseHopStart = -9999;
+  let bubbleHold = false; /* overture: hold the mascot off-stage during the intro */
+  let prevScroll = scrollY;
+  let scrollVel = 0;
+  let artKick = 0;
+  let faceCur = 1;
+  let marqueeX = 0;
+  let lastMs = 0;
+  let t0 = 0;
+  const marqueeTrack = document.getElementById('marqueeTrack');
+  const marqueeTrack2 = document.getElementById('marqueeTrack2');
+  const marquees = [...document.querySelectorAll('.marquee')];
+  const footerMark = document.querySelector('.footer-mark');
+  const skewEls = [...document.querySelectorAll('[data-skew]')];
+  let marqueeX2 = 0;
+  let skewCur = 0;
+  const heroLines = [...heroHeadline.querySelectorAll('.line')];
+
+  /* ================================================
+     Paper fleet — a boat, a paper plane and a rocket weave
+     down the whole page. Each eases toward a moving target
+     along its own graceful serpentine (the way the thought-
+     cloud navigates), banks into its heading with weight, and
+     leaves a themed trail: smoke off the plane, flame off the
+     rocket, a spreading wake off the boat.
+     ================================================ */
+  const fleetEl = document.getElementById('fleet');
+  const FTAU = Math.PI * 2;
+  const clampf = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const angLerp = (cur, tgt, t) => cur + (((tgt - cur + 540) % 360) - 180) * t;
+  /* per-kind trail behaviour */
+  const TRAIL = {
+    smoke:  { n: 20, sp: 11, idle: 20, off: 13, css: 'border-radius:50%;background:radial-gradient(circle,rgba(122,118,110,.6),rgba(122,118,110,0) 70%)' },
+    flame:  { n: 32, sp: 5,  idle: 70, off: 15, css: 'border-radius:50%;background:radial-gradient(circle,rgba(255,232,150,.95),rgba(255,120,20,.7) 45%,rgba(252,28,70,0) 74%)' },
+    wake:   { n: 18, sp: 15, idle: 14, off: 12, css: 'border-radius:50%;border:2px solid rgba(120,175,205,.55);background:radial-gradient(circle,rgba(210,232,242,.4),rgba(210,232,242,0) 72%)' },
+    trace:  { n: 16, sp: 24, idle: 5,  off: 9,  css: 'border-radius:50%;background:rgba(14,16,15,.5)' },
+  };
+  const CRAFT = fleetEl ? [
+    { el: document.getElementById('craftBoat'),   base: .34, a1: .32, f1: 2.3, p1: .5, a2: .08, f2: 5.0, p2: 1.2, yTop: .18, yBot: .84, ay: .08, fy: 1.9, py: .8, k: .05,  sw: [.6, 10, .5, 8], kind: 'boat',   trail: 'wake' },
+    { el: document.getElementById('craftPlane'),  base: .58, a1: .36, f1: 3.2, p1: 2.3, a2: .10, f2: 6.2, p2: .3, yTop: .10, yBot: .95, ay: .11, fy: 2.7, py: 2.0, k: .07, sw: [.9, 11, .8, 9], kind: 'plane',  trail: 'smoke' },
+    { el: document.getElementById('craftRocket'), base: .48, a1: .28, f1: 4.0, p1: 4.1, a2: .07, f2: 7.4, p2: 2.6, yTop: .06, yBot: .99, ay: .07, fy: 3.3, py: 3.5, k: .085, sw: [1.1, 8, 1.0, 7], kind: 'rocket', trail: 'flame' },
+    { el: document.getElementById('craftCrane'),  base: .44, a1: .34, f1: 2.7, p1: 1.4, a2: .09, f2: 5.6, p2: 3.0, yTop: .12, yBot: .90, ay: .10, fy: 2.2, py: 1.1, k: .06,  sw: [.7, 13, .62, 10], kind: 'crane', trail: 'trace' },
+    { el: document.getElementById('craftKite'),   base: .66, a1: .30, f1: 1.9, p1: 3.3, a2: .11, f2: 4.4, p2: 1.6, yTop: .14, yBot: .88, ay: .06, fy: 1.6, py: 2.5, k: .045, sw: [.55, 16, .48, 12], kind: 'kite',  trail: null },
+  ] : [];
+  CRAFT.forEach((c) => {
+    if (!c.el) return;
+    c.cur = null; c.rot = null; c.lastX = 0; c.lastY = 0; c.emit = 0; c.pi = 0;
+    c.pool = [];
+    if (!c.trail) return;
+    const tr = TRAIL[c.trail];
+    const base = c.trail === 'flame' ? 15 : c.trail === 'wake' ? 24 : c.trail === 'trace' ? 6 : 30;
+    for (let i = 0; i < tr.n; i++) {
+      const el = document.createElement('div'); el.className = 'ftrail';
+      el.style.cssText = tr.css + `;width:${base}px;height:${base}px;opacity:0`;
+      fleetEl.insertBefore(el, fleetEl.firstChild);   /* behind the craft */
+      c.pool.push({ el, live: false, age: 0, life: 1, x: 0, y: 0, vx: 0, vy: 0, s0: 1, s1: 1, op0: 1 });
+    }
+  });
+  let fleetReady = false;
+
+  const fleetPath = (c, p) => ({
+    x: innerWidth * clampf(c.base + c.a1 * Math.sin(FTAU * c.f1 * p + c.p1) + c.a2 * Math.sin(FTAU * c.f2 * p + c.p2), 0.07, 0.93),
+    y: innerHeight * clampf(c.yTop + (c.yBot - c.yTop) * p + c.ay * Math.sin(FTAU * c.fy * p + c.py), 0.04, 0.99),
+  });
+
+  const R = (a, b) => a + Math.random() * (b - a);
+  function spawnTrail(c, x, y, hx, hy) {
+    const p = c.pool[c.pi]; c.pi = (c.pi + 1) % c.pool.length;
+    const tr = TRAIL[c.trail];
+    p.live = true; p.age = 0;
+    p.x = x - hx * tr.off + R(-3, 3);
+    p.y = y - hy * tr.off + R(-3, 3);
+    if (c.trail === 'flame') {
+      p.vx = -hx * 42 + R(-18, 18); p.vy = -hy * 42 + R(-18, 18);
+      p.s0 = R(.9, 1.3); p.s1 = .06; p.op0 = .92; p.life = R(.36, .6); p.sxy = 1;
+    } else if (c.trail === 'smoke') {
+      p.vx = -hx * 12 + R(-9, 9); p.vy = -hy * 12 - 14 + R(-6, 6);
+      p.s0 = .3; p.s1 = R(1.1, 1.6); p.op0 = .3; p.life = R(1.5, 2.3); p.sxy = 1;
+    } else if (c.trail === 'trace') { /* a dotted flight path */
+      p.vx = R(-2, 2); p.vy = R(-2, 2);
+      p.s0 = .55; p.s1 = .15; p.op0 = .5; p.life = R(.9, 1.5); p.sxy = 1;
+    } else { /* wake */
+      p.vx = -hx * 8 + R(-6, 6); p.vy = -hy * 8 + 7 + R(-3, 3);
+      p.s0 = .3; p.s1 = R(1.3, 1.8); p.op0 = .5; p.life = R(1.3, 1.9); p.sxy = 2.1;
+    }
+  }
+
+  function updateFleet(t, dt) {
+    if (!fleetReady || reduced || !fleetEl) return;
+    const denom = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+    const p = clampf(scrollY / denom, 0, 1);
+    CRAFT.forEach((c) => {
+      if (!c.el) return;
+      const tg = fleetPath(c, p);
+      if (!c.cur) { c.cur = { x: tg.x, y: tg.y }; c.lastX = tg.x; c.lastY = tg.y; }
+      c.cur.x += (tg.x - c.cur.x) * c.k;
+      c.cur.y += (tg.y - c.cur.y) * c.k;
+      const fwd = fleetPath(c, Math.min(1, p + 0.004)), bk = fleetPath(c, Math.max(0, p - 0.004));
+      const headRad = Math.atan2(fwd.y - bk.y, fwd.x - bk.x);
+      const headDeg = headRad * 180 / Math.PI;
+      const hx = Math.cos(headRad), hy = Math.sin(headRad);
+      const swx = Math.sin(t * c.sw[0] + c.p1) * c.sw[1];
+      const swy = Math.cos(t * c.sw[2] + c.p1) * c.sw[3];
+      const rx = c.cur.x + swx, ry = c.cur.y + swy;
+
+      /* banking with weight — smooth the heading, add flutter on top */
+      let targetBase, flutter;
+      if (c.kind === 'plane' || c.kind === 'crane') { targetBase = headDeg; flutter = Math.sin(t * 2.1 + c.p1) * 2.6; }
+      else if (c.kind === 'rocket') { targetBase = headDeg + 90; flutter = Math.sin(t * 2.6 + c.p1) * 2.6; }
+      else if (c.kind === 'kite') { targetBase = clampf((rx - c.lastX) * 9, -15, 15); flutter = Math.sin(t * 1.5 + c.p1) * 6; }
+      else { targetBase = clampf((rx - c.lastX) * 8, -7, 7); flutter = Math.sin(t * 1.2 + c.p1) * 7; }
+      if (c.rot === null) c.rot = targetBase;
+      c.rot = angLerp(c.rot, targetBase, 0.14);
+      const rot = c.rot + flutter;
+      c.el.style.transform = `translate(${rx.toFixed(1)}px,${ry.toFixed(1)}px) translate(-50%,-50%) rotate(${rot.toFixed(1)}deg)`;
+
+      /* emit the trail by distance travelled, plus a little idle emission */
+      const dist = Math.hypot(rx - c.lastX, ry - c.lastY);
+      c.lastX = rx; c.lastY = ry;
+      if (c.trail) {
+        const tr = TRAIL[c.trail];
+        c.emit += dist + tr.idle * dt;
+        let guard = 0;
+        while (c.emit >= tr.sp && guard++ < 6) { c.emit -= tr.sp; spawnTrail(c, rx, ry, hx, hy); }
+      }
+
+      /* advance the trail particles */
+      c.pool.forEach((q) => {
+        if (!q.live) return;
+        q.age += dt;
+        if (q.age >= q.life) { q.live = false; q.el.style.opacity = '0'; return; }
+        const u = q.age / q.life;
+        q.x += q.vx * dt; q.y += q.vy * dt;
+        const sc = q.s0 + (q.s1 - q.s0) * u;
+        const op = c.trail === 'flame' ? q.op0 * (1 - u) * (1 - u) : q.op0 * (1 - u);
+        const sxScale = c.trail === 'wake' ? sc * q.sxy : sc;
+        const syScale = c.trail === 'wake' ? sc * 0.5 : sc;
+        q.el.style.opacity = op.toFixed(3);
+        q.el.style.transform = `translate(${q.x.toFixed(1)}px,${q.y.toFixed(1)}px) translate(-50%,-50%) scale(${sxScale.toFixed(3)},${syScale.toFixed(3)})`;
+      });
+    });
+  }
+
+  const frame = (ms) => {
+    requestAnimationFrame(frame);
+    if (!t0) t0 = ms;
+    const t = (ms - t0) / 1000;
+    const dt = Math.min(0.05, (ms - lastMs) / 1000 || 0.016);
+    lastMs = ms;
+
+    if (inkTick) inkTick(t);
+
+    scrollVel += ((scrollY - prevScroll) - scrollVel) * 0.12;
+    prevScroll = scrollY;
+
+    const tg = target();
+    setPose(tg.pose);
+    if (curPose !== lastPose) { lastPose = curPose; poseHopStart = ms; }
+
+    /* The mascot eases toward its section stop, then breathes in place —
+       a small idle bob + a gentle lean into its travel. Not a video. */
+    const swayX = reduced ? 0 : Math.sin(t * 0.7) * 6;
+    const bobY  = reduced ? 0 : Math.sin(t * 1.45) * 5;
+    const k = reduced ? 1 : 0.072;
+    if (!bubbleHold) {
+      cur.x += (tg.x - cur.x) * k;
+      cur.y += (tg.y - cur.y) * k;
+      cur.size += (tg.size - cur.size) * k;
+    }
+
+    const vx = cur.x - prevX;
+    prevX = cur.x;
+    const tilt = reduced ? 0 : Math.max(-5, Math.min(5, vx * 0.35)) + Math.sin(t * 0.6) * 1.1;
+
+    if (mascotEl) {
+      const pel = poseMap[curPose];
+      if (innerWidth < 600) {
+        /* Phones: the character is docked in the bottom-right corner by CSS
+           (anchored by its own box, so no pose is ever clipped off-screen).
+           It stays alive — a soft idle float, a hop each time it changes
+           pose, and a lean into the scroll — without leaving the corner. */
+        const hopP = reduced ? 1 : Math.min(1, (ms - poseHopStart) / 520);
+        const hop = reduced ? 0 : Math.sin(hopP * Math.PI) * -16;      /* up then settle */
+        const lean = reduced ? 0 : Math.max(-7, Math.min(7, scrollVel * 0.3));
+        mascotEl.style.transform = 'none';
+        if (pel) {
+          pel.style.height = cur.size.toFixed(0) + 'px';
+          pel.style.transform =
+            `translateY(${(bobY + hop).toFixed(1)}px) rotate(${((Math.sin(t * 0.7) * 1.6) + lean * 0.5).toFixed(2)}deg)`;
+        }
+      } else {
+        const half = cur.size * 0.42;
+        const sx = Math.max(half, Math.min(innerWidth - half, cur.x - scrollX));
+        const sy = Math.max(96 + cur.size * 0.4, cur.y - scrollY);  /* clear of the header */
+        mascotEl.style.transform =
+          `translate3d(${(sx + swayX).toFixed(1)}px, ${(sy + bobY).toFixed(1)}px, 0)`;
+        if (pel) {
+          pel.style.height = cur.size.toFixed(0) + 'px';
+          pel.style.transform = `translate(-50%, -54%) rotate(${tilt.toFixed(2)}deg)`;
+        }
+      }
+    }
+
+    /* Colored artifacts — each with its own drift amplitude and tempo,
+       swelling gently when the scroll moves fast */
+    artKick += (Math.min(1, Math.abs(scrollVel) / 34) - artKick) * 0.06;
+    if (!reduced) {
+      arts.forEach((a, i) => {
+        const rel = (a.y - scrollY) - innerHeight * 0.5;
+        const py = -rel * a.depth;
+        const ampX = 16 + (i % 3) * 14;
+        const spd = 0.28 + (i % 4) * 0.11;
+        const dx = Math.sin(t * spd + i * 2.1) * ampX;
+        const dy = Math.cos(t * spd * 0.8 + i * 1.7) * (10 + (i % 2) * 8);
+        const dr = Math.sin(t * 0.22 + i * 1.4) * (5 + (i % 3) * 3);
+        const sc = 1 + Math.sin(t * spd * 0.6 + i) * 0.04 + artKick * 0.14;
+        /* the whole colour field leans toward the cursor for depth */
+        const px = mnx * a.depth * 150;
+        const pmy = mny * a.depth * 110;
+        a.el.style.transform =
+          `translate3d(${dx + px}px, ${py + dy + pmy}px, 0) rotate(${a.rot + dr}deg) scale(${sc})`;
+      });
+    }
+
+    /* Hero lines drift apart gently as you leave */
+    if (!reduced && scrollY < innerHeight * 1.2) {
+      heroLines.forEach((l, i) => {
+        l.style.transform = `translateY(${-scrollY * 0.035 * i}px)`;
+      });
+    }
+
+    /* Live type field — every headline letter breathes on a slow idle
+       wave, and lifts / tilts / warms toward crimson as the cursor passes.
+       Lerp-smoothed per letter; only after the overture has settled. */
+    if (letterFX && scrollY < innerHeight * 0.9) {
+      const active = finePointer && !reduced && pointerSeen;
+      const cvx = (mnx + 0.5) * innerWidth, cvy = (mny + 0.5) * innerHeight;
+      const R = 168;
+      for (const c of typeGeo) {
+        let tl = 0, tt = 0, ts = 1, tw = 0;
+        if (active) {
+          const dx = cvx - (c.cx - scrollX);
+          const dy = cvy - (c.cy - scrollY);
+          const f = Math.max(0, 1 - Math.hypot(dx, dy) / R);
+          const e = f * f * (3 - 2 * f);
+          tl = -e * 18;
+          tt = clampf(-dx / R, -1, 1) * e * 12;
+          ts = 1 + e * 0.22;
+          tw = e;
+        }
+        const br = reduced ? 0 : Math.sin(t * 1.05 + c.seed) * 1.5;
+        c.lift += (tl - c.lift) * 0.16;
+        c.tilt += (tt - c.tilt) * 0.16;
+        c.sc += (ts - c.sc) * 0.16;
+        c.warm += (tw - c.warm) * 0.16;
+        c.el.style.transform =
+          `translateY(${(c.lift + br).toFixed(2)}px) rotate(${c.tilt.toFixed(2)}deg) scale(${c.sc.toFixed(3)})`;
+        if (c.warm > 0.004) {
+          const w = c.warm;
+          c.el.style.color = `rgb(${INK_RGB[0] + (CRIM_RGB[0] - INK_RGB[0]) * w | 0},${INK_RGB[1] + (CRIM_RGB[1] - INK_RGB[1]) * w | 0},${INK_RGB[2] + (CRIM_RGB[2] - INK_RGB[2]) * w | 0})`;
+        } else if (c.el.style.color) {
+          c.el.style.color = '';
+        }
+      }
+    }
+
+    /* Marquees ride the scroll velocity, drifting opposite ways */
+    if (marqueeTrack && !reduced) {
+      const half = marqueeTrack.scrollWidth / 2;
+      marqueeX -= (70 + Math.min(520, Math.abs(scrollVel) * 26)) * dt;
+      if (marqueeX <= -half) marqueeX += half;
+      marqueeTrack.style.transform = `translate3d(${marqueeX}px, 0, 0)`;
+    }
+    if (marqueeTrack2 && !reduced) {
+      const half2 = marqueeTrack2.scrollWidth / 2;
+      if (marqueeX2 === 0) marqueeX2 = -half2;
+      marqueeX2 += (70 + Math.min(520, Math.abs(scrollVel) * 26)) * dt;
+      if (marqueeX2 >= 0) marqueeX2 -= half2;
+      marqueeTrack2.style.transform = `translate3d(${marqueeX2}px, 0, 0)`;
+    }
+
+    /* Colour inks into the running lines as they scroll into view, and into
+       the footer wordmark as you reach the foot of the page — scroll-driven,
+       so it lands the same on desktop and touch, no cursor required */
+    for (const m of marquees) {
+      const r = m.getBoundingClientRect();
+      m.classList.toggle('lit', r.top < innerHeight * 0.92 && r.bottom > innerHeight * 0.06);
+    }
+    if (footerMark) {
+      const r = footerMark.getBoundingClientRect();
+      const fp = clamp01((innerHeight - r.top) / (innerHeight * 0.55));
+      footerMark.style.backgroundSize = (fp * 100).toFixed(1) + '% 100%';
+    }
+
+    /* Lists lean with the scroll, then settle upright */
+    if (!reduced) {
+      const skT = Math.max(-3.2, Math.min(3.2, scrollVel * 0.055));
+      skewCur += (skT - skewCur) * 0.1;
+      skewEls.forEach((el) => { el.style.transform = `skewY(${skewCur}deg)`; });
+    }
+
+    /* Pinned band — the sentence scrubs across; the story arc draws itself;
+       chips pop at fixed points of the traversal */
+    if (scrubGeo) {
+      const span = Math.max(1, scrubGeo.height - innerHeight);
+      const spT = clamp01((scrollY - scrubGeo.top) / span);
+      scrubP += (spT - scrubP) * (reduced ? 1 : 0.12);
+      const startX = innerWidth * 0.7;
+      const endX = -(scrubGeo.trackW - innerWidth * 0.3);
+      scrubTrack.style.transform = `translate3d(${startX + (endX - startX) * scrubP}px, 0, 0)`;
+
+      const c1x = 60 + 80 * scrubP, c1y = 25 + 120 * scrubP;
+      const c2x = 210 + 60 * scrubP, c2y = 140 - 122 * scrubP;
+      bezPath.setAttribute('d', `M 24 130 C ${c1x} ${c1y}, ${c2x} ${c2y}, 300 34`);
+      bezL1.setAttribute('x2', c1x); bezL1.setAttribute('y2', c1y);
+      bezL2.setAttribute('x2', c2x); bezL2.setAttribute('y2', c2y);
+      bezB1.setAttribute('x', c1x - 6); bezB1.setAttribute('y', c1y - 6);
+      bezB2.setAttribute('x', c2x - 6); bezB2.setAttribute('y', c2y - 6);
+      const bl = bezPath.getTotalLength();
+      bezPath.style.strokeDasharray = bl;
+      bezPath.style.strokeDashoffset = bl * (1 - Math.min(1, scrubP * 1.5));
+
+      scrubStar.style.transform = `rotate(${scrubP * 540}deg)`;
+      chipEls.forEach((c, i) => c.classList.toggle('pop', scrubP > 0.32 + i * 0.28));
+    }
+
+    /* Glyphs drift on mouse parallax */
+    if (!reduced) {
+      decos.forEach((d) => {
+        d.x += (mnx * d.depth - d.x) * 0.06;
+        d.y += (mny * d.depth - d.y) * 0.06;
+        d.el.style.transform = `translate3d(${d.x}px, ${d.y}px, 0)`;
+      });
+    }
+
+    /* Reading progress line fills with the whole journey */
+    if (progressFill) {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      progressFill.style.height = (clamp01(max > 0 ? scrollY / max : 0) * 100).toFixed(2) + '%';
+    }
+    /* Story thread writes itself down the page on scroll */
+    if (threadLen) {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      const drawn = Math.min(1, clamp01(max > 0 ? scrollY / max : 0) * 1.04 + 0.04);
+      threadPath.style.strokeDashoffset = (threadLen * (1 - drawn)).toFixed(1);
+    }
+    /* Section navigator — light the stop we're currently in */
+    if (navDots.length) {
+      const mark = scrollY + innerHeight * 0.4;
+      let act = -1;
+      for (let i = 0; i < navDots.length; i++) { if (navDots[i].top <= mark) act = i; }
+      if (act !== navActive) {
+        navActive = act;
+        navDots.forEach((d, i) => d.el.classList.toggle('active', i === act));
+      }
+    }
+
+    /* Chapters — the narrative thread fills as you read down */
+    if (chaptersGeo && chaptersFill) {
+      const readLine = scrollY + innerHeight * 0.6;
+      const filled = clamp01((readLine - chaptersGeo.railTop) / chaptersGeo.railH);
+      chaptersFill.style.height = (filled * 100).toFixed(2) + '%';
+      for (let i = 0; i < chapterRows.length; i++) {
+        chapterRows[i].classList.toggle('lit', chaptersGeo.nodes[i] <= readLine + 4);
+      }
+    }
+
+    updateFleet(t, dt);
+  };
+  requestAnimationFrame(frame);
+
+  /* ================================================
+     The overture — one crimson mark gathers charge on
+     blank paper, then detonates. Ink speed-lines fire,
+     colour shards blow outward, ink droplets scatter,
+     and the whole page — every headline letter, every
+     artifact, the thought-cloud — drifts out of the
+     blast and eases into place, no two pieces at once.
+     The mark itself floats up to become the logo.
+     ================================================ */
+  const HUES = ['#0ae448', '#ff8709', '#fec5fb', '#9d95ff', '#00bae2', '#f100cb', '#fc1c46'];
+  let overtureDone = false;
+  const FALL = 940;            /* the ink drop's fall, before it lands */
+  const cxv0 = () => innerWidth / 2;
+  const cyv0 = () => innerHeight / 2;
+
+  /* ---- Detonation visuals: flash, ink speed-lines, shards, droplets ---- */
+  const SHAPES = ['circle', 'bar', 'ring', 'plus', 'square'];
+  const detonate = () => {
+    const cxv = cxv0(), cyv = cyv0();
+    const reach = Math.max(innerWidth, innerHeight);
+
+    /* A soft breath of light — a bloom, not a hard flash */
+    const flash = document.createElement('div');
+    flash.className = 'ov-flash';
+    document.body.appendChild(flash);
+    flash.animate(
+      [{ opacity: 0 }, { opacity: .5, offset: .22 }, { opacity: 0 }],
+      { duration: 460, easing: 'cubic-bezier(.33,0,.3,1)', fill: 'forwards' }
+    );
+    setTimeout(() => flash.remove(), 500);
+
+    /* Soft ink bloom — the organic body of the blast, spreading and
+       melting away like a drop of ink hitting wet paper */
+    const bloom = document.createElement('div');
+    bloom.className = 'ov-bloom';
+    bloom.style.left = `${cxv}px`;
+    bloom.style.top = `${cyv}px`;
+    document.body.appendChild(bloom);
+    bloom.animate(
+      [
+        { transform: 'translate(-50%,-50%) scale(.08)', opacity: 0 },
+        { transform: 'translate(-50%,-50%) scale(.6)', opacity: .9, offset: .3 },
+        { transform: 'translate(-50%,-50%) scale(1.5)', opacity: 0 },
+      ],
+      { duration: 1000, easing: 'cubic-bezier(.22,.68,.3,1)', fill: 'forwards' }
+    );
+    setTimeout(() => bloom.remove(), 1050);
+
+    /* A few feathered wisps of motion — a whisper of energy radiating
+       out, soft and quick to fade (not hard comic rays) */
+    const NR = 15;
+    for (let i = 0; i < NR; i++) {
+      const ray = document.createElement('div');
+      ray.className = 'ray';
+      const len = reach * (0.3 + Math.random() * 0.22);
+      const ang = (i / NR) * 360 + (Math.random() * 12 - 6);
+      ray.style.height = `${len}px`;
+      ray.style.left = `${cxv - 1}px`;
+      ray.style.top = `${cyv - len}px`;
+      const crimson = i % 4 === 0;
+      ray.style.background = crimson
+        ? 'linear-gradient(to top, rgba(252,28,70,0), rgba(252,28,70,.34) 32%, rgba(252,28,70,0))'
+        : 'linear-gradient(to top, rgba(14,16,15,0), rgba(14,16,15,.2) 34%, rgba(14,16,15,0))';
+      document.body.appendChild(ray);
+      ray.animate(
+        [
+          { transform: `rotate(${ang}deg) scaleY(0)`, opacity: 0 },
+          { transform: `rotate(${ang}deg) scaleY(.8)`, opacity: .8, offset: .4 },
+          { transform: `rotate(${ang}deg) scaleY(1.05)`, opacity: 0 },
+        ],
+        { duration: 520 + Math.random() * 260, delay: Math.random() * 90, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'forwards' }
+      );
+      setTimeout(() => ray.remove(), 950);
+    }
+
+    /* Colour shards — a soft, varied debris field that drifts out and
+       floats down like confetti settling, not shrapnel */
+    const NS = 54;
+    for (let i = 0; i < NS; i++) {
+      const p = document.createElement('div');
+      p.className = 'shard';
+      const hue = HUES[i % HUES.length];
+      const shape = SHAPES[i % SHAPES.length];
+      const s = 6 + Math.random() * 18;
+      p.style.width = `${s}px`;
+      p.style.height = `${s}px`;
+      if (shape === 'circle') { p.style.borderRadius = '50%'; p.style.background = hue; }
+      else if (shape === 'bar') { p.style.height = `${Math.max(3, s * 0.34)}px`; p.style.borderRadius = '2px'; p.style.background = hue; }
+      else if (shape === 'ring') { p.style.borderRadius = '50%'; p.style.border = `${Math.max(2, s * 0.16)}px solid ${hue}`; }
+      else if (shape === 'plus') { p.style.background = `linear-gradient(${hue},${hue}) 50%/100% 32% no-repeat, linear-gradient(${hue},${hue}) 50%/32% 100% no-repeat`; }
+      else { p.style.borderRadius = '2px'; p.style.background = hue; }
+      p.style.left = `${cxv}px`;
+      p.style.top = `${cyv}px`;
+      document.body.appendChild(p);
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 140 + Math.random() * reach * 0.42;
+      const tx = Math.cos(ang) * dist;
+      const ty = Math.sin(ang) * dist * 0.82;
+      const rot = Math.random() * 460 - 230;
+      const fall = 90 + Math.random() * 120;
+      const drift = (Math.random() * 40 - 20);
+      p.animate(
+        [
+          { transform: 'translate(-50%,-50%) scale(.4) rotate(0deg)', opacity: 0 },
+          { transform: `translate(calc(-50% + ${tx * 0.5}px), calc(-50% + ${ty * 0.5}px)) scale(1) rotate(${rot * 0.45}deg)`, opacity: 1, offset: .32 },
+          { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(.97) rotate(${rot}deg)`, opacity: 1, offset: .68 },
+          { transform: `translate(calc(-50% + ${tx + drift}px), calc(-50% + ${ty + fall}px)) scale(.82) rotate(${rot * 1.15}deg)`, opacity: 0 },
+        ],
+        { duration: 1350 + Math.random() * 750, delay: Math.random() * 200, easing: 'cubic-bezier(.22,.66,.3,1)', fill: 'forwards' }
+      );
+      setTimeout(() => p.remove(), 2350);
+    }
+
+    /* Ink droplets — the blast throws wet ink that arcs and falls,
+       the same ink the thought-cloud is drawn from */
+    for (let i = 0; i < 10; i++) {
+      const d = document.createElement('div');
+      d.className = 'inkdrop';
+      const s = 7 + Math.random() * 16;
+      d.style.width = `${s}px`;
+      d.style.height = `${s * (0.8 + Math.random() * 0.5)}px`;
+      d.style.borderRadius = `${40 + Math.random() * 30}% ${60 + Math.random() * 20}% ${45 + Math.random() * 25}% ${55 + Math.random() * 20}%`;
+      d.style.left = `${cxv}px`;
+      d.style.top = `${cyv}px`;
+      document.body.appendChild(d);
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 100 + Math.random() * reach * 0.28;
+      const tx = Math.cos(ang) * dist;
+      const ty = Math.sin(ang) * dist * 0.62 - 30;
+      const rot = Math.random() * 160 - 80;
+      d.animate(
+        [
+          { transform: 'translate(-50%,-50%) scale(.3)', opacity: 0 },
+          { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(1) rotate(${rot}deg)`, opacity: 1, offset: .5 },
+          { transform: `translate(calc(-50% + ${tx * 1.08}px), calc(-50% + ${ty + 180 + Math.random() * 110}px)) scale(.72) rotate(${rot * 1.3}deg)`, opacity: 0 },
+        ],
+        { duration: 1350 + Math.random() * 450, delay: Math.random() * 160, easing: 'cubic-bezier(.28,.64,.32,1)', fill: 'forwards' }
+      );
+      setTimeout(() => d.remove(), 2000);
+    }
+  };
+
+  /* Fire the release: the page is thrown out of the blast */
+  const burst = () => {
+    detonate();
+    /* A soft breath through the hero as the blast lands — a gentle swell
+       that eases back to rest, emanating from the impact point */
+    if (!reduced && 'animate' in Element.prototype) {
+      const hb = heroEl.getBoundingClientRect();
+      heroEl.style.transformOrigin = `50% ${innerHeight / 2 - hb.top}px`;
+      heroEl.animate(
+        [
+          { transform: 'scale(1)' },
+          { transform: 'scale(1.038)', offset: .3 },
+          { transform: 'scale(1)' },
+        ],
+        { duration: 760, easing: 'cubic-bezier(.22,.68,.3,1)', fill: 'none' }
+      );
+    }
+    /* Pip sweeps in from the top of the sky and glides down to the hero stop */
+    bubbleHold = false;
+    cur.x = scrollX + innerWidth * 0.86;
+    cur.y = scrollY - innerHeight * 0.32;
+    cur.size = 120;
+    prevX = cur.x;
+    startHero();
+  };
+
+  /* Arm the artifact flights: held inside the mark through the charge
+     (backwards fill), launched at the detonation, radiating outward */
+  const armFlyers = (launchDelay) => {
+    const cxv = cxv0(), cyv = cyv0();
+    const flyers = [...document.querySelectorAll('.deco, .art')].filter((el) => {
+      const r = el.getBoundingClientRect();
+      return r.bottom > -80 && r.top < innerHeight + 80 && r.width > 0;
+    });
+    const rof = (el) => { const r = el.getBoundingClientRect(); return Math.hypot((r.left + r.width / 2) - cxv, (r.top + r.height / 2) - cyv); };
+    const maxD = Math.max(1, ...flyers.map(rof));
+    flyers.forEach((el) => {
+      const r = el.getBoundingClientRect();
+      const dx = cxv - (r.left + r.width / 2);
+      const dy = cyv - (r.top + r.height / 2);
+      const spin = Math.random() * 120 - 60;
+      const stagger = (Math.hypot(dx, dy) / maxD) * 200 + Math.random() * 170;   /* near settles first */
+      el.animate(
+        [
+          { transform: `translate(${dx}px, ${dy}px) scale(.15) rotate(${spin}deg)`, opacity: 0 },
+          { transform: `translate(${dx * 0.55}px, ${dy * 0.55}px) scale(.7) rotate(${spin * 0.6}deg)`, opacity: 1, offset: .28 },
+          { transform: `translate(${dx * 0.08}px, ${dy * 0.08 - 16}px) scale(1.05) rotate(${spin * -0.1}deg)`, opacity: 1, offset: .7 },
+          { transform: 'none', opacity: 1 },
+        ],
+        { duration: 1050 + Math.random() * 320, delay: launchDelay + stagger, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' }
+      );
+    });
+  };
+
+  /* Arm the headline: every letter is held scaled-to-nothing inside the
+     mark, then drifts out and eases into its real place. Letters nearer
+     the centre settle first, so the type resolves as a soft outward wave */
+  const armLetters = (launchDelay) => {
+    const cxv = cxv0(), cyv = cyv0();
+    const chars = [...heroHeadline.querySelectorAll('.ch')];
+    const measured = chars.map((el) => {
+      const r = el.getBoundingClientRect();
+      const dx = cxv - (r.left + r.width / 2);
+      const dy = cyv - (r.top + r.height / 2);
+      return { el, dx, dy, dist: Math.hypot(dx, dy) };
+    });
+    const maxD = Math.max(1, ...measured.map((m) => m.dist));
+    measured.forEach((m) => {
+      const spin = Math.random() * 70 - 35;
+      const stagger = (m.dist / maxD) * 200 + Math.random() * 150;
+      m.el.animate(
+        [
+          { transform: `translate(${m.dx}px, ${m.dy}px) scale(.4) rotate(${spin}deg)`, opacity: 0 },
+          { transform: `translate(${m.dx * 0.8}px, ${m.dy * 0.8}px) scale(.56) rotate(${spin * 0.7}deg)`, opacity: 1, offset: .2 },
+          { transform: `translate(${m.dx * 0.1}px, ${m.dy * 0.1}px) scale(1.03) rotate(${spin * -0.06}deg)`, opacity: 1, offset: .7 },
+          { transform: 'none', opacity: 1 },
+        ],
+        { duration: 900 + Math.random() * 260, delay: launchDelay + stagger, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' }
+      );
+    });
+  };
+
+  const runOverture = () => {
+    if (overtureDone) return;
+    overtureDone = true;
+    if (reduced || !('animate' in Element.prototype)) {
+      startHero();
+      /* reduced-motion / very old browsers: skip the burst, just set sail */
+      if (fleetEl && !reduced) { fleetReady = true; fleetEl.classList.add('sailing'); }
+      return;
+    }
+
+    const html = document.documentElement;
+    html.classList.add('burst-mode');   /* settles headline lines for measuring */
+
+    /* Blank stage: the mascot waits off-stage, letters and artifacts wait
+       compressed inside the mark; nothing is visible but the mark itself */
+    bubbleHold = true;
+    cur.x = scrollX + innerWidth / 2;
+    cur.y = scrollY + innerHeight / 2;
+    prevX = cur.x;
+    /* Measure + arm synchronously so the settled layout never paints */
+    armLetters(FALL);
+    armFlyers(FALL);
+
+    /* A single drop of ink falls onto the paper. Where it lands, the
+       story bursts into being. */
+    const seed = document.createElement('div');
+    seed.className = 'seed';
+    seed.style.left = `${innerWidth / 2 - 11}px`;
+    seed.style.top = `${innerHeight / 2 - 11}px`;
+    document.body.appendChild(seed);
+
+    const H = innerHeight;
+
+    /* A faint blurred streak dragged behind the drop — its bottom rides
+       the drop's centre (shared translateY + easing) while scaleY grows
+       it into a smear through the fast descent, then collapses on impact */
+    const trail = document.createElement('div');
+    trail.className = 'drip-trail';
+    trail.style.left = `${innerWidth / 2 - 7.5}px`;
+    trail.style.height = '90px';
+    trail.style.top = `${innerHeight / 2 - 90}px`;
+    document.body.appendChild(trail);
+    trail.animate(
+      [
+        { transform: `translateY(${-0.66 * H}px) scaleY(0)`, opacity: 0 },
+        { transform: `translateY(${-0.5 * H}px) scaleY(.25)`, opacity: .28, offset: .34 },
+        { transform: `translateY(${-0.08 * H}px) scaleY(1)`, opacity: .46, offset: .86 },
+        { transform: 'translateY(0px) scaleY(.45)', opacity: 0, offset: .94 },
+        { transform: 'translateY(0px) scaleY(0)', opacity: 0 },
+      ],
+      { duration: FALL, easing: 'cubic-bezier(.62,0,.86,.36)', fill: 'forwards' }
+    );
+    setTimeout(() => trail.remove(), FALL + 80);
+
+    seed.animate(
+      [
+        /* enters from just above the page, heavy and barely moving */
+        { transform: `translateY(${-0.66 * H}px) scaleX(.72) scaleY(1.62)`, opacity: 1 },
+        /* gathers weight near the top before gravity takes it */
+        { transform: `translateY(${-0.5 * H}px) scaleX(.72) scaleY(1.7)`, opacity: 1, offset: .34 },
+        /* accelerates hard, stretching into a long teardrop */
+        { transform: `translateY(${-0.08 * H}px) scaleX(.82) scaleY(2.15)`, opacity: 1, offset: .86 },
+        /* rounds as it meets the paper */
+        { transform: 'translateY(0px) scaleX(1) scaleY(.98)', opacity: 1, offset: .94 },
+        /* and flattens hard on impact */
+        { transform: 'translateY(0px) scaleX(1.5) scaleY(.52)', opacity: 1 },
+      ],
+      { duration: FALL, easing: 'cubic-bezier(.62,0,.86,.36)', fill: 'forwards' }
+    );
+
+    setTimeout(() => {
+      burst();
+      /* The ink gathers back up and floats off to settle as the logo */
+      const mark = document.querySelector('.brand__mark');
+      const mr = mark.getBoundingClientRect();
+      const dx = mr.left + mr.width / 2 - innerWidth / 2;
+      const dy = mr.top + mr.height / 2 - innerHeight / 2;
+      const flight = seed.animate(
+        [
+          { transform: 'translateY(0px) scaleX(1.5) scaleY(.52)' },
+          { transform: `translateY(${-0.06 * H}px) scaleX(.9) scaleY(1.12)`, offset: .22 },
+          { transform: `translate(${dx * 0.32}px, ${dy * 1.02 - 24}px) scale(1.05)`, offset: .58 },
+          { transform: `translate(${dx}px, ${dy}px) scale(.72)` },
+        ],
+        { duration: 900, easing: 'cubic-bezier(.32,.06,.28,1)', fill: 'forwards' }
+      );
+      flight.onfinish = () => {
+        html.classList.add('mark-landed');
+        setTimeout(() => seed.remove(), 220);
+      };
+      /* Once the story has landed, bring the intro copy in — later, and
+         on its own, after the burst has cleared — and set the fleet sailing */
+      setTimeout(() => {
+        html.classList.add('told');
+        html.classList.add('live-type');
+        measureType();
+        letterFX = true;
+        if (fleetEl) { fleetReady = true; fleetEl.classList.add('sailing'); }
+      }, 1500);
+      setTimeout(() => html.classList.remove('burst-mode', 'mark-landed'), 2600);
+    }, FALL);
+  };
+  boot = runOverture;
+
+  /* Safety net — whatever happens with the intro (skipped, interrupted,
+     or throttled in a preview frame), make sure Pip takes the stage. */
+  setTimeout(() => {
+    bubbleHold = false;
+    if (mascotEl && !mascotEl.classList.contains('live')) mascotEl.classList.add('live');
+  }, 1500);
+</script>
+</body>
+</html>
