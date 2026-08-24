@@ -1368,6 +1368,15 @@
   @media (max-width: 600px) {
     :root { --margin-x: 22px; }
 
+    /* Pip is docked in the bottom-right corner and anchored by his own box,
+       so every pose sits fully on-screen (no more clipping off the edge).
+       The JS keeps him alive in place — float, hop, lean. */
+    .mascot { left: auto; right: 0; top: auto; bottom: 0; }
+    .mascot__pose {
+      left: auto; top: auto; right: 15px; bottom: 12px;
+      transform-origin: bottom center;
+    }
+
     /* Hero — headline sized to the column (no more clipped STORY), and a
        tighter top so the story starts sooner */
     .hero { padding-top: 118px; min-height: 90vh; padding-bottom: 56px; }
@@ -2160,12 +2169,12 @@
   let anchors = [];
   let arts = [];
   const measure = () => {
-    const narrow = innerWidth < 760;
+    const narrow = innerWidth < 600;
     anchors = [...document.querySelectorAll('[data-mascot]')].map((el) => {
       const r = el.getBoundingClientRect();
       /* character display height — a small corner companion on phones */
       let size = parseFloat(el.dataset.size) || 280;
-      if (narrow) size = Math.min(size * 0.4, 104);
+      if (narrow) size = Math.min(size * 0.36, 96);
       return {
         x: r.left + scrollX + r.width / 2,
         y: r.top + scrollY + r.height / 2,
@@ -2324,6 +2333,8 @@
   /* The glide loop — the mascot eases toward its section stop */
   const cur = { x: innerWidth * 0.82, y: innerHeight * 0.4, size: 300 };
   let prevX = cur.x;
+  let lastPose = null;        /* to fire a little hop when the pose changes */
+  let poseHopStart = -9999;
   let bubbleHold = false; /* overture: hold the mascot off-stage during the intro */
   let prevScroll = scrollY;
   let scrollVel = 0;
@@ -2480,6 +2491,7 @@
 
     const tg = target();
     setPose(tg.pose);
+    if (curPose !== lastPose) { lastPose = curPose; poseHopStart = ms; }
 
     /* The mascot eases toward its section stop, then breathes in place —
        a small idle bob + a gentle lean into its travel. Not a video. */
@@ -2496,25 +2508,32 @@
     prevX = cur.x;
     const tilt = reduced ? 0 : Math.max(-5, Math.min(5, vx * 0.35)) + Math.sin(t * 0.6) * 1.1;
 
-    let sx, sy;
-    if (innerWidth < 760) {
-      /* phones: a small companion tucked into the very bottom-right corner,
-         clear of the reading column — it still swaps pose section to section */
-      sx = innerWidth - cur.size * 0.42 - 4;
-      sy = innerHeight - cur.size * 0.46 - 8;
-    } else {
-      const half = cur.size * 0.42;
-      sx = Math.max(half, Math.min(innerWidth - half, cur.x - scrollX));
-      /* keep the character clear of the header band */
-      sy = Math.max(96 + cur.size * 0.4, cur.y - scrollY);
-    }
     if (mascotEl) {
-      mascotEl.style.transform =
-        `translate3d(${(sx + swayX).toFixed(1)}px, ${(sy + bobY).toFixed(1)}px, 0)`;
       const pel = poseMap[curPose];
-      if (pel) {
-        pel.style.height = cur.size.toFixed(0) + 'px';
-        pel.style.transform = `translate(-50%, -54%) rotate(${tilt.toFixed(2)}deg)`;
+      if (innerWidth < 600) {
+        /* Phones: the character is docked in the bottom-right corner by CSS
+           (anchored by its own box, so no pose is ever clipped off-screen).
+           It stays alive — a soft idle float, a hop each time it changes
+           pose, and a lean into the scroll — without leaving the corner. */
+        const hopP = reduced ? 1 : Math.min(1, (ms - poseHopStart) / 520);
+        const hop = reduced ? 0 : Math.sin(hopP * Math.PI) * -16;      /* up then settle */
+        const lean = reduced ? 0 : Math.max(-7, Math.min(7, scrollVel * 0.3));
+        mascotEl.style.transform = 'none';
+        if (pel) {
+          pel.style.height = cur.size.toFixed(0) + 'px';
+          pel.style.transform =
+            `translateY(${(bobY + hop).toFixed(1)}px) rotate(${((Math.sin(t * 0.7) * 1.6) + lean * 0.5).toFixed(2)}deg)`;
+        }
+      } else {
+        const half = cur.size * 0.42;
+        const sx = Math.max(half, Math.min(innerWidth - half, cur.x - scrollX));
+        const sy = Math.max(96 + cur.size * 0.4, cur.y - scrollY);  /* clear of the header */
+        mascotEl.style.transform =
+          `translate3d(${(sx + swayX).toFixed(1)}px, ${(sy + bobY).toFixed(1)}px, 0)`;
+        if (pel) {
+          pel.style.height = cur.size.toFixed(0) + 'px';
+          pel.style.transform = `translate(-50%, -54%) rotate(${tilt.toFixed(2)}deg)`;
+        }
       }
     }
 
