@@ -1490,13 +1490,13 @@
   <!-- The mascot — Pip the storyteller travels down the page with the scroll,
        shifting pose section to section. Real character, not a video clip. -->
   <div class="mascot" aria-hidden="true">
-    <img class="mascot__pose" data-pose="hero"   src="mascot/pip-hero.png"   alt="" width="1000" height="646">
-    <img class="mascot__pose" data-pose="proud"  src="mascot/pip-proud.png"  alt="" width="785"  height="900">
-    <img class="mascot__pose" data-pose="pen"    src="mascot/pip-pen.png"    alt="" width="900"  height="830">
-    <img class="mascot__pose" data-pose="sprint" src="mascot/pip-sprint.png" alt="" width="1000" height="566">
-    <img class="mascot__pose" data-pose="relax"  src="mascot/pip-relax.png"  alt="" width="807"  height="900">
-    <img class="mascot__pose" data-pose="listen" src="mascot/pip-listen.png" alt="" width="894"  height="900">
-    <img class="mascot__pose" data-pose="base"   src="mascot/pip-base.png"   alt="" width="766"  height="860">
+    <img class="mascot__pose" data-pose="hero"   data-pip="hero"   alt="" width="1000" height="646">
+    <img class="mascot__pose" data-pose="proud"  data-pip="proud"  alt="" width="785"  height="900">
+    <img class="mascot__pose" data-pose="pen"    data-pip="pen"    alt="" width="900"  height="830">
+    <img class="mascot__pose" data-pose="sprint" data-pip="sprint" alt="" width="1000" height="566">
+    <img class="mascot__pose" data-pose="relax"  data-pip="relax"  alt="" width="807"  height="900">
+    <img class="mascot__pose" data-pose="listen" data-pip="listen" alt="" width="894"  height="900">
+    <img class="mascot__pose" data-pose="base"   data-pip="base"   alt="" width="766"  height="860">
   </div>
   <div class="tdot tdot--1" aria-hidden="true"></div>
   <div class="tdot tdot--2" aria-hidden="true"></div>
@@ -1567,7 +1567,7 @@
     <span class="hero__scroll">(Scroll — the story follows)</span>
 
     <div data-mascot data-hero data-pose="hero" data-size="276" style="right: 4%; top: 66px; width: 300px; height: 300px;"></div>
-    <div class="m-stop" data-side="right" aria-hidden="true"><img src="mascot/pip-hero.png" alt="" width="1000" height="646"></div>
+    <div class="m-stop" data-side="right" aria-hidden="true"><img data-pip="hero" alt="" width="1000" height="646"></div>
   </section>
 
   <!-- Marquee -->
@@ -1607,7 +1607,7 @@
     <p class="work-note reveal">A young studio — more stories in the making. <a href="#contact">Yours could be the next one.</a></p>
 
     <div data-mascot data-pose="proud" data-size="300" style="right: 6%; top: 26%; width: 300px; height: 300px;"></div>
-    <div class="m-stop" data-side="left" aria-hidden="true"><img src="mascot/pip-proud.png" alt="" width="785" height="900"></div>
+    <div class="m-stop" data-side="left" aria-hidden="true"><img data-pip="proud" alt="" width="785" height="900"></div>
   </section>
 
   <!-- Capabilities -->
@@ -1659,7 +1659,7 @@
       </div>
     </div>
     <div data-mascot data-pose="pen" data-size="272" style="right: 7%; top: 4%; width: 280px; height: 280px;"></div>
-    <div class="m-stop" data-side="right" aria-hidden="true"><img src="mascot/pip-pen.png" alt="" width="900" height="830"></div>
+    <div class="m-stop" data-side="right" aria-hidden="true"><img data-pip="pen" alt="" width="900" height="830"></div>
   </section>
 
   <!-- Statement — pinned band, the sentence scrubs across with the scroll -->
@@ -1751,7 +1751,7 @@
       </div>
     </div>
     <div data-mascot data-pose="relax" data-size="300" style="right: 5%; top: 16%; width: 300px; height: 300px;"></div>
-    <div class="m-stop" data-side="left" aria-hidden="true"><img src="mascot/pip-relax.png" alt="" width="807" height="900"></div>
+    <div class="m-stop" data-side="left" aria-hidden="true"><img data-pip="relax" alt="" width="807" height="900"></div>
   </section>
 
   <!-- Contact -->
@@ -1807,7 +1807,7 @@
       </div>
     </form>
     <div data-mascot data-pose="listen" data-size="300" style="right: 8%; top: 18%; width: 300px; height: 300px;"></div>
-    <div class="m-stop" data-side="right" aria-hidden="true"><img src="mascot/pip-listen.png" alt="" width="894" height="900"></div>
+    <div class="m-stop" data-side="right" aria-hidden="true"><img data-pip="listen" alt="" width="894" height="900"></div>
   </section>
 
   <!-- Second marquee — drifts the other way -->
@@ -1886,7 +1886,7 @@
   <!-- Footer -->
   <footer class="page">
     <div data-mascot data-pose="base" data-size="248" style="right: 12%; top: 12%; width: 248px; height: 248px;"></div>
-    <div class="m-stop" data-side="center" aria-hidden="true"><img src="mascot/pip-base.png" alt="" width="766" height="860"></div>
+    <div class="m-stop" data-side="center" aria-hidden="true"><img data-pip="base" alt="" width="766" height="860"></div>
     <div class="footer-mark" aria-hidden="true">Tell<i>.</i></div>
     <div class="footer-row">
       <span>&copy; 2026 Tell</span>
@@ -1914,6 +1914,14 @@
   document.documentElement.classList.add('js');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointer = matchMedia('(pointer: fine)').matches;
+
+  /* Pip images — one source of truth. Locally each resolves to its file;
+     the artifact build swaps PIP for a data-URI map so every picture is
+     embedded exactly once (not per <img>), keeping the page light. */
+  const PIP = null; /*__PIP_MAP__*/
+  document.querySelectorAll('img[data-pip]').forEach((el) => {
+    el.src = PIP ? PIP[el.dataset.pip] : 'mascot/pip-' + el.dataset.pip + '.png';
+  });
 
   /* Story films — clip 0 scrubs with scroll, clips 1 and 2 loop */
   /* mascot poses swap by section — no video, a real character on the paper */
