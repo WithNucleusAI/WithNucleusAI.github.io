@@ -1385,52 +1385,14 @@
   @media (max-width: 600px) {
     :root { --margin-x: 22px; }
 
-    /* On phones Pip TRAVELS inline — a stop in each section's whitespace, so
-       he scrolls up the page with the content, section to section, walking
-       the story. The fixed desktop traveller steps aside. */
-    .mascot { display: none; }
-    .m-stop {
-      display: block;
-      /* pivot centred so the JS fly-through sweep swings him wide across the
-         screen yet keeps him on-frame; data-side only sets the swing direction */
-      text-align: center;
-      margin: clamp(34px, 10vw, 74px) 0 clamp(4px, 2vw, 14px);
-      opacity: 0;
-      transition: opacity .7s ease, transform .85s cubic-bezier(.22,1,.36,1);
-      will-change: transform, opacity;
-    }
-    .m-stop[data-side="right"]  { transform: translate(30px, 26px); }
-    .m-stop[data-side="left"]   { transform: translate(-30px, 26px); }
-    .m-stop[data-side="center"] { transform: translateY(26px); }
-    .m-stop.in { opacity: 1; transform: none; }
-    .m-stop img {
-      display: inline-block;
-      height: clamp(154px, 45vw, 196px);
-      width: auto; max-width: 90%;
-      will-change: transform;
-      transform: translateZ(0);
-      backface-visibility: hidden;
-      /* a whisper of depth so he sits on the paper, not floats above it */
-      filter: drop-shadow(0 7px 11px rgba(28, 18, 10, .10));
-    }
-    /* No-JS fallback: if the motion engine never runs, Pip still breathes */
-    html:not(.js) .m-stop img { animation: m-float 4.6s ease-in-out infinite; }
-
-    /* Pip runs across the pinned scrub band, below the scrubbing sentence */
-    .m-run {
-      display: block;
-      position: absolute;
-      left: 0; bottom: 11%;
-      z-index: 7;
-      pointer-events: none;
-      will-change: transform;
-    }
-    .m-run img {
-      display: block;
-      height: clamp(116px, 32vw, 148px);
-      width: auto; max-width: none;
-      filter: drop-shadow(0 7px 11px rgba(28, 18, 10, .12));
-    }
+    /* On phones Pip travels as ONE fixed character on a single continuous
+       scroll path — exactly like desktop, just smaller. He weaves down the
+       page and tucks behind the opaque header at the very top (above/below
+       the header). The per-section stickers and scrub runner retire; the
+       traveller covers every section, driven by the JS below. */
+    .m-stop, .m-run { display: none; }
+    html.js .mascot { display: block; }
+    .mascot__pose { filter: drop-shadow(0 8px 13px rgba(28, 18, 10, .13)); }
 
     /* Hero — headline sized to the column (no more clipped STORY), and a
        tighter top so the story starts sooner */
@@ -2246,18 +2208,26 @@
   let mStops = [];   /* phone: the inline Pip stops, driven per-frame */
   const measure = () => {
     const narrow = innerWidth < 600;
+    /* On phones the traveller weaves along a deliberate path, sized small and
+       tucked toward each section's whitespace so he glides BESIDE the copy,
+       not over it: strong left/right for the text sections, centred only in
+       the open bands (scrub, footer), and lifted high at the hero so he flies
+       past the headline near the header rather than sitting on the lead.
+       On desktop he follows each anchor's own placement. */
+    const MX = { hero: 0.72, proud: 0.2, pen: 0.8, sprint: 0.5, relax: 0.2, listen: 0.8, base: 0.5 };
+    const MY = { hero: 0.12 };   /* vertical spot within the anchor box (0.5 = centre) */
     anchors = [...document.querySelectorAll('[data-mascot]')].map((el) => {
       const r = el.getBoundingClientRect();
-      /* character display height — a small corner companion on phones */
+      const pose = el.dataset.pose || 'base';
       let size = parseFloat(el.dataset.size) || 280;
-      if (narrow) size = Math.min(size * 0.36, 96);
-      return {
-        x: r.left + scrollX + r.width / 2,
-        y: r.top + scrollY + r.height / 2,
-        size,
-        pose: el.dataset.pose || 'base',
-        hero: 'hero' in el.dataset,
-      };
+      let x = r.left + scrollX + r.width / 2;
+      let y = r.top + scrollY + r.height / 2;
+      if (narrow) {
+        size = Math.max(94, Math.min(112, size * 0.40));
+        x = innerWidth * (MX[pose] ?? 0.5);
+        y = r.top + scrollY + r.height * (MY[pose] ?? 0.5);
+      }
+      return { x, y, size, pose, hero: 'hero' in el.dataset };
     }).sort((a, b) => a.y - b.y);
     arts = [...document.querySelectorAll('.art')].map((el) => {
       el.style.transform = '';
@@ -2593,8 +2563,25 @@
     if (mascotEl) {
       const pel = poseMap[curPose];
       if (innerWidth < 600) {
-        /* Phones: the fixed traveller steps aside — Pip lives inline in the
-           column, driven by the mobile stop engine just below. */
+        /* Phones: the SAME continuous traveller as desktop, tuned smaller.
+           One character on one scroll-driven path — weaving down the page,
+           riding up behind the opaque header at the top (so he reads above
+           AND below it), and breaking into a run-bounce through the sprint
+           (scrub) stretch. */
+        const half = cur.size * 0.5;
+        const sx = Math.max(half * 0.6, Math.min(innerWidth - half * 0.6, cur.x - scrollX + swayX));
+        /* let him tuck up behind the header (mascot z-index 6 < header 50)
+           rather than being held below it, like the desktop path */
+        let sy = cur.y - scrollY;
+        sy = Math.max(-cur.size * 0.42, Math.min(innerHeight - cur.size * 0.24, sy));
+        const runHop  = (curPose === 'sprint' && !reduced) ? Math.abs(Math.sin(t * 6.6)) * -12 : 0;
+        const runTilt = (curPose === 'sprint' && !reduced) ? Math.sin(t * 3.3) * 2.4 : 0;
+        mascotEl.style.transform =
+          `translate3d(${sx.toFixed(1)}px, ${(sy + bobY + runHop).toFixed(1)}px, 0)`;
+        if (pel) {
+          pel.style.height = cur.size.toFixed(0) + 'px';
+          pel.style.transform = `translate(-50%, -54%) rotate(${(tilt + runTilt).toFixed(2)}deg)`;
+        }
       } else {
         const half = cur.size * 0.42;
         const sx = Math.max(half, Math.min(innerWidth - half, cur.x - scrollX));
@@ -2605,37 +2592,6 @@
           pel.style.height = cur.size.toFixed(0) + 'px';
           pel.style.transform = `translate(-50%, -54%) rotate(${tilt.toFixed(2)}deg)`;
         }
-      }
-    }
-
-    /* ---- Phone: the inline Pip travels with the story ----
-       Each stop is inline in the column, so he never covers text or clips,
-       but he is no static sticker: every frame he sweeps horizontally as he
-       passes (a real traveller crossing the page), floats on a parallax
-       offset, leans into the scroll, springs a little hop as he arrives, and
-       swells a touch. The desktop motion vocabulary, retuned for the phone. */
-    if (!reduced && innerWidth < 600 && mStops.length) {
-      const reach = Math.min(innerWidth * 0.30, 118);   /* how far he swings sideways */
-      for (const m of mStops) {
-        if (!m.img) continue;
-        const r = m.el.getBoundingClientRect();
-        if (r.bottom < -180 || r.top > innerHeight + 180) continue;
-        /* progress of his CENTRE across the viewport: 0 at the bottom edge,
-           0.5 dead-centre, 1 at the top edge */
-        const pc = clamp01((innerHeight - (r.top + r.height / 2)) / innerHeight);
-        const cross = (0.5 - pc) * 2;                     /* +1 entering low → −1 leaving high */
-        const pass  = Math.sin(clamp01(pc) * Math.PI);    /* 0 at the edges, 1 mid-pass */
-        /* He swings in wide from his side, sails through the centre, and out
-           the far side — a real traverse, not a hover. */
-        const driftX = m.side * cross * reach;
-        const parY   = cross * 46;                        /* strong vertical parallax */
-        const bob    = Math.sin(t * 1.5 + m.phase) * 7;
-        const idle   = Math.sin(t * 0.7 + m.phase) * 2.6;
-        const lean   = clampf(scrollVel * 0.34, -13, 13); /* leans into your scroll */
-        const hop    = -15 * Math.sin(clamp01((pc - 0.15) / 0.5) * Math.PI);
-        const sc     = 0.9 + pass * 0.13;                 /* swells as he passes close */
-        m.img.style.transform =
-          `translate(${driftX.toFixed(1)}px, ${(bob + parY + hop).toFixed(1)}px) rotate(${(idle + lean * 0.5).toFixed(2)}deg) scale(${sc.toFixed(3)})`;
       }
     }
 
@@ -2760,22 +2716,6 @@
 
       scrubStar.style.transform = `rotate(${scrubP * 540}deg)`;
       chipEls.forEach((c, i) => c.classList.toggle('pop', scrubP > 0.32 + i * 0.28));
-
-      /* Phone: Pip sprints rightward across the band as the sentence scrubs
-         left beneath him — a side-scroller run. Quick footfalls bounce him,
-         his body sways, and he digs in a touch faster mid-stride. */
-      if (mRunImg && innerWidth < 600) {
-        if (reduced) {
-          mRunImg.style.transform = `translateX(${(innerWidth * 0.34).toFixed(0)}px)`;
-        } else {
-          const runX = (-0.14 + scrubP * 1.16) * innerWidth;   /* off-left → off-right */
-          const step = Math.abs(Math.sin(t * 7.2));             /* footfalls ~2.3/sec */
-          const hop  = step * -15;                              /* bounce up each stride */
-          const sway = Math.sin(t * 3.6) * 3.2;                 /* body rock with the run */
-          mRunImg.style.transform =
-            `translate(${runX.toFixed(1)}px, ${hop.toFixed(1)}px) rotate(${(3 + sway).toFixed(2)}deg)`;
-        }
-      }
     }
 
     /* Glyphs drift on mouse parallax */
