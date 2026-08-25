@@ -1388,14 +1388,17 @@
     .mascot { display: none; }
     .m-stop {
       display: block;
-      margin: clamp(30px, 9vw, 66px) 0 clamp(4px, 2vw, 14px);
+      /* pivot centred so the JS fly-through sweep swings him wide across the
+         screen yet keeps him on-frame; data-side only sets the swing direction */
+      text-align: center;
+      margin: clamp(34px, 10vw, 74px) 0 clamp(4px, 2vw, 14px);
       opacity: 0;
       transition: opacity .7s ease, transform .85s cubic-bezier(.22,1,.36,1);
       will-change: transform, opacity;
     }
-    .m-stop[data-side="right"]  { text-align: right; transform: translate(36px, 28px); }
-    .m-stop[data-side="left"]   { text-align: left;  transform: translate(-36px, 28px); }
-    .m-stop[data-side="center"] { text-align: center; transform: translateY(28px); }
+    .m-stop[data-side="right"]  { transform: translate(30px, 26px); }
+    .m-stop[data-side="left"]   { transform: translate(-30px, 26px); }
+    .m-stop[data-side="center"] { transform: translateY(26px); }
     .m-stop.in { opacity: 1; transform: none; }
     .m-stop img {
       display: inline-block;
@@ -2589,20 +2592,25 @@
        offset, leans into the scroll, springs a little hop as he arrives, and
        swells a touch. The desktop motion vocabulary, retuned for the phone. */
     if (!reduced && innerWidth < 600 && mStops.length) {
+      const reach = Math.min(innerWidth * 0.30, 118);   /* how far he swings sideways */
       for (const m of mStops) {
         if (!m.img) continue;
         const r = m.el.getBoundingClientRect();
-        if (r.bottom < -120 || r.top > innerHeight + 120) continue;
-        const p = clamp01((innerHeight - r.top) / (innerHeight + r.height));
-        const cross = 0.5 - p;                              /* +.5 entering → −.5 leaving */
-        const driftX = m.side * cross * 34;                 /* sweeps ~17px each way across */
-        const parY   = cross * 24;                          /* gentle vertical parallax */
-        const bob    = Math.sin(t * 1.5 + m.phase) * 6;
-        const idle   = Math.sin(t * 0.7 + m.phase) * 2.1;
-        const lean   = clampf(scrollVel * 0.28, -9, 9);
-        const hopW   = clamp01((p - 0.12) / 0.16) * clamp01((0.52 - p) / 0.34);
-        const hop    = Math.sin(hopW * Math.PI) * -13;      /* a spring as he arrives */
-        const sc     = 0.93 + clamp01((p - 0.04) / 0.28) * 0.07;
+        if (r.bottom < -180 || r.top > innerHeight + 180) continue;
+        /* progress of his CENTRE across the viewport: 0 at the bottom edge,
+           0.5 dead-centre, 1 at the top edge */
+        const pc = clamp01((innerHeight - (r.top + r.height / 2)) / innerHeight);
+        const cross = (0.5 - pc) * 2;                     /* +1 entering low → −1 leaving high */
+        const pass  = Math.sin(clamp01(pc) * Math.PI);    /* 0 at the edges, 1 mid-pass */
+        /* He swings in wide from his side, sails through the centre, and out
+           the far side — a real traverse, not a hover. */
+        const driftX = m.side * cross * reach;
+        const parY   = cross * 46;                        /* strong vertical parallax */
+        const bob    = Math.sin(t * 1.5 + m.phase) * 7;
+        const idle   = Math.sin(t * 0.7 + m.phase) * 2.6;
+        const lean   = clampf(scrollVel * 0.34, -13, 13); /* leans into your scroll */
+        const hop    = -15 * Math.sin(clamp01((pc - 0.15) / 0.5) * Math.PI);
+        const sc     = 0.9 + pass * 0.13;                 /* swells as he passes close */
         m.img.style.transform =
           `translate(${driftX.toFixed(1)}px, ${(bob + parY + hop).toFixed(1)}px) rotate(${(idle + lean * 0.5).toFixed(2)}deg) scale(${sc.toFixed(3)})`;
       }
