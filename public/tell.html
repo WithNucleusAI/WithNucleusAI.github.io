@@ -1399,10 +1399,16 @@
     .m-stop.in { opacity: 1; transform: none; }
     .m-stop img {
       display: inline-block;
-      height: clamp(140px, 41vw, 178px);
-      width: auto; max-width: 94%;
-      animation: m-float 4.6s ease-in-out infinite;
+      height: clamp(154px, 45vw, 196px);
+      width: auto; max-width: 90%;
+      will-change: transform;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      /* a whisper of depth so he sits on the paper, not floats above it */
+      filter: drop-shadow(0 7px 11px rgba(28, 18, 10, .10));
     }
+    /* No-JS fallback: if the motion engine never runs, Pip still breathes */
+    html:not(.js) .m-stop img { animation: m-float 4.6s ease-in-out infinite; }
 
     /* Hero — headline sized to the column (no more clipped STORY), and a
        tighter top so the story starts sooner */
@@ -2211,6 +2217,7 @@
   /* Waypoints + colored-artifact parallax anchors */
   let anchors = [];
   let arts = [];
+  let mStops = [];   /* phone: the inline Pip stops, driven per-frame */
   const measure = () => {
     const narrow = innerWidth < 600;
     anchors = [...document.querySelectorAll('[data-mascot]')].map((el) => {
@@ -2231,6 +2238,12 @@
       const r = el.getBoundingClientRect();
       return { el, y: r.top + scrollY + r.height / 2, depth: parseFloat(el.dataset.depth) || 0.12, rot: parseFloat(el.dataset.rot) || 0 };
     });
+    mStops = [...document.querySelectorAll('.m-stop')].map((el, i) => ({
+      el,
+      img: el.querySelector('img'),
+      side: el.dataset.side === 'left' ? -1 : (el.dataset.side === 'center' ? 0 : 1),
+      phase: i * 1.9,
+    }));
     const sb = document.getElementById('scrubBand');
     if (sb) {
       scrubGeo = {
@@ -2554,19 +2567,8 @@
     if (mascotEl) {
       const pel = poseMap[curPose];
       if (innerWidth < 600) {
-        /* Phones: the character is docked in the bottom-right corner by CSS
-           (anchored by its own box, so no pose is ever clipped off-screen).
-           It stays alive — a soft idle float, a hop each time it changes
-           pose, and a lean into the scroll — without leaving the corner. */
-        const hopP = reduced ? 1 : Math.min(1, (ms - poseHopStart) / 520);
-        const hop = reduced ? 0 : Math.sin(hopP * Math.PI) * -16;      /* up then settle */
-        const lean = reduced ? 0 : Math.max(-7, Math.min(7, scrollVel * 0.3));
-        mascotEl.style.transform = 'none';
-        if (pel) {
-          pel.style.height = cur.size.toFixed(0) + 'px';
-          pel.style.transform =
-            `translateY(${(bobY + hop).toFixed(1)}px) rotate(${((Math.sin(t * 0.7) * 1.6) + lean * 0.5).toFixed(2)}deg)`;
-        }
+        /* Phones: the fixed traveller steps aside — Pip lives inline in the
+           column, driven by the mobile stop engine just below. */
       } else {
         const half = cur.size * 0.42;
         const sx = Math.max(half, Math.min(innerWidth - half, cur.x - scrollX));
@@ -2577,6 +2579,32 @@
           pel.style.height = cur.size.toFixed(0) + 'px';
           pel.style.transform = `translate(-50%, -54%) rotate(${tilt.toFixed(2)}deg)`;
         }
+      }
+    }
+
+    /* ---- Phone: the inline Pip travels with the story ----
+       Each stop is inline in the column, so he never covers text or clips,
+       but he is no static sticker: every frame he sweeps horizontally as he
+       passes (a real traveller crossing the page), floats on a parallax
+       offset, leans into the scroll, springs a little hop as he arrives, and
+       swells a touch. The desktop motion vocabulary, retuned for the phone. */
+    if (!reduced && innerWidth < 600 && mStops.length) {
+      for (const m of mStops) {
+        if (!m.img) continue;
+        const r = m.el.getBoundingClientRect();
+        if (r.bottom < -120 || r.top > innerHeight + 120) continue;
+        const p = clamp01((innerHeight - r.top) / (innerHeight + r.height));
+        const cross = 0.5 - p;                              /* +.5 entering → −.5 leaving */
+        const driftX = m.side * cross * 34;                 /* sweeps ~17px each way across */
+        const parY   = cross * 24;                          /* gentle vertical parallax */
+        const bob    = Math.sin(t * 1.5 + m.phase) * 6;
+        const idle   = Math.sin(t * 0.7 + m.phase) * 2.1;
+        const lean   = clampf(scrollVel * 0.28, -9, 9);
+        const hopW   = clamp01((p - 0.12) / 0.16) * clamp01((0.52 - p) / 0.34);
+        const hop    = Math.sin(hopW * Math.PI) * -13;      /* a spring as he arrives */
+        const sc     = 0.93 + clamp01((p - 0.04) / 0.28) * 0.07;
+        m.img.style.transform =
+          `translate(${driftX.toFixed(1)}px, ${(bob + parY + hop).toFixed(1)}px) rotate(${(idle + lean * 0.5).toFixed(2)}deg) scale(${sc.toFixed(3)})`;
       }
     }
 
