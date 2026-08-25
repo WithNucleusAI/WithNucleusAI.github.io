@@ -559,6 +559,9 @@
      (where the fixed traveller does the job); on phones they place him in
      each section's whitespace so he scrolls up the page with the story. */
   .m-stop { display: none; }
+  /* The running Pip inside the scrub band — phone only (desktop's fixed
+     traveller sprints through there already) */
+  .m-run { display: none; }
   @keyframes m-float {
     0%, 100% { transform: translateY(0) rotate(-1deg); }
     50%      { transform: translateY(-9px) rotate(1.5deg); }
@@ -1413,6 +1416,22 @@
     /* No-JS fallback: if the motion engine never runs, Pip still breathes */
     html:not(.js) .m-stop img { animation: m-float 4.6s ease-in-out infinite; }
 
+    /* Pip runs across the pinned scrub band, below the scrubbing sentence */
+    .m-run {
+      display: block;
+      position: absolute;
+      left: 0; bottom: 11%;
+      z-index: 7;
+      pointer-events: none;
+      will-change: transform;
+    }
+    .m-run img {
+      display: block;
+      height: clamp(116px, 32vw, 148px);
+      width: auto; max-width: none;
+      filter: drop-shadow(0 7px 11px rgba(28, 18, 10, .12));
+    }
+
     /* Hero — headline sized to the column (no more clipped STORY), and a
        tighter top so the story starts sooner */
     .hero { padding-top: 118px; min-height: 90vh; padding-bottom: 56px; }
@@ -1711,6 +1730,8 @@
           </g>
         </svg>
       </div>
+      <!-- Phone: Pip sprints across the pinned band as the sentence scrubs -->
+      <div class="m-run" aria-hidden="true"><img data-pip="sprint" alt="" width="1000" height="566"></div>
     </div>
     <div data-mascot data-pose="sprint" data-size="242" style="left: 7%; top: 62%; width: 260px; height: 260px;"></div>
   </section>
@@ -2113,6 +2134,8 @@
   /* Pinned scrub band + glyph decorations */
   const scrubTrack = document.getElementById('scrubTrack');
   const scrubStar = document.getElementById('scrubStar');
+  const mRun = document.querySelector('.m-run');
+  const mRunImg = mRun ? mRun.querySelector('img') : null;
   const chipEls = [...document.querySelectorAll('.chip')];
   const bezPath = document.getElementById('bezPath');
   const bezL1 = document.getElementById('bezL1');
@@ -2737,6 +2760,22 @@
 
       scrubStar.style.transform = `rotate(${scrubP * 540}deg)`;
       chipEls.forEach((c, i) => c.classList.toggle('pop', scrubP > 0.32 + i * 0.28));
+
+      /* Phone: Pip sprints rightward across the band as the sentence scrubs
+         left beneath him — a side-scroller run. Quick footfalls bounce him,
+         his body sways, and he digs in a touch faster mid-stride. */
+      if (mRunImg && innerWidth < 600) {
+        if (reduced) {
+          mRunImg.style.transform = `translateX(${(innerWidth * 0.34).toFixed(0)}px)`;
+        } else {
+          const runX = (-0.14 + scrubP * 1.16) * innerWidth;   /* off-left → off-right */
+          const step = Math.abs(Math.sin(t * 7.2));             /* footfalls ~2.3/sec */
+          const hop  = step * -15;                              /* bounce up each stride */
+          const sway = Math.sin(t * 3.6) * 3.2;                 /* body rock with the run */
+          mRunImg.style.transform =
+            `translate(${runX.toFixed(1)}px, ${hop.toFixed(1)}px) rotate(${(3 + sway).toFixed(2)}deg)`;
+        }
+      }
     }
 
     /* Glyphs drift on mouse parallax */
