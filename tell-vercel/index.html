@@ -1143,6 +1143,20 @@
     46% { transform: translate(-40px, 30px) rotate(-8deg); opacity: 0; }
     100% { transform: translate(0,0) rotate(0); opacity: 1; }
   }
+  /* Honeypot — invisible to people, catnip to bots */
+  .hp-field {
+    position: absolute !important; left: -9999px !important;
+    width: 1px; height: 1px; opacity: 0; overflow: hidden;
+  }
+  /* Submission status line */
+  .form-status {
+    margin-top: 16px; min-height: 1.2em;
+    font-size: 14px; line-height: 1.5; color: var(--muted);
+    opacity: 0; transform: translateY(4px);
+    transition: opacity .35s ease, transform .35s ease;
+  }
+  .form-status.show { opacity: 1; transform: none; }
+  .form-status.is-error { color: var(--crimson); }
 
   /* ============================================
      Footer
@@ -1788,19 +1802,28 @@
         </svg>
       </div>
     </div>
-    <form class="contact-form reveal" action="#" method="post" id="contactForm">
+    <form class="contact-form reveal" id="contactForm"
+          action="https://api.web3forms.com/submit" method="POST">
+      <!-- Web3Forms delivers each submission to hello@tell.art. The access key
+           is public by design — it only names the destination inbox, and spam
+           is caught by the honeypot below. -->
+      <input type="hidden" name="access_key" value="PASTE-YOUR-WEB3FORMS-ACCESS-KEY">
+      <input type="hidden" name="subject" value="New enquiry via tell.art">
+      <input type="hidden" name="from_name" value="tell.art">
+      <!-- Honeypot: hidden from people, filled only by bots -->
+      <input type="checkbox" name="botcheck" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="field-wrap">
-        <input class="field" id="f-name" type="text" name="name" placeholder=" " autocomplete="name">
+        <input class="field" id="f-name" type="text" name="name" placeholder=" " autocomplete="name" required>
         <label class="field-label" for="f-name">Your name</label>
         <span class="field-line" aria-hidden="true"></span>
       </div>
       <div class="field-wrap">
-        <input class="field" id="f-email" type="email" name="email" placeholder=" " autocomplete="email">
+        <input class="field" id="f-email" type="email" name="email" placeholder=" " autocomplete="email" required>
         <label class="field-label" for="f-email">Email address</label>
         <span class="field-line" aria-hidden="true"></span>
       </div>
       <div class="field-wrap">
-        <textarea class="field" id="f-msg" name="message" placeholder=" "></textarea>
+        <textarea class="field" id="f-msg" name="message" placeholder=" " required></textarea>
         <label class="field-label" for="f-msg">Tell us briefly, what are you looking for?</label>
         <span class="field-line" aria-hidden="true"></span>
       </div>
@@ -1811,6 +1834,7 @@
             <path d="M22 2 L11 13 M22 2 L15 22 L11 13 L2 9 Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/>
           </svg>
         </button>
+        <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
       </div>
     </form>
     <div data-mascot data-pose="listen" data-size="300" style="right: 8%; top: 18%; width: 300px; height: 300px;"></div>
@@ -2087,19 +2111,50 @@
   /* Contact — the paper plane takes off when the story is sent */
   const contactForm = document.getElementById('contactForm');
   const sendBtn = document.getElementById('sendBtn');
+  const formStatus = document.getElementById('formStatus');
   if (contactForm && sendBtn) {
     const label = sendBtn.querySelector('.send-btn__label');
     const original = label.textContent;
-    contactForm.addEventListener('submit', (e) => {
+    let busy = false;
+    const say = (msg, isError) => {
+      if (!formStatus) return;
+      formStatus.textContent = msg;
+      formStatus.classList.toggle('is-error', !!isError);
+      formStatus.classList.toggle('show', !!msg);
+    };
+    contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (sendBtn.classList.contains('sent')) return;
+      if (busy) return;
+      /* native required / email validation first */
+      if (typeof contactForm.reportValidity === 'function' && !contactForm.reportValidity()) return;
+      busy = true;
+      say('');
       sendBtn.classList.add('sent');
-      setTimeout(() => { label.textContent = 'On its way —'; }, 380);
-      setTimeout(() => {
+      const flyTimer = setTimeout(() => { label.textContent = 'On its way —'; }, 380);
+      try {
+        const res = await fetch(contactForm.action, {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: new FormData(contactForm),
+        });
+        const data = await res.json().catch(() => ({}));
+        clearTimeout(flyTimer);
+        if (res.ok && data.success !== false) {
+          label.textContent = 'Sent —';
+          say("Thanks — we'll be in touch soon.");
+          contactForm.reset();
+          setTimeout(() => { sendBtn.classList.remove('sent'); label.textContent = original; }, 2600);
+        } else {
+          throw new Error((data && data.message) || 'send failed');
+        }
+      } catch (err) {
+        clearTimeout(flyTimer);
         sendBtn.classList.remove('sent');
         label.textContent = original;
-        contactForm.reset();
-      }, 2600);
+        say('That didn’t send — please email hello@tell.art directly.', true);
+      } finally {
+        busy = false;
+      }
     });
   }
 
