@@ -1423,7 +1423,13 @@
        traveller covers every section, driven by the JS below. */
     .m-stop, .m-run { display: none; }
     html.js .mascot { display: block; }
-    .mascot__pose { filter: drop-shadow(0 8px 13px rgba(28, 18, 10, .13)); }
+    .mascot__pose {
+      filter: drop-shadow(0 8px 13px rgba(28, 18, 10, .13));
+      /* own GPU layer: the per-frame rotate composites and the shadow
+         rasterizes once, instead of re-running the filter every frame */
+      will-change: transform;
+      backface-visibility: hidden;
+    }
 
     /* Hero — headline sized to the column (no more clipped STORY), and a
        tighter top so the story starts sooner */
@@ -2452,6 +2458,8 @@
   let prevX = cur.x;
   let lastPose = null;        /* to fire a little hop when the pose changes */
   let poseHopStart = -9999;
+  let lastPoseEl = null;      /* only rewrite the pose height when it changes */
+  let lastSizePx = -1;        /* (writing height every frame forces layout) */
   let bubbleHold = false; /* overture: hold the mascot off-stage during the intro */
   let prevScroll = scrollY;
   let scrollVel = 0;
@@ -2614,7 +2622,10 @@
        a small idle bob + a gentle lean into its travel. Not a video. */
     const swayX = reduced ? 0 : Math.sin(t * 0.7) * 6;
     const bobY  = reduced ? 0 : Math.sin(t * 1.45) * 5;
-    const k = reduced ? 1 : 0.072;
+    /* Frame-rate-independent follow: the mascot keeps the same easing speed
+       whether the device renders at 60fps or dips to 30, so it never trails
+       the scroll on a slow frame. Identical to the old 0.072 at 60fps. */
+    const k = reduced ? 1 : 1 - Math.pow(1 - 0.072, dt * 60);
     if (!bubbleHold) {
       cur.x += (tg.x - cur.x) * k;
       cur.y += (tg.y - cur.y) * k;
@@ -2627,6 +2638,16 @@
 
     if (mascotEl) {
       const pel = poseMap[curPose];
+      /* Height changes trigger layout, so only write it when it actually
+         moves (pose swap or an eased size step) — not every frame. The
+         per-frame motion rides on transform alone, which the GPU composites. */
+      if (pel) {
+        const sizePx = Math.round(cur.size);
+        if (pel !== lastPoseEl || sizePx !== lastSizePx) {
+          pel.style.height = sizePx + 'px';
+          lastPoseEl = pel; lastSizePx = sizePx;
+        }
+      }
       if (innerWidth < 600) {
         /* Phones: the SAME continuous traveller as desktop, tuned smaller.
            One character on one scroll-driven path — weaving down the page,
@@ -2643,20 +2664,14 @@
         const runTilt = (curPose === 'sprint' && !reduced) ? Math.sin(t * 3.3) * 2.4 : 0;
         mascotEl.style.transform =
           `translate3d(${sx.toFixed(1)}px, ${(sy + bobY + runHop).toFixed(1)}px, 0)`;
-        if (pel) {
-          pel.style.height = cur.size.toFixed(0) + 'px';
-          pel.style.transform = `translate(-50%, -54%) rotate(${(tilt + runTilt).toFixed(2)}deg)`;
-        }
+        if (pel) pel.style.transform = `translate(-50%, -54%) rotate(${(tilt + runTilt).toFixed(2)}deg)`;
       } else {
         const half = cur.size * 0.42;
         const sx = Math.max(half, Math.min(innerWidth - half, cur.x - scrollX));
         const sy = Math.max(96 + cur.size * 0.4, cur.y - scrollY);  /* clear of the header */
         mascotEl.style.transform =
           `translate3d(${(sx + swayX).toFixed(1)}px, ${(sy + bobY).toFixed(1)}px, 0)`;
-        if (pel) {
-          pel.style.height = cur.size.toFixed(0) + 'px';
-          pel.style.transform = `translate(-50%, -54%) rotate(${tilt.toFixed(2)}deg)`;
-        }
+        if (pel) pel.style.transform = `translate(-50%, -54%) rotate(${tilt.toFixed(2)}deg)`;
       }
     }
 
