@@ -818,6 +818,23 @@
   .work-item:hover .work-item__index { color: var(--crimson); }
   .work-item:hover .work-item__name { color: var(--crimson); transform: translateX(10px); }
   .work-item:hover .work-item__arrow { opacity: 1; transform: none; }
+  /* An honest "coming soon" row — not a project, a promise */
+  .work-item--soon { cursor: default; }
+  .work-item--soon .work-item__index { color: var(--faint); }
+  .work-item--soon .work-item__name { color: var(--faint); font-weight: 400; }
+  .work-soon {
+    margin-left: auto; align-self: center;
+    display: inline-flex; align-items: center; gap: 9px;
+    font-size: 11px; letter-spacing: .09em; text-transform: uppercase;
+    color: var(--crimson); white-space: nowrap;
+  }
+  .work-soon::before {
+    content: ""; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--crimson); animation: soon-pulse 1.9s ease-in-out infinite;
+  }
+  @keyframes soon-pulse { 0%, 100% { opacity: .3; transform: scale(.7); } 50% { opacity: 1; transform: scale(1.1); } }
+  @media (prefers-reduced-motion: reduce) { .work-soon::before { animation: none; opacity: 1; } }
+  .work-note strong { color: var(--crimson); font-weight: 600; }
   .work-note {
     margin-top: clamp(30px, 3.2vw, 46px); max-width: 460px;
     font-size: 15px; line-height: 1.55; color: var(--muted);
@@ -1577,29 +1594,22 @@
     <div class="section-head">
       <span class="eyebrow reveal">Selected Work</span>
       <h2 class="heading-lg lines">Stories<br>We've Told</h2>
-      <span class="section-count reveal" aria-hidden="true">Selected<span>·</span>2023–25</span>
+      <span class="section-count reveal" aria-hidden="true">Now live<span>·</span>2026</span>
     </div>
     <div class="work-list" data-stagger>
-      <a class="work-item" href="#contact">
+      <a class="work-item" href="https://inland-industrial.vercel.app" target="_blank" rel="noopener noreferrer">
         <span class="work-item__index">01</span>
-        <span class="work-item__name">Harbor &amp; Pine</span>
-        <span class="work-item__meta">Heritage brand · 2024</span>
-        <span class="work-item__arrow" aria-hidden="true">→</span>
+        <span class="work-item__name">Inland Industrial Tire</span>
+        <span class="work-item__meta">Industrial · Brand &amp; web</span>
+        <span class="work-item__arrow" aria-hidden="true">↗</span>
       </a>
-      <a class="work-item" href="#contact">
+      <div class="work-item work-item--soon">
         <span class="work-item__index">02</span>
-        <span class="work-item__name">Lumen Health</span>
-        <span class="work-item__meta">Digital identity · 2025</span>
-        <span class="work-item__arrow" aria-hidden="true">→</span>
-      </a>
-      <a class="work-item" href="#contact">
-        <span class="work-item__index">03</span>
-        <span class="work-item__name">Fieldnote</span>
-        <span class="work-item__meta">Brand &amp; web · 2024</span>
-        <span class="work-item__arrow" aria-hidden="true">→</span>
-      </a>
+        <span class="work-item__name">New work, under wraps</span>
+        <span class="work-soon">Revealing next week</span>
+      </div>
     </div>
-    <p class="work-note reveal">A young studio — more stories in the making. <a href="#contact">Yours could be the next one.</a></p>
+    <p class="work-note reveal">Fresh off the studio floor — <strong>more reveals coming next week.</strong> <a href="#contact">Yours could be the next one.</a></p>
 
     <div data-mascot data-pose="proud" data-size="300" style="right: 6%; top: 26%; width: 300px; height: 300px;"></div>
     <div class="m-stop" data-side="left" aria-hidden="true"><img data-pip="proud" alt="" width="785" height="900"></div>
@@ -2214,7 +2224,7 @@
        the open bands (scrub, footer), and lifted high at the hero so he flies
        past the headline near the header rather than sitting on the lead.
        On desktop he follows each anchor's own placement. */
-    const MX = { hero: 0.72, proud: 0.2, pen: 0.8, sprint: 0.5, relax: 0.2, listen: 0.8, base: 0.5 };
+    const MX = { hero: 0.72, proud: 0.78, pen: 0.8, sprint: 0.5, relax: 0.2, listen: 0.8, base: 0.5 };
     const MY = { hero: 0.12 };   /* vertical spot within the anchor box (0.5 = centre) */
     anchors = [...document.querySelectorAll('[data-mascot]')].map((el) => {
       const r = el.getBoundingClientRect();
