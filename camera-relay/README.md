@@ -120,15 +120,48 @@ You're doing this over your remote-desktop session into the India laptop.
 
 ---
 
-## Microphone options (your voice)
-- **Easiest:** enable microphone redirection in your remote-desktop tool (RDP:
-  *Local Resources → Microphone*; AnyDesk/Chrome Remote Desktop have audio
-  options). Then the meeting's mic = your CA mic via the remote session. No extra
-  setup.
-- **Over the relay (better quality):** the sender already muxes your mic into the
-  stream. On the India laptop, route that audio into a virtual mic —
-  Windows: **VB-Audio Cable** (OBS → Monitor to the cable → meeting mic = cable);
-  Linux: a **PulseAudio null sink** fed by ffmpeg, selected as the mic.
+## Microphone — your voice from California
+Your mic is already muxed into the relay stream (the sender captures it). You
+just expose it on the India laptop as a virtual **microphone** the meeting
+selects. Two ways:
+
+- **Easiest (no extra setup):** enable microphone redirection in your
+  remote-desktop tool (RDP: *Local Resources → Microphone*; AnyDesk / Chrome
+  Remote Desktop have audio options). The meeting's mic then = your CA mic via
+  the remote session. Fine for talking; quality is compressed.
+- **Over the relay (cleaner, in sync with your video):** turn the stream's audio
+  into a virtual mic on the India laptop, per OS below.
+
+**Linux — one script:**
+```bash
+cd camera-relay/receiver
+bash virtual-mic-linux.sh        # creates a "RelayMic" device + starts routing
+# in the meeting app, pick microphone = "RelayMic";  Ctrl+C to stop
+bash virtual-mic-linux.sh teardown   # removes it when done
+```
+It builds a PulseAudio/PipeWire null sink + remapped source and feeds the
+stream's audio into it with ffmpeg. Runs alongside your video path (OBS Virtual
+Camera or `receive-to-vcam-linux.sh`).
+
+**Windows — reuse the OBS you're already receiving video in:**
+1. Install **VB-Audio Cable** (creates "CABLE Input" / "CABLE Output"), reboot.
+2. In OBS: Settings → **Audio** → Advanced → **Monitoring Device** = *CABLE Input*.
+3. Right-click the Media Source → **Advanced Audio Properties** → set *Audio
+   Monitoring* to **Monitor Only (mute output)**.
+4. In the meeting, pick microphone = **CABLE Output**. (Your face is still OBS
+   Virtual Camera.)
+
+**macOS — same idea with BlackHole:**
+1. Install **BlackHole (2ch)**.
+2. OBS → Settings → **Audio** → **Monitoring Device** = *BlackHole 2ch*; set the
+   media source to **Monitor Only**.
+3. Meeting microphone = **BlackHole 2ch**.
+
+The Windows/macOS routes reuse the single OBS instance already pulling the
+stream, so your mic and camera come from one decode and stay in lip-sync. The
+Linux script pulls audio as a second reader — perfect for meetings, with a
+possible fraction-of-a-second offset from the video; for tight sync on Linux
+too, do both from one ffmpeg (video → v4l2loopback, audio → the null sink).
 
 ## Latency & quality — set expectations
 Your camera travels CA → Mumbai → India laptop → meeting. Expect roughly a
@@ -167,5 +200,6 @@ camera-relay/
 ├── sender/
 │   └── send-webcam.sh               # California: ffmpeg webcam -> relay
 └── receiver/
-    └── receive-to-vcam-linux.sh     # India (Linux): relay -> /dev/video virtual cam
+    ├── receive-to-vcam-linux.sh     # India (Linux): relay -> /dev/video virtual cam
+    └── virtual-mic-linux.sh         # India (Linux): relay audio -> "RelayMic" virtual mic
 ```
