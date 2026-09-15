@@ -95,6 +95,11 @@ script if `/dev/video0` / avfoundation `0:0` isn't your camera).
 
 You're doing this over your remote-desktop session into the India laptop.
 
+> **India laptop is a Mac?** Follow **[`receiver/macos-setup.md`](receiver/macos-setup.md)**
+> — a start-to-finish macOS runbook (OBS Virtual Camera + BlackHole mic, exact
+> permissions, and per-platform device menus). The generic steps below are the
+> same idea in short form.
+
 **OBS (Windows/macOS/Linux — the cross-platform way):**
 1. Add a **Media Source** → uncheck *Local File*.
 2. Input: `srt://RELAY_IP:8890?streamid=read:cam:viewer:YOUR_VIEW_PASSWORD`
@@ -200,6 +205,7 @@ camera-relay/
 ├── sender/
 │   └── send-webcam.sh               # California: ffmpeg webcam -> relay
 └── receiver/
+    ├── macos-setup.md               # India Mac: full OBS Virtual Camera + BlackHole runbook
     ├── receive-to-vcam-linux.sh     # India (Linux): relay -> /dev/video virtual cam
     └── virtual-mic-linux.sh         # India (Linux): relay audio -> "RelayMic" virtual mic
 ```
