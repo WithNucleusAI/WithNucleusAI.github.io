@@ -1,0 +1,61 @@
+# MediaMTX relay config — carries ONE camera stream (path: cam) from
+# California -> India over SRT (low-latency) with RTMP as a fallback.
+#
+# This box only relays your webcam. Your meeting traffic never touches it,
+# so it is NOT a VPN and does not change the IP the meeting sees.
+#
+# Before use: replace the two CHANGE_ME passwords below with long random
+# strings (e.g. `openssl rand -hex 24`). The same values go into the
+# sender/receiver stream URLs.
+
+logLevel: info
+
+###############################################################################
+# Protocols
+###############################################################################
+
+# SRT — primary transport. Low latency, survives packet loss on the open
+# internet far better than RTMP. UDP/8890.
+srt: yes
+srtAddress: :8890
+
+# RTMP — fallback if a client can't do SRT. TCP/1935.
+rtmp: yes
+rtmpAddress: :1935
+
+# Everything else off — we don't need it and it only widens the attack surface.
+rtsp: no
+hls: no
+webrtc: no
+api: no
+metrics: no
+pprof: no
+playback: no
+
+###############################################################################
+# Auth — a publisher (California) and a viewer (India), scoped to path "cam".
+# Credentials travel inside the SRT/RTMP streamid (see sender/receiver).
+###############################################################################
+
+authInternalUsers:
+  - user: publisher
+    pass: CHANGE_ME_PUBLISH_PASSWORD
+    ips: []
+    permissions:
+      - action: publish
+        path: cam
+  - user: viewer
+    pass: CHANGE_ME_VIEW_PASSWORD
+    ips: []
+    permissions:
+      - action: read
+        path: cam
+
+###############################################################################
+# Path
+###############################################################################
+
+paths:
+  cam:
+    # Drop the feed if the publisher disconnects so a stale frame isn't served.
+    source: publisher

@@ -1,0 +1,12 @@
+# Runs the MediaMTX relay on your VPS.
+#   docker compose up -d
+# host networking so SRT (UDP/8890) and RTMP (TCP/1935) bind directly to the
+# public interface — SRT is UDP and does not play well with docker's NAT.
+services:
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    container_name: camera-relay
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./mediamtx.yml:/mediamtx.yml:ro
