@@ -5,11 +5,9 @@ meeting **on a laptop physically in India** (so it exits from a real Indian
 residential IP — no VPN) while your **actual webcam in California** appears as
 the camera. You sit in California and drive the whole thing.
 
-> This is for a meeting you're invited to, working around what looks like a
-> broken geo-check. Fastest real fix is still to ask the host to disable the
-> region restriction — if it's the bug you think it is, that's a one-click
-> change and none of the below is needed. Also confirm doing this doesn't
-> violate the platform's or organizer's terms for the meeting.
+> This is for a meeting you're invited to, working around a geo-check on your
+> own side without involving the other party. Use it for access you're entitled
+> to — not to make false claims about where you're based.
 
 ## Easy mode — the guided console (`app/`)
 
