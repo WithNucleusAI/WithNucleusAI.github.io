@@ -11,6 +11,27 @@ the camera. You sit in California and drive the whole thing.
 > change and none of the below is needed. Also confirm doing this doesn't
 > violate the platform's or organizer's terms for the meeting.
 
+## Easy mode — the guided console (`app/`)
+
+Prefer a UI over reading this? **[`app/index.html`](app/index.html)** is a
+self-contained, no-install web console that walks a non-technical person through
+the whole thing: you fill in your server address and passwords once, and it
+writes out every command, config file, and URL below with copy buttons; the
+Mac steps are a checklist that remembers your progress; and the last step is a
+live "test my camera & mic" panel to confirm the whole chain works before the
+call.
+
+Open it two ways:
+- **Just open the file** — double-click `app/index.html` (works offline; the
+  camera test needs a normal browser tab with camera permission).
+- **Host it on this site** — it's plain HTML, so it can be served from GitHub
+  Pages like the rest of the repo.
+
+The console can't spin up the server or install the Mac apps for you (a web page
+is sandboxed), so those stay as guided copy-paste steps — everything else it
+fills in and verifies for you. The rest of this README is the same process in
+long form.
+
 ## How it works — two independent layers
 
 ```
@@ -197,6 +218,8 @@ quarter-second of delay — usable, a bit like a satellite call. To keep it smoo
 ```
 camera-relay/
 ├── README.md                        # this runbook
+├── app/
+│   └── index.html                   # the guided web console (easy mode)
 ├── config.env.example               # shared IP + passwords (copy to config.env)
 ├── relay/
 │   ├── mediamtx.yml                 # SRT/RTMP relay config + auth
