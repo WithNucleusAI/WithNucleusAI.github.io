@@ -1,938 +1,656 @@
-<title>Relay Console</title>
-<meta name="description" content="A guided control panel for putting your California camera into a meeting you join from a Mac in India." />
+<title>Camera Bridge Setup</title>
+<meta name="description" content="A gentle, one-step-at-a-time helper that sets up joining a meeting from another country using your own camera — no tech knowledge needed." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Nunito+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
 <style>
   :root {
-    --bg: #eef1f4;
-    --surface: #ffffff;
-    --surface-2: #f4f7f9;
-    --inset: #eef2f5;
-    --border: #dae1e8;
-    --border-strong: #c4ced8;
-    --ink: #101820;
-    --muted: #56626f;
-    --faint: #8894a1;
-    --accent: #0e7490;
-    --accent-2: #0b5f77;
+    --bg: #f1f4f6;
+    --card: #ffffff;
+    --soft: #eef2f5;
+    --inset: #eaeff2;
+    --border: #dde4ea;
+    --border-2: #c9d3db;
+    --ink: #13202a;
+    --muted: #566573;
+    --faint: #8492a0;
+    --accent: #0e8a86;
+    --accent-2: #0a6f6c;
     --accent-ink: #ffffff;
-    --accent-soft: #d9edf1;
-    --accent-line: #9cd0da;
-    --live: #e5484d;
-    --ok: #2f9e44;
-    --ok-soft: #dff2e3;
-    --warn: #b8730a;
-    --warn-soft: #fbeed6;
-    --shadow: 0 1px 2px rgba(16,24,32,.05), 0 6px 20px rgba(16,24,32,.06);
-    --shadow-sm: 0 1px 2px rgba(16,24,32,.06);
-    --radius: 15px;
-    --radius-sm: 9px;
-    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-    --sans: "IBM Plex Sans", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-    --display: "Archivo", var(--sans);
+    --accent-soft: #d7efec;
+    --accent-line: #9dd8d2;
+    --sun: #f2a541;
+    --sun-soft: #fbe6cd;
+    --live: #e5605d;
+    --ok: #2f9e5e;
+    --ok-soft: #daf1e3;
+    --shadow: 0 1px 2px rgba(19,32,42,.04), 0 10px 30px rgba(19,32,42,.08);
+    --shadow-sm: 0 1px 3px rgba(19,32,42,.08);
+    --shadow-lift: 0 2px 6px rgba(14,138,134,.18), 0 12px 26px rgba(14,138,134,.22);
+    --r-lg: 22px;
+    --r-md: 14px;
+    --r-sm: 10px;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    --sans: "Nunito Sans", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    --serif: "Fraunces", Georgia, "Times New Roman", serif;
   }
   :root:not([data-theme="light"]) {
     @media (prefers-color-scheme: dark) {
-      --bg: #0d1219;
-      --surface: #151c26;
-      --surface-2: #1a222d;
-      --inset: #0f151d;
-      --border: #29333f;
-      --border-strong: #384656;
-      --ink: #e8edf3;
-      --muted: #9aa7b6;
-      --faint: #6b7889;
-      --accent: #22b8c6;
-      --accent-2: #3fcbd8;
-      --accent-ink: #05222a;
-      --accent-soft: #10333b;
-      --accent-line: #1c5966;
-      --live: #ff6369;
-      --ok: #51cf66;
-      --ok-soft: #123018;
-      --warn: #f0a742;
-      --warn-soft: #3a2a10;
-      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.36);
-      --shadow-sm: 0 1px 2px rgba(0,0,0,.35);
+      --bg: #0e151b;
+      --card: #17212b;
+      --soft: #1c2732;
+      --inset: #121b23;
+      --border: #2a3742;
+      --border-2: #3a4a57;
+      --ink: #e9eef2;
+      --muted: #9dabb8;
+      --faint: #6d7c8a;
+      --accent: #2fc0ba;
+      --accent-2: #54d3cd;
+      --accent-ink: #04211f;
+      --accent-soft: #103430;
+      --accent-line: #1f5c57;
+      --sun: #f4b45f;
+      --sun-soft: #3a2c12;
+      --live: #ff7773;
+      --ok: #56cf82;
+      --ok-soft: #123322;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 30px rgba(0,0,0,.4);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.4);
+      --shadow-lift: 0 2px 8px rgba(0,0,0,.4), 0 14px 30px rgba(0,0,0,.45);
     }
   }
   :root[data-theme="dark"] {
-    --bg: #0d1219;
-    --surface: #151c26;
-    --surface-2: #1a222d;
-    --inset: #0f151d;
-    --border: #29333f;
-    --border-strong: #384656;
-    --ink: #e8edf3;
-    --muted: #9aa7b6;
-    --faint: #6b7889;
-    --accent: #22b8c6;
-    --accent-2: #3fcbd8;
-    --accent-ink: #05222a;
-    --accent-soft: #10333b;
-    --accent-line: #1c5966;
-    --live: #ff6369;
-    --ok: #51cf66;
-    --ok-soft: #123018;
-    --warn: #f0a742;
-    --warn-soft: #3a2a10;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.36);
-    --shadow-sm: 0 1px 2px rgba(0,0,0,.35);
+    --bg: #0e151b; --card: #17212b; --soft: #1c2732; --inset: #121b23; --border: #2a3742; --border-2: #3a4a57;
+    --ink: #e9eef2; --muted: #9dabb8; --faint: #6d7c8a; --accent: #2fc0ba; --accent-2: #54d3cd; --accent-ink: #04211f;
+    --accent-soft: #103430; --accent-line: #1f5c57; --sun: #f4b45f; --sun-soft: #3a2c12; --live: #ff7773; --ok: #56cf82; --ok-soft: #123322;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 30px rgba(0,0,0,.4); --shadow-sm: 0 1px 3px rgba(0,0,0,.4); --shadow-lift: 0 2px 8px rgba(0,0,0,.4), 0 14px 30px rgba(0,0,0,.45);
   }
 
   * { box-sizing: border-box; }
-  body {
-    background: var(--bg);
-    color: var(--ink);
-    font-family: var(--sans);
-    font-size: 15px;
-    line-height: 1.55;
-    -webkit-font-smoothing: antialiased;
-  }
-  h1, h2, h3 { font-family: var(--display); margin: 0; line-height: 1.15; text-wrap: balance; letter-spacing: -.01em; }
+  html, body { height: 100%; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  h1, h2, h3 { margin: 0; line-height: 1.15; text-wrap: balance; }
   p { margin: 0; }
-  a { color: var(--accent); text-underline-offset: 2px; }
-  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  a { color: var(--accent-2); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+  button { font-family: inherit; }
 
-  /* ---------- shell ---------- */
-  .app { display: grid; grid-template-columns: 264px minmax(0, 1fr); min-height: 100%; }
-  .rail {
-    position: sticky; top: env(safe-area-inset-top, 0px);
-    align-self: start; height: 100dvh;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    padding: 20px 16px; display: flex; flex-direction: column; gap: 6px;
-    overflow-y: auto;
-  }
-  .brand { display: flex; align-items: center; gap: 11px; padding: 6px 8px 16px; }
-  .sig {
-    position: relative; width: 30px; height: 30px; border-radius: 9px; flex: none;
-    background: var(--accent); display: grid; place-items: center; box-shadow: var(--shadow-sm);
-  }
-  .sig::before { content: ""; width: 11px; height: 11px; border-radius: 50%; background: var(--accent-ink); opacity: .92; }
-  .sig[data-live="1"] { background: var(--live); }
-  .sig[data-live="1"]::before { background: #fff; animation: pulse 1.15s ease-in-out infinite; }
-  @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.7); } }
-  @media (prefers-reduced-motion: reduce) { .sig[data-live="1"]::before { animation: none; } }
-  .brand b { font-family: var(--display); font-weight: 800; font-size: 16px; letter-spacing: -.02em; display: block; }
-  .brand span { font-size: 11.5px; color: var(--faint); letter-spacing: .04em; text-transform: uppercase; }
+  /* progress header */
+  .top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+  .bar { height: 5px; background: var(--inset); }
+  .bar > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: 0 4px 4px 0; transition: width .4s cubic-bezier(.4,0,.2,1); }
+  .toprow { display: flex; align-items: center; gap: 12px; max-width: 620px; margin: 0 auto; padding: 11px 18px; }
+  .badge { display: flex; align-items: center; gap: 9px; font-weight: 700; }
+  .badge .dot { width: 24px; height: 24px; border-radius: 8px; background: var(--accent); display: grid; place-items: center; color: var(--accent-ink); }
+  .badge .dot svg { width: 14px; height: 14px; }
+  .badge b { font-size: 15px; letter-spacing: -.01em; }
+  .step-of { margin-left: auto; font-size: 13px; color: var(--faint); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .menu-btn { border: 1px solid var(--border-2); background: var(--card); color: var(--muted); border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+  .menu-btn:hover { color: var(--accent-2); border-color: var(--accent); }
 
-  .rail-label { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); padding: 12px 8px 4px; }
-  .navbtn {
-    display: grid; grid-template-columns: 24px 1fr auto; align-items: center; gap: 11px;
-    width: 100%; text-align: left; border: 0; background: transparent; color: var(--ink);
-    font-family: var(--sans); font-size: 14px; font-weight: 500; padding: 9px 8px; border-radius: 9px; cursor: pointer;
-  }
-  .navbtn:hover { background: var(--surface-2); }
-  .navbtn[aria-current="true"] { background: var(--accent-soft); color: var(--accent-2); font-weight: 600; }
-  .navbtn .n {
-    width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center;
-    font-family: var(--display); font-size: 12.5px; font-weight: 700;
-    background: var(--inset); color: var(--muted); border: 1px solid var(--border);
-  }
-  .navbtn[aria-current="true"] .n { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
-  .navbtn .tick { width: 16px; height: 16px; opacity: 0; color: var(--ok); }
-  .navbtn[data-done="1"] .tick { opacity: 1; }
-  .navbtn[data-done="1"] .n { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+  /* jump sheet */
+  .sheet { position: fixed; inset: 0; z-index: 60; display: none; }
+  .sheet[data-open="1"] { display: block; }
+  .sheet .scrim { position: absolute; inset: 0; background: rgba(10,16,20,.42); }
+  .sheet .list { position: absolute; right: 14px; top: calc(58px + env(safe-area-inset-top, 0px)); width: min(300px, 88vw); background: var(--card); border: 1px solid var(--border); border-radius: var(--r-md); box-shadow: var(--shadow); padding: 8px; max-height: 74vh; overflow-y: auto; }
+  .sheet .list h4 { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); padding: 8px 10px 4px; font-weight: 700; }
+  .jump { display: grid; grid-template-columns: 24px 1fr 16px; align-items: center; gap: 10px; width: 100%; text-align: left; border: 0; background: transparent; color: var(--ink); font-weight: 600; font-size: 14px; padding: 9px 10px; border-radius: 9px; cursor: pointer; }
+  .jump:hover { background: var(--soft); }
+  .jump[aria-current="true"] { background: var(--accent-soft); color: var(--accent-2); }
+  .jump .jn { width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center; font-size: 12px; font-weight: 800; background: var(--inset); color: var(--muted); }
+  .jump[data-done="1"] .jn { background: var(--ok-soft); color: var(--ok); }
+  .jump .jt { opacity: 0; color: var(--ok); }
+  .jump[data-done="1"] .jt { opacity: 1; }
 
-  .rail-foot { margin-top: auto; padding: 14px 8px 4px; font-size: 11.5px; color: var(--faint); line-height: 1.5; }
-
-  /* ---------- main ---------- */
-  .main { min-width: 0; padding: 0 clamp(16px, 4vw, 44px); }
-  .wrap { max-width: 760px; margin: 0 auto; padding-block: clamp(26px, 5vw, 48px) 72px; }
-  .panel[hidden] { display: none; }
-  .eyebrow { font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); font-weight: 600; }
-  .panel > .eyebrow { margin-bottom: 10px; }
-  .h-lead { font-size: clamp(26px, 5vw, 36px); font-weight: 800; }
-  .sub { color: var(--muted); font-size: 16px; margin-top: 12px; max-width: 62ch; }
-
-  section.block { margin-top: 26px; }
-  .block > h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-  .block > .hint { color: var(--muted); font-size: 14px; margin-bottom: 14px; max-width: 64ch; }
-
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
-  .card + .card { margin-top: 14px; }
-
-  /* diagram */
-  .flow { display: flex; align-items: stretch; gap: 10px; flex-wrap: wrap; }
-  .node {
-    flex: 1 1 130px; min-width: 0; background: var(--surface-2); border: 1px solid var(--border);
-    border-radius: 12px; padding: 13px 14px;
-  }
-  .node .cap { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
-  .node .ttl { font-weight: 600; font-size: 14px; margin-top: 3px; }
-  .node .dsc { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
-  .node.accent { background: var(--accent-soft); border-color: var(--accent-line); }
-  .arrow { display: grid; place-items: center; color: var(--accent); flex: 0 0 auto; font-weight: 700; }
-  @media (max-width: 620px) {
-    .flow { flex-direction: column; }
-    .arrow { transform: rotate(90deg); height: 18px; }
-  }
-
-  /* callouts */
-  .note { display: flex; gap: 12px; border-radius: 12px; padding: 14px 16px; font-size: 13.5px; line-height: 1.5; }
-  .note .ic { flex: none; width: 20px; height: 20px; margin-top: 1px; }
-  .note.warn { background: var(--warn-soft); color: color-mix(in srgb, var(--warn) 78%, var(--ink)); border: 1px solid color-mix(in srgb, var(--warn) 32%, transparent); }
-  .note.warn .ic { color: var(--warn); }
-  .note.info { background: var(--accent-soft); color: var(--accent-2); border: 1px solid var(--accent-line); }
-  .note.info .ic { color: var(--accent); }
-  .note b { font-weight: 600; }
-
-  /* lists */
-  .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; counter-reset: s; }
-  .steps > li { display: grid; grid-template-columns: 28px 1fr; gap: 13px; align-items: start; }
-  .steps > li::before {
-    counter-increment: s; content: counter(s);
-    width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center;
-    font-family: var(--display); font-weight: 700; font-size: 13px;
-    background: var(--inset); border: 1px solid var(--border); color: var(--muted);
-  }
-  .steps .st-t { font-weight: 600; }
-  .steps .st-d { color: var(--muted); font-size: 13.5px; margin-top: 2px; }
-
-  ul.plain { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13.5px; display: flex; flex-direction: column; gap: 6px; }
-  ul.plain b { color: var(--ink); font-weight: 600; }
-
-  /* forms */
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  @media (max-width: 560px) { .grid2 { grid-template-columns: 1fr; } }
-  .field { display: flex; flex-direction: column; gap: 6px; }
-  .field label { font-size: 13px; font-weight: 600; }
-  .field .desc { font-size: 12px; color: var(--faint); }
-  .field input, .field select {
-    font-family: var(--sans); font-size: 14px; color: var(--ink); background: var(--surface-2);
-    border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 10px 12px; width: 100%;
-  }
-  .field input:focus, .field select:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
-  .inline { display: flex; gap: 8px; }
-  .inline input { flex: 1; }
+  /* stage */
+  .stage { max-width: 560px; margin: 0 auto; padding: 0 20px; }
+  .screen { padding-block: clamp(24px, 6vw, 52px) 40px; }
+  .screen[hidden] { display: none; }
+  .heroic { width: 66px; height: 66px; border-radius: 20px; background: var(--accent-soft); border: 1px solid var(--accent-line); display: grid; place-items: center; color: var(--accent-2); margin-bottom: 22px; }
+  .heroic.sun { background: var(--sun-soft); border-color: color-mix(in srgb, var(--sun) 40%, transparent); color: color-mix(in srgb, var(--sun) 72%, var(--ink)); }
+  .heroic svg { width: 32px; height: 32px; }
+  .eyebrow { font-size: 12px; letter-spacing: .13em; text-transform: uppercase; color: var(--accent-2); font-weight: 700; margin-bottom: 12px; }
+  h1.title { font-family: var(--serif); font-weight: 600; font-size: clamp(28px, 6.5vw, 40px); letter-spacing: -.01em; }
+  .lead { color: var(--muted); font-size: 17px; margin-top: 14px; }
+  .body { margin-top: 26px; display: flex; flex-direction: column; gap: 14px; }
 
   /* buttons */
-  .btn {
-    font-family: var(--sans); font-weight: 600; font-size: 14px; cursor: pointer;
-    border-radius: var(--radius-sm); padding: 10px 16px; border: 1px solid transparent;
-    display: inline-flex; align-items: center; gap: 8px; justify-content: center;
-  }
-  .btn.primary { background: var(--accent); color: var(--accent-ink); }
+  .actions { margin-top: 30px; display: flex; flex-direction: column; gap: 12px; }
+  .btn { border: 1px solid transparent; border-radius: 999px; font-weight: 700; font-size: 16px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 14px 22px; }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); box-shadow: var(--shadow-lift); }
   .btn.primary:hover { background: var(--accent-2); }
-  .btn.ghost { background: var(--surface-2); color: var(--ink); border-color: var(--border-strong); }
-  .btn.ghost:hover { border-color: var(--accent); color: var(--accent-2); }
-  .btn.mini { padding: 7px 11px; font-size: 12.5px; }
-  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn.primary:active { transform: translateY(1px); }
+  .btn.soft { background: var(--soft); color: var(--ink); border-color: var(--border-2); }
+  .btn.soft:hover { border-color: var(--accent); color: var(--accent-2); }
+  .btn.text { background: transparent; color: var(--muted); font-weight: 600; padding: 8px; font-size: 15px; }
+  .btn.text:hover { color: var(--accent-2); }
+  .btn.block { width: 100%; }
+  .btn.lg { padding: 16px 24px; font-size: 17px; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+  .backlink { display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; color: var(--faint); font-weight: 600; font-size: 14px; cursor: pointer; padding: 8px 2px; }
+  .backlink:hover { color: var(--muted); }
 
-  /* code blocks */
-  .code {
-    position: relative; background: var(--inset); border: 1px solid var(--border);
-    border-radius: 11px; margin-top: 12px;
-  }
-  .code .code-head {
-    display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    padding: 8px 10px 8px 13px; border-bottom: 1px solid var(--border);
-  }
-  .code .fname { font-family: var(--mono); font-size: 11.5px; color: var(--faint); letter-spacing: .02em; }
-  .code pre {
-    margin: 0; padding: 13px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px;
-    line-height: 1.65; color: var(--ink); white-space: pre;
-  }
+  /* pieces / list */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--shadow); padding: 20px; }
+  .piece { display: grid; grid-template-columns: 46px 1fr; gap: 15px; align-items: start; }
+  .piece + .piece { margin-top: 4px; }
+  .picon { width: 46px; height: 46px; border-radius: 13px; background: var(--soft); display: grid; place-items: center; color: var(--accent-2); }
+  .picon svg { width: 22px; height: 22px; }
+  .piece .pt { font-weight: 700; font-size: 15.5px; }
+  .piece .pd { color: var(--muted); font-size: 14.5px; margin-top: 3px; }
+
+  /* analogy row */
+  .analogy { display: flex; flex-direction: column; gap: 12px; }
+  .astep { display: grid; grid-template-columns: 40px 1fr; gap: 14px; align-items: center; background: var(--card); border: 1px solid var(--border); border-radius: var(--r-md); padding: 15px 16px; box-shadow: var(--shadow-sm); }
+  .astep .num { width: 40px; height: 40px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-2); display: grid; place-items: center; font-weight: 800; font-family: var(--serif); font-size: 18px; }
+  .astep .at { font-weight: 700; }
+  .astep .ad { color: var(--muted); font-size: 14px; margin-top: 2px; }
+
+  /* callout */
+  .tip { display: flex; gap: 12px; border-radius: var(--r-md); padding: 15px 16px; font-size: 14.5px; line-height: 1.5; }
+  .tip svg { flex: none; width: 20px; height: 20px; margin-top: 2px; }
+  .tip.sun { background: var(--sun-soft); color: color-mix(in srgb, var(--sun) 72%, var(--ink)); }
+  .tip.sun svg { color: color-mix(in srgb, var(--sun) 78%, var(--ink)); }
+  .tip.mint { background: var(--accent-soft); color: var(--accent-2); }
+  .tip.mint svg { color: var(--accent); }
+  .tip b { font-weight: 700; }
+
+  /* form */
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .field + .field { margin-top: 16px; }
+  .field label { font-weight: 700; font-size: 15px; }
+  .field .desc { font-size: 13.5px; color: var(--faint); margin-top: -2px; }
+  .field input, .field select { font-family: var(--sans); font-size: 16px; font-weight: 600; color: var(--ink); background: var(--soft); border: 1.5px solid var(--border-2); border-radius: var(--r-sm); padding: 13px 14px; width: 100%; }
+  .field input::placeholder { color: var(--faint); font-weight: 500; }
+  .field input:focus, .field select:focus { outline: none; border-color: var(--accent); background: var(--card); }
+  .field .row { display: flex; gap: 9px; }
+  .field .row input { flex: 1; }
+  .mk { border: 1.5px solid var(--border-2); background: var(--card); color: var(--accent-2); border-radius: var(--r-sm); font-weight: 700; font-size: 14px; padding: 0 15px; cursor: pointer; white-space: nowrap; }
+  .mk:hover { border-color: var(--accent); }
+  .valid { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--ok); margin-top: 10px; }
+  .valid[hidden] { display: none; }
+
+  /* reveal */
+  .reveal { border: 1px dashed var(--border-2); border-radius: var(--r-md); overflow: hidden; }
+  .reveal > summary, .reveal .rev-btn { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 9px; padding: 13px 15px; font-weight: 700; font-size: 14px; color: var(--muted); width: 100%; background: transparent; border: 0; text-align: left; }
+  .reveal > summary::-webkit-details-marker { display: none; }
+  .reveal > summary:hover, .reveal .rev-btn:hover { color: var(--accent-2); }
+  .reveal .chev { width: 16px; height: 16px; transition: transform .2s; margin-left: auto; }
+  .reveal[open] .chev { transform: rotate(180deg); }
+  .reveal .rev-body { padding: 0 15px 15px; }
+
+  /* code */
+  .code { background: var(--inset); border: 1px solid var(--border); border-radius: var(--r-sm); margin-top: 10px; }
+  .code .ch { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 8px 8px 13px; border-bottom: 1px solid var(--border); }
+  .code .fn { font-family: var(--mono); font-size: 11px; color: var(--faint); }
+  .code pre { margin: 0; padding: 13px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; white-space: pre; color: var(--ink); }
   .code pre.wrap { white-space: pre-wrap; word-break: break-all; }
-  .copy { background: var(--surface); border: 1px solid var(--border-strong); color: var(--muted); border-radius: 7px; padding: 5px 10px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; font-family: var(--sans); }
+  .copy { background: var(--card); border: 1px solid var(--border-2); color: var(--muted); border-radius: 8px; padding: 6px 12px; font-size: 12.5px; font-weight: 700; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
   .copy:hover { color: var(--accent-2); border-color: var(--accent); }
   .copy.ok { color: var(--ok); border-color: var(--ok); }
   .copy svg { width: 13px; height: 13px; }
 
+  /* big copy target (paste-this) */
+  .paste { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; background: var(--card); border: 1.5px solid var(--accent-line); border-radius: var(--r-md); padding: 10px 10px 10px 14px; }
+  .paste code { font-family: var(--mono); font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .paste .copy { background: var(--accent); color: var(--accent-ink); border-color: transparent; padding: 9px 15px; font-size: 14px; }
+  .paste .copy.ok { background: var(--ok); }
+
   /* checklist */
-  .check { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-  .check > li { display: grid; grid-template-columns: 26px 1fr; gap: 12px; align-items: start; padding: 14px 0; border-top: 1px solid var(--border); }
-  .check > li:first-child { border-top: 0; }
-  .check input[type=checkbox] { width: 20px; height: 20px; margin-top: 1px; accent-color: var(--accent); cursor: pointer; }
-  .check .ct { font-weight: 600; }
-  .check .cd { color: var(--muted); font-size: 13.5px; margin-top: 3px; }
-  .check li[data-checked="1"] .ct { color: var(--faint); text-decoration: line-through; text-decoration-color: var(--border-strong); }
+  .todo { list-style: none; margin: 0; padding: 0; }
+  .todo > li { display: grid; grid-template-columns: 26px 1fr; gap: 13px; align-items: start; padding: 16px 0; border-top: 1px solid var(--border); }
+  .todo > li:first-child { border-top: 0; }
+  .todo input[type=checkbox] { width: 22px; height: 22px; margin-top: 1px; accent-color: var(--accent); cursor: pointer; }
+  .todo .tt { font-weight: 700; font-size: 15.5px; }
+  .todo .td { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  .todo li[data-done="1"] .tt { color: var(--faint); text-decoration: line-through; text-decoration-color: var(--border-2); }
 
-  /* tabs */
-  .tabs { display: inline-flex; background: var(--inset); border: 1px solid var(--border); border-radius: 10px; padding: 3px; gap: 3px; }
-  .tabs button { border: 0; background: transparent; color: var(--muted); font-family: var(--sans); font-weight: 600; font-size: 13px; padding: 7px 13px; border-radius: 7px; cursor: pointer; }
-  .tabs button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); }
-
-  /* device tester */
-  .tester { display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; align-items: start; }
-  @media (max-width: 640px) { .tester { grid-template-columns: 1fr; } }
-  .videobox { position: relative; aspect-ratio: 16/9; max-width: 100%; background: #0b0f14; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); display: grid; place-items: center; }
+  /* tester */
+  .videobox { position: relative; aspect-ratio: 16/9; max-width: 100%; background: #0b1116; border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--border); display: grid; place-items: center; }
   .videobox video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-  .videobox .ph { color: #6b7889; font-size: 13px; text-align: center; padding: 20px; }
-  .meter { height: 12px; border-radius: 7px; background: var(--inset); border: 1px solid var(--border); overflow: hidden; }
-  .meter > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--ok), var(--warn), var(--live)); transition: width .06s linear; }
-  .tester .field select { font-size: 13px; }
+  .videobox .ph { color: #7a8894; font-size: 14px; text-align: center; padding: 22px; }
+  .picker { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; }
+  .meter { height: 14px; border-radius: 8px; background: var(--inset); border: 1px solid var(--border); overflow: hidden; }
+  .meter > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--ok), var(--sun), var(--live)); transition: width .06s linear; }
 
-  .btnrow { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--border); }
-  .btnrow .spacer { flex: 1; }
+  /* success check */
+  .celebrate { width: 92px; height: 92px; margin: 0 0 6px; }
+  .celebrate circle { fill: var(--ok-soft); }
+  .celebrate path { fill: none; stroke: var(--ok); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 48; stroke-dashoffset: 48; animation: draw .5s .15s ease forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @media (prefers-reduced-motion: reduce) { .celebrate path { animation: none; stroke-dashoffset: 0; } }
 
-  .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%) translateY(20px); background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 999px; font-size: 13px; font-weight: 600; opacity: 0; transition: opacity .18s, transform .18s; pointer-events: none; z-index: 50; box-shadow: var(--shadow); }
+  .recap { display: flex; flex-direction: column; gap: 10px; }
+  .recap .ri { display: grid; grid-template-columns: 22px 1fr; gap: 11px; align-items: start; font-size: 14.5px; }
+  .recap .ri svg { width: 18px; height: 18px; color: var(--ok); margin-top: 2px; }
+  .recap .ri b { font-weight: 700; }
+
+  .toast { position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%) translateY(16px); background: var(--ink); color: var(--bg); padding: 11px 20px; border-radius: 999px; font-size: 14px; font-weight: 700; opacity: 0; transition: opacity .18s, transform .18s; pointer-events: none; z-index: 80; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--inset); color: var(--muted); border: 1px solid var(--border); }
-  .pill.ok { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
-
-  /* mobile top nav */
-  .topbar { display: none; }
-  @media (max-width: 860px) {
-    .app { grid-template-columns: 1fr; }
-    .rail { display: none; }
-    .topbar {
-      display: flex; align-items: center; gap: 12px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
-      background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 16px calc(12px + env(safe-area-inset-top, 0px));
-      padding-top: 12px;
-    }
-    .chiprow { display: flex; gap: 7px; overflow-x: auto; padding: 10px 16px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 57px; z-index: 19; }
-    .chip { flex: none; border: 1px solid var(--border); background: var(--surface-2); color: var(--muted); border-radius: 999px; padding: 6px 13px; font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: var(--sans); white-space: nowrap; }
-    .chip[aria-current="true"] { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
-    .chip[data-done="1"]:not([aria-current="true"]) { border-color: var(--ok); color: var(--ok); }
-  }
 </style>
 
-<div class="app">
-  <!-- ================= RAIL ================= -->
-  <nav class="rail" aria-label="Steps">
-    <div class="brand">
-      <div class="sig" id="sig" data-live="0" aria-hidden="true"></div>
-      <div>
-        <b>Relay Console</b>
-        <span>Camera bridge</span>
-      </div>
-    </div>
-    <div class="rail-label">Setup</div>
-    <div id="railnav"></div>
-    <div class="rail-foot">
-      Everything you type stays on this device. This console prepares the steps — it doesn't connect to your meeting.
-    </div>
-  </nav>
+<header class="top">
+  <div class="bar"><i id="bar"></i></div>
+  <div class="toprow">
+    <span class="badge"><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m23 7-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></span><b>Camera Bridge</b></span>
+    <span class="step-of" id="stepof"></span>
+    <button class="menu-btn" id="menubtn" aria-haspopup="true">Steps
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+  </div>
+</header>
 
-  <!-- ================= TOPBAR (mobile) ================= -->
-  <div>
-    <div class="topbar">
-      <div class="sig" id="sig-m" data-live="0" aria-hidden="true" style="width:26px;height:26px;border-radius:8px"></div>
-      <b style="font-family:var(--display);font-weight:800;font-size:15px">Relay Console</b>
-    </div>
-    <div class="chiprow" id="chiprow"></div>
-
-    <main class="main">
-      <div class="wrap">
-
-        <!-- ---------- OVERVIEW ---------- -->
-        <section class="panel" data-panel="overview">
-          <div class="eyebrow">Your camera, joining from anywhere</div>
-          <h1 class="h-lead">Be in the meeting from India<br />with your camera in California.</h1>
-          <p class="sub">Some meeting sites only let people in from a specific country. This console walks you — step by step — through joining on a Mac that's <b>in</b> that country, while the face and voice on screen come from your own computer somewhere else. No jargon, just fill in a few boxes and follow the checklist.</p>
-
-          <section class="block">
-            <div class="card">
-              <div class="flow" aria-label="How the pieces connect">
-                <div class="node"><div class="cap">You are here</div><div class="ttl">California</div><div class="dsc">Your webcam &amp; mic</div></div>
-                <div class="arrow" aria-hidden="true">→</div>
-                <div class="node"><div class="cap">In the middle</div><div class="ttl">A small server</div><div class="dsc">Passes the video along</div></div>
-                <div class="arrow" aria-hidden="true">→</div>
-                <div class="node accent"><div class="cap">In the country</div><div class="ttl">The India Mac</div><div class="dsc">Runs the meeting</div></div>
-                <div class="arrow" aria-hidden="true">→</div>
-                <div class="node"><div class="cap">The call</div><div class="ttl">Meeting site</div><div class="dsc">Sees the India Mac</div></div>
-              </div>
-              <p class="hint" style="margin:16px 0 0">The meeting opens on the India Mac, so the site sees an Indian connection. Your camera is streamed in and shows up there as if it were that Mac's own webcam. You sit in California and control the Mac from your desk.</p>
-            </div>
-          </section>
-
-          <section class="block">
-            <div class="note warn">
-              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
-              <div><b>Try the easy fix first.</b> If the country block looks like a glitch, ask whoever runs the meeting to turn it off — that's usually one setting on their end and skips all of this. And make sure joining this way is okay for your meeting before you set it up.</div>
-            </div>
-          </section>
-
-          <section class="block">
-            <h2>What you'll need</h2>
-            <p class="hint">About 20 minutes to set up once. After that, starting a call takes two minutes.</p>
-            <ul class="plain">
-              <li><b>A Mac in the country</b> you need to appear from — a friend's or home machine on a normal home internet connection.</li>
-              <li><b>A small rented server</b> (about $5/month) that passes the video along. A tech-savvy friend can set this up once, or follow Step 2.</li>
-              <li><b>A remote-control app</b> (like Chrome Remote Desktop or AnyDesk) so you can see and use that Mac from California.</li>
-              <li><b>Two free apps on the Mac</b> — OBS and BlackHole — which the console links you to.</li>
-            </ul>
-          </section>
-
-          <div class="btnrow">
-            <div class="spacer"></div>
-            <button class="btn primary" data-go="settings">Start setup →</button>
-          </div>
-        </section>
-
-        <!-- ---------- SETTINGS ---------- -->
-        <section class="panel" data-panel="settings" hidden>
-          <div class="eyebrow">Step 1</div>
-          <h1 class="h-lead">Your details</h1>
-          <p class="sub">Fill these in once. The console uses them to write out every command and link in the later steps, so you never have to type them again. They're saved only in this browser.</p>
-
-          <section class="block">
-            <div class="card">
-              <div class="grid2">
-                <div class="field">
-                  <label for="relayHost">Server address</label>
-                  <span class="desc">The address of your relay server (from Step 2). An IP like 203.0.113.10 or a domain name.</span>
-                  <input id="relayHost" type="text" placeholder="203.0.113.10" autocomplete="off" spellcheck="false" />
-                </div>
-                <div class="field">
-                  <label for="relayPort">Port</label>
-                  <span class="desc">Leave this as 8890 unless your helper changed it.</span>
-                  <input id="relayPort" type="text" inputmode="numeric" placeholder="8890" autocomplete="off" spellcheck="false" />
-                </div>
-                <div class="field">
-                  <label for="pubPass">Sending password</label>
-                  <span class="desc">Protects the camera going <i>into</i> the server.</span>
-                  <div class="inline">
-                    <input id="pubPass" type="text" placeholder="choose a strong one" autocomplete="off" spellcheck="false" />
-                    <button class="btn ghost mini" data-gen="pubPass" title="Generate">Make one</button>
-                  </div>
-                </div>
-                <div class="field">
-                  <label for="viewPass">Viewing password</label>
-                  <span class="desc">Protects the camera coming <i>out</i> to the Mac.</span>
-                  <div class="inline">
-                    <input id="viewPass" type="text" placeholder="choose a strong one" autocomplete="off" spellcheck="false" />
-                    <button class="btn ghost mini" data-gen="viewPass" title="Generate">Make one</button>
-                  </div>
-                </div>
-                <div class="field">
-                  <label for="quality">Video quality</label>
-                  <span class="desc">Smooth is best on most home internet.</span>
-                  <select id="quality">
-                    <option value="720">Smooth — 720p (recommended)</option>
-                    <option value="1080">Sharp — 1080p (needs fast internet)</option>
-                    <option value="low">Low bandwidth — 480p</option>
-                  </select>
-                </div>
-                <div class="field">
-                  <label for="passphrase">Encryption phrase <span style="color:var(--faint);font-weight:400">(optional)</span></label>
-                  <span class="desc">Extra scrambling on the link. Leave blank to skip.</span>
-                  <input id="passphrase" type="text" placeholder="optional — 16+ characters" autocomplete="off" spellcheck="false" />
-                </div>
-              </div>
-            </div>
-            <div class="note info" style="margin-top:14px">
-              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16v-4m0-4h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z"/></svg>
-              <div><b>Private to you.</b> These stay in this browser only — they're never sent anywhere by this page. They're the passwords for <i>your</i> server, used just to write out the steps.</div>
-            </div>
-          </section>
-
-          <div class="btnrow">
-            <button class="btn ghost" data-go="overview">← Back</button>
-            <div class="spacer"></div>
-            <button class="btn primary" data-go="server">Next: the server →</button>
-          </div>
-        </section>
-
-        <!-- ---------- SERVER ---------- -->
-        <section class="panel" data-panel="server" hidden>
-          <div class="eyebrow">Step 2 · one time only</div>
-          <h1 class="h-lead">The relay server</h1>
-          <p class="sub">This is the one technical part. If that's not your thing, hand this page to a tech-savvy friend — it's a 10-minute job they do once. Rent a small server near the country you need (for India, a "Mumbai" region), then copy the two blocks below onto it.</p>
-
-          <section class="block">
-            <h2>A. Save this as a file</h2>
-            <p class="hint">Copy this and save it on the server as a file named <b>mediamtx.yml</b>. Your passwords are already filled in.</p>
-            <div class="code">
-              <div class="code-head"><span class="fname">mediamtx.yml</span><button class="copy" data-copy="out-yml"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button></div>
-              <pre id="out-yml" class="wrap"></pre>
-            </div>
-          </section>
-
-          <section class="block">
-            <h2>B. Turn it on</h2>
-            <p class="hint">Run these on the server (they install the relay and open the door for the video). Needs Docker — the first line installs it if missing.</p>
-            <div class="code">
-              <div class="code-head"><span class="fname">terminal · on the server</span><button class="copy" data-copy="out-server-cmd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button></div>
-              <pre id="out-server-cmd" class="wrap"></pre>
-            </div>
-            <div class="note info" style="margin-top:14px">
-              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16v-4m0-4h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z"/></svg>
-              <div>Also open ports <b>8890 (UDP)</b> and <b>1935 (TCP)</b> in your server provider's firewall settings. Then put the server's address back in Step 1.</div>
-            </div>
-          </section>
-
-          <div class="btnrow">
-            <button class="btn ghost" data-go="settings">← Back</button>
-            <div class="spacer"></div>
-            <button class="btn primary" data-go="california">Next: your camera →</button>
-          </div>
-        </section>
-
-        <!-- ---------- CALIFORNIA ---------- -->
-        <section class="panel" data-panel="california" hidden>
-          <div class="eyebrow">Step 3 · your computer</div>
-          <h1 class="h-lead">Send your camera</h1>
-          <p class="sub">On the computer you're actually sitting at, send your webcam to the server. First, a quick look to check your camera and lighting.</p>
-
-          <section class="block">
-            <div class="card">
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
-                <h2 style="font-size:16px">Camera preview</h2>
-                <button class="btn ghost mini" id="preview-btn">Turn on preview</button>
-              </div>
-              <div class="videobox" style="max-width:420px">
-                <video id="preview-video" playsinline autoplay muted hidden></video>
-                <div class="ph" id="preview-ph">Click "Turn on preview" to see yourself and check your framing.</div>
-              </div>
-            </div>
-          </section>
-
-          <section class="block">
-            <h2>Then start streaming</h2>
-            <p class="hint">Pick whichever you prefer. OBS is the friendly, click-around way.</p>
-            <div class="tabs" role="tablist" style="margin-bottom:14px">
-              <button role="tab" aria-selected="true" data-tab="ca-obs">Use OBS (easy)</button>
-              <button role="tab" aria-selected="false" data-tab="ca-cmd">One command (advanced)</button>
-            </div>
-
-            <div data-tabpanel="ca-obs">
-              <ol class="steps">
-                <li><div><div class="st-t">Open OBS → Settings → Stream</div><div class="st-d">Set "Service" to <b>Custom</b>.</div></div></li>
-                <li><div><div class="st-t">Paste this into the "Server" box</div><div class="st-d">Leave "Stream Key" empty.</div>
-                  <div class="code"><div class="code-head"><span class="fname">OBS · Server</span><button class="copy" data-copy="out-pub-url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button></div><pre id="out-pub-url" class="wrap"></pre></div>
-                </div></li>
-                <li><div><div class="st-t">Add your webcam</div><div class="st-d">In "Sources" click +, choose <b>Video Capture Device</b>, pick your camera.</div></div></li>
-                <li><div><div class="st-t">Click "Start Streaming"</div><div class="st-d">That's it — your camera is now on its way to the Mac.</div></div></li>
-              </ol>
-            </div>
-
-            <div data-tabpanel="ca-cmd" hidden>
-              <p class="hint">If you'd rather use the terminal. Needs <b>ffmpeg</b> installed. Choose your computer:</p>
-              <div class="tabs" style="margin-bottom:12px">
-                <button data-os="mac" aria-selected="true">macOS</button>
-                <button data-os="linux" aria-selected="false">Linux</button>
-              </div>
-              <div class="code"><div class="code-head"><span class="fname" id="cmd-fname">terminal · macOS</span><button class="copy" data-copy="out-ffmpeg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button></div><pre id="out-ffmpeg" class="wrap"></pre></div>
-              <p class="hint" style="margin-top:10px">On Windows, use the OBS tab instead — it's the simplest way there.</p>
-            </div>
-          </section>
-
-          <div class="btnrow">
-            <button class="btn ghost" data-go="server">← Back</button>
-            <div class="spacer"></div>
-            <button class="btn primary" data-go="mac">Next: the India Mac →</button>
-          </div>
-        </section>
-
-        <!-- ---------- MAC ---------- -->
-        <section class="panel" data-panel="mac" hidden>
-          <div class="eyebrow">Step 4 · the India Mac</div>
-          <h1 class="h-lead">Set up the Mac</h1>
-          <p class="sub">Do this on the India Mac — through your remote-control app, from California. Tick each item as you go; the console remembers where you left off.</p>
-
-          <section class="block">
-            <div class="card">
-              <ul class="check" id="mac-check">
-                <li data-key="m1">
-                  <input type="checkbox" id="m1" />
-                  <label for="m1"><span class="ct">Install OBS and BlackHole</span><span class="cd">Two free apps. OBS shows your camera; BlackHole carries your voice. In Terminal:</span>
-                    <div class="code"><div class="code-head"><span class="fname">terminal · on the Mac</span><button class="copy" data-copy="out-brew"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button></div><pre id="out-brew" class="wrap">brew install --cask obs
-brew install blackhole-2ch</pre></div>
-                    <span class="cd">No Homebrew? Get OBS from obsproject.com and BlackHole from existential.audio.</span>
-                  </label>
-                </li>
-                <li data-key="m2">
-                  <input type="checkbox" id="m2" />
-                  <label for="m2"><span class="ct">Allow camera &amp; microphone</span><span class="cd">System Settings → Privacy &amp; Security → turn on <b>Camera</b> and <b>Microphone</b> for OBS and for your browser. If OBS asks to approve a "virtual camera" add-on, allow it (restart once if asked).</span></label>
-                </li>
-                <li data-key="m3">
-                  <input type="checkbox" id="m3" />
-                  <label for="m3"><span class="ct">Bring your camera into OBS</span><span class="cd">In OBS: Sources → + → <b>Media Source</b> → untick "Local File". Paste this in "Input", set "Input Format" to <b>mpegts</b>:</span>
-                    <div class="code"><div class="code-head"><span class="fname">OBS · Media Source input</span><button class="copy" data-copy="out-view-url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button></div><pre id="out-view-url" class="wrap"></pre></div>
-                    <span class="cd">Your California face should appear in the OBS window.</span>
-                  </label>
-                </li>
-                <li data-key="m4">
-                  <input type="checkbox" id="m4" />
-                  <label for="m4"><span class="ct">Click "Start Virtual Camera"</span><span class="cd">Bottom-right in OBS. This makes your face available to the meeting as a camera called <b>OBS Virtual Camera</b>.</span></label>
-                </li>
-                <li data-key="m5">
-                  <input type="checkbox" id="m5" />
-                  <label for="m5"><span class="ct">Send your voice to BlackHole</span><span class="cd">OBS → Settings → Audio → Advanced → set <b>Monitoring Device</b> to <i>BlackHole 2ch</i>. Then right-click the Media Source → Advanced Audio Properties → set its Audio Monitoring to <b>Monitor Only (mute output)</b>. This stops echo and feeds your voice to the meeting's microphone.</span></label>
-                </li>
-              </ul>
-            </div>
-          </section>
-
-          <div class="btnrow">
-            <button class="btn ghost" data-go="california">← Back</button>
-            <div class="spacer"></div>
-            <button class="btn primary" data-go="join">Next: join &amp; test →</button>
-          </div>
-        </section>
-
-        <!-- ---------- JOIN ---------- -->
-        <section class="panel" data-panel="join" hidden>
-          <div class="eyebrow">Step 5 · the call</div>
-          <h1 class="h-lead">Test, then join</h1>
-          <p class="sub">Before the real meeting, check the whole chain works. Do this test <b>on the India Mac, in Chrome</b> — the same browser you'll join the meeting in.</p>
-
-          <section class="block">
-            <h2>Pre-flight check</h2>
-            <p class="hint">Pick <b>OBS Virtual Camera</b> and <b>BlackHole 2ch</b> below. If you see your face and the bar moves when you talk in California, everything's connected.</p>
-            <div class="card">
-              <div class="tester">
-                <div class="videobox">
-                  <video id="test-video" playsinline autoplay muted hidden></video>
-                  <div class="ph" id="test-ph">Press "Start test" to check your camera and microphone.</div>
-                </div>
-                <div style="display:flex;flex-direction:column;gap:13px">
-                  <div class="field">
-                    <label for="test-cam">Camera</label>
-                    <select id="test-cam"><option>Start the test to list cameras</option></select>
-                  </div>
-                  <div class="field">
-                    <label for="test-mic">Microphone</label>
-                    <select id="test-mic"><option>Start the test to list microphones</option></select>
-                  </div>
-                  <div class="field">
-                    <label>Microphone level</label>
-                    <div class="meter" aria-hidden="true"><i id="test-meter"></i></div>
-                  </div>
-                  <button class="btn primary" id="test-btn">Start test</button>
-                </div>
-              </div>
-              <p class="hint" id="test-msg" style="margin:14px 0 0"></p>
-            </div>
-          </section>
-
-          <section class="block">
-            <h2>Join the meeting</h2>
-            <p class="hint">The meeting is on a private site, so you'll join in a browser on the Mac.</p>
-            <ol class="steps">
-              <li><div><div class="st-t">Use Chrome, not Safari</div><div class="st-d">Safari hides the virtual camera. Chrome (or Firefox) shows it.</div></div></li>
-              <li><div><div class="st-t">Make sure OBS Virtual Camera is already running</div><div class="st-d">Start it in OBS <i>before</i> opening the meeting site. If the site is already open, reload the page.</div></div></li>
-              <li><div><div class="st-t">Open the meeting link and click "Allow"</div><div class="st-d">When Chrome asks for camera and microphone, allow it.</div></div></li>
-              <li><div><div class="st-t">Choose your devices</div><div class="st-d">Camera → <b>OBS Virtual Camera</b>. Microphone → <b>BlackHole 2ch</b>. Speaker → the Mac's normal output, so your remote-control app plays the meeting back to you. If the site has no camera menu, click the little camera icon in Chrome's address bar to pick it.</div></div></li>
-            </ol>
-          </section>
-
-          <section class="block">
-            <div class="note info">
-              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
-              <div><b>You're set.</b> Your face and voice come from California; the meeting sees the India Mac. Keep OBS running for the whole call.</div>
-            </div>
-          </section>
-
-          <div class="btnrow">
-            <button class="btn ghost" data-go="mac">← Back</button>
-            <div class="spacer"></div>
-            <button class="btn ghost" data-go="overview">Back to start</button>
-          </div>
-        </section>
-
-      </div>
-    </main>
+<div class="sheet" id="sheet">
+  <div class="scrim" data-close></div>
+  <div class="list">
+    <h4>Jump to a step</h4>
+    <div id="jumplist"></div>
   </div>
 </div>
+
+<main class="stage">
+
+  <!-- 0 WELCOME -->
+  <section class="screen" data-screen="welcome">
+    <div class="heroic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg></div>
+    <div class="eyebrow">A gentle setup, one step at a time</div>
+    <h1 class="title">Be in the meeting, no matter where you are.</h1>
+    <p class="lead">Some meeting websites only let people join from one country. This helper walks you through joining anyway — with <b>your own face and voice</b> — in small, simple steps. No tech background needed. Take it one screen at a time.</p>
+    <div class="body">
+      <div class="tip sun">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+        <div><b>Easiest option first:</b> if the country block seems like a mistake, ask whoever runs the meeting to turn it off. That's one click for them and skips everything here.</div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn primary block lg" data-next>Let's begin →</button>
+    </div>
+  </section>
+
+  <!-- 1 HOW -->
+  <section class="screen" data-screen="how" hidden>
+    <div class="heroic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div>
+    <div class="eyebrow">The idea in 30 seconds</div>
+    <h1 class="title">You send a stand-in — wearing your face.</h1>
+    <p class="lead">Think of a doorman who only lets in locals. Here's the trick:</p>
+    <div class="body">
+      <div class="analogy">
+        <div class="astep"><div class="num">1</div><div><div class="at">A laptop that's already in the country joins for you</div><div class="ad">The website sees a local, so it lets it in.</div></div></div>
+        <div class="astep"><div class="num">2</div><div><div class="at">We stream your camera over to that laptop</div><div class="ad">A small "courier" in the middle carries your picture and voice.</div></div></div>
+        <div class="astep"><div class="num">3</div><div><div class="at">The laptop wears your face &amp; voice</div><div class="ad">So the meeting sees and hears you — not the laptop.</div></div></div>
+      </div>
+      <p class="lead" style="font-size:15px">You sit at your own computer the whole time and control that laptop from afar, like using someone else's screen over the internet.</p>
+    </div>
+    <div class="actions">
+      <button class="btn primary block lg" data-next>Makes sense →</button>
+      <button class="backlink" data-back>← Back</button>
+    </div>
+  </section>
+
+  <!-- 2 NEED -->
+  <section class="screen" data-screen="need" hidden>
+    <div class="heroic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+    <div class="eyebrow">Before we start</div>
+    <h1 class="title">Four things you'll need.</h1>
+    <p class="lead">About 20 minutes to set up once. After that, starting a call takes two minutes.</p>
+    <div class="body">
+      <div class="card">
+        <div class="piece"><div class="picon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div><div><div class="pt">A laptop in the country</div><div class="pd">A Mac in the place you need to appear from — a friend's or home machine on normal home internet.</div></div></div>
+        <div class="piece"><div class="picon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10" r="3"/></svg></div><div><div class="pt">A remote-control app</div><div class="pd">Like Chrome Remote Desktop or AnyDesk, so you can see and use that laptop from where you are.</div></div></div>
+        <div class="piece"><div class="picon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.3 2.4a1 1 0 0 1-.9 1.6H3.6a1 1 0 0 1-.9-1.6L4 16"/></svg></div><div><div class="pt">A small helper server</div><div class="pd">A tiny rented computer (about $5/month) that carries the video. A tech-savvy friend can set this up once — or you can, with our steps.</div></div></div>
+        <div class="piece"><div class="picon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 4 6v6c0 5 3.4 7.7 8 10 4.6-2.3 8-5 8-10V6l-8-4Z"/></svg></div><div><div class="pt">Two free apps on the laptop</div><div class="pd">Called OBS and BlackHole — we link you straight to them when it's time.</div></div></div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn primary block lg" data-next>I've got these →</button>
+      <button class="backlink" data-back>← Back</button>
+    </div>
+  </section>
+
+  <!-- 3 DETAILS -->
+  <section class="screen" data-screen="details" hidden>
+    <div class="heroic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z" opacity="0"/><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg></div>
+    <div class="eyebrow">Step 1 of 5 · Set up</div>
+    <h1 class="title">Enter your three details.</h1>
+    <p class="lead">Whoever set up the helper server gives you these. Type them once and we'll fill in every step for you.</p>
+    <div class="body">
+      <div class="card">
+        <div class="field">
+          <label for="relayHost">Server address</label>
+          <span class="desc">Looks like <b>203.0.113.10</b>, or a web address.</span>
+          <input id="relayHost" type="text" placeholder="203.0.113.10" autocomplete="off" spellcheck="false" />
+        </div>
+        <div class="field">
+          <label for="pubPass">Sending code</label>
+          <span class="desc">The password that protects your camera going out.</span>
+          <div class="row"><input id="pubPass" type="text" placeholder="paste it here" autocomplete="off" spellcheck="false" /><button class="mk" data-gen="pubPass">Make one</button></div>
+        </div>
+        <div class="field">
+          <label for="viewPass">Receiving code</label>
+          <span class="desc">The password the laptop uses to pick your camera up.</span>
+          <div class="row"><input id="viewPass" type="text" placeholder="paste it here" autocomplete="off" spellcheck="false" /><button class="mk" data-gen="viewPass">Make one</button></div>
+        </div>
+        <div class="valid" id="details-ok" hidden><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg> Saved — these will fill in the next steps.</div>
+
+        <details class="reveal" style="margin-top:16px">
+          <summary>More options (usually not needed)<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <div class="rev-body">
+            <div class="field"><label for="relayPort">Port</label><span class="desc">Leave 8890 unless told otherwise.</span><input id="relayPort" type="text" inputmode="numeric" placeholder="8890" autocomplete="off" /></div>
+            <div class="field"><label for="quality">Video quality</label><select id="quality"><option value="720">Smooth — best for most (720p)</option><option value="1080">Sharp — needs fast internet (1080p)</option><option value="low">Low data (480p)</option></select></div>
+            <div class="field"><label for="passphrase">Extra scramble code</label><span class="desc">Optional. Leave blank to skip.</span><input id="passphrase" type="text" placeholder="optional" autocomplete="off" /></div>
+          </div>
+        </details>
+      </div>
+      <div class="tip mint">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16v-4m0-4h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z"/></svg>
+        <div><b>Private to you.</b> These stay in this browser only — never sent anywhere. Don't have them yet? <button class="btn text" style="padding:0;font-weight:800;color:var(--accent-2)" data-goto="server">Set up the server →</button></div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn primary block lg" data-next>Next →</button>
+      <button class="backlink" data-back>← Back</button>
+    </div>
+  </section>
+
+  <!-- 4 SERVER -->
+  <section class="screen" data-screen="server" hidden>
+    <div class="heroic sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.3 2.4a1 1 0 0 1-.9 1.6H3.6a1 1 0 0 1-.9-1.6L4 16"/><circle cx="8" cy="10" r="1"/></svg></div>
+    <div class="eyebrow">Step 2 of 5 · Set up</div>
+    <h1 class="title">The helper server.</h1>
+    <p class="lead">This is the only techie part, and it's done <b>once</b>. If a friend is helping, you can skip it — just tap the button.</p>
+    <div class="body">
+      <div class="tip mint">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16v-4m0-4h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z"/></svg>
+        <div>Rent a small server (for India, choose a <b>Mumbai</b> location) from any cloud provider, then follow the two parts below on it.</div>
+      </div>
+
+      <details class="reveal">
+        <summary>Show me how to set it up<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <div class="rev-body">
+          <p class="desc" style="margin:4px 0 0;color:var(--muted);font-size:14px"><b>A.</b> Save this on the server as a file named <b>mediamtx.yml</b>:</p>
+          <div class="code"><div class="ch"><span class="fn">mediamtx.yml</span><button class="copy" data-copy="out-yml"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button></div><pre id="out-yml" class="wrap"></pre></div>
+          <p class="desc" style="margin:14px 0 0;color:var(--muted);font-size:14px"><b>B.</b> Run these on the server to switch it on:</p>
+          <div class="code"><div class="ch"><span class="fn">terminal · on the server</span><button class="copy" data-copy="out-server-cmd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button></div><pre id="out-server-cmd" class="wrap"></pre></div>
+          <p class="desc" style="margin:12px 0 0;color:var(--muted);font-size:13.5px">Also open ports <b>8890 (UDP)</b> and <b>1935 (TCP)</b> in the provider's firewall. Then put the server's address into Step 1.</p>
+        </div>
+      </details>
+    </div>
+    <div class="actions">
+      <button class="btn primary block lg" data-goto="details">My friend set this up — skip ✓</button>
+      <button class="backlink" data-back>← Back</button>
+    </div>
+  </section>
+
+  <!-- 5 CAMERA -->
+  <section class="screen" data-screen="camera" hidden>
+    <div class="heroic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>
+    <div class="eyebrow">Step 3 of 5 · Set up</div>
+    <h1 class="title">Turn your camera on.</h1>
+    <p class="lead">On the computer you're using right now, we'll send your webcam to the server. First, a peek to check your camera works.</p>
+    <div class="body">
+      <div class="card">
+        <div class="videobox" style="max-width:100%">
+          <video id="preview-video" playsinline autoplay muted hidden></video>
+          <div class="ph" id="preview-ph">Tap below to see yourself and check your lighting.</div>
+        </div>
+        <button class="btn soft block" id="preview-btn" style="margin-top:14px">Show my camera</button>
+      </div>
+
+      <p class="lead" style="font-size:16px;font-weight:700;color:var(--ink);margin-top:6px">Then send it with OBS:</p>
+      <div class="card">
+        <ol class="todo">
+          <li><input type="checkbox" id="c1" /><label for="c1"><span class="tt">Open OBS → Settings → Stream</span><span class="td">Set "Service" to <b>Custom</b>.</span></label></li>
+          <li><input type="checkbox" id="c2" /><label for="c2"><span class="tt">Paste this into the "Server" box</span><span class="td">Leave "Stream Key" empty.</span>
+            <div class="paste"><code id="out-pub-url"></code><button class="copy" data-copy="out-pub-url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button></div>
+          </label></li>
+          <li><input type="checkbox" id="c3" /><label for="c3"><span class="tt">Add your webcam &amp; click "Start Streaming"</span><span class="td">Sources → + → Video Capture Device → your camera. Then Start Streaming.</span></label></li>
+        </ol>
+        <details class="reveal" style="margin-top:8px">
+          <summary>Prefer a typed command instead?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <div class="rev-body">
+            <div style="display:flex;gap:8px;margin-bottom:8px"><button class="mk" data-os="mac" aria-pressed="true">macOS</button><button class="mk" data-os="linux" aria-pressed="false">Linux</button></div>
+            <div class="code"><div class="ch"><span class="fn" id="cmd-fn">terminal · macOS</span><button class="copy" data-copy="out-ffmpeg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button></div><pre id="out-ffmpeg" class="wrap"></pre></div>
+          </div>
+        </details>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn primary block lg" data-next>Next →</button>
+      <button class="backlink" data-back>← Back</button>
+    </div>
+  </section>
+
+  <!-- 6 MAC -->
+  <section class="screen" data-screen="mac" hidden>
+    <div class="heroic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 20h20"/></svg></div>
+    <div class="eyebrow">Step 4 of 5 · Set up</div>
+    <h1 class="title">Set up the far-away laptop.</h1>
+    <p class="lead">Do this on the laptop in the country — through your remote-control app. Tick each box; we'll remember your place.</p>
+    <div class="body">
+      <div class="card">
+        <ul class="todo" id="mac-check">
+          <li data-key="m1"><input type="checkbox" id="m1" /><label for="m1"><span class="tt">Install the two free apps</span><span class="td">In the laptop's Terminal, paste this. (No Homebrew? Get OBS from obsproject.com and BlackHole from existential.audio.)</span>
+            <div class="code"><div class="ch"><span class="fn">terminal · on the laptop</span><button class="copy" data-copy="out-brew"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button></div><pre id="out-brew" class="wrap">brew install --cask obs
+brew install blackhole-2ch</pre></div>
+          </label></li>
+          <li data-key="m2"><input type="checkbox" id="m2" /><label for="m2"><span class="tt">Allow camera &amp; microphone</span><span class="td">System Settings → Privacy &amp; Security → turn on <b>Camera</b> and <b>Microphone</b> for OBS and the browser. If asked to allow a "virtual camera," say yes.</span></label></li>
+          <li data-key="m3"><input type="checkbox" id="m3" /><label for="m3"><span class="tt">Bring your camera into OBS</span><span class="td">OBS → Sources → + → <b>Media Source</b> → untick "Local File". Paste this in "Input", set "Input Format" to <b>mpegts</b>:</span>
+            <div class="paste"><code id="out-view-url"></code><button class="copy" data-copy="out-view-url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button></div>
+            <span class="td">Your face should appear in the OBS window.</span></label></li>
+          <li data-key="m4"><input type="checkbox" id="m4" /><label for="m4"><span class="tt">Click "Start Virtual Camera"</span><span class="td">Bottom-right in OBS. This lets the meeting use your face as a camera called <b>OBS Virtual Camera</b>.</span></label></li>
+          <li data-key="m5"><input type="checkbox" id="m5" /><label for="m5"><span class="tt">Send your voice through</span><span class="td">OBS → Settings → Audio → set <b>Monitoring Device</b> to <i>BlackHole 2ch</i>. Then right-click the Media Source → Advanced Audio Properties → set Audio Monitoring to <b>Monitor Only</b>.</span></label></li>
+        </ul>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn primary block lg" data-next>Next: check it works →</button>
+      <button class="backlink" data-back>← Back</button>
+    </div>
+  </section>
+
+  <!-- 7 CHECK -->
+  <section class="screen" data-screen="check" hidden>
+    <div class="heroic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg></div>
+    <div class="eyebrow">Step 5 of 5 · Go</div>
+    <h1 class="title">Let's check it works.</h1>
+    <p class="lead">Do this <b>on the far-away laptop, in Chrome</b>. Pick <b>OBS Virtual Camera</b> and <b>BlackHole 2ch</b> below. See your face and a moving bar? You're ready.</p>
+    <div class="body">
+      <div class="card">
+        <div class="videobox">
+          <video id="test-video" playsinline autoplay muted hidden></video>
+          <div class="ph" id="test-ph">Tap "Start the check" to try your camera and microphone.</div>
+        </div>
+        <div class="picker">
+          <div class="field"><label for="test-cam">Camera</label><select id="test-cam"><option>Start the check to see cameras</option></select></div>
+          <div class="field"><label for="test-mic">Microphone</label><select id="test-mic"><option>Start the check to see microphones</option></select></div>
+          <div class="field"><label>Voice level <span class="desc" style="display:inline">— talk and watch it move</span></label><div class="meter" aria-hidden="true"><i id="test-meter"></i></div></div>
+          <button class="btn primary block" id="test-btn">Start the check</button>
+          <p class="desc" id="test-msg" style="color:var(--muted);font-size:14px"></p>
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn primary block lg" data-next>It works — how do I join? →</button>
+      <button class="backlink" data-back>← Back</button>
+    </div>
+  </section>
+
+  <!-- 8 JOIN -->
+  <section class="screen" data-screen="join" hidden>
+    <div class="heroic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 10l4.5-4.5M20 4v5h-5"/><path d="M4 20a16 16 0 0 1 12-16"/><rect x="2" y="14" width="8" height="8" rx="2"/></svg></div>
+    <div class="eyebrow">The call</div>
+    <h1 class="title">Join the meeting.</h1>
+    <p class="lead">On the far-away laptop, open the meeting link in <b>Chrome</b> (not Safari — Safari hides the camera).</p>
+    <div class="body">
+      <div class="card">
+        <ol class="todo">
+          <li><input type="checkbox" id="j1" /><label for="j1"><span class="tt">Make sure OBS is running</span><span class="td">"Start Virtual Camera" should already be on <i>before</i> you open the meeting. If the page is already open, reload it.</span></label></li>
+          <li><input type="checkbox" id="j2" /><label for="j2"><span class="tt">Open the meeting &amp; click "Allow"</span><span class="td">When Chrome asks for camera and microphone, allow it.</span></label></li>
+          <li><input type="checkbox" id="j3" /><label for="j3"><span class="tt">Choose your devices</span><span class="td">Camera → <b>OBS Virtual Camera</b>. Microphone → <b>BlackHole 2ch</b>. Speaker → the laptop's normal output, so you hear everyone through your remote-control app. No camera menu on the site? Click the little camera icon in Chrome's address bar.</span></label></li>
+        </ol>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn primary block lg" data-next>I'm in! →</button>
+      <button class="backlink" data-back>← Back</button>
+    </div>
+  </section>
+
+  <!-- 9 DONE -->
+  <section class="screen" data-screen="done" hidden>
+    <svg class="celebrate" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46"/><path d="M30 52l14 14 28-30"/></svg>
+    <div class="eyebrow">All set</div>
+    <h1 class="title">You're on the call — as you.</h1>
+    <p class="lead">Your face and voice come from your computer; the meeting sees the far-away laptop. Nicely done.</p>
+    <div class="body">
+      <div class="card">
+        <div class="recap">
+          <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg><div>Keep <b>OBS running</b> for the whole meeting.</div></div>
+          <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg><div>Expect a <b>slight delay</b> — your video travels a long way. Turn your camera down a notch if it stutters.</div></div>
+          <div class="ri"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg><div>Next time, you can jump straight to <b>“Turn your camera on”</b> from the Steps menu.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn soft block lg" data-goto="camera">Set up for another call</button>
+      <button class="backlink" data-goto="welcome">Back to start</button>
+    </div>
+  </section>
+
+</main>
 
 <div class="toast" id="toast" role="status" aria-live="polite">Copied</div>
 
 <script>
 (function () {
   "use strict";
-
-  var STEPS = [
-    { key: "overview", label: "Overview", num: "" },
-    { key: "settings", label: "Your details", num: "1" },
-    { key: "server", label: "The server", num: "2" },
-    { key: "california", label: "Send camera", num: "3" },
-    { key: "mac", label: "The India Mac", num: "4" },
-    { key: "join", label: "Test & join", num: "5" }
+  var SCREENS = [
+    { k: "welcome", t: "Welcome" }, { k: "how", t: "How it works" }, { k: "need", t: "What you need" },
+    { k: "details", t: "Your details" }, { k: "server", t: "The server" }, { k: "camera", t: "Turn camera on" },
+    { k: "mac", t: "The laptop" }, { k: "check", t: "Check it works" }, { k: "join", t: "Join" }, { k: "done", t: "Done" }
   ];
+  var idxOf = {}; SCREENS.forEach(function (s, i) { idxOf[s.k] = i; });
 
-  // ---------- storage ----------
-  var LS_S = "relayconsole.settings.v1";
-  var LS_C = "relayconsole.checks.v1";
-  var LS_STEP = "relayconsole.step.v1";
+  var LS_S = "bridge.settings.v2", LS_C = "bridge.checks.v2", LS_I = "bridge.idx.v2";
   function load(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
   function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
-
   var settings = load(LS_S, { relayHost: "", relayPort: "8890", pubPass: "", viewPass: "", passphrase: "", quality: "720" });
   var checks = load(LS_C, {});
 
-  // ---------- helpers ----------
   function $(s, r) { return (r || document).querySelector(s); }
   function $all(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
-  function esc(s) { return String(s == null ? "" : s); }
+  function setText(id, t) { var e = document.getElementById(id); if (e) e.textContent = t; }
 
   function randPass() {
-    var b = new Uint8Array(18), h = "";
-    (crypto.getRandomValues ? crypto : { getRandomValues: function (a) { for (var i = 0; i < a.length; i++) a[i] = Math.floor(Math.random() * 256); } }).getRandomValues(b);
-    for (var i = 0; i < b.length; i++) h += b[i].toString(16).padStart(2, "0");
-    return h;
+    var b = new Uint8Array(16), h = "", g = (window.crypto && crypto.getRandomValues) ? crypto : { getRandomValues: function (a) { for (var i = 0; i < a.length; i++) a[i] = (Math.random() * 256) | 0; } };
+    g.getRandomValues(b); for (var i = 0; i < b.length; i++) h += b[i].toString(16).padStart(2, "0"); return h;
   }
-
-  function qualityParams(q) {
-    if (q === "1080") return { size: "1920x1080", rate: "30", bitrate: "4500k" };
-    if (q === "low") return { size: "854x480", rate: "24", bitrate: "1200k" };
-    return { size: "1280x720", rate: "30", bitrate: "2500k" };
-  }
+  function qp(q) { return q === "1080" ? { s: "1920x1080", r: "30", b: "4500k" } : q === "low" ? { s: "854x480", r: "24", b: "1200k" } : { s: "1280x720", r: "30", b: "2500k" }; }
 
   var caOS = "mac";
-
   function build() {
-    var host = settings.relayHost || "YOUR-SERVER-ADDRESS";
-    var port = settings.relayPort || "8890";
-    var pub = settings.pubPass || "SENDING-PASSWORD";
-    var view = settings.viewPass || "VIEWING-PASSWORD";
-    var pass = settings.passphrase || "";
-    var enc = pass ? "&passphrase=" + pass + "&pbkeylen=16" : "";
-    var q = qualityParams(settings.quality);
-
+    var host = settings.relayHost || "YOUR-SERVER-ADDRESS", port = settings.relayPort || "8890";
+    var pub = settings.pubPass || "SENDING-CODE", view = settings.viewPass || "RECEIVING-CODE", pass = settings.passphrase || "";
+    var enc = pass ? "&passphrase=" + pass + "&pbkeylen=16" : "", q = qp(settings.quality);
     var pubURL = "srt://" + host + ":" + port + "?streamid=publish:cam:publisher:" + pub + enc;
     var viewURL = "srt://" + host + ":" + port + "?streamid=read:cam:viewer:" + view + enc;
-
-    var yml =
-      "logLevel: info\n\n" +
-      "srt: yes\n" +
-      "srtAddress: :" + port + "\n" +
-      "rtmp: yes\n" +
-      "rtmpAddress: :1935\n" +
-      "rtsp: no\nhls: no\nwebrtc: no\napi: no\n\n" +
-      "authInternalUsers:\n" +
-      "  - user: publisher\n    pass: " + pub + "\n    ips: []\n    permissions:\n      - action: publish\n        path: cam\n" +
-      "  - user: viewer\n    pass: " + view + "\n    ips: []\n    permissions:\n      - action: read\n        path: cam\n\n" +
-      "paths:\n  cam:\n    source: publisher\n";
-
-    var serverCmd =
-      "# 1) install Docker if you don't have it\n" +
-      "command -v docker >/dev/null || curl -fsSL https://get.docker.com | sh\n\n" +
-      "# 2) open the doors for the video\n" +
-      "sudo ufw allow 22/tcp && sudo ufw allow " + port + "/udp && sudo ufw allow 1935/tcp && sudo ufw --force enable\n\n" +
-      "# 3) start the relay (run in the folder with mediamtx.yml)\n" +
-      "docker run -d --name relay --restart unless-stopped --network host \\\n" +
-      "  -v \"$PWD/mediamtx.yml:/mediamtx.yml:ro\" bluenviron/mediamtx:latest";
-
-    var ffmpeg;
-    if (caOS === "linux") {
-      ffmpeg =
-        "ffmpeg -f v4l2 -framerate " + q.rate + " -video_size " + q.size + " -i /dev/video0 \\\n" +
-        "  -f alsa -i default \\\n" +
-        "  -c:v libx264 -preset veryfast -tune zerolatency -b:v " + q.bitrate + " -pix_fmt yuv420p -g 60 \\\n" +
-        "  -c:a aac -b:a 128k -ar 48000 \\\n" +
-        "  -f mpegts \"" + pubURL + "&pkt_size=1316\"";
-    } else {
-      ffmpeg =
-        "# list your devices first:  ffmpeg -f avfoundation -list_devices true -i \"\"\n" +
-        "ffmpeg -f avfoundation -framerate " + q.rate + " -video_size " + q.size + " -i \"0:0\" \\\n" +
-        "  -c:v libx264 -preset veryfast -tune zerolatency -b:v " + q.bitrate + " -pix_fmt yuv420p -g 60 \\\n" +
-        "  -c:a aac -b:a 128k -ar 48000 \\\n" +
-        "  -f mpegts \"" + pubURL + "&pkt_size=1316\"";
-    }
-
-    setText("out-yml", yml);
-    setText("out-server-cmd", serverCmd);
-    setText("out-pub-url", pubURL);
-    setText("out-view-url", viewURL);
-    setText("out-ffmpeg", ffmpeg);
-    var fn = $("#cmd-fname"); if (fn) fn.textContent = "terminal · " + (caOS === "linux" ? "Linux" : "macOS");
+    var yml = "logLevel: info\n\nsrt: yes\nsrtAddress: :" + port + "\nrtmp: yes\nrtmpAddress: :1935\nrtsp: no\nhls: no\nwebrtc: no\napi: no\n\nauthInternalUsers:\n  - user: publisher\n    pass: " + pub + "\n    ips: []\n    permissions:\n      - action: publish\n        path: cam\n  - user: viewer\n    pass: " + view + "\n    ips: []\n    permissions:\n      - action: read\n        path: cam\n\npaths:\n  cam:\n    source: publisher\n";
+    var cmd = "command -v docker >/dev/null || curl -fsSL https://get.docker.com | sh\nsudo ufw allow 22/tcp && sudo ufw allow " + port + "/udp && sudo ufw allow 1935/tcp && sudo ufw --force enable\ndocker run -d --name relay --restart unless-stopped --network host \\\n  -v \"$PWD/mediamtx.yml:/mediamtx.yml:ro\" bluenviron/mediamtx:latest";
+    var ff = caOS === "linux"
+      ? "ffmpeg -f v4l2 -framerate " + q.r + " -video_size " + q.s + " -i /dev/video0 \\\n  -f alsa -i default \\\n  -c:v libx264 -preset veryfast -tune zerolatency -b:v " + q.b + " -pix_fmt yuv420p -g 60 \\\n  -c:a aac -b:a 128k -ar 48000 -f mpegts \"" + pubURL + "&pkt_size=1316\""
+      : "ffmpeg -f avfoundation -framerate " + q.r + " -video_size " + q.s + " -i \"0:0\" \\\n  -c:v libx264 -preset veryfast -tune zerolatency -b:v " + q.b + " -pix_fmt yuv420p -g 60 \\\n  -c:a aac -b:a 128k -ar 48000 -f mpegts \"" + pubURL + "&pkt_size=1316\"";
+    setText("out-yml", yml); setText("out-server-cmd", cmd); setText("out-pub-url", pubURL); setText("out-view-url", viewURL); setText("out-ffmpeg", ff);
+    var fn = $("#cmd-fn"); if (fn) fn.textContent = "terminal · " + (caOS === "linux" ? "Linux" : "macOS");
+    var ok = $("#details-ok"); if (ok) ok.hidden = !(settings.relayHost && settings.pubPass && settings.viewPass);
   }
-  function setText(id, t) { var el = document.getElementById(id); if (el) el.textContent = t; }
 
-  // ---------- navigation ----------
-  var current = load(LS_STEP, "overview");
-  if (!STEPS.some(function (s) { return s.key === current; })) current = "overview";
-
-  function stepDone(key) {
-    if (key === "settings") return !!(settings.relayHost && settings.pubPass && settings.viewPass);
-    if (key === "mac") return ["m1", "m2", "m3", "m4", "m5"].every(function (k) { return checks[k]; });
+  // navigation
+  var cur = load(LS_I, 0); if (typeof cur !== "number" || cur < 0 || cur >= SCREENS.length) cur = 0;
+  function done(k) {
+    if (k === "details") return !!(settings.relayHost && settings.pubPass && settings.viewPass);
+    if (k === "mac") return ["m1", "m2", "m3", "m4", "m5"].every(function (x) { return checks[x]; });
     return false;
   }
-
-  function renderNav() {
-    var rail = $("#railnav"), chips = $("#chiprow");
-    rail.innerHTML = ""; chips.innerHTML = "";
-    STEPS.forEach(function (s) {
-      var done = stepDone(s.key);
-      var b = document.createElement("button");
-      b.className = "navbtn"; b.setAttribute("data-go", s.key);
-      if (s.key === current) b.setAttribute("aria-current", "true");
-      if (done) b.setAttribute("data-done", "1");
-      b.innerHTML =
-        '<span class="n">' + (s.num || "•") + '</span>' +
-        '<span>' + s.label + '</span>' +
-        '<svg class="tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>';
-      rail.appendChild(b);
-
-      var c = document.createElement("button");
-      c.className = "chip"; c.setAttribute("data-go", s.key);
-      if (s.key === current) c.setAttribute("aria-current", "true");
-      if (done) c.setAttribute("data-done", "1");
-      c.textContent = (s.num ? s.num + ". " : "") + s.label;
-      chips.appendChild(c);
+  function render() {
+    $all(".screen").forEach(function (s, i) { s.hidden = i !== cur; });
+    $("#bar").style.width = Math.round((cur) / (SCREENS.length - 1) * 100) + "%";
+    $("#stepof").textContent = (cur + 1) + " / " + SCREENS.length;
+    var jl = $("#jumplist"); jl.innerHTML = "";
+    SCREENS.forEach(function (s, i) {
+      var b = document.createElement("button"); b.className = "jump"; b.setAttribute("data-idx", i);
+      if (i === cur) b.setAttribute("aria-current", "true");
+      if (done(s.k)) b.setAttribute("data-done", "1");
+      b.innerHTML = '<span class="jn">' + (i + 1) + '</span><span class="jt-label">' + s.t + '</span><svg class="jt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>';
+      jl.appendChild(b);
     });
   }
-
-  function show(key) {
-    current = key; save(LS_STEP, key);
-    $all(".panel").forEach(function (p) { p.hidden = p.getAttribute("data-panel") !== key; });
-    renderNav();
-    var chip = $('.chip[data-go="' + key + '"]'); if (chip && chip.scrollIntoView) chip.scrollIntoView({ block: "nearest", inline: "center" });
-    try { $(".main").scrollTo ? window.scrollTo({ top: 0, behavior: "smooth" }) : window.scrollTo(0, 0); } catch (e) {}
-  }
+  function goIdx(i) { cur = Math.max(0, Math.min(SCREENS.length - 1, i)); save(LS_I, cur); render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  function goKey(k) { if (idxOf[k] != null) goIdx(idxOf[k]); }
 
   document.addEventListener("click", function (e) {
-    var go = e.target.closest("[data-go]");
-    if (go) { show(go.getAttribute("data-go")); return; }
+    var n = e.target.closest("[data-next]"); if (n) { goIdx(cur + 1); return; }
+    var b = e.target.closest("[data-back]"); if (b) { goIdx(cur - 1); return; }
+    var g = e.target.closest("[data-goto]"); if (g) { goKey(g.getAttribute("data-goto")); return; }
+    var j = e.target.closest("[data-idx]"); if (j) { goIdx(+j.getAttribute("data-idx")); closeSheet(); return; }
   });
 
-  // ---------- settings inputs ----------
-  function bind(id, key) {
-    var el = document.getElementById(id);
-    if (!el) return;
-    el.value = settings[key] || (key === "relayPort" ? "8890" : "");
-    el.addEventListener("input", function () { settings[key] = el.value.trim(); save(LS_S, settings); build(); renderNav(); });
-  }
-  bind("relayHost", "relayHost"); bind("relayPort", "relayPort");
-  bind("pubPass", "pubPass"); bind("viewPass", "viewPass"); bind("passphrase", "passphrase");
-  var qsel = $("#quality"); if (qsel) { qsel.value = settings.quality || "720"; qsel.addEventListener("change", function () { settings.quality = qsel.value; save(LS_S, settings); build(); }); }
+  // jump sheet
+  var sheet = $("#sheet");
+  function openSheet() { sheet.setAttribute("data-open", "1"); }
+  function closeSheet() { sheet.removeAttribute("data-open"); }
+  $("#menubtn").addEventListener("click", openSheet);
+  sheet.addEventListener("click", function (e) { if (e.target.hasAttribute("data-close")) closeSheet(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeSheet(); });
 
-  $all("[data-gen]").forEach(function (b) {
-    b.addEventListener("click", function () {
-      var key = b.getAttribute("data-gen"), p = randPass();
-      settings[key] = p; document.getElementById(key).value = p; save(LS_S, settings); build(); renderNav();
-      toast("Password created");
-    });
-  });
+  // settings bind
+  function bind(id, key) { var el = document.getElementById(id); if (!el) return; el.value = settings[key] || (key === "relayPort" ? "8890" : ""); el.addEventListener("input", function () { settings[key] = el.value.trim(); save(LS_S, settings); build(); render(); }); }
+  bind("relayHost", "relayHost"); bind("relayPort", "relayPort"); bind("pubPass", "pubPass"); bind("viewPass", "viewPass"); bind("passphrase", "passphrase");
+  var qs = $("#quality"); if (qs) { qs.value = settings.quality || "720"; qs.addEventListener("change", function () { settings.quality = qs.value; save(LS_S, settings); build(); }); }
+  $all("[data-gen]").forEach(function (btn) { btn.addEventListener("click", function () { var k = btn.getAttribute("data-gen"), p = randPass(); settings[k] = p; document.getElementById(k).value = p; save(LS_S, settings); build(); render(); toast("Code created"); }); });
+  $all("[data-os]").forEach(function (btn) { btn.addEventListener("click", function () { $all("[data-os]").forEach(function (b) { b.setAttribute("aria-pressed", b === btn ? "true" : "false"); }); caOS = btn.getAttribute("data-os"); build(); }); });
 
-  // ---------- checklist ----------
-  $all("#mac-check li").forEach(function (li) {
-    var key = li.getAttribute("data-key"), cb = li.querySelector("input");
-    cb.checked = !!checks[key];
-    li.setAttribute("data-checked", checks[key] ? "1" : "0");
-    cb.addEventListener("change", function () {
-      checks[key] = cb.checked; save(LS_C, checks);
-      li.setAttribute("data-checked", cb.checked ? "1" : "0");
-      renderNav();
-    });
-  });
+  // checklist
+  $all("#mac-check li").forEach(function (li) { var k = li.getAttribute("data-key"), cb = li.querySelector("input"); cb.checked = !!checks[k]; li.setAttribute("data-done", checks[k] ? "1" : "0"); cb.addEventListener("change", function () { checks[k] = cb.checked; save(LS_C, checks); li.setAttribute("data-done", cb.checked ? "1" : "0"); render(); }); });
 
-  // ---------- copy ----------
-  function copyText(t) {
-    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t);
-    return new Promise(function (res, rej) {
-      try { var ta = document.createElement("textarea"); ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta); res(); } catch (e) { rej(e); }
-    });
-  }
+  // copy
+  function copyText(t) { if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t); return new Promise(function (res, rej) { try { var ta = document.createElement("textarea"); ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta); res(); } catch (e) { rej(e); } }); }
   document.addEventListener("click", function (e) {
     var b = e.target.closest(".copy"); if (!b) return;
     var el = document.getElementById(b.getAttribute("data-copy")); if (!el) return;
-    copyText(el.textContent).then(function () {
-      b.classList.add("ok"); var old = b.innerHTML; b.innerHTML = "Copied ✓";
-      setTimeout(function () { b.classList.remove("ok"); b.innerHTML = old; }, 1400);
-      toast("Copied to clipboard");
-    }).catch(function () { toast("Press Ctrl/Cmd + C to copy"); });
+    copyText(el.textContent).then(function () { b.classList.add("ok"); var o = b.innerHTML; b.innerHTML = "Copied ✓"; setTimeout(function () { b.classList.remove("ok"); b.innerHTML = o; }, 1400); toast("Copied"); }).catch(function () { toast("Press Ctrl/Cmd + C"); });
   });
+  var toastEl = $("#toast"), tt; function toast(m) { toastEl.textContent = m; toastEl.classList.add("show"); clearTimeout(tt); tt = setTimeout(function () { toastEl.classList.remove("show"); }, 1600); }
 
-  var toastEl = $("#toast"), toastT;
-  function toast(msg) { toastEl.textContent = msg; toastEl.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(function () { toastEl.classList.remove("show"); }, 1700); }
-
-  // ---------- tabs (California) ----------
-  $all('[data-tab]').forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var group = btn.parentNode;
-      $all("[data-tab]", group).forEach(function (b) { b.setAttribute("aria-selected", b === btn ? "true" : "false"); });
-      var name = btn.getAttribute("data-tab");
-      $all("[data-tabpanel]").forEach(function (p) { if (p.getAttribute("data-tabpanel") === "ca-obs" || p.getAttribute("data-tabpanel") === "ca-cmd") p.hidden = p.getAttribute("data-tabpanel") !== name; });
-    });
-  });
-  $all('[data-os]').forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      $all("[data-os]").forEach(function (b) { b.setAttribute("aria-selected", b === btn ? "true" : "false"); });
-      caOS = btn.getAttribute("data-os"); build();
-    });
-  });
-
-  // ---------- camera preview (Step 3) ----------
-  var previewStream = null;
+  // camera preview
+  var prev = null;
   $("#preview-btn").addEventListener("click", function () {
-    var btn = this, v = $("#preview-video"), ph = $("#preview-ph");
-    if (previewStream) { previewStream.getTracks().forEach(function (t) { t.stop(); }); previewStream = null; v.hidden = true; ph.hidden = false; ph.textContent = "Preview off."; btn.textContent = "Turn on preview"; return; }
-    navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(function (s) {
-      previewStream = s; v.srcObject = s; v.hidden = false; ph.hidden = true; btn.textContent = "Turn off preview";
-    }).catch(function (err) {
-      ph.hidden = false; ph.textContent = "Couldn't open the camera here (" + (err && err.name || "blocked") + "). If you opened this inside an app, open it in a normal browser tab to preview.";
-    });
+    var v = $("#preview-video"), ph = $("#preview-ph"), btn = this;
+    if (prev) { prev.getTracks().forEach(function (t) { t.stop(); }); prev = null; v.hidden = true; ph.hidden = false; ph.textContent = "Camera off."; btn.textContent = "Show my camera"; return; }
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(function (s) { prev = s; v.srcObject = s; v.hidden = false; ph.hidden = true; btn.textContent = "Hide my camera"; }).catch(function (err) { ph.hidden = false; ph.textContent = "Couldn't open the camera here (" + (err && err.name || "blocked") + "). Open this page in a normal browser tab to preview."; });
   });
 
-  // ---------- device tester (Step 5) ----------
-  var testStream = null, audioCtx = null, rafId = null, sig = $("#sig"), sigM = $("#sig-m");
-  function setLive(on) { [sig, sigM].forEach(function (el) { if (el) el.setAttribute("data-live", on ? "1" : "0"); }); }
-
-  function listDevices() {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
-    navigator.mediaDevices.enumerateDevices().then(function (devs) {
-      var cams = devs.filter(function (d) { return d.kind === "videoinput"; });
-      var mics = devs.filter(function (d) { return d.kind === "audioinput"; });
-      fillSel($("#test-cam"), cams, "Camera");
-      fillSel($("#test-mic"), mics, "Microphone");
-    });
-  }
-  function fillSel(sel, devs, label) {
-    if (!sel) return;
-    var cur = sel.value;
-    sel.innerHTML = "";
-    if (!devs.length) { var o = document.createElement("option"); o.textContent = "No " + label.toLowerCase() + " found"; sel.appendChild(o); return; }
-    devs.forEach(function (d, i) { var o = document.createElement("option"); o.value = d.deviceId; o.textContent = d.label || (label + " " + (i + 1)); sel.appendChild(o); });
-    if (cur) sel.value = cur;
-  }
-
+  // device tester
+  var tStream = null, aCtx = null, raf = null, dot = $(".badge .dot");
+  function live(on) { if (dot) dot.style.background = on ? "var(--live)" : "var(--accent)"; }
+  function listDevices() { if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return; navigator.mediaDevices.enumerateDevices().then(function (d) { fill($("#test-cam"), d.filter(function (x) { return x.kind === "videoinput"; }), "Camera"); fill($("#test-mic"), d.filter(function (x) { return x.kind === "audioinput"; }), "Microphone"); }); }
+  function fill(sel, devs, label) { if (!sel) return; var cur2 = sel.value; sel.innerHTML = ""; if (!devs.length) { var o = document.createElement("option"); o.textContent = "No " + label.toLowerCase() + " found"; sel.appendChild(o); return; } devs.forEach(function (d, i) { var o = document.createElement("option"); o.value = d.deviceId; o.textContent = d.label || (label + " " + (i + 1)); sel.appendChild(o); }); if (cur2) sel.value = cur2; }
+  function stopStream() { if (tStream) { tStream.getTracks().forEach(function (t) { t.stop(); }); tStream = null; } if (raf) { cancelAnimationFrame(raf); raf = null; } if (aCtx) { try { aCtx.close(); } catch (e) {} aCtx = null; } }
   function startTest() {
     var cam = $("#test-cam").value, mic = $("#test-mic").value;
-    var constraints = {
-      video: cam ? { deviceId: { exact: cam } } : true,
-      audio: mic ? { deviceId: { exact: mic } } : true
-    };
-    stopStreamOnly();
-    navigator.mediaDevices.getUserMedia(constraints).then(function (s) {
-      testStream = s;
-      var v = $("#test-video"); v.srcObject = s; v.hidden = false; $("#test-ph").hidden = true;
-      $("#test-btn").textContent = "Stop test"; setLive(true);
-      $("#test-msg").textContent = "Live. See your face and watch the bar move as you talk. If the camera list doesn't show \"OBS Virtual Camera\", make sure it's started in OBS, then press Start test again.";
-      listDevices();
-      meter(s);
-    }).catch(function (err) {
-      $("#test-ph").hidden = false;
-      $("#test-msg").textContent = "Couldn't open camera/mic here (" + (err && err.name || "blocked") + "). This test needs a normal browser tab with permission — open this page directly in Chrome on the Mac. The setup steps still work regardless.";
-    });
+    stopStream();
+    navigator.mediaDevices.getUserMedia({ video: cam ? { deviceId: { exact: cam } } : true, audio: mic ? { deviceId: { exact: mic } } : true }).then(function (s) {
+      tStream = s; var v = $("#test-video"); v.srcObject = s; v.hidden = false; $("#test-ph").hidden = true; $("#test-btn").textContent = "Stop the check"; live(true);
+      $("#test-msg").textContent = "Live! If the Camera list doesn't show “OBS Virtual Camera”, start it in OBS and tap the check again.";
+      listDevices(); meter(s);
+    }).catch(function (err) { $("#test-ph").hidden = false; $("#test-msg").textContent = "Couldn't open camera/mic here (" + (err && err.name || "blocked") + "). This needs a normal browser tab with permission — open this page directly in Chrome on the laptop."; });
   }
-  function meter(stream) {
-    try {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      var src = audioCtx.createMediaStreamSource(stream);
-      var an = audioCtx.createAnalyser(); an.fftSize = 512; src.connect(an);
-      var data = new Uint8Array(an.frequencyBinCount), bar = $("#test-meter");
-      (function loop() {
-        an.getByteTimeDomainData(data);
-        var peak = 0; for (var i = 0; i < data.length; i++) { var d = Math.abs(data[i] - 128); if (d > peak) peak = d; }
-        bar.style.width = Math.min(100, Math.round((peak / 128) * 140)) + "%";
-        rafId = requestAnimationFrame(loop);
-      })();
-    } catch (e) {}
-  }
-  function stopStreamOnly() {
-    if (testStream) { testStream.getTracks().forEach(function (t) { t.stop(); }); testStream = null; }
-    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-    if (audioCtx) { try { audioCtx.close(); } catch (e) {} audioCtx = null; }
-  }
-  function stopTest() {
-    stopStreamOnly();
-    $("#test-video").hidden = true; $("#test-ph").hidden = false; $("#test-meter").style.width = "0%";
-    $("#test-btn").textContent = "Start test"; setLive(false);
-    $("#test-msg").textContent = "";
-  }
-  $("#test-btn").addEventListener("click", function () { testStream ? stopTest() : startTest(); });
-  ["#test-cam", "#test-mic"].forEach(function (s) { var el = $(s); el.addEventListener("change", function () { if (testStream) startTest(); }); });
+  function meter(s) { try { aCtx = new (window.AudioContext || window.webkitAudioContext)(); var src = aCtx.createMediaStreamSource(s), an = aCtx.createAnalyser(); an.fftSize = 512; src.connect(an); var data = new Uint8Array(an.frequencyBinCount), bar = $("#test-meter"); (function loop() { an.getByteTimeDomainData(data); var pk = 0; for (var i = 0; i < data.length; i++) { var d = Math.abs(data[i] - 128); if (d > pk) pk = d; } bar.style.width = Math.min(100, Math.round(pk / 128 * 140)) + "%"; raf = requestAnimationFrame(loop); })(); } catch (e) {} }
+  function stopTest() { stopStream(); $("#test-video").hidden = true; $("#test-ph").hidden = false; $("#test-meter").style.width = "0%"; $("#test-btn").textContent = "Start the check"; live(false); $("#test-msg").textContent = ""; }
+  $("#test-btn").addEventListener("click", function () { tStream ? stopTest() : startTest(); });
+  ["#test-cam", "#test-mic"].forEach(function (s) { $(s).addEventListener("change", function () { if (tStream) startTest(); }); });
 
-  // ---------- init ----------
-  build();
-  show(current);
+  build(); render();
 })();
 </script>
