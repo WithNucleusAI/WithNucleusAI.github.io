@@ -52,17 +52,48 @@ Or download OBS from obsproject.com and BlackHole from existential.audio.
      meeting as an echo.
 
 ## 5. Join the meeting (on the Mac, via your remote session)
-Start the OBS Virtual Camera **before** opening the meeting app so it's listed.
-Then in the meeting app set:
+Start the OBS Virtual Camera **before** opening the meeting app/portal so it's
+listed. Then set:
 - **Camera → OBS Virtual Camera**
 - **Microphone → BlackHole 2ch**
 - **Speaker → the Mac's normal output** (MacBook Speakers / headphones) so your
   remote-desktop tool relays the meeting audio back to California.
 
-If the app doesn't show the virtual camera or BlackHole, fully **quit and reopen
-the app** (most apps enumerate devices only at launch).
+If a native app doesn't show the virtual camera or BlackHole, fully **quit and
+reopen the app**; in a browser, **reload the tab** (devices are enumerated only
+at launch / page load).
 
-### Per-platform device menus
+**This meeting is on a private web portal — use the browser steps just below.**
+
+### Private / custom web portal — your case (joins in a browser)
+A private portal runs in a **web browser** (it uses the browser's camera/mic via
+WebRTC), so device selection happens in the browser + the site's own controls,
+not a native app. The portal runs on the MacBook, so it sees the **India IP** —
+no change to the geo side.
+
+1. **Use Chrome** (or another Chromium browser, or Firefox) — **not Safari**.
+   Safari filters out virtual cameras, so OBS Virtual Camera often won't appear;
+   Chrome/Firefox enumerate it reliably.
+2. macOS **System Settings → Privacy & Security** → give that **browser** Camera
+   **and** Microphone permission.
+3. **Start OBS Virtual Camera (and confirm BlackHole) BEFORE opening the portal.**
+   Browsers list devices at page load — if the portal tab is already open,
+   **reload it** after OBS is running.
+4. Open the portal; when the browser prompts, **Allow** camera + microphone.
+5. Pick the devices:
+   - **Portal has its own camera/mic dropdown** (a gear/settings or a pre-join
+     screen): choose **OBS Virtual Camera** and **BlackHole 2ch**.
+   - **Portal has no picker** (uses browser defaults): click the **camera icon in
+     Chrome's address bar** → set this site's camera = *OBS Virtual Camera*, mic =
+     *BlackHole 2ch*. Global defaults live at `chrome://settings/content/camera`
+     and `chrome://settings/content/microphone`; you can also force the mic
+     default via macOS **System Settings → Sound → Input → BlackHole 2ch**.
+   - **Speaker:** leave on the Mac's normal output so your remote-desktop tool
+     relays the meeting audio back to you.
+6. Face/voice not showing? **Reload the portal tab** with OBS Virtual Camera
+   already running, then re-grant permission.
+
+### Per-platform device menus (reference, if it turns out to be a known app)
 - **Zoom:** Settings → **Video** → Camera → *OBS Virtual Camera*; **Audio** →
   Microphone → *BlackHole 2ch*, Speaker → *MacBook Speakers*. Update Zoom to the
   latest build if the virtual camera is hidden.
@@ -86,4 +117,7 @@ the app** (most apps enumerate devices only at launch).
 | No "BlackHole 2ch" option | Reinstall `brew install blackhole-2ch`; log out/in. Confirm it shows in *Audio MIDI Setup*. |
 | You hear an echo of yourself | The Media Source audio must be **Monitor Only (mute output)**, not *Monitor and Output*. |
 | You can't hear the meeting | Meeting **Speaker** must be the Mac's real output, and your remote-desktop tool must have audio relay enabled (use Chrome Remote Desktop / AnyDesk, not plain VNC). |
-| Camera is black in the meeting | Grant the meeting app Camera permission in Privacy & Security; verify OBS shows the feed first. |
+| Camera is black in the meeting | Grant the meeting app/browser Camera permission in Privacy & Security; verify OBS shows the feed first. |
+| Portal (browser) shows no OBS Virtual Camera | You're likely in **Safari** — switch to **Chrome/Firefox**. Or the tab loaded before OBS started — **reload** it. |
+| Portal uses the Mac's real webcam, not yours | Pick *OBS Virtual Camera* via the **address-bar camera icon** in Chrome (or the portal's own device dropdown); check the site isn't pinned to a different default. |
+| Portal won't re-prompt for devices | Reset this site's permission (address-bar site settings → reset), then reload and Allow again. |
