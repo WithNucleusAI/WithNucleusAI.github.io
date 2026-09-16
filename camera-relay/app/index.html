@@ -359,21 +359,28 @@
     <div class="heroic sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.3 2.4a1 1 0 0 1-.9 1.6H3.6a1 1 0 0 1-.9-1.6L4 16"/><circle cx="8" cy="10" r="1"/></svg></div>
     <div class="eyebrow">Step 2 of 5 · Set up</div>
     <h1 class="title">The helper server.</h1>
-    <p class="lead">This is the only techie part, and it's done <b>once</b>. If a friend is helping, you can skip it — just tap the button.</p>
+    <p class="lead">This is the only techie part, and it's done <b>once</b> — really just one paste, no commands to type. If a friend is handling it, tap skip.</p>
     <div class="body">
+      <div class="analogy">
+        <div class="astep"><div class="num">1</div><div><div class="at">Rent a small server</div><div class="ad">Any cloud provider works. Pick a location near the country you need (for India, <b>Mumbai</b>). The smallest, cheapest size is plenty.</div></div></div>
+        <div class="astep"><div class="num">2</div><div><div class="at">Paste the script below into its "startup" box</div><div class="ad">While creating the server there's a box called <b>User data</b>, <b>Startup Script</b>, or <b>Cloud-Config</b> (often under "Advanced"). Paste the whole thing there — the server then sets itself up on its own.</div></div></div>
+        <div class="astep"><div class="num">3</div><div><div class="at">Copy its address into Step 1</div><div class="ad">Give it about a minute to start, then copy the server's IP address into "Server address" back in Step 1.</div></div></div>
+      </div>
+
+      <div class="code"><div class="ch"><span class="fn">startup script — copy all of it</span><button class="copy" data-copy="out-cloudinit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button></div><pre id="out-cloudinit" class="wrap"></pre></div>
+
       <div class="tip mint">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16v-4m0-4h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z"/></svg>
-        <div>Rent a small server (for India, choose a <b>Mumbai</b> location) from any cloud provider, then follow the two parts below on it.</div>
+        <div>The script opens the doors it needs by itself. If your provider has a <b>separate firewall</b> page, also allow <b>UDP 8890</b> and <b>TCP 1935</b> there.</div>
       </div>
 
       <details class="reveal">
-        <summary>Show me how to set it up<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <summary>Rather set it up by hand over SSH?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></summary>
         <div class="rev-body">
           <p class="desc" style="margin:4px 0 0;color:var(--muted);font-size:14px"><b>A.</b> Save this on the server as a file named <b>mediamtx.yml</b>:</p>
           <div class="code"><div class="ch"><span class="fn">mediamtx.yml</span><button class="copy" data-copy="out-yml"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button></div><pre id="out-yml" class="wrap"></pre></div>
-          <p class="desc" style="margin:14px 0 0;color:var(--muted);font-size:14px"><b>B.</b> Run these on the server to switch it on:</p>
+          <p class="desc" style="margin:14px 0 0;color:var(--muted);font-size:14px"><b>B.</b> Then run these to switch it on:</p>
           <div class="code"><div class="ch"><span class="fn">terminal · on the server</span><button class="copy" data-copy="out-server-cmd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button></div><pre id="out-server-cmd" class="wrap"></pre></div>
-          <p class="desc" style="margin:12px 0 0;color:var(--muted);font-size:13.5px">Also open ports <b>8890 (UDP)</b> and <b>1935 (TCP)</b> in the provider's firewall. Then put the server's address into Step 1.</p>
         </div>
       </details>
     </div>
@@ -558,10 +565,11 @@ brew install blackhole-2ch</pre></div>
     var viewURL = "srt://" + host + ":" + port + "?streamid=read:cam:viewer:" + view + enc;
     var yml = "logLevel: info\n\nsrt: yes\nsrtAddress: :" + port + "\nrtmp: yes\nrtmpAddress: :1935\nrtsp: no\nhls: no\nwebrtc: no\napi: no\n\nauthInternalUsers:\n  - user: publisher\n    pass: " + pub + "\n    ips: []\n    permissions:\n      - action: publish\n        path: cam\n  - user: viewer\n    pass: " + view + "\n    ips: []\n    permissions:\n      - action: read\n        path: cam\n\npaths:\n  cam:\n    source: publisher\n";
     var cmd = "command -v docker >/dev/null || curl -fsSL https://get.docker.com | sh\nsudo ufw allow 22/tcp && sudo ufw allow " + port + "/udp && sudo ufw allow 1935/tcp && sudo ufw --force enable\ndocker run -d --name relay --restart unless-stopped --network host \\\n  -v \"$PWD/mediamtx.yml:/mediamtx.yml:ro\" bluenviron/mediamtx:latest";
+    var ci = "#!/bin/bash\nset -e\nexport DEBIAN_FRONTEND=noninteractive\n# Camera Bridge relay - sets itself up automatically on first boot.\n\ncommand -v docker >/dev/null 2>&1 || curl -fsSL https://get.docker.com | sh\n\ncat >/root/mediamtx.yml <<'YML'\n" + yml + "YML\n\nif command -v ufw >/dev/null 2>&1; then ufw allow 22/tcp; ufw allow " + port + "/udp; ufw allow 1935/tcp; ufw --force enable; fi\n\ndocker rm -f relay 2>/dev/null || true\ndocker run -d --name relay --restart unless-stopped --network host \\\n  -v /root/mediamtx.yml:/mediamtx.yml:ro bluenviron/mediamtx:latest\n";
     var ff = caOS === "linux"
       ? "ffmpeg -f v4l2 -framerate " + q.r + " -video_size " + q.s + " -i /dev/video0 \\\n  -f alsa -i default \\\n  -c:v libx264 -preset veryfast -tune zerolatency -b:v " + q.b + " -pix_fmt yuv420p -g 60 \\\n  -c:a aac -b:a 128k -ar 48000 -f mpegts \"" + pubURL + "&pkt_size=1316\""
       : "ffmpeg -f avfoundation -framerate " + q.r + " -video_size " + q.s + " -i \"0:0\" \\\n  -c:v libx264 -preset veryfast -tune zerolatency -b:v " + q.b + " -pix_fmt yuv420p -g 60 \\\n  -c:a aac -b:a 128k -ar 48000 -f mpegts \"" + pubURL + "&pkt_size=1316\"";
-    setText("out-yml", yml); setText("out-server-cmd", cmd); setText("out-pub-url", pubURL); setText("out-view-url", viewURL); setText("out-ffmpeg", ff);
+    setText("out-yml", yml); setText("out-server-cmd", cmd); setText("out-cloudinit", ci); setText("out-pub-url", pubURL); setText("out-view-url", viewURL); setText("out-ffmpeg", ff);
     var fn = $("#cmd-fn"); if (fn) fn.textContent = "terminal · " + (caOS === "linux" ? "Linux" : "macOS");
     var ok = $("#details-ok"); if (ok) ok.hidden = !(settings.relayHost && settings.pubPass && settings.viewPass);
   }

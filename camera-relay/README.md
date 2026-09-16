@@ -70,6 +70,18 @@ is not a VPN.
 
 ## Step 1 — Stand up the relay (VPS)
 
+The relay is a small public-IP server (~$5/mo, put it near the target country —
+for India, Mumbai) that both machines connect out to; it only forwards the
+camera stream, so it is not a VPN.
+
+**Easiest — one paste, no SSH.** Fill your two codes into
+[`relay/cloud-init.sh`](relay/cloud-init.sh) (or let the guided app generate a
+ready-filled copy), then paste the whole script into the provider's **User data
+/ Startup Script / Cloud-Config** box when creating the server. It installs
+Docker, writes the config, opens the ports, and starts MediaMTX on first boot.
+Give it ~1 minute, then use the server's public IP as `RELAY_IP`.
+
+**Or by hand over SSH:**
 ```bash
 # 1. Put strong passwords in the config:
 cd camera-relay/relay
@@ -84,7 +96,8 @@ ssh user@RELAY_IP 'cd ~/relay && sudo bash setup-relay.sh'
 
 `setup-relay.sh` installs Docker, opens UDP/8890 (SRT) + TCP/1935 (RTMP), and
 starts MediaMTX. Note the VPS **public IP** it prints — it goes in every stream
-URL below. Also open those ports in your cloud provider's security group.
+URL below. Either way, if your provider has a **separate** cloud firewall /
+security group, open UDP/8890 and TCP/1935 there too.
 
 ## Step 2 — Fill in shared config (both laptops)
 
@@ -220,6 +233,7 @@ camera-relay/
 │   └── index.html                   # the guided web console (easy mode)
 ├── config.env.example               # shared IP + passwords (copy to config.env)
 ├── relay/
+│   ├── cloud-init.sh                # one-paste startup script (self-configures on boot)
 │   ├── mediamtx.yml                 # SRT/RTMP relay config + auth
 │   ├── docker-compose.yml           # run MediaMTX on the VPS
 │   └── setup-relay.sh               # provision the VPS (docker + firewall)
